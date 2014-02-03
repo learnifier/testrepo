@@ -1,0 +1,100 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_reports').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+        require(['dabox-datatables'], function() {
+        var oTable = $('#listreports').dataTable({
+            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
+            "bPaginate": false,
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [ 
+                {
+                    "sWidth": "70%",
+                    "mDataProp": "name",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.name;
+                    },
+                    "aTargets": [ 0 ]
+                }
+            ],
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "No reports your query",
+                "sLoadingRecords": "<p>Loading reports...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#listreports_filter input').attr('placeholder', 'Search reports');
+    } );
+                
+</script>
+
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<h1>Reports</h1>
+
+<section class="list">
+    <table class="list" id="listreports">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
+            </tr>
+            <tr>
+                <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
+            </tr>
+            <tr>
+                <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
+            </tr>
+<!--            <tr>
+                <td>Participant completion status</td>
+            </tr>
+            <tr>
+                <td>Participant completion rate</td>
+            </tr>
+            <tr>
+                <td>Participants - Overdue activities</td>
+            </tr>
+            <tr>
+                <td>Participants  - Not yet invited</td>
+            </tr>
+            <tr>
+                <td>Bounce backs - Unresolved</td>
+            </tr>
+            <tr>
+                <td>Bounce backs - All over time (including resolved)</td>
+            </tr>
+            <tr>
+                <td>Materials - Completion rate</td>
+            </tr>
+            <tr>
+                <td>Materials - Usage</td>
+            </tr>
+            <tr>
+                <td>Credits - All by status</td>
+            </tr>
+            <tr>
+                <td>Credits - All per status</td>
+            </tr>
+            <tr>
+                <td>Credits - All per product</td>
+            </tr>-->
+        </tbody>
+    </table>
+</section>
+
+[/@dws.skin]
+

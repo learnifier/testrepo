@@ -1,0 +1,20 @@
+[#ftl strip_text="true" /]
+
+[@dws.skin skin="CPMultiOrg" menu=menu head=cpweb_head foot=foot orgName=""]
+
+<div class="grid_16">
+    <ul class="selectorglist">
+        [#list orgs as org]
+        <li>
+            <a href="${helper.urlFor('CpMainModule','home',[org.orgId])}">
+                <p class="arrow">»</p>
+                <img src="${org.logo!cocoboxCdn +'/cocobox/img/cp/defaultLogo.png'}" />
+                <h1 title="${infoHelper.getMiniOrgInfo(org.orgId).displayName}">[@common.trunc str=infoHelper.getMiniOrgInfo(org.orgId).displayName maxLen=20 /]</h1>
+            </a>
+        </li>
+        [/#list]
+    </ul>
+</div>
+
+
+[/@dws.skin]

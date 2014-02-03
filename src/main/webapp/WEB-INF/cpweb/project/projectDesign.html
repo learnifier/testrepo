@@ -1,0 +1,43 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<article class="projectdesign">
+
+[@pInfo.projectInfo selected="design"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.design.title" /]</h2>
+
+<section class="action">
+	
+    <form action="${helper.urlFor('ProjectModule','viewDesign',[prj.projectId])}" method="post">
+        <button type="submit" class="edit primary"><span>View Layout</span>
+            <span style="font-size: 10px; display:block; white-space: normal; line-height: 12px; font-weight: light; color: #999; text-shadow: 0px 1px #fff;">View the layout in the Course Builder Application without. You will not be able to make any changes to the layout.</span>
+            <div><img src="${cocoboxCdn}/cocobox/img/cp/cb_screenshot.png" style="width: 200px; margin: 0 auto;" /></div>
+        </button>
+    </form>
+
+    <form action="${helper.urlFor('ProjectModule','gotoDesignBuilder',[prj.projectId])}" method="post">
+        <button type="submit" class="edit primary"><span>Edit Layout</span>
+            <span style="font-size: 10px; display:block; white-space: normal; line-height: 12px; font-weight: light; color: #999; text-shadow: 0px 1px #fff;">Edit the layout in the Course Builder Application then, come back to this page to edit your details.</span>
+            <div><img src="${cocoboxCdn}/cocobox/img/cp/cb_screenshot.png" style="width: 200px; margin: 0 auto;" /></div>
+        </button>
+    </form>
+
+</section>
+
+</article>
+
+
+
+[/@dws.skin]
+

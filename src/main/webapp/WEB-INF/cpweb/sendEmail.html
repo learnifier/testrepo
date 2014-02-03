@@ -1,0 +1,136 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+
+    function fetchTemplate(id) {
+        $.post("${helper.urlFor('MailJsonModule','getTemplate')}", {"templateId": id}, function(response) {
+            $("#subject").val(response.subject);
+            $("#body").val(response.body);
+            $("#mtype").val(response.mtype);
+
+        });
+    }
+
+    $('#templates').on('change', function() {
+        if (this.value == '') {
+            $("#subject").val("");
+            $("#body").val("");
+            $("#mtype").val("");
+            return;
+        }
+
+        fetchTemplate(this.value);
+    });
+
+    [#if stickyTemplateId??]
+    $(function() {
+        fetchTemplate(${stickyTemplateId});
+    });
+    [/#if]
+
+</script>
+
+[#import "/se/dabox/services/dwsfu/ckeditor4.ftl" as ck /]
+
+[@ck.ckeditorScriptTags /]
+[@ck.initCkeditor target="#body" /]
+
+<script type="text/javascript">
+    $(function() {
+        $("#emailform").submit(function(event) {
+            var body = $('#body');
+            body.ckeditorGet().updateElement();
+
+            if (body.val().length == 0) {
+                cocobox.errorDialog('No email content','You must enter a e-mail body');
+                event.stopPropagation();
+                return false;
+            }
+
+            require(['dabox-common', 'dabox-jquery'], function() {
+                cocobox.longOp();
+                $("#submitbutton").cocobox('inputBlock');
+            });
+        })
+    });
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[#assign counter=1 /]
+[#include "allocationFailure.html" /]
+
+<section id="sendemail">
+
+    <h1>Send Email</h1>
+    [#-- Only display if we don't have a sticky id --]
+    [#if !stickyTemplateId??]
+    <div id="selecttemplate">   
+        <h2>${counter} Select Email Template</h2>
+        <label for="templates">Email Templates</label>
+        <select id="templates" class="input_full">
+            <option value="">No Template</option>
+            <optgroup label="Generic templates">
+                [#list templateLists.stickyList as template]
+                <option value="${template.id}">${template.name}</option>
+                [/#list]
+            </optgroup>
+            <optgroup label="Custom templates">
+                [#list templateLists.unstickyList as template]
+                <option value="${template.id}">${template.name}</option>
+                [/#list]
+            </optgroup>
+        </select>
+    </div>
+    [#assign counter = counter + 1 /]
+    [/#if]
+    <div id="composeemail">   
+        <h2>${counter} Compose and Send Email</h2>
+        <div>
+
+            [#global formPrefix="meweb.createemail" /]
+            <form action="${formLink}" name="email" id="emailform" class="fullpage" method="post">
+                [@mbform.alertsection]
+                [/@mbform.alertsection]
+                <section class="field clearfix">
+                    <div class="column">
+
+                        <fieldset>
+
+                            <label for="to">To</label>
+                            <ul id="to">
+                                [#list receivers as receiver]
+                                    <li>${receiver.displayName?xhtml} &lt;${receiver.primaryEmail?xhtml}&gt;</li>
+                                [/#list]
+                            </ul>
+                            [#if sender??]
+                                <label for="from">From</label>
+                                <p id="from">${sender.name?xhtml} &lt;${sender.email?xhtml}&gt;</p>
+                            [/#if]
+
+                            [@mbform.inputText name="subject" class="input_full"  tabindex="5" /]
+                            [@mbform.textarea name="body" tabindex="6" /]
+
+                        </fieldset>
+                    </div>
+                </section>
+                [@mbform.infosection]
+                [/@mbform.infosection]
+                <section class="action">
+                    <input type="hidden" name="mtype" />
+                    <button id="submitbutton" tabindex="7" class="primary send"><span>[@dws.txt key='form.action.sendemail' /]</span></button>
+                    [#if showCancel]
+                        <a href="${helper.urlFor('mail.SendMailModule', 'cancel', [org.id, sms.uuid] )}" tabindex="8" class="cancel">[@dws.txt key="form.action.cancel" /]</a>
+                    [/#if]
+                </section>
+            </form>
+        </div>
+    </div>
+
+</section>
+
+[/@dws.skin]
+

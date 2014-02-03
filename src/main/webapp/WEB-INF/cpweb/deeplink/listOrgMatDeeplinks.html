@@ -1,0 +1,146 @@
+[#ftl strip_text="true" /]
+
+[#import "/settings/settingsMenu.html" as sMenu /]
+
+
+[#!-- Netbean hint
+<script src="../../js/listDeeplinksOrgMats.js">
+</script> -->
+
+[#import "orgMatRenderer.html" as sOrgMatRender /]
+
+[#assign oListDetails]
+<div class="loadspinner"><img src="${contextPath}/img/spinner-threedots.gif" /></div>
+[/#assign]
+
+
+[#assign foot]
+[@sOrgMatRender.oRenderer][/@sOrgMatRender.oRenderer]
+
+${cpweb_foot}
+
+<script>
+    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+
+    var fnFormatOrgMatDetails = function (oTable, nTr) {
+        return "${oListDetails?js_string}";
+    }
+
+
+    listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
+    listDeeplinksOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+    listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks')}";
+    listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus')}";
+    listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo')}";
+    listDeeplinksOrgMats.newOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','newOrgMatLink')}";
+    listDeeplinksOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
+    listDeeplinksOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+    listDeeplinksOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
+    listDeeplinksOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
+    listDeeplinksOrgMats.contextPath = "${contextPath}";
+    listDeeplinksOrgMats.sLang = "Search uploaded materials";
+
+    require(['dabox-datatables', 'jsrender', 'jquery-ui', 'jqueryui-editable'], function() {
+        listDeeplinksOrgMats.init();
+    });
+
+    $(document).ready(function() {
+       require(['dabox-common', 'jquery.form', 'dabox-formbeanjs'], function() {
+            $('#addlinkcreditsform').ajaxForm(cocobox.getAjaxFormbeanHandler("addlinkcreditsform", function(data) {
+                var totalId = "#opl"+data.opid;
+                $(totalId).text(parseInt($(totalId).text(),10)+1);
+                var linkId = "#assigned"+data.linkid;
+                $(linkId).text(data.balance);
+                $('#addlinkcredits').dialog('close');
+            }));
+       });
+     });
+
+    function showAddLinkCredits(linkid, opid) {
+        $("#oplid").val(linkid);
+
+        cocobox.getAjaxFormbeanHandler("addlinkcreditsform",null).beforeSend();
+
+        cocobox.ajaxPost("${helper.urlFor('material.ProductMaterialJsonModule','productBalance',[org.id])?js_string}/"+opid, {
+            success: function(data) {
+                $("#addlinkcreditsBalance").html(data.available);
+            }
+        })
+
+        $("#addlinkcredits").dialog({
+            width: 400,
+            height: 400,
+            modal: true,
+            resizable: false
+        });
+    }
+    
+    function renderDeleteTokenColumn(oObj, linkId){
+        [#if security.isBoAdmin()]
+                return '<button type="button" onclick="listMaterialsProducts.deleteToken(\'' +  oObj.aData.deleteLink + '\',\'' +  linkId + '\','+oObj.aData.amount+')">Delete</button>';
+        [#else]
+                return '';
+        [/#if]
+    }
+
+    function updateProductLinkTitle(linkId, title) {
+        cocobox.ajaxPost("${helper.urlFor('material.ProductMaterialJsonModule','changeLinkTitle')}",{
+            data: {
+                "linkid": linkId,
+                "title": title
+            }
+        })
+    }
+    </script>
+
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@sMenu.settingsMenu selected="orgmat_deeplinks"][/@sMenu.settingsMenu]
+[/#assign]
+
+[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+ 
+<h1>Materials</h1>
+
+<div id="listmaterialstabs">
+    <ul style="display:none;">
+        <li><a href="#tab_products" id="tab_prodlist">Purchased materials </a></li>
+        <li><a href="#tab_orgmats" id="tab_orgmatslist">Uploaded materials </a></li>
+    </ul>
+    <div id="tab_products">
+        <section class="list">
+            <table class="list" id="listproducts">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <div id="tab_orgmats">
+        <section class="list">
+            <table class="list" id="listmaterials">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+[#include "addLinkCredits.html" /]
+
+[/@dws.skin]
+

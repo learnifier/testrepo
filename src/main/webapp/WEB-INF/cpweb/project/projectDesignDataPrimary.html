@@ -1,0 +1,146 @@
+[#ftl strip_text="true" /]
+
+[#macro fieldValue name]${oldValues[name]!databankValues[name]!''}[/#macro]
+
+
+[#assign foot]
+${cpweb_foot}
+<script type="text/javascript">
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');    
+
+    dpSettings = {
+        'defaultDate': "+1d",
+        'minDate': 0,
+        'showAnim': 'slideDown',
+        'dateFormat': 'yy-mm-dd',
+		'timeFormat': 'HH:mm',
+        'showOn': "both",
+        'buttonImage': "${cocoboxCdn}/cocobox/img/calendar-icon2.png",
+        'buttonImageOnly': true
+    };
+</script>
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
+
+<section id="designdata">
+    <h1>[@dws.txt key="cpweb.designdata.title" /]<span> ${prj.name?xhtml}</span></h1>
+    <p>Bring your course to life by setting duration for activites, when a session starts and ends, the phone number for a conference call, etc...</p>
+
+    [#global formPrefix="cpweb" /]
+    <form action="${helper.urlFor('project.VerifyProjectDesignModule','updateNewDesign',[prj.projectId])}" name="createProjectGeneral" class="fullpage" method="post">
+        [@mbform.alertsection]
+        [/@mbform.alertsection]
+        [#if errorFields?size > 0]
+            <section class="alert">
+              <h1>[@dws.txt key="form.alert.title" /]</h1>
+              <ul>
+                  <li>Check your input in the fields marked in red as the input does not match the required format.</li>
+              </ul>
+            </section>
+        [/#if]
+        
+        <section class="field clearfix design">
+            <ul>
+                [#if components??]
+                [#list components as component]
+                <li class="mainitem clearfix">
+                    [@displayComponent component /]
+                </li>
+                [/#list]
+                [/#if]
+            </ul>
+        </section>
+        [@mbform.infosection]
+        [/@mbform.infosection]
+        <section class="action">
+            <input type="hidden" name="orgId" value="${org.id}" />
+            <button type="submit" tabindex="3" class="primary save"><span>[@dws.txt key='form.action.verifyPrjDesign' /]</span></button>
+            <a href="${helper.urlFor('project.ProjectModule', 'roster', [prj.projectId])}" tabindex="5" class="cancel">[@dws.txt key="form.action.cancel" /]</a>
+        </section>
+
+    </form>
+
+</section>
+
+[/@dws.skin]
+
+[#macro displayComponent component]
+[#if component.children?size > 0 || component.type == 'text' ]
+    <div class="text">
+        <h1>${component.properties.title!''}</h1>
+        <p class="desc">${component.properties.description!''}</p>
+    </div>
+    [#if component.children?size > 0]
+        [#list component.children as child]
+            [#if child.properties.splitContainerPosition?? && child.properties.splitContainerPosition == "top" ]
+                <div class="text">
+                    [#if child.properties["title"]??]<h1>${child.properties["title"]}</h1>[/#if]
+                    [#if child.properties["description"]??]<p class="desc">${child.properties["description"]}</p>[/#if]
+                    [@listComponentFields child /]
+                </div>
+            [/#if]
+         [/#list]
+         <ul class="subitems">
+            [#list component.children as child]
+                [#if !child.properties.splitContainerPosition?? || child.properties.splitContainerPosition != "top" ]
+                    <li class="subitem">[@displayComponent child /]</li>
+                [/#if]
+           [/#list]
+        </ul>
+    [/#if]
+[#else]
+    <div class="text">
+        [#if component.properties["title"]??]<h1>${component.properties["title"]}</h1>[/#if]
+        [#if component.properties["description"]??]<p class="desc">${component.properties["description"]}</p>[/#if]
+        [@listComponentFields component /]
+    </div>
+[/#if]
+
+[/#macro]
+
+[#macro listComponentFields component]
+[#if componentFieldSet[component.cid]??]
+[#local fields = componentFieldSet[component.cid] /]
+<div class="details clearfix">
+    <ul>
+        [#list fields as field]
+        <li class="${field.name}">[@listComponentField component field /]</li>
+        [/#list]
+    </ul>
+</div>
+[/#if]
+[/#macro]
+
+[#macro listComponentField component field]
+<label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
+[#assign extraAttrs = "" /]
+[#assign fieldType = "text"]
+[#if field.name = "duration"]
+  [#assign fieldType = "number"]
+  [#assign extraAttrs = "min='1'" /]
+[#elseif field.name = "phone"]
+  [#assign fieldType = "tel"]
+[#elseif field.name = "url" || field.name = "locUrl"]
+  [#assign fieldType = "url"]
+[/#if]
+[#assign fname = component.cid+'_'+field.name /]
+<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" class="[#if errorFields?seq_contains(fname)]invalid[/#if]" [#if field.mandatory]required[/#if] />
+[#if field.name = "duration"]
+<span style="font-weight: bold;">  min</span>
+[/#if]
+[#if field.dataType == "DATETIME"]
+<span>  ${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
+[/#if]
+
+[#if field.dataType == "DATETIME"]
+[@mbform._onreadyJavascript]
+[#compress]
+requirejs(['jquery-ui-timepicker-addon'], function() {
+	$("#f${component.cid}_${field.name}").datetimepicker(dpSettings);
+});
+[/#compress]
+[/@]
+[/#if]
+[/#macro]

@@ -1,0 +1,50 @@
+[#ftl strip_text="true" /]
+
+[#import "/settings/settingsMenu.html" as sMenu /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+</script>
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@sMenu.settingsMenu selected="designs"][/@sMenu.settingsMenu]
+[/#assign]
+
+
+[@dws.skin skin="CPAuthMenu2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.editdesignsettings.title" /></h1>
+<p>
+
+<div>
+    [#global formPrefix="cpweb.editdesignsettings" /]
+    <form action="${formLink}" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
+        [@mbform.alertsection]
+        [/@mbform.alertsection]
+        <section class="field clearfix">
+            <div class="column">
+
+                <fieldset>
+
+                    [@mbform.inputText name="name" class="input_full"  tabindex="1" /]
+
+                    [@mbform.textarea name="description" tabindex="2" /]
+
+                </fieldset>
+            </div>
+        </section>
+        [@mbform.infosection]
+        [/@mbform.infosection]
+        <section class="action">
+            <input type="hidden" name="orgId" value="${org.id}" />
+            <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savedesignsettings' /></span></button>
+            <a href="${helper.urlFor('coursedesign.DesignModule','overview',[org.id, info.designId])}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+        </section>
+
+    </form>
+</div>
+
+[/@dws.skin>

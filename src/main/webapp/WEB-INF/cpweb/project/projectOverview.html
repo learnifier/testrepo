@@ -1,0 +1,20 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.overview.title" /]</h2>
+
+
+[/@dws.skin]
+

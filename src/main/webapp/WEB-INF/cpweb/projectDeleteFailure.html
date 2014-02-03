@@ -1,0 +1,23 @@
+[#ftl /]
+
+[#if session.hasFlashAttribute("projectDeleteFailures") ]
+<section class="alert list">
+    <h1>[@dws.txt key="cpweb.project.deletefailure.title" /]</h1>
+    <p>[@dws.txt key="cpweb.project.deletefailure.text" /]</p>
+        <table class="list" id="deletefailure">
+        <thead>
+            <th>User</th>
+            <th>Reason</th>
+        </thead>
+        <tbody>
+            [#list session.getFlashAttribute("projectDeleteFailures") as DeleteFailure ]
+                <tr>
+                    <td class="num">${DeleteFailure.name}</td>
+                    <td class="num">${DeleteFailure.reason}</td>                
+                </tr>
+            [/#list]
+        </tbody>
+    </table>
+</section>
+
+[/#if]

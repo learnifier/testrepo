@@ -1,0 +1,120 @@
+[#ftl strip_text="true" /]
+
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
+</script>
+
+<script>
+    $(document).ready(function() {
+        require(['dabox-datatables'], function() {
+        var oTable = $('#listparticipations').dataTable({
+            "sDom": 'rt<"dataTables_footer clearfix"i>',
+            "bPaginate": false,
+            "aaSorting": [[1,'asc']],
+            "aoColumnDefs": [ 
+                {
+                    "mDataProp": "projectname",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="'+ oObj.aData.projectlink + '" style="display:block;">' + oObj.aData.projectname +'</a> ';
+                    },
+                    "aTargets": [ 0 ]
+                },
+            ],
+                        
+            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[user.userId])}",
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
+                "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+                
+    } );
+
+</script>
+[/#assign]
+
+[#assign head]
+${cpweb_head}
+<style>
+    #logoform {
+        display: block;
+        margin: 20px auto;
+        padding: 15px; 
+    }
+    .progress {
+        position:relative;
+        width:400px;
+        border: 1px solid #ddd;
+        padding: 1px;
+        border-radius: 3px;
+        display: none;
+    }
+    .bar {
+        background-color: #B4F5B4;
+        width:0%; 
+        height:20px;
+        border-radius: 3px; 
+    }
+    .percent {
+        position:absolute;
+        display:inline-block;
+        top:3px;
+        left:48%; 
+    }
+</style>
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="useroverview">
+    <section id="userinfo">
+        <div id="itemactions">
+            [#if role == "clientadmin"]
+                <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
+                    <button>Resend invitation</button>
+                </form>
+            [/#if]
+            <form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
+                <button>Edit</button>
+            </form>
+        </div>
+        <div id="usericon">
+            [#if userimg??]
+            <img src="${userimg}" alt="${user.displayName?xhtml} Profile Image"/>
+            [#else]
+            <img src="${cocoboxCdn}/cocobox/img/cp/userImage_64x64.png" alt="${user.displayName?xhtml} Profile Image" />
+            [/#if]
+            <p>User</p><h1>${user.displayName?xhtml}</h1>
+        </div>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Email</span><span class="setting clearfix">${user.primaryEmail?xhtml}</span></li>
+                <li><span class="label">Language</span><span class="setting clearfix">${locale.getDisplayName(userLocale)?xhtml}</span></li>
+                <li><span class="label">Role</span><span class="setting clearfix">[@dws.txt key="cpweb.useroverview." + role!"role_na" /]</span></li>
+            </ul>
+        </div>
+    </section>
+
+
+    <h2>Participations</h2>
+    <section class="list">
+        <table class="list" id="listparticipations">
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+
+</section>
+
+[/@dws.skin]
+

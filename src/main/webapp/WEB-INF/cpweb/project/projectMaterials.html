@@ -1,0 +1,173 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#macro deleteTd productId]
+<form method="post" action=""><input type="hidden" name="productId" value="" /><input type="submit" /></form>
+[/#macro]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+                 
+</script>
+<script>
+
+    $(document).ready(function() {
+        require(['dabox-datatables', 'dabox-common', 'dabox-jquery'], function() {
+            var oTable = $('#projectmaterials').dataTable({
+                "sDom": 'rt<"dataTables_footer clearfix"i>',
+                "bPaginate": false,
+                "aaSorting": [[1,'asc']],
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [ 0 ],
+                        "mDataProp": "type",
+                        "sClass": "type",
+                        "fnRender": function ( oObj ) {
+                            if (oObj.aData.thumbnail==null ){
+                                return  '<div class="'+oObj.aData.type+'"></div>';
+                            } else {
+                                return  '<img src="'+oObj.aData.thumbnail+'" />';
+
+                            }
+                        }
+                    },
+                    {
+                        "aTargets": [ 1 ],
+                        "mDataProp": "title",
+                        "fnRender": function ( oObj ) {
+                            var desc = oObj.aData.desc || "";
+                            return  '<h1>' + oObj.aData.title + '</h1><p>'
+                                + 'English' + '</p><p>' + desc + '</p>';
+                        }
+                    },
+
+                    {
+                        "aTargets": [ 2 ],
+                        "mDataProp": null,
+                        "fnRender" : function ( oObj) {
+
+                            if(oObj.aData.crispAdminAvailable) {
+                                return '<a href="' + oObj.aData.crispAdminLink + '" target="_blank">Administrated via ' +  oObj.aData.crispName + '</a>';
+                            } else {
+                                return ' ';
+                            }
+                        }
+                    },
+
+                    {
+                        "aTargets": [ 3 ],
+                        "mDataProp": null,
+                        "fnRender": function ( oObj ) {
+                            return  '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+oObj.aData.system+'|'+oObj.aData.id+'" /><button type="submit">Remove</button></form>';
+                        }
+                    }
+                ],
+                "oLanguage": {
+                    "sEmptyTable": "<span class='emptytable'>No materials have been added to this project.</span>",
+                    "sLoadingRecords": "<p>Loading materials...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                },
+                "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','projectMaterials',[prj.projectId])}"
+            });
+
+            $("#addMaterial").submit(function() {
+                cocobox.longOp();
+                $("button",this).cocobox('inputBlock');
+            });
+        });
+    } );
+
+    function onDelete(form) {
+        require(['dabox-common','dabox-jquery', 'jquery.form'], function() {
+            $("button", form).cocobox('inputBlock');
+            var lop = cocobox.longOp();
+
+            $(form).ajaxSubmit({
+                success: function(data) {
+                    if (data.status == 'OK') {
+                        window.location = data.location;
+                    } else if (data.status == 'error.indesign') {
+                        lop.abort();
+                        cocobox.errorDialog('Material cannot be removed','The material is used in the project course design and can therefore not be removed. Remove the material from the course design. Then, come back here and try again to remove the material.');
+                    } else if (data.status == 'error.allocatedcredits') {
+                        lop.abort();
+                        cocobox.errorDialog('Material cannot be removed','The material has been used by one or more participants in this project. Therefore it cannot be removed.');
+                    } else {
+                        lop.abort();
+                        //Unknown error
+                        cocobox.errorDialog('Material cannot be removed','A system error occured and the material was not removed.');
+                    }
+                },
+
+                error: function() {
+                    lop.abort();
+                    //Unknown error
+                    cocobox.errorDialog('Material cannot be removed','A system error occured and the material was not removed.');
+                }
+            });
+        });
+
+        return false;
+    }
+
+    $(function() {
+        require(['jquery-ui','dabox-jquery'], function() {
+            $( "#materialId" ).combobox({
+                'renderFn': function( ul, item ) {
+                    return $( "<li>" )
+                    .data( "item.autocomplete", item )
+                    .append( "<a>" + item.label + "</a>" )
+                    .appendTo( ul );
+                }
+            });
+        });
+    });
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="materials"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.materials.title" /]</h2>
+
+<section id="addprojectmaterial">
+    [#global formPrefix="cpweb.project.addmaterial" /]
+    <form action="${addLink}" name="addMaterial" id="addMaterial" class="fullpage" method="post">
+        [@mbform.alertsection]
+        [/@mbform.alertsection]
+        <section class="field">
+            <div class="ui-widget">
+                [@mbform.select name="materialId" class="input_full" tabindex="1"]
+                    <option value=""></option>
+                    [#list materials?sort_by("title") as mat]
+                        [@mbform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@mbform.option]
+                    [/#list]
+                [/@mbform.select]
+            </div>
+        </section>
+        [@mbform.infosection]
+        [/@mbform.infosection]
+        <button type="submit">Add</button>
+    </form>
+</section>
+
+<section class="list">
+    <table class="list" id="projectmaterials">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+[/@dws.skin]
+

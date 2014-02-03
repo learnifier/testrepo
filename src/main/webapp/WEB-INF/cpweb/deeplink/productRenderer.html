@@ -1,0 +1,74 @@
+[#ftl strip_text="true" /]
+
+[#macro pRenderer ]    
+
+<script id="prodlinkinfo" type="text/x-jsrender">
+
+    [#noparse]
+    <div class="linkdetails clearfix" id="linkdetailsdiv{{>linkid}}">
+        <form data-linkid="{{>linkid}}">
+            {{if !defaultLink}}<button class="deleteplinkbutton">Delete Link</button>{{/if}}
+            <h2 id="linktitle{{>linkid}}" class="linktitle">
+                    {{if title && title != ""}}
+                      <span class="text">{{>title}}</span>
+                    {{else defaultLink}}
+                      <span class="text">Default Link</span>
+                    {{else}}
+                      <span class="text">Link</span>
+                    {{/if}}
+                    </span><span class="edit">Edit link title</span></h2>
+            <div class="linkstatus tooltip" title="Turning the link ON and OFF. If set to ON, credits need to be assigned for the link to function. When set to ON, the Active Until date will limit the last day the link can be accessed.">
+                <h3>Active</h3>
+                <div id="linkstatussetting{{>linkid}}" class="linkstatussetting">
+                    <input type="radio" value="true"  class="statuson" name="status" id="lsstateon{{>linkid}}" {{if active == true}}checked="checked"{{/if}}/><label for="lsstateon{{>linkid}}">ON</label>
+                    <input type="radio" value="false" class="statusoff" name="status" id="lsstateoff{{>linkid}}" {{if active == false}}checked="checked"{{/if}} /><label for="lsstateoff{{>linkid}}">OFF</label>
+                </div>
+            </div>
+            <div class="linkquantity tooltip" title="Assign the number of credits that corresponds to the numbers of users that will access this link. Open the credits history to see details of assigned credits.">
+                <h3>Assigned Credits</h3>
+                <span id="assigned{{>linkid}}">{{>balance}}</span><button onclick="showAddLinkCredits('{{>linkid}}', {{>opid}}); return false;">Add Credits</button>
+                <p>
+                    <a href="#" onclick="listDeeplinksProducts.creditHistory({{>linkid}}); return false;">Credit history</a>
+                    {{if defaultLink}}<a href="#" onclick="$('#autoassign{{>linkid}}').slideToggle('slow'); return false;" >Auto-assign credits</a>{{/if}}
+                </p>
+            </div>
+            <div class="linkdate tooltip" title="Use this to set the last date the link can be accessed. It link is set to OFF, the link will not be accessible no matter what this date is set to.">
+                <h3>Active Until</h3>
+                <input type="text" id="datepicker{{>linkid}}" placeholder="Date not set" value="{{>activeto}}" />
+            </div>
+            <div class="autoassign" id="autoassign{{>linkid}}" style="display:none;">
+                <h3>Auto-assign credits</h3>
+                <div id="autosetting{{>linkid}}" class="setting">
+                    <input type="radio" value="true"  class="statuson" name="auto" id="linkAutoOn{{>linkid}}" {{if autoAdd == true}}checked="checked"{{/if}}/><label for="linkAutoOn{{>linkid}}">ON</label>
+                    <input type="radio" value="false" class="statusoff" name="auto" id="linkAutoOff{{>linkid}}" {{if autoAdd == false}}checked="checked"{{/if}} /><label for="linkAutoOff{{>linkid}}">OFF</label>
+                </div>
+                <div class="description">
+                    Turning auto-assign on will automatically add all new credits for this product to this link. <b>Please note. Do not activate this feature without being fully aware of the implications.</b> 
+                </div>
+            </div>
+            <div class="quantitydetails" id="quantitydetails{{>linkid}}" style="display:none;">
+                <h3>Credit history</h3>                    
+                <section class="list">
+                    <table class="list" id="linkcredithistory{{>linkid}}">
+                        <thead>
+                        <th>Quantity</th>
+                        <th>Added By</th>
+                        <th>Added Date</th>
+                        <th></th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <div class="linkurl tooltip" title="Copy this link and paste it in the document that will be distributed to the participants. This document could be a web page, an email, a LMS, or some other media used for distribution.">
+                <h3>URL</h3>
+                <input type="text" class="input_full" value="{{>link}}" contenteditable="false"/>
+            </div>
+        </form>
+    </div>
+    [/#noparse]
+
+</script>
+
+[/#macro]

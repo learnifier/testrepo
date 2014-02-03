@@ -1,0 +1,318 @@
+[#ftl strip_text="true" /]
+
+[#import "welcomeMessage.html" as wm /]
+
+[#assign foot]
+${cpweb_foot}
+
+[#if security.isBoAdmin()]
+<script>
+    $('.orgname').show().delay(2000).slideUp();
+</script>
+[/#if]
+
+<script>
+    $('#tm_home').addClass('activeItem').prev().addClass('prevItem');
+    $(document).ready(function() {
+        require(['dabox-datatables','dabox-common', 'jquery.timeago'], function() {
+            var actTable = $('#tw_actions').dataTable({
+                "sDom": 'rt',
+                "bPaginate": false,
+                "aaSorting": [[3,'asc']],
+                "aoColumnDefs": [
+                    {
+                        "sWidth": "64",
+                        "bSortable": false,
+                        "mDataProp": null,
+                        "sClass": "thumbnail",
+                        "fnRender": function ( oObj ) {
+                            return  '<a href="'+ oObj.aData.link + '"><img src="'+ oObj.aData.thumbnail + '" alt="' + oObj.aData.projectName +' thumbnail" /></a>';
+
+                        },
+                        "aTargets": [ 0 ]
+                    },
+                    {
+                        "sWidth": "500",
+                        "bSortable": false,
+                        "mDataProp": null,
+                        "sClass": "info",
+                        "fnRender": function ( oObj ) {
+                            var template = '<a href="'+ oObj.aData.link + '"><p class="name">' + oObj.aData.projectName +'</p>';
+                            
+                            if (oObj.aData.bounceCount > 0 ){
+                                template = template + '<div class="bounces"><span class="bounce-count">' + oObj.aData.bounceCount + '</span>' + 
+                                '<span class="bounce-text">email(s) bounced back</span></div>';
+                            }
+                            
+                            if (oObj.aData.alerts > 0) {
+                                template = template + '<div class="alerts"><span class="alert-count">' +  oObj.aData.alerts + '</span>' + 
+                                '<span class="alert-text">participant(s) could not be activated</span></div>'
+                            }
+                            
+                            template = template + '</a>';
+                            
+                            return template;
+                           
+
+                        },
+                        "aTargets": [ 1 ]
+                    },
+                    {
+                        "sWidth": "150",
+                        "mDataProp": "oldest",
+                        "bSortable": false,
+                        "sClass": "date",
+                        "fnRender": function ( oObj ) {
+                            return '<abbr class="timeago" title="' + oObj.aData.oldestAgo + '">' + oObj.aData.oldestStr+ '</abbr>';
+                        },
+                        "aTargets": [ 2 ]
+                    },
+                    {
+                       "sWidth": "120",
+                       "mDataProp": null,
+                        "bSortable": false,
+                        "sClass": "action-button",
+                        "fnRender": function ( oObj ) {
+                            return  '<a href="'+ oObj.aData.link + '" class="btn secondarybackgroundcolor">Action</a>'
+                        },
+                        "aTargets": [ 3 ]
+                    }
+
+                ],
+                "sAjaxSource": "${helper.urlFor('CpJsonModule','listProjectAlerts',[org.id])}",
+                "oLanguage": {
+                    "sEmptyTable": "<span class='emptytable'>No bounced back emails.</span>",
+                    "sLoadingRecords": "<p>Loading bounce back notifications...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                },
+            "fnInitComplete": function() {
+                var itemCount = actTable._('tr').length;
+                if (itemCount > 0) {
+                    $('#actions').slideDown();
+                    $('.timeago').timeago();
+                }
+            }
+            });
+
+            var favTable = $('#tw_favorites').dataTable({
+                "sDom": 'rt',
+                "bPaginate": false,
+                "aaSorting": [[1,'asc']],
+                "aoColumnDefs": [
+                    {
+                        "bSortable": false,
+                        "mDataProp": null,
+                        "sWidth": "5%",
+                        "fnRender": function ( oObj ) {
+                            if (oObj.aData.favorite) {
+                                return  '<div class="favorite isfav" onclick="toggleFavorite(this)"></div>';
+                            
+                            } else {
+                            
+                                return  '<div class="favorite isnotfav" onclick="toggleFavorite(this)"></div> ';
+                            }
+                        },
+                        "aTargets": [ 0 ]
+                    },
+                    {
+                        "sWidth": "95%",
+                        "bSortable": false,
+                        "mDataProp": "name",
+                        "sClass": "favdetails",
+                        "fnRender": function ( oObj ) {
+                            return  '<a href="'+ oObj.aData.link + '"><p>' + oObj.aData.name +'</p>' +
+                                '<p class="details"><span>Added: ' + oObj.aData.added + '</span><span>Invited: ' +  oObj.aData.invited + '</span></p></a>';
+                        },
+                        "aTargets": [ 1 ]
+                    }
+                ],
+                "sAjaxSource": "${helper.urlFor('CpJsonModule','listFavoriteOrgProjects',[org.id])}",
+                "oLanguage": {
+                    "sEmptyTable": "<span class='emptytable'><a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>Click the star next to a project to add it as a favorite.</a></span>",
+                    "sLoadingRecords": ""
+                }
+            });
+        } );
+    });
+                
+    var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
+    var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
+
+    function toggleFavorite(target) {
+        log('Toggle ',target);
+
+        var div = target;
+        var tr = $(target).parent().parent().get()[0]
+        var rowData = $('#tw_favorites').dataTable().fnGetData(tr);
+
+        var prjId = rowData.id;
+        log('Rowdata', rowData, prjId);
+
+        var ajax = {};
+        var ajaxData = {projectId: prjId};
+        ajax.data = ajaxData;
+
+        if ($(target).hasClass("isfav")) {
+            ajax.success = function() {
+                $(div).removeClass("isfav").addClass("isnotfav");
+            }
+            cocobox.ajaxPost(deleteFavorite,ajax);
+        } else {
+            ajax.success = function() {
+                $(div).removeClass("isnotfav").addClass("isfav");
+            }
+            cocobox.ajaxPost(addFavorite,ajax);
+        }
+    }
+                
+</script>
+
+<script>
+    require(['knockout'], function(ko) {
+
+        function ProductBalance(data) {
+            var self = this;
+            self.title = ko.observable(data.title);
+            self.thumbnail = ko.observable(data.thumbnail);
+            self.availCredits = ko.observable(data.availCredits);
+        }
+
+        function AccountBalanceModel() {
+            var self = this;
+
+            self.products = ko.observableArray([]);
+
+            self.productCount = ko.computed(function(){
+                return self.products().length;                
+            })
+
+            self.creditCount = ko.computed(function(){
+                var total = 0;
+                $.each(self.products(),function(){
+                    total+=this.availCredits();
+                })
+                return total;
+            })
+            
+            self.topfive = ko.computed(function(){
+                return self.products().slice(0,5);
+            })
+
+            self.loadData = function() {
+                $.getJSON("${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}", function(allData) {
+                    var mappedTasks = $.map(allData.aaData, function(item) { return new ProductBalance(item) });
+                    mappedTasks.sort(function(a,b){
+                        var diff = b.availCredits() - a.availCredits();
+                        if (diff != 0) {
+                            return diff;
+                        }
+                        if (a.title() < b.title()) {
+                            return -1;
+                        }
+                        return 1;
+                    });
+                    self.products(mappedTasks);                    
+                });
+            }   
+        }
+
+        model = new AccountBalanceModel();
+        ko.applyBindings(model);
+
+        $(function() {
+            model.loadData();
+        })
+            
+    })
+</script>
+
+
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+<div class="infobox" id="actions" style="display: none;">
+    <h1>Action</h1>
+    <p>Take action on the following issues. Reach out to tech support as needed.</p>
+    <section class="widget" id="sw_actions">
+        <table class="widget" id="tw_actions">
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+
+<section class="column" style="width: 520px; margin-right: 20px; float: left;">
+
+    <div class="infobox clearfix">
+        <section id="new-project">
+            <h1>New Project</h1>
+            <p>Get started with a new project by following the simple the step-by-step instructions.</p>
+            <p class="btn-center-wrapper ">
+                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-strong secondarybackgroundcolor">Add Project</a>
+            </p>
+        </section>
+        <section id="manage-projects">
+            <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="home-box-link-h2">View All Projects</a>
+            <h1>Manage Projects</h1>
+            <h3>Favorite Projects</h3>
+            <section class="widget" id="sw_favorites">
+                <table class="widget" id="tw_favorites">
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    </div>
+    <div class="infobox clearfix">
+        <h2>Upload your materials</h2>
+        <p>Add your own training materials to tailor the learning to your needs.</p>
+        <div class="btn-center-wrapper">
+            <a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn navBackgroundColor">Upload Material</a>
+    </div>
+    </div>
+    <div class="infobox clearfix">
+        <h2>Invite an administrator</h2>
+        <p>Invite additional administrators to manage projects from this portal.</p>
+        <div class="btn-center-wrapper">
+            <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn navBackgroundColor">Invite Administrator</a>
+        </div>
+    </div>
+</section>
+
+<section class="column" style="width: 400px; float: left;">
+
+    [#if (dwsrt.config["cpweb.support.htmlsnippet"]) != ""]
+        <div id="techsupportinfo" class="infobox">
+            ${dwsrt.config["cpweb.support.htmlsnippet"]}
+        </div>
+    [/#if]
+    [#if welcomeMessage??]
+    <div class="infobox clearfix" id="contact">
+        [@wm.welcomeBox welcomeMessage /]
+    </div>
+    [/#if]
+    <div class="infobox clearfix" id="balance">
+        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="home-box-link-h3">See Full Report</a>
+        <h2>Your Account Status</h2>
+        <div id="product-count" class="secondarybackgroundcolor">
+            <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
+        </div>
+        <h3>Top 5 balance</h3>
+            <ul class="clearfix" data-bind="foreach: topfive">
+                <li>
+                    <img data-bind="attr: { src: thumbnail}" src="${cocoboxCdn}/cocobox/img/1x1-pixel.png" />
+                    <p class="availCredits" data-bind="text: availCredits"></p>
+                    <p class="title" data-bind="text: title"></p>
+                </li>
+            </ul>   
+    </div>
+
+</section>
+
+
+
+
+
+[/@dws.skin]

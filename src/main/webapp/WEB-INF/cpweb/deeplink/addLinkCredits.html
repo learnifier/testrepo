@@ -1,0 +1,28 @@
+[#ftl]
+[#global formsess=linkformsess /]
+
+<div id="addlinkcredits" title="Add Credits">
+        <h1>Add credits to link</h1>
+        <p>Type the number of credits that you would like to add to this link.</p>
+        [#global formPrefix="cpweb" /]
+        <form action="${addLinkCreditsFormLink}" id="addlinkcreditsform" name="addlinkcreditsform" class="fullpage" method="post">
+            [@mbform.alertsection]
+            [/@mbform.alertsection]
+            <section class="field clearfix">
+                <div class="column">
+                    <fieldset>
+                        <div id="available">Available credits: <span id="addlinkcreditsBalance"></span></div>
+                        [@mbform.inputText name="credits" class="input_full"  tabindex="1" /]
+                    </fieldset>
+                </div>
+            </section>
+            [@mbform.infosection]
+            [/@mbform.infosection]
+            <section class="action">
+                <input type="hidden" name="orgId" value="${org.id?c}" />
+                <input type="hidden" name="oplid" id="oplid" value="" />
+                <button type="submit" tabindex="100" class="add primary" onclick="$('#addlinkcreditsBalance').empty(); return true;"><span>[@dws.txt key='form.action.addcredits' /]</span></button>
+                <a href="#" onclick="$('#addlinkcredits').dialog('close');$('#addlinkcreditsBalance').empty();return false;" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+            </section>
+        </form>
+</div>

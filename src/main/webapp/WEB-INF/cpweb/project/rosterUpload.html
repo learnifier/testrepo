@@ -1,0 +1,28 @@
+[#ftl]
+[#global formsess=rosterformsess /]
+
+<div id="rosterupload" title="Upload Roster">
+        <h1>Select the roster file</h1>
+        
+        <p>Download the roster template below to your desktop. Click Browse, select the file, and then click Open. Then click Upload Roster.</p>
+        <p><a href="${cocoboxCdn}/cocobox/roster/RosterTemplate.xlt">Download roster template</a></p>
+        [#global formPrefix="cpweb" /]
+        <form action="${uploadRosterFormLink}" id="uploadRoster" name="uploadRoster" class="fullpage" method="post" enctype="multipart/form-data" onsubmit="$('#rosterUploadBtn').cocobox('inputBlock')">
+            [@mbform.alertsection]
+            [/@mbform.alertsection]
+            <section class="field clearfix">
+                <div class="column">
+                    <fieldset>
+                        [@mbform.inputFile name="file" class="input_full"  tabindex="5" /]
+                    </fieldset>
+                </div>
+            </section>
+            [@mbform.infosection]
+            [/@mbform.infosection]
+            <section class="action">
+                <input type="hidden" name="orgId" value="${org.id}" />
+                <button type="submit" tabindex="100" class="upload primary" id="rosterUploadBtn"><span>[@dws.txt key='form.action.uploadroster' /]</span></button>
+                <a href="#" onclick="$('#rosterupload').dialog('close'); return false;" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+            </section>
+        </form>
+</div>

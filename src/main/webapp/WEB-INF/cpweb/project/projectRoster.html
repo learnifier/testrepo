@@ -1,0 +1,467 @@
+[#ftl strip_text="true" /]
+
+[#import "bounceInfo.html" as bInfoRender /]
+[#import "projectInfo.html" as pInfo /]
+
+[#assign foot]
+
+[@bInfoRender.bRenderer][/@bInfoRender.bRenderer]
+
+${cpweb_foot}
+
+[#include "jsr_progressinfoTemplate.inc"]
+[#include "jsr_adminlinkTemplate.inc"]
+[#include "jsr_reportinfoTemplate.inc"]
+[#include "jsr_detailsTable.inc"]
+[#include "jsr_invitesTemplate.inc"]
+
+
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+
+</script>
+<script>
+    $(document).ready(function() {
+        require(['dabox-datatables', 'jquery.timeago'], function() {
+            window.oTable = $('#projectroster').dataTable({
+                "sDom": 'rt<"dataTables_footer clearfix"i>',
+                "bPaginate": false,
+                "aaSorting": [[2, 'asc']],
+                "fnRowCallback": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
+                    if (oObj.inError) {
+                        $(nRow).addClass('error');
+                        $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
+                        return nRow;
+                    } else if (!oObj.activated) {
+                        $(nRow).addClass('inactive');
+                        $(nRow).css('opacity', '0.6');
+                        return nRow;
+                    }
+                },
+                "fnInitComplete": function() {
+                    log('DataTables has finished its initialisation.');
+                    showRow();
+                    $('.timeago').timeago();
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0],
+                        "mDataProp": null,
+                        "bSortable": false,
+                        "sWidth": 12,
+                        "fnRender": function(oObj) {
+                            return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + oObj.aData.id + '"/>';
+                        }
+                    },
+                    {
+                        "aTargets": [1],
+                        "mDataProp": "participationLink",
+                        "bSortable": false,
+                        "sWidth": 16,
+                        "fnRender": function(oObj) {
+                            if (oObj.aData.inError) {
+                                var msg = oObj.aData.errorMsg;
+                                if (msg == null) {
+                                    msg = 'Participation error reason is not known';
+                                }
+
+                                window.partError = window.partError || {};
+
+                                window.partError[oObj.aData.id] = msg;
+
+                                var onclick = "onclick='showRosterPartErrorBox(window.partError[" + oObj.aData.id + "])'";
+
+                                var data = '<img src="${cocoboxCdn}/cocobox/img/cp/participation_error.png" ' + onclick + ' class="participationTriangle" alt="Participation Link"/>';
+
+                                return data;
+                            } else if (oObj.aData.activated) {
+                                return  '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + oObj.aData.participationLink + '\'); return false"><img src="${cocoboxCdn}/cocobox/img/cp/project_participationLink.png" alt="Participation Link"/></a>';
+                            }
+
+                            return '';
+                        }
+                    },
+                    {
+                        "aTargets": [2],
+                        "mDataProp": "displayName",
+                        "sWidth": 250,
+                        "useRendered": false,
+                        "fnRender": function(oObj) {
+                            return  '<a href="' + oObj.aData.link + '" style="display:block;" title="' + oObj.aData.email + '">' + oObj.aData.displayName + '</a> ';
+                        }
+                    },
+                    {
+                        "aTargets": [3],
+                        "mDataProp": "firstEmail",
+                        "fnRender": function(oObj) {
+                            if (oObj.aData.firstEmailStr) {
+                                return  oObj.aData.firstEmailStr;
+                            } else if (oObj.aData.sending && !oObj.aData.firstEmailStr) {
+                                return  "Sending...";
+                            } else {
+                                return null;
+                            }
+                        }
+                    },
+                    {
+                        "aTargets": [4],
+                        "mDataProp": "lastEmail",
+                        "fnRender": function(oObj) {
+                            if (oObj.aData.sending) {
+                                return "Sending..."
+                            } else if (oObj.aData.bounced) {
+                                return '<a href="#" onclick="showBounceInfo(' + oObj.aData.id + '); return false" class="alert" title="' + oObj.aData.lastEmailStr + '">Bounced back</a>';
+                            } else {
+                                return  oObj.aData.lastEmailStr;
+                            }
+                        }
+                    },
+                    {
+                        "aTargets": [5],
+                        "mDataProp": "lastAccess",
+                        "fnRender": function(oObj) {
+
+                            if (oObj.aData.lastAccess) {
+                                return '<abbr class="timeago" title="' + oObj.aData.lastAccessAgo + '">' + oObj.aData.lastAccessStr + '</abbr>';
+                            } else {
+                                return 'Not yet logged in';
+                            }
+                        }
+                    },
+                    {
+                        "aTargets": [6],
+                        "mDataProp": "status",
+                        "sWidth": 120,
+                        "fnRender": function(oObj) {
+                            return  '<div class="progress"><div class="bar" style="width:' + oObj.aData.status +
+                                    '%;"><div class="percent">' + oObj.aData.status + '%</div</div>';
+                        }
+                    },
+                    {
+                        "aTargets": [7],
+                        "mDataProp": null,
+                        "bSortable": false,
+                        "useRendered": false,
+                        "sWidth": 25,
+                        "fnRender": function(oObj) {
+
+                            return '<div class="expand"></div>';
+
+                        }
+                    }
+                ],
+                "sAjaxSource": "${helper.urlFor('ProjectJsonModule','projectRoster', [prj.projectId?c])}",
+                "oLanguage": {
+                    "sEmptyTable": "<span class='emptytable'>The roster is empty. Add a participant above to get started. </span>",
+                    "sLoadingRecords": "<p>Loading roster...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                }
+            });
+        });
+
+        cpweb.registerListform($("#projectrosterform").first());
+        $('#listprojects_filter input').attr('placeholder', 'Search for projects');
+
+        $.fn.clearForm = function() {
+            return this.each(function() {
+                var type = this.type, tag = this.tagName.toLowerCase();
+                if (tag == "form")
+                    return $(":input", this).clearForm();
+                if (type == "text" || type == "email")
+                    this.value = "";
+            });
+        };
+
+        require(['jquery.form', 'dabox-common', 'dabox-formbeanjs'], function() {
+            $("#uploadRoster").ajaxForm(cocobox.getAjaxFormbeanHandler("uploadRoster"));
+        });
+
+        $("#cball").click(function(ev) {
+            if (this.checked) {
+                var items = $("input.rowcb").not(":checked");
+                items.trigger('click');
+                //Trigger change so that IE8- picks up the change
+                items.trigger('change');
+            } else {
+                var items = $("input.rowcb").filter(":checked");
+                items.trigger('click');
+                //Trigger change so that IE8- picks up the change
+                items.trigger('change');
+            }
+        })
+
+        $("#projectrosterform").submit(cpweb.projectRosterListForm);
+
+
+    });
+
+
+
+    var fetchAndInjectDetails = function(detailsData, injectInRow) {
+        var ajaxCallUrl = detailsData.detailsUrl;
+
+        cocobox.ajaxPost(ajaxCallUrl, {
+            success: function(data) {
+                $(injectInRow).empty();
+                $(injectInRow).removeClass('loading');
+
+
+                var completed = 0;
+                for (var i = 0; i < data.progress.length; i++) {
+                    if (data.progress[i].completed) {
+                        completed++;
+                    }
+                    data.progress.completed = completed;
+                }
+
+                if (data.reports.length == 0) {
+                    data.reports.push({empty: true});
+                } else {
+
+                    for (var i = 0; i < data.reports.length; i++) {
+                        if (data.reports[i].type == 'application/pdf') {
+                            data.reports[i].filetype = data.reports[i].type.split('application/').join('');
+                        }
+
+                    }
+                }
+
+                var renderedProgress = $('#progressTemplate').render(data.progress);
+                var renderedReports = $('#reportinfoTemplate').render(data.reports);
+                var renderedAdminlinks = $('#adminlinkTemplate').render(data.adminlinks);
+                var renderedInvites = $('#invitesTemplate').render(data.idprojects);
+
+
+                $(injectInRow).append($('#detailsTable').render({
+                    renderedProgress: renderedProgress,
+                    completedCids: completed,
+                    totalnumberOfCidsWithProgress: data.progress.length,
+                    renderedReports: renderedReports,
+                    renderedAdminlinks: renderedAdminlinks,
+                    renderedInvites: renderedInvites
+                }));
+                $(injectInRow).find('.timeago').timeago();
+                //Hide invite section if no invites
+                if (renderedInvites.len < 1) {
+                    $('.invites').hide();
+                }
+            }
+        });
+    }
+
+    var showRow = function() {
+        require(['dabox-datatables', 'jsrender'], function() {
+            var oTable = $('#projectroster').dataTable(),
+                    detailsData = {};
+
+            $('.expand').click(function() {
+
+                var parentTd = $(this).parent()[0];
+                var clickedRow = $(parentTd).parent()[0];
+
+                var aoData = oTable.fnGetData(clickedRow);
+                detailsData.detailsUrl = aoData.detailsUrl;
+
+                $(this).toggleClass('expanded');
+                $(clickedRow).toggleClass('expanded');
+
+                if (oTable.fnIsOpen(clickedRow)) {
+                    oTable.fnClose(clickedRow);
+                } else {
+                    var injectInContainer = $('<div>');
+
+                    oTable.fnOpen(clickedRow, injectInContainer, "details");
+                    $(injectInContainer).attr('class', 'loading');
+
+                    if (aoData.inError) {
+                        $(injectInContainer).html('<p>Sorry, but something went wrong as we were setting up this participant. Try fixing this by either sending an email to ' + aoData.displayName + ' or by using the "Activate" functionality. If that does not do it, please reach out to tech support.');
+
+                        if (aoData.bounced) {
+                            $(injectInContainer).append('<p>The last email sent to ' + aoData.displayName + ' bounced back. Please check the email address and resend the email. </p>');
+                        }
+
+                    } else if (!aoData.activated) {
+                        $(injectInContainer).html('<p>Invite the participant to see details here. </p>');
+
+                    } else {
+                        $(injectInContainer).attr('class', 'loading');
+                        $(injectInContainer).html('<img src="${cocoboxCdn}/cocobox/img/loading.gif" alt="spinner"/>');
+                        $(injectInContainer).attr('class', 'loading detailscontainer');
+                        fetchAndInjectDetails(detailsData, injectInContainer);
+                    }
+
+                }
+
+            });
+        });
+    }
+
+
+    function showUploadRoster() {
+        $("#rosterupload").dialog({
+            width: 400,
+            height: 400,
+            modal: true,
+            resizable: false
+        });
+    }
+    function showBounceInfo(strPartId) {
+        cocobox.ajaxPost("${helper.urlFor('ProjectJsonModule','participationBounceInfo')}/" + strPartId, {
+            success: showBounceDialog
+        });
+    }
+    function showBounceDialog(data) {
+        var bDialog = $("#bounceinfo").render(data);
+        $(bDialog).dialog({
+            width: 800,
+            height: 600,
+            modal: true,
+            resizable: true
+        });
+    }
+
+    function addMemberListener() {
+        require(['dabox-common', 'dabox-jquery'], function() {
+            cocobox.longOp();
+            $(".save").cocobox('inputBlock');
+        });
+        return true;
+    }
+
+    $('#memberemail').keyup(function() {
+        log($('#memberemail').val());
+    });
+
+
+    require(['jquery-ui','Chart'], function() {
+        var chartAnimation = false;
+        if ( Modernizr.canvas === true ) {
+                chartAnimation = true;
+        }
+        var dataUrl = '${helper.urlFor('ProjectJsonModule','projectRoster', [prj.projectId?c])}';
+            pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
+    });
+
+</script>
+
+[/#assign]
+
+[#assign cpweb_head]
+${cpweb_head}
+<!--[if lte IE 8]>
+<script src="${cocoboxCdn}/cocobox/js/excanvas/excanvas.compiled.js"></script>
+<![endif]-->
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+[#include "../allocationFailure.html" /]
+
+[@pInfo.projectInfo selected="participants"][/@pInfo.projectInfo]
+
+<section id="prj-charts" class="infobox">
+    <div>Total participants in project: <span id="prj-ch-total"></span></div>
+    <ul>
+        <li>
+            <table>
+                <tr id="prj-ch-status-invited"><td><span>Not Started:</span></td><td><span class="chart-data"></span></td></tr>
+                <tr id="prj-ch-status-inprogress"><td><span>In Progress:</span></td><td><span class="chart-data"></span></td></tr>
+                <tr id="prj-ch-status-completed"><td><span>Completed:</span></td><td><span class="chart-data"></span></td></tr>
+            </table>
+            <div class="prj-ch-wrapper">
+                <canvas id="prj-ch-status" width="100" height="100"></canvas>
+                <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
+            </div>
+        </li>
+        [#if prj.type.ptype == 2]
+        <li>
+            <table>
+                <tbody>
+                <tr id="prj-ch-overdue-ontrack"><td><span>On Track:</span></td><td><span class="chart-data"></span></td></tr>
+                <tr id="prj-ch-overdue-overdue"><td><span>Overdue:</span></td><td><span class="chart-data"></span></td></tr>
+                </tbody>
+            </table>
+            <div class="prj-ch-wrapper">
+                <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
+                <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
+            </div>
+        </li>
+        [/#if]
+        <li>
+            <table>
+                <tbody>
+                    <tr id="prj-ch-notinvited"><td><span>Not Invited:</span></td><td><span class="chart-data"></span></td></tr>
+                    <tr id="prj-ch-bounced"><td><span>Bounce Backs:</span></td><td><span class="chart-data"></span></td></tr>
+                    <tr id="prj-ch-inerror"><td><span>Project Errors:</span></td><td><span class="chart-data"></span></td></tr>
+                </tbody>
+            </table>
+            <div id="prj-action-needed"></div>
+        </li>
+    </ul>
+</section>
+
+
+<h2>[@dws.txt key="cpweb.project.participants.title" /]</h2>
+
+<section id="addtoroster">
+    <div id="upload" style="float: right;">
+        <button type="button" onclick="showUploadRoster();
+                return false" class="upload"><span>Upload Roster</span></button>
+    </div>
+    <h3>Add participant</h3>
+    <div id="manual">
+        [#global formPrefix="cpweb" /]
+        <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post" onsubmit="return addMemberListener()">
+            <section class="field">
+                [@mbform.inputText name="memberfirstname" class=""  tabindex="1" maxlength="64" /]
+                [@mbform.inputText name="memberlastname" class=""  tabindex="2" maxlength="64" /]
+                [@mbform.inputEmail name="memberemail" class=""  tabindex="3" maxlength="96" /]
+            </section>
+            <section class="action">
+                <input type="submit" value="[@dws.txt key='form.action.addmember' /]"  tabindex="100" class="save" />
+            </section>  
+        </form>
+    </div>
+</section>
+
+<form method="post" id="projectrosterform" action="${helper.urlFor('ProjectModificationModule','listCommand')}">
+    [@mbform.listformFields /]
+    <input type="hidden" name="projectId" value="${prj.projectId?c}" />
+    <section class="listactions">
+        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');
+                return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
+        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'delete');
+                return false">Delete</button>
+        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
+                return false">Activate</button>
+        [@dwsrt.feature feature="autoical"][#if prj.autoIcal]Calender invitations are ON. <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>[/#if][/@dwsrt.feature]
+    </section>
+
+    <section class="list">
+        <table class="list" id="projectroster">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="cball"></th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Invited</th>
+                    <th>Last Email</th>
+                    <th>Last Seen</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}">Download roster as a Excel file</a>
+    </section>
+</form>
+
+[#include "rosterUpload.html" /]
+
+[#include "bounceInfo.html" /]
+
+[#include "projectRosterParticipationErrorBox.html"]
+
+[/@dws.skin]
+

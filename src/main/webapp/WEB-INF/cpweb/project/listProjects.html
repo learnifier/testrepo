@@ -1,0 +1,121 @@
+[#ftl strip_text="true" /]
+
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+        require(['dabox-datatables'], function() {
+        var oTable = $('#listprojects').dataTable({
+            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
+            "aaSorting": [[1,'asc']],
+            "aoColumnDefs": [ 
+                {
+                    "bSortable": false,
+                    "mDataProp": null,
+                    "fnRender": function ( oObj ) {
+                        if (oObj.aData.favorite) {
+                        return  '<div class="favorite isfav" onclick="toggleFavorite(this)"></div> ';
+                            
+                        } else {
+                            
+                        return  '<div class="favorite isnotfav" onclick="toggleFavorite(this)"></div> ';
+                        }
+                    },
+                    "aTargets": [ 0 ]
+                },
+                {
+                    "sWidth": "70%",
+                    "mDataProp": "name",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="'+ oObj.aData.link + '">' + oObj.aData.name +'</a> ';
+                    },
+                    "aTargets": [ 1 ]
+                },
+                {
+                    "mDataProp": "added",
+                    "aTargets": [ 2 ]
+                },
+                {
+                    "mDataProp": "invited",
+                    "aTargets": [ 3 ]
+                }
+            ],
+            "sAjaxSource": "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}",
+            "iDisplayLength": 25,
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "No projects matches your query",
+                "sEmptyTable": "<span class='emptytable'>Start now by creating your <a href='${helper.urlFor('project.NewProjectModule','setup',[org.id])}'>first project</a></span>",
+                "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });        
+        $('#listprojects_filter input').attr('placeholder', 'Search projects');
+    } );
+
+    var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
+    var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
+
+	
+	
+	function toggleFavorite(target) {
+		//log('Toggle ',target);
+		requirejs(['dabox-common'], function() {
+			var div = target;
+			var tr = $(target).parent().parent().get()[0]
+			var rowData = $('#listprojects').dataTable().fnGetData(tr);
+
+			var prjId = rowData.id;
+			//log('Rowdata', rowData, prjId);
+
+			var ajax = {};
+			var ajaxData = {projectId: prjId};
+			ajax.data = ajaxData;
+
+
+				if ($(target).hasClass("isfav")) {
+					ajax.success = function() {
+						$(div).removeClass("isfav").addClass("isnotfav");
+					}
+					cocobox.ajaxPost(deleteFavorite,ajax);
+				} else {
+					ajax.success = function() {
+						$(div).removeClass("isnotfav").addClass("isfav");
+					}
+					cocobox.ajaxPost(addFavorite,ajax);
+				}
+		});
+	}
+
+	
+</script>
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head foot=foot orgName=orgName]
+
+<a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-add navBackgroundColor">Add Project</a>
+<h1>Projects</h1>
+<section class="list">
+    <table class="list" id="listprojects">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Project Name</th>
+                <th># Added</th>
+                <th># Invited</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+
+[/@dws.skin]
+

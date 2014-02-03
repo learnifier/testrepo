@@ -1,0 +1,168 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+    $(document).ready(function() {
+        require(['dabox-datatables', 'dabox-common','dabox-jquery'], function() {
+        var oTable = $('#projecttasks').dataTable({
+            "sDom": 'rt<"dataTables_footer clearfix"i>',
+            "bPaginate": false,
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mDataProp": "mailTemplateName"
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": "targetFilter",
+                    "fnRender": function ( oObj ) {
+                        if ( oObj.aData.targetFilter == 'all' ) {
+                            return '[@dws.txt key="cpweb.project.schedule.target.all" /]'
+                        } else if ( oObj.aData.targetFilter == 'invited' ) {
+                            return '[@dws.txt key="cpweb.project.schedule.target.invited" /]'                                
+                        } else if ( oObj.aData.targetFilter == 'notinvited' ) {
+                            return '[@dws.txt key="cpweb.project.schedule.target.notinvited" /]'                                
+                        } else {
+                            return  null;                        
+                        }
+                    }
+                },
+                {
+                    "aTargets": [ 2 ],
+                    "mDataProp": "scheduledString"
+                },
+                {
+                    "aTargets": [ 3 ],
+                    "mDataProp": "status",
+                    "bUseRendered": false,
+                    "fnRender": function ( oObj ) {
+                        if ( oObj.aData.status == 'N' ) {
+                            return '<span>[@dws.txt key="cpweb.project.schedule.status.new" /]</span>'
+                        } else if ( oObj.aData.status == 'E' ) {
+                            return '<span class="ok">[@dws.txt key="cpweb.project.schedule.status.executed" /]</span>'                       
+                        } else if ( oObj.aData.status == 'C' ) {
+                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.cancelled" /]</span>'                           
+                        } else if ( oObj.aData.status == 'A' ) {
+                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.allocfailure" /]</span>'                             
+                        } else if ( oObj.aData.status == 'M' ) {
+                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.missing" /]</span>'                     
+                        } else {
+                            return  null;                        
+                        }
+                    }
+                },
+                {
+                    "aTargets": [ 4 ],
+                    "mDataProp": null,
+                    
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        log(oObj.aData.status);
+                        if ( oObj.aData.status == 'N' ) {
+                           return '<button onclick="deleteTask(\'' +  oObj.aData.taskId + '\',this)">Delete</button>';
+                        } else {
+                            return  null;                        
+                        }
+                    }
+                },
+				{
+                    "aTargets": [ 5 ],
+                    "mDataProp": null,
+                    
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        log(oObj.aData.status);
+                        if ( oObj.aData.status == 'N' ) {
+                           return '<a type="button" href="' + oObj.aData.editLink + '">Edit</a>';
+                        } else {
+                            return  null;                        
+                        }
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>The schedule is empty. Add a communication above to get started.</span>",
+                "sLoadingRecords": "<p>Loading schedule...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            },
+            "sAjaxSource": "${helper.urlFor('ProjectJsonModule','projectTasks',[prj.projectId])}"
+        });
+
+		$("#addTaskForm").submit(function() {
+            cocobox.longOp();
+            $(".schedule").cocobox('inputBlock');
+        });
+    } );
+    });
+
+    var reloadTaskList = function (data) {
+        var oTable = $('#projecttasks').dataTable();
+        oTable.fnClearTable();
+        oTable.fnAddData(data.aaData);
+    };
+
+
+    var deleteTask= function (taskId, button) {
+        log('Delete tsk', button);
+        cocobox.confirmationDialog("Delete scheduled task", "Do you want to delete this scheduled task?", function() {
+            $(button).cocobox('inputBlock');
+            var ajaxData = {taskId: taskId};
+            cocobox.ajaxPost('${helper.urlFor("project.ProjectModificationModule","removeTask", [prj.projectId])}', {
+                data: ajaxData,
+                success: reloadTaskList
+            });
+        });
+        return false;
+    };
+
+
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="schedule"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.schedule.title" /]</h2>
+
+<section id="addtask">
+    [#global formPrefix="cpweb" /]
+    <form action="${formlink}" name="addTaskForm" id="addTaskForm" class="fullpage" method="post">
+        <section class="field">           
+            [@mbform.select name="tasktarget" class="input_full" tabindex="2"]
+            [@mbform.option value="all"]All participants[/@mbform.option]
+            [@mbform.option value="invited"]Invited participants[/@mbform.option]
+            [@mbform.option value="notinvited"]Not invited participants[/@mbform.option]
+            [/@mbform.select]
+
+            [@mbform.inputDateTimeRequireJs name="taskdate" class="input_full"  tabindex="3"/]
+        </section>
+        <section class="action">
+            <input type="submit" value="[@dws.txt key='form.action.addtask' /]"  tabindex="100" class="schedule" />
+        </section>
+    </form>
+
+</section>
+
+<section class="list">
+    <table class="list" id="projecttasks">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>To</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th></th>
+				<th></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+[/@dws.skin]
+

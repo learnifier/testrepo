@@ -1,0 +1,91 @@
+[#ftl strip_text="true" /]
+
+
+[#assign cpweb_foot ]
+<script>
+    $('#tm_reports').addClass('activeItem').prev().addClass('prevItem');
+
+
+    $(document).ready(function() {
+        require(['dabox-report-datatables'], function() {
+        var balTable = $('#r_credits_used').dataTable({
+            "sDom": 'rt',
+            "bPaginate": false,
+            "aaSorting": [[1,'asc']],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mDataProp": null,
+                    "fnRender": function ( oObj ) {
+                        if (oObj.aData.targetType == 'deeplink') {
+                            return  oObj.aData.name == null ? oObj.aData.deeplinkId : oObj.aData.name;
+                        } else if (oObj.aData.targetType == 'project'){
+                            return  oObj.aData.name == null ? oObj.aData.projectId : oObj.aData.name;
+                        } else {
+                            return 'Unknown';
+                        }
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": "amount",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.amount;
+                    }
+                }
+            ],
+            "sAjaxSource": "${helper.urlFor('report.ReportJsonModule','listUsedReport',[org.id, product.id.id])}",
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>No credits have been used.</span>",
+                "sLoadingRecords": "<p>Loading details...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#report_filter input').attr('placeholder', 'Search the report data');
+
+    } );
+
+</script>
+
+[/#assign]
+
+[#assign cpweb_head ]
+${cpweb_head}
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="reportoverview">
+
+    <section id="reportinfo">
+        <div class="itemicon">
+            <p>Report</p><h1>Credits used for ${product.title!''?xhtml} (${product.id.id!''?xhtml})</h1>
+        </div>
+        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Back to credit status report</a>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Description</span><span class="setting clearfix">This report provides an overview of the number of credits available for the selected product. It also provides the details on which order those credits originated from.</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="r_table">
+        <table class="report" id="r_credits_used">
+            <thead>
+                <tr>
+                    <th>Project/Link</th>
+                    <th>Used</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+
+</section>
+
+
+[/@dws.skin]
+

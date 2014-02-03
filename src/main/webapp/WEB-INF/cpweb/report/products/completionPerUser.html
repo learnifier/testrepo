@@ -1,0 +1,182 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_reports').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+
+    $(document).ready(function() {
+        require(['dabox-ajax-longrun-gui', 'dabox-report-datatables', 'dabox-common', 'dabox-jquery'], function(lr) {
+
+            var tableColTitles = ["Name"];
+            var tableColIds = ["displayName"];
+            var tableJSON = [];
+            var sumDataIP = ['In Progress'];
+            var sumDataNA = ['Not Accessed'];
+            var sumDataC = ['Completed'];
+
+            lr.guiLongRun('${helper.urlFor("report.ReportJsonModule","productReport",[org.id])}', {
+                type: 'GET',
+                progressTarget: '#loadingTh',
+                error: function() {
+                    $('#r_product_completion').html($('<td class="errormessage">').text('We were unable to generate this report right now. Please, try again later.'));
+                },
+                success: function(data) {
+                    extractCols(data.products);
+                    renderColDefs();
+                    initializeTable(data.aaData, data.products);
+                    renderSummary(data.aaData.length, data.products);
+                }
+            });
+
+            function extractCols(products) {
+                for (var product in products) {
+                    tableColTitles.push(products[product]['title']);
+                    tableColIds.push('productStatus.' + products[product]['id']);
+                    sumDataIP.push(0);
+                    sumDataNA.push(0);
+                    sumDataC.push(0);
+                }
+                ;
+            }
+            ;
+
+            function completionRateCalc(i, sumDataNA, sumDataIP, sumDataC) {
+                if (i > 0 && sumDataC > 0) {
+                    return ((sumDataC / (sumDataC + sumDataNA + sumDataIP))*100).toFixed(2) + '%';
+                } else if (i === 0) {
+                    return 'Completion Rate (%)';
+                } else {
+                    return '';
+                }
+            }
+            function reachCalc(i, itemCount, sumDataNA, sumDataIP, sumDataC) {
+                var access = sumDataC + sumDataNA + sumDataIP;
+                if (i > 0 && access > 0) {
+                    return ((access / itemCount)*100).toFixed(2) + '%';
+                } else if (i === 0) {
+                    return 'Reach (%)';
+                } else {
+                    return '';
+                }
+            }
+            function renderSummary(itemCount) {
+                for (var i = 0; i < tableColTitles.length; i++) {
+                    $('#r_product_completion #not_started').append("<td>" + sumDataNA[i] + "</td>");
+                    $('#r_product_completion #in_progress').append("<td>" + sumDataIP[i] + "</td>");
+                    $('#r_product_completion #completed').append("<td>" + sumDataC[i] + "</td>");
+                    $('#r_product_completion #completion_rate').append("<td>" + completionRateCalc(i, sumDataNA[i], sumDataIP[i], sumDataC[i]) + "</td>");
+                    $('#r_product_completion #reach').append("<td>" + reachCalc(i, itemCount, sumDataNA[i], sumDataIP[i], sumDataC[i]) + "</td>");
+                }
+                ;
+            }
+            ;
+
+            function renderColDefs() {
+                for (var i = 0; i < tableColTitles.length; i++) {
+                    tableJSON.push({
+                        "sTitle": "<span class='pop' title='" + tableColTitles[i] + "'>" + tableColTitles[i] + "</span>",
+                        "sWidth": "" + 100 / tableColTitles.length + "%",
+                        "aTargets": [i],
+                        "mDataProp": tableColIds[i],
+                        "sDefaultContent": "",
+                        "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                            if (sData == 'c') {
+                                sumDataC[iCol] = sumDataC[iCol] + 1;
+                                $(nTd).text('Completed').addClass('c');
+                            } else if (sData == 'ip') {
+                                sumDataIP[iCol] = sumDataIP[iCol] + 1;
+                                $(nTd).text('In progress').addClass('ip');
+                            } else if (sData == 'na') {
+                                sumDataNA[iCol] = sumDataNA[iCol] + 1;
+                                $(nTd).text('Not accessed').addClass('na');
+                            }
+                        }
+                    });
+                }
+                ;
+            }
+            ;
+
+            function initializeTable(aaData, products) {
+                oTable = $('#r_product_completion').dataTable({
+                    "sScrollX": "100%",
+                    "sScrollXInner": "200%",
+                    "aoColumnDefs": tableJSON,
+                    "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
+                    "oTableTools": {
+                        "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
+                    },
+                    "bPaginate": false,
+                    "aaSorting": [[0, 'asc']],
+                    "aaData": aaData,
+                    "oLanguage": {
+                        "sSearch": "",
+                        "sEmptyTable": "<span class='emptytable'>No usage recorded than can be reported.</span>",
+                        "sLoadingRecords": "<p>Loading report...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                    },
+                    "fnHeaderCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
+                        var headings = $('th', nHead);
+
+                        //log(headings);
+
+                        $.each(headings, function(key, element) {
+                            //log(element);
+                            $(element).css('max-width', $(element).css('width'));
+                        });
+                    },
+                    "fnInitComplete": function() {
+                        $('.pop').tooltip();
+                    }
+                });
+
+            }
+            ;
+        });
+    });
+</script>
+
+[/#assign]
+
+[#assign cpweb_head ]
+${cpweb_head}
+[#include "/report/reportExportHead.html" /]
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="reportoverview">
+
+    <section id="reportinfo">
+        <div class="itemicon">
+            <p>Report</p><h1>[@dws.txt key="cpweb.report.productcompletion.title" /]</h1>
+        </div>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Description</span><span class="setting clearfix">This report gives provides an overview of the completion status for all products. The report also gives you an idea of how many people within your organization that has been given access to a specific product.</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="r_table">
+        <table class="report" id="r_product_completion">
+            <thead>
+            </thead>
+            <tbody>
+                <tr><th id="loadingTh"></th></tr>
+            </tbody>
+            <tfoot class="summary">
+                <tr id="not_started"></tr>
+                <tr id="in_progress"></tr>
+                <tr id="completed"></tr>
+                <tr id="completion_rate"></tr>
+                <tr id="reach"></tr>
+            </tfoot>
+        </table>
+    </section>
+
+    [/@dws.skin]
+

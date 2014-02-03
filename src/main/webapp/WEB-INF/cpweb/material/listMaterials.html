@@ -1,0 +1,89 @@
+[#ftl strip_text="true" /]
+
+[#import "/material/materialsMenu.html" as mMenu /]
+
+[#!-- Netbean hint
+<script src="../../js/listMaterialsProducts.js">
+</script>
+<script src="../../js/listMaterialsOrgMats.js">
+</script> -->
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+
+    require(['dabox-datatables'], function() {
+
+        listMaterialsProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+        listMaterialsProducts.newOrgMatUrl = "${helper.urlFor('material.ProductMaterialJsonModule','newProdLink',[org.id])}";
+        listMaterialsProducts.deleteOrgMatLinkUrl = "${helper.urlFor('material.ProductMaterialJsonModule','deleteLink',[org.id])}";
+        listMaterialsProducts.contextPath = "${contextPath}";
+        listMaterialsProducts.sLang = "Search purchased materials";
+
+        listMaterialsProducts.init();
+
+        listMaterialsOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
+        listMaterialsOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+        listMaterialsOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
+        listMaterialsOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+        listMaterialsOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
+        listMaterialsOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
+        listMaterialsOrgMats.contextPath = "${contextPath}";
+        listMaterialsOrgMats.sLang = "Search added materials";
+
+        listMaterialsOrgMats.init();
+    });
+    
+    $( "#ctxnav li" ).click(function(){
+        if (!$(this).hasClass('activeItem')) {
+            $( ".matlist" ).toggle();
+            $( "#ctxnav li" ).toggleClass('activeItem');
+        } 
+        }
+    )
+    
+</script>
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@mMenu.materialsMenu selected="added"][/@mMenu.materialsMenu]
+[/#assign]
+
+[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+ 
+<a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn btn-add navBackgroundColor">Add Material</a>
+<h1>Materials</h1>
+<div id="listmaterialstabs">
+    <div id="tab_orgmats" class="matlist">
+        <section class="list">
+            <table class="list" id="listmaterials">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <div id="tab_products" class="matlist" style="display: none;">
+        <section class="list">
+            <table class="list" id="listproducts">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+[/@dws.skin]
+

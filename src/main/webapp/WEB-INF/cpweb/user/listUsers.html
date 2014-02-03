@@ -1,0 +1,81 @@
+[#ftl strip_text="true" /]
+
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
+</script>
+
+<script>
+    $(document).ready(function() {
+        require(['dabox-datatables'], function() {
+        var oTable = $('#listusers').dataTable({
+            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
+            "aaSorting": [[1,'asc']],
+            "aoColumnDefs": [ 
+                {
+                    "bSortable": false,
+                    "mDataProp": null,
+                    "fnRender": function ( oObj ) {
+
+                        if (oObj.aData.imagelink24) {
+                            return  '<a href="'+ oObj.aData.link + '"><img src="'+oObj.aData.imagelink24+'" class="photo" /></a> ';
+                        } else {
+                            return  '<a href="'+ oObj.aData.link + '"><img src="${cocoboxCdn}/cocobox/img/cp/userImage_24x24.png" class="photo" /></a> ';
+                        }
+                    },
+                    "aTargets": [ 0 ]
+                },
+                {
+                    "sWidth": "50%",
+                    "mDataProp": "name",
+                    "fnRender": function ( oObj ) {
+                            return  '<a href="'+ oObj.aData.link + '">' +  oObj.aData.name +'</a> ';
+                    },
+                    "aTargets": [ 1 ]
+                },
+                {
+                    "mDataProp": "email",
+                    "aTargets": [ 2 ]
+                }
+            ],
+            "sAjaxSource": "${helper.urlFor('CpJsonModule','listUsers',[org.id])}",                      
+            "iDisplayLength": 25,
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "No user matches your query",
+                "sEmptyTable": "<span class='emptytable'>Start now by creating your <a href='${helper.urlFor('CreateUserModule','create',[org.id])}'>first user</a></span>",
+                "sLoadingRecords": "<p>Loading users...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#listusers_filter input').attr('placeholder', 'Search users');
+                
+    } );
+                
+</script>
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-add navBackgroundColor">Add User</a>
+<h1>Users</h1>
+<section class="list">
+    <table class="list" id="listusers">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Email Address</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+[/@dws.skin]
+

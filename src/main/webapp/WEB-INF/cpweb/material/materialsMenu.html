@@ -1,0 +1,13 @@
+[#ftl strip_text="true" /]
+
+[#macro materialsMenu selected ]
+
+<nav id="ctxnav">
+    <ul>
+        <li id="sm_added" [#if selected == 'added']class="activeItem"[/#if]><a><span>Added</span></a></li>
+        <li id="sm_purchased" [#if selected == 'purchased']class="activeItem"[/#if]><a><span>Purchased</span></a></li>
+    </ul>
+</nav>
+
+[/#macro]
+

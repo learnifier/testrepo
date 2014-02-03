@@ -1,0 +1,18 @@
+[#ftl /]
+
+[#-- The dialog where the activation/deactivation error occurs in --]
+
+<div id="rosterPartErrorBox" title="Participation error">
+    <div id="rosterPartErrorBoxReason"></div>
+</div>
+
+<script>
+    function showRosterPartErrorBox(msg) {
+        $("#rosterPartErrorBoxReason").html(msg);
+
+        $("#rosterPartErrorBox").dialog({
+            width: 600,
+            height: 400
+        });
+    }
+</script>

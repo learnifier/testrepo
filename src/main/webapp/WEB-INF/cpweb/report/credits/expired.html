@@ -1,0 +1,107 @@
+[#ftl strip_text="true" /]
+
+
+[#assign cpweb_foot ]
+<script>
+    $('#tm_reports').addClass('activeItem').prev().addClass('prevItem');
+
+
+    $(document).ready(function() {
+        require(['dabox-report-datatables'], function() {
+        var balTable = $('#r_credits_expired').dataTable({
+            "sDom": 'rt',
+            "bPaginate": false,
+            "aaSorting": [[1,'asc']],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mDataProp": "orderNo",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.orderNo;
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": "created",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.createdStr;
+                    }
+                },
+                {
+                    "aTargets": [ 2 ],
+                    "mDataProp": "baseproduct",
+                    "fnRender": function ( oObj ) {
+                        var kitId = oObj.aData.baseproduct;
+                        var productId= '${product.id.id}';
+                        if (kitId == productId) {
+                            return 'N/A';
+                        } else {
+                            return  kitId;                            
+                        }
+                    }
+                },
+                {
+                    "aTargets": [ 3 ],
+                    "mDataProp": "amount",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.amount;
+                    }
+                }
+            ],
+            "sAjaxSource": "${helper.urlFor('report.ReportJsonModule','listExpiredReport',[org.id, product.id.id])}",
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>No orders have been placed.</span>",
+                "sLoadingRecords": "<p>Loading details...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#report_filter input').attr('placeholder', 'Search the report data');
+
+    } );
+
+</script>
+
+[/#assign]
+
+[#assign cpweb_head ]
+${cpweb_head}
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="reportoverview">
+
+    <section id="reportinfo">
+        <div class="itemicon">
+            <p>Report</p><h1>Credits expired for ${product.title!''?xhtml} (${product.id.id!''?xhtml})</h1>
+        </div>
+        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Back to credit status report</a>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Description</span><span class="setting clearfix">This report provides an overview of the number of credits expired for the selected product. It also provides the details on which order those credits originated from.</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="r_table">
+        <table class="report" id="r_credits_expired">
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Created</th>
+                    <th>Kit</th>
+                    <th>Expired</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+
+</section>
+
+
+[/@dws.skin]
+

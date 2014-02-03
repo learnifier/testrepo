@@ -1,0 +1,52 @@
+[#ftl strip_text="true" /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+</script>
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.editmaterial.title" /></h1>
+
+<div>
+    [#global formPrefix="cpweb.editmaterial" /]
+    <form action="${formLink}" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
+        [@mbform.alertsection]
+        [/@mbform.alertsection]
+        <section class="field clearfix">
+            <div class="column">
+
+                <fieldset>
+
+                    [@mbform.inputText name="title" class="input_full"  tabindex="1" /]
+
+                    [@mbform.textarea name="description" tabindex="2" /]
+
+                    [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
+                    [@mbform.select name="lang" class="input_full" tabindex="3"]
+                    [@mbform.option value="en" defaultValue=defaultValue]English[/@mbform.option]
+                    [/@mbform.select]
+
+                    [#if formsess.getDefaultValue('type') == 'link']
+                        [@mbform.inputText name="link" class="input_full"  tabindex="4" /]
+                    [/#if]
+
+                </fieldset>
+            </div>
+        </section>
+        [@mbform.infosection]
+        [/@mbform.infosection]
+        <section class="action">
+            <input type="hidden" name="orgId" value="${org.id}" />
+            <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savemtrl' /></span></button>
+            <a href="${helper.urlFor("CpMainModule", "listMaterials", [org.id] )}#orgmat"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+        </section>
+
+    </form>
+</div>
+
+[/@dws.skin>

@@ -1,0 +1,44 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    "use strict";
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+</script>
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="reports"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.settings.title" /]</h2>
+
+<section class="list">
+    <table class="list" id="listreports">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="${helper.urlFor('project.report.ProjectReportModule','activityReport', [prj.projectId])}">Project Status</a></td>
+            </tr>			
+            [#list materials?sort_by("title") as mat]
+                [#if mat.nativeType == 'idproject']
+                <tr>
+                    <td><a href="${helper.urlFor('project.report.ProjectReportModule','idProductReport', [prj.projectId, mat.id])}">${mat.title}-report for current project</a></td>
+                </tr>
+                [/#if]
+            [/#list]
+        </tbody>
+    </table>
+</section>
+
+
+[/@dws.skin]
+

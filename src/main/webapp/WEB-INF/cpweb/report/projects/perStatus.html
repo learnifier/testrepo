@@ -1,0 +1,111 @@
+[#ftl strip_text="true" /]
+
+<#assign test =  />
+
+[#assign cpweb_foot ]
+
+<script>
+    $('#tm_reports').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+        require(['dabox-report-datatables'], function() {
+        var balTable = $('#r_projects_status').dataTable({
+            "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"ip>',
+            "oTableTools": {
+                "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
+             },
+            "bPaginate": true,
+            "iDisplayLength": 50,
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mDataProp": "projectName",
+                    "sWidth": "60%",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="${helper.urlFor('project.report.ProjectReportModule','activityReport')}/' +  oObj.aData.projectId + '">' + oObj.aData.projectName + '</a>';
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": "totalCount",
+                    "sClass": "center",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.totalCount;
+                    }
+                },
+                {
+                    "aTargets": [ 2 ],
+                    "mDataProp": "invitedCount",
+                    "sClass": "center",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.invitedCount;
+                    }
+                },
+                {
+                    "aTargets": [ 3 ],
+                    "mDataProp": "completedCount",
+                    "sClass": "center completed",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.completedCount;
+                    }
+                }
+            ],
+            "sAjaxSource": "${helper.urlFor('report.ReportJsonModule','listParticipationStatus',[org.id])}",
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sSearch": "",
+                "sEmptyTable": "<span class='emptytable'>No projects available on your account.</span>",
+                "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#report_filter input').attr('placeholder', 'Search projects');
+
+    } );
+
+</script>
+[/#assign]
+
+[#assign cpweb_head ]
+${cpweb_head}
+[#include "/report/reportExportHead.html" /]
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="reportoverview">
+
+    <section id="reportinfo">
+        <div class="itemicon">
+            <p>Report</p><h1>Project status overview</h1>
+        </div>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Description</span><span class="setting clearfix">This report gives provides an overview of the completion status for all projects. You can drill down in each project by clicking on it.</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="r_table">
+        <table class="report" id="r_projects_status">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Total</th>
+                    <th>Invited</th>
+                    <th>Completed</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+
+</section>
+
+
+[/@dws.skin]
+

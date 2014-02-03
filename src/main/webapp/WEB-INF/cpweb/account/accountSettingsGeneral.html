@@ -1,0 +1,48 @@
+[#ftl strip_text="true" /]
+
+[#import "/se/dabox/cocosite/module/account/name.html" as aname /]
+[#import "/se/dabox/cocosite/module/account/language.html" as alanguage /]
+[#import "/se/dabox/cocosite/module/account/email.html" as aemail /]
+[#import "/se/dabox/cocosite/module/account/password.html" as apassword /]
+[#import "/se/dabox/cocosite/module/account/picture.html" as apicture /]
+[#import "/se/dabox/cocosite/module/account/social.html" as asocial /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_home').addClass('activeItem').prev().addClass('prevItem');
+
+    $(function(){
+        require(['dabox-common','cocobox-accountsettings'], function() {
+            cocobox.setlist.expandableList('#settingsList');
+            cocoboxAccountSettings();
+        });
+    });
+    
+</script>
+
+[/#assign]
+
+[#assign cpweb_head]
+${cpweb_head}
+[@commonCss.jcrop /]
+[@commonCss.jqueryMinicolors /]
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<div id="settingsList">
+    <h1>[@dws.txt key="cpweb.accountsetting.title" /]</h1>
+    <ul>
+        [@apicture.accountPicture/]
+        [@aname.accountName/]
+        [@alanguage.accountLanguage/]
+        [@apassword.accountPassword/]
+        [@aemail.accountEmail/]
+        [@asocial.social/]
+    </ul>    
+</div>
+
+[/@dws.skin]
+

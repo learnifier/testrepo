@@ -1,0 +1,101 @@
+[#ftl strip_text="true" /]
+
+[#import "/settings/settingsMenu.html" as sMenu /]
+
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+</script>
+
+
+[#import "/se/dabox/services/dwsfu/ckeditor4.ftl" as ck /]
+
+[@ck.ckeditorScriptTags /]
+[@ck.initCkeditorReadOnly target="#body" /]
+
+<script type="text/javascript">
+    $(function() {
+
+        $("#emailform").submit(function(event) {
+            var body = $('#body');
+            body.ckeditorGet().updateElement();
+
+            if (body.val().length === 0) {
+                cocobox.errorDialog('No email content','The email body cannot be empty.');
+                event.stopPropagation();
+                return false;
+            }
+        });
+    });
+
+    $('#deleteBtn').click(function() {
+        cocobox.confirmationDialog("Delete email template", "Do you want to delete this email template?", function() { $('#deleteForm').submit(); });
+        return false;
+      });
+
+</script>
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@sMenu.settingsMenu selected="emails"][/@sMenu.settingsMenu]
+[/#assign]
+
+[#assign head]
+${cpweb_head}
+
+[/#assign]
+
+[@dws.skin skin="CPAuthMenu2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="emailoverview">
+    <section id="emailinfo">
+        <div id="itemactions">
+            [#if !template.stickyCheck]
+            <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
+                <button type="submit" id="deleteBtn">Delete</button>
+            </form>
+            [/#if]
+            [#if !template.stickyCheck]
+            <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
+                <button type="submit">Edit Email</button>
+            </form>
+            [/#if]
+            [#if !template.stickyCheck]
+            <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
+                <button type="submit">Edit Settings</button>
+            </form>
+            [/#if]
+            <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
+                <button type="submit">Copy to New</button>
+            </form>
+        </div>
+        <div class="itemicon">
+            <p>Email Template</p><h1>${template.name?xhtml}</h1>
+        </div>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Description</span><span class="setting clearfix">${template.description!''?xhtml}</span></li>
+                <li><span class="label">Origin</span><span class="setting clearfix">[@dws.txt key="cpweb.emailoverview." + template.sticky?string!""  /]</span></li>
+                <li><span class="label">Language</span><span class="setting clearfix">${template.locale.getDisplayName(userLocale)?xhtml}</span></li>
+                <li><span class="label">Created By</span><span class="setting clearfix">${usernameHelper(template.createdBy)!''?xhtml}</span></li>
+                <li><span class="label">Created</span><span class="setting clearfix">${template.created?datetime}</span></li>
+                <li><span class="label">Updated By</span><span class="setting clearfix">${usernameHelper(template.updatedBy)!''?xhtml}</span></li>
+                <li><span class="label">Updated</span><span class="setting clearfix">${(template.updated?datetime)!""}</span></li>
+            </ul>
+        </div>
+    </section>
+    <h2>Email template preview</h2>
+    <section id="emailcontent">
+        <p class="label">Subject:</p>
+        <p class="subject">${template.subject!''?xhtml}<p/>
+        <p class="label">Body:</p>
+        <textarea id="body" disabled="disabled">${template.mainContent!''?xhtml}</textarea>
+    </section>
+
+</section>
+
+
+[/@dws.skin]
+

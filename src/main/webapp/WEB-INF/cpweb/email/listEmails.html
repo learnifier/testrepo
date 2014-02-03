@@ -1,0 +1,84 @@
+[#ftl strip_text="true" /]
+
+[#import "/settings/settingsMenu.html" as sMenu /]
+
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+    require(['dabox-datatables'], function() {
+        var oTable = $('#listemails').dataTable({
+            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
+            "bPaginate": false,
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [
+                {
+                   "aTargets": [ 0 ],
+                   "sWidth": "70%",
+                    "mDataProp": "name",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="'+ oObj.aData.editlink + '" title="' + oObj.aData.description  + '">' + oObj.aData.name +'</a> ';
+                    }
+                 },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": null,
+                    "sClass": "control",
+                    "fnRender": function ( oObj ) {
+                        if ( oObj.aData.sticky ) {
+                            return '[@dws.txt key="cpweb.emailoverview.true" /]'
+                        } else {
+                            return '[@dws.txt key="cpweb.emailoverview.false" /]'                            
+                        }
+                    }
+                }
+            ],
+
+            "sAjaxSource": "${helper.urlFor('mail.MailJsonModule','listTemplates', [org.id])}",
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "No email templates matches your query",
+                "sEmptyTable": "<span class='emptytable'>You have no email templates on your account.</span>",
+                "sLoadingRecords": "<p>Loading email templates...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+
+        $('#listemails_filter input').attr('placeholder', 'Search email templates');
+
+    } );
+
+</script>
+
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@sMenu.settingsMenu selected="emails"][/@sMenu.settingsMenu]
+[/#assign]
+
+
+[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+
+<h1>Email Templates</h1>
+<section class="list">
+    <table class="list" id="listemails">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Origin</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+
+
+
+[/@dws.skin]
+

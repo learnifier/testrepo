@@ -1,0 +1,11 @@
+[#ftl /]
+
+<script id="courseDesignBox" type="text/x-jsrender">
+    <li tabindex="2" data-design="{{:designId}}">
+        <img src="{{>thumbnail}}" alt="{{>name}} thumbnail" draggable="false"> 
+        <h3>{{>name}}</h3>
+        <p>{{>description}}</p>
+        <span class="btn secondarybackgroundcolor select">Select</span>
+        <span class="btn primarybackgroundcolor selected">Selected</span>
+    </li>
+</script>

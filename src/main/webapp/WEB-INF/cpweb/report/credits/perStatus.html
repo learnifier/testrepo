@@ -1,0 +1,148 @@
+[#ftl strip_text="true" /]
+
+
+[#assign cpweb_foot ]
+[#include "/report/reportExport.html" /]
+
+<script>
+    $('#tm_reports').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+        require(['dabox-common', 'dabox-report-datatables'], function() {
+
+        var balTable = $('#r_credits_perstatus').dataTable({
+            "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"ip>',
+            "oTableTools": {
+                "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf"
+             },
+            "bPaginate": true,
+            "iDisplayLength": 50,
+            "aaSorting": [[6,'desc']],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mDataProp": "thumbnail",
+                    "sClass": "thumbnail",
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        if (oObj.aData.thumbnail) {
+                            return  '<img src="'+oObj.aData.thumbnail+'" />';
+                        } else {
+                            return  '';
+                        }
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": "id",
+                    "fnRender": function ( oObj ) {
+                        return  oObj.aData.id;
+                    }
+                },
+                {
+                    "aTargets": [ 2 ],
+                    "mDataProp": "title",
+                    "sWidth": "55%",
+                    "fnRender": function ( oObj ) {
+                        return  '<span title="' + oObj.aData.title  + '">' + cocobox.trunc(oObj.aData.title , 30) + '</span>';
+                    }
+                },
+                {
+                    "aTargets": [ 3 ],
+                    "mDataProp": "totalCredits",
+                    "bUseRendered": false,
+                    "sClass": "center",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="${helper.urlFor('report.ReportModule','creditsPurchased', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.totalCredits + '</a>';
+                    }
+                },
+                {
+                    "aTargets": [ 4 ],
+                    "mDataProp": "usedCredits",
+                    "bUseRendered": false,
+                    "sClass": "center",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="${helper.urlFor('report.ReportModule','creditsUsed', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.usedCredits + '</a>';
+                    }
+                },
+                {
+                    "aTargets": [ 5 ],
+                    "mDataProp": "expiredCredits",
+                    "bUseRendered": false,
+                    "sClass": "center",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="${helper.urlFor('report.ReportModule','creditsExpired', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.expiredCredits + '</a>';
+                    }
+                },
+                {
+                    "aTargets": [ 6 ],
+                    "mDataProp": "availCredits",
+                    "bUseRendered": false,
+                    "sClass": "center available",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="${helper.urlFor('report.ReportModule','creditsAvailable', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.availCredits + '</a>';
+                    }
+                }
+            ],
+            "sAjaxSource": "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}",
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sSearch": "",
+                "sEmptyTable": "<span class='emptytable'>No products available on your account.</span>",
+                "sLoadingRecords": "<p>Loading account balances...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#report_filter input').attr('placeholder', 'Search the report data');
+
+    } );
+
+</script>
+[/#assign]
+
+[#assign cpweb_head ]
+${cpweb_head}
+[#include "/report/reportExportHead.html" /]
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<section id="reportoverview">
+
+    <section id="reportinfo">
+        <div class="itemicon">
+            <p>Report</p><h1>Credits status per product</h1>
+        </div>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Description</span><span class="setting clearfix">This report gives provides an overview of the credit balances for all your available products. You can drill down on each number by clicking on it.</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="r_table">
+        <table class="report" id="r_credits_perstatus">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Number</th>
+                    <th>Purchased</th>
+                    <!--<th>Reserved</th>-->
+                    <th>Used</th>
+                    <th>Expired</th>
+                    <th>Available</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+
+</section>
+
+
+[/@dws.skin]
+

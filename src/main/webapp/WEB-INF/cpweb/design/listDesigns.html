@@ -1,0 +1,131 @@
+[#ftl strip_text="true" /]
+
+[#import "/settings/settingsMenu.html" as sMenu /]
+
+[#assign listDetails]
+<div id="listitem"> 
+
+    <div id="itemactions">
+        <button tabindex="2">Delete</button>
+        <button tabindex="1">Edit</button>
+    </div>
+
+    <h1>%name%</h1>
+    <p>%desc%</p>
+
+    <div id="itemdetails">
+        <table>
+            <tbody>
+                <tr>
+                    <td>[@dws.txt key="cpweb.email.lang" /]</td>
+                    <td>%lang%</td>
+                    <td>[@dws.txt key="cpweb.email.status" /]</td>
+                    <td>%status%</td>
+                </tr>
+                <tr>
+                    <td>[@dws.txt key="cpweb.email.createdby" /]</td>
+                    <td>%createdby%</td>
+                    <td>[@dws.txt key="cpweb.email.createddate" /]</td>
+                    <td>%createddate%</td>
+                </tr>
+                <tr>
+                    <td>[@dws.txt key="cpweb.email.modby" /]</td>
+                    <td>%modifiedby%</td>
+                    <td>[@dws.txt key="cpweb.email.moddate" /]</td>
+                    <td>%modifieddate%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="emailpreview">
+        <div class="box">
+            <p>[@dws.txt key="cpweb.email.subject" /]</p>
+            <p id="emailsubject">%subject%</p>
+            <p>[@dws.txt key="cpweb.email.body" /]</p>
+            <div id="emailbody">%body%</div>
+        </div>
+    </div>
+
+</div>
+
+[/#assign]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+    require(['dabox-datatables'], function() {
+        var oTable = $('#listdesigns').dataTable({
+            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
+            "bPaginate": false,
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [
+                {
+                   "sWidth": "70%",
+                    "mDataProp": "name",
+                    "fnRender": function ( oObj ) {
+                        return  '<a href="'+ oObj.aData.editlink + '" title="' + oObj.aData.description  + '">' + oObj.aData.name +'</a> ';
+                    },
+                    "aTargets": [ 0 ]
+                 },
+                {
+                    "aTargets": [ 1 ],
+                    "mDataProp": null,
+                    "sClass": "control",
+                    "fnRender": function ( oObj ) {
+                        if ( oObj.aData.sticky ) {
+                            return '<span class="on">[@dws.txt key="cpweb.designoverview.true" /]</span>'
+                        } else {
+                            return '<span class="off">[@dws.txt key="cpweb.designoverview.false" /]</span>'                            
+                        }
+                    }
+                }
+            ],
+
+            "sAjaxSource": "${helper.urlFor('coursedesign.CourseDesignJsonModule', 'list', [org.id])?js_string}",
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "No course designs matches your query",
+                "sEmptyTable": "<span class='emptytable'>You have no course designs on your account.</span>",
+                "sLoadingRecords": "<p>Loading course designs...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+        });
+        $('#listdesigns_filter input').attr('placeholder', 'Search course designs');
+
+    } );
+
+</script>
+
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@sMenu.settingsMenu selected="designs"][/@sMenu.settingsMenu]
+[/#assign]
+
+
+[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+
+<h1>Course Designs</h1>
+<section class="list">
+    <table class="list" id="listdesigns">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Origin</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+
+
+
+[/@dws.skin]
+

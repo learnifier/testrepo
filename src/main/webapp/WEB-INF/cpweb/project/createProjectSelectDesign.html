@@ -1,0 +1,167 @@
+[#ftl strip_text="true" /]
+
+[#!-- Netbeans hint
+<script src="/js/cpweb.js"></script>
+<script src="/js/dev/jquery-1.7.2.js"></script>
+<script src="../../js/createProject.js"></script> -->
+--]
+
+[#assign foot]
+${cpweb_foot}
+
+[#include "courseDesignRenderer.html" />
+
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');    
+
+    var listCourseDesigns = "${helper.urlFor('coursedesign.CourseDesignJsonModule', 'list', [org.id])?js_string}";
+
+    [#if session.hasFlashAttribute("missingProducts") ]
+    $(function(){
+        require(['dabox-common'] , function(){
+            var msg = '${session.getFlashAttribute("missingProducts")?xhtml?js_string}'.split('\n');
+            cocobox.infoDialog('Missing material(s)',msg);
+        });
+    })
+    [/#if]
+
+
+    $(function(){
+        require(['jsrender'] , function(){
+                    $("#prjtype").val('DESIGNED_PROJECT');
+                    jQuery.post(listCourseDesigns, null, function(data) {
+                        var extra = {
+                            "designId":0,
+                            "name":"Materials List",
+                            "createdBy":0,
+                            "created":0,
+                            "createdStr":"",
+                            "sticky":false,
+                            "enabled":true,
+                            "description":"Deliver your products in a simple list format.",
+                            "editlink":"",
+                            "thumbnail": "${cocoboxCdn}/cocobox/img/ml_default.png"
+                        };
+                        data.aaData.push(extra);
+                        $("#crprj_designslist ul").html(
+                        $("#courseDesignBox").render(data.aaData)
+                    );
+                    }, "json");
+                });
+
+                $('#crprj_designslist ul').on('click', 'li', function() {
+                    log(this);
+                    $('#next_btn').removeAttr('disabled', 'disabled');
+                    $(this).parent('ul').find('li').removeClass('selection');
+                    $(this).addClass('selection');
+                    $('#design').val($(this).data('design'));
+                    $('html, body').delay(300).animate({
+                        scrollTop: $(".crprj_actions").offset().top-40
+                    }, 300);
+                    return true;
+                });
+            });
+
+</script>
+
+[/#assign]
+
+
+[#assign cpweb_head]
+${cpweb_head}
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.createprojectselectdesign.title" /]</h1>
+
+[#global formPrefix="cpweb.createproject" /]
+<form action="${formLink}" name="createProjectSelectDesign" class="fullpage" method="post">
+    [@mbform.alertsection]
+    [/@mbform.alertsection]
+    <section class="field clearfix">
+        <div class="column">
+
+            <fieldset>
+                <div id="projectname">
+                    <h2>1 Name your project - seen only by administrators</h2>
+                    [@mbform.inputText name="projectname" class="input_full"  tabindex="1" maxlength="63"/]
+
+                </div>
+                <div id="typeselections" class="clearfix">
+                    <div id="crprj_designslist" style="">
+                        <input type="hidden" name="design" id="design" />
+                        <h2>2 Select your course design</h2>
+                        <ul id="designlist_options" class="crprj-option-list clearfix">                            
+                        </ul>
+                    </div>
+                </div>
+                <div id="projecttimezone">
+                    <h2>3 Set the time zone - can be edited later</h2>
+                        [#assign defaultValue = formsess.getDefaultValue('timezone')!(defaultTimezone.ID)!'' /]
+                        [@mbform.select name="timezone" class="input_full" tabindex="7" required="required"]
+                        <option></option>
+                        [#assign tzValueFound = false /]
+                        <optgroup label="Recently used">
+                            [#list timezones.recentList as tz]
+                                [@mbform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@mbform.option]
+                                [#if tz.ID == defaultValue]
+                                  [#assign tzValueFound = true /]
+                                [/#if]
+                            [/#list]
+                        </optgroup>
+                        <optgroup label="All timezones">
+                            [#list timezones.otherList?sort as tz]
+                                [#if tzValueFound]
+                                    [@mbform.option value=tz.ID defaultValue="xyz"]${tz.ID?xhtml}[/@mbform.option]
+                                [#else]
+                                    [@mbform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@mbform.option]
+                                [/#if]
+                            [/#list]
+                        </optgroup>
+                        [/@mbform.select]
+                </div>
+                <div id="projectsettings">
+                    <h2>4 Choose your default settings - can be edited later</h2>
+
+                    <div id="settings_summary">
+                        <ul>
+                            <li><span class="label">Language: </span>${(defaultLangLocale).getDisplayName(userLocale)?xhtml}</li>
+                            <li><span class="label">Country: </span>${(defaultCountryLocale).getDisplayCountry(userLocale)?xhtml}</li>
+                            <li><a onclick="$('#settings_expanded').toggle();">Edit default settings</a></li>
+                        </ul>
+                    </div>
+                    <div id="settings_expanded" style="display: none;">
+
+                        [#assign defaultValue = formsess.getDefaultValue('projectlang')!defaultLangLocale /]
+                        [@mbform.select name="projectlang" class="input_full" tabindex="5"]
+                        [#list langs as lang]
+                        [@mbform.option value=lang defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@mbform.option]
+                        [/#list]
+                        [/@mbform.select]
+                        
+                        [#assign defaultValue = formsess.getDefaultValue('country')!defaultCountryLocale /]
+                        [@mbform.select name="country" class="input_full" tabindex="6"]
+                        [#list countries as country]
+                        [@mbform.option value=country defaultValue=defaultValue]${country.getDisplayCountry(userLocale)?xhtml}[/@mbform.option]
+                        [/#list]
+                        [/@mbform.select]
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </section>
+    [@mbform.infosection]
+    [/@mbform.infosection]
+    <section class="action crprj_actions">
+        <input type="hidden" name="orgId" value="${org.id}" />
+        <input type="hidden" id="prjtype" name="prjtype" />
+        <button tabindex="100" class="primary next" disabled="disabled" id="next_btn"><span>[@dws.txt key='form.action.next' /]</span></button>
+        <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="cancel">[@dws.txt key="form.action.cancel" /]</a>
+    </section>
+
+</form>
+
+[/@dws.skin]
+

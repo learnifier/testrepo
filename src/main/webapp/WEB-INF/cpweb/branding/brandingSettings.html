@@ -1,0 +1,271 @@
+[#ftl strip_text="true" /]
+
+[#import "/settings/settingsMenu.html" as sMenu /]
+
+
+[#assign uploadFoot]
+${cpweb_foot}
+<script>
+    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+</script>
+
+<script>
+    require(['cocobox-accountsettings'], function() {
+        //Do nothing in here
+    })
+
+   $(function(){
+        require(['dabox-common'], function() {
+            cocobox.setlist.expandableList('#settingsList');
+        });
+    });
+    
+    (function() {
+        require(['jquery.form', 'jquery.Jcrop'], function() {
+
+        var bar = $('.bar');
+        var percent = $('.percent');
+        var status = $('#status');
+        
+        var width = ${width};
+        var height = ${height};
+
+        var $preview = $('#preview');
+        // Our simple event handler, called from onChange and onSelect
+        // event handlers, as per the Jcrop invocation above
+        function showPreview(coords)
+        {
+            if (parseInt(coords.w) > 0)
+            {
+                var rx = 234 / coords.w;
+                var ry = 60 / coords.h;
+
+                $preview.css({
+                    width: Math.round(rx * width) + 'px',
+                    height: Math.round(ry * height) + 'px',
+                    marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+                    marginTop: '-' + Math.round(ry * coords.y) + 'px'
+                }).show();
+            }
+        }
+
+        function updateCoords(c) {
+            jQuery('#x').val(c.x);
+            jQuery('#y').val(c.y);
+            jQuery('#w').val(c.w);
+            jQuery('#h').val(c.h);
+        };
+
+        $('#logoform').ajaxForm({
+            dataType: 'json',
+            beforeSend: function() {
+                $('#totalcrop').fadeOut(500);
+                //                $('.progress').show('slow');
+                //                status.empty();
+                var percentVal = '0%';
+                bar.width(percentVal)
+                percent.html(percentVal);
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+                var percentVal = percentComplete + '%';
+                bar.width(percentVal)
+                percent.html(percentVal);
+            },
+            complete: function(xhr) {
+                bar.width(396);
+                percent.html('100%');
+                //              $('.progress').hide('slow');
+
+                $('#uploadPicBtn #uploaded').show();
+                $('#selectPicBtn #selected').hide();
+              
+                var json = jQuery.parseJSON(xhr.responseText);
+
+                if (json.status && json.status == 'OK') {
+
+                    $('#saveLogoBtn').removeAttr('disabled', 'disabled');
+                    
+                    $('#crop').html($("<img>", {
+                        id: "cropboximg",
+                        width: width,
+                        height: height,
+                        src: json.previewUrl
+                    }));
+                    
+                    $('#preview').attr('src',json.previewUrl);
+
+                    $("#totalcrop").slideDown("slow");
+                    $("#cropboximg").Jcrop({
+                        bgColor: '#666',
+                        aspectRatio: width/height,
+                        setSelect: [0,0,width,height],
+                        onChange: showPreview,
+                        onSelect: function(c) { showPreview(c); updateCoords(c)}
+                    });
+                    $("#pid").val(json.preview);
+                } else {
+                    cocobox.errorDialog('Error uploading image','Uploading of image was not successful. Make sure that the logo is in a valid format.');
+                }
+            }
+        });
+        });
+    })();
+
+    $('#selectPicBtn').click(function(){
+        $('#image').click();
+    });
+    $('#image').change(function(){
+        $('#uploadPicBtn').attr('disabled', null)
+        $('#uploadPicBtn #uploaded').hide();
+        $('#selectPicBtn #selected').show();
+        $('.percent').text('0%')
+        $('.bar').css('width', '0')
+    });
+    //    $('#uploadPicBtn').click(uploadImage);
+    //    $("#saveLogoBtn").click(imageupdateForm);
+    
+    function brandingUpdateForm(form) {
+        require(['dabox-jquery','dabox-common'], function() {
+            cocobox.longOp('Updating the portal theme. This will take approximately 30 seconds. Please stand by.');
+            $("button",form).cocobox('inputBlock');
+        });
+
+        return true;
+    };
+    
+    $('#resetLogoBtn').click( function() {
+       var input = $("<input>").attr("type", "hidden").attr("name","reset").val("reset");
+       $('#logosaveform').append(input);
+    }); 
+       
+
+    $("#resetColorBtn").click(function() {
+        log('ResetColorBtn clicked');
+        var input = $("<input>").attr("type", "hidden").attr("name","reset").val("reset");
+        $("#colorform").append(input);
+    });
+    
+</script>
+[/#assign]
+
+[#assign head]
+    [@commonCss.jcrop /]
+    [@commonCss.jqueryMinicolors /]
+    ${cpweb_head}
+
+    <style>
+        /* Hack for jquery-ui and jcrop */
+        .ui-front {
+            z-index: 1000;
+        }
+    </style>
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@sMenu.settingsMenu selected="branding"][/@sMenu.settingsMenu]
+[/#assign]
+
+
+[@dws.skin skin="CPAuthMenu2" head=head ctxMenu=cpweb_ctxMenu foot=uploadFoot orgName=orgName]
+<div id="settingsList">
+    <h1>[@dws.txt key="cpweb.page.branding.title" /]</h1>
+    <ul>
+        <li id="logo" class="expandable">
+            <a class="setting">
+                <span class="label">[@dws.txt key="cpweb.setting.logotype.title" /]</span>
+                <span class="edit">[@dws.txt key="cpweb.setting.edit" /]</span>
+                <span class="short">Set Customized Logo</span>
+            </a>
+            <div class="content">
+                <div class="label">[@dws.txt key="cpweb.setting.logotype.title" /]</div>
+                <div class="form" id="uploadlogo">
+                    [#global formPrefix="cpweb.logotype.language" /]
+                    <form action="${helper.urlFor('branding.LogoModule','uploadImage',[org.id])}" method="post" enctype="multipart/form-data" id="logoform">
+                        <h3>Step 1 - Select the logo</h3>
+                        <input type="file" name="image" id="image" required="required" />
+                        <p class="format"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span></p>
+                        <h3>Step 2 - Upload the logo</h3>
+                        <button type="submit" id="uploadPicBtn" disabled="disabled">
+                            [@dws.txt key="form.action.uploadlogo" /]
+                        </button>
+                        <div class="progress_wrapper">
+                            <div class="progress">
+                                <div class="bar"></div>
+                                <div class="percent">0%</div>
+                            </div>                            
+                        </div>
+                        <h3>Step 3 - Crop the uploaded logo</h3>
+                        <ul id="preparepicture_wrapper">
+                            <li>
+                                <div id="picture_wrapper">
+                                    <img id="preview" />
+                                </div>
+                            </li>
+                            <li>
+                                <div id="crop_wrapper">
+                                    <div id="totalcrop" style="display: none">
+                                        <div id="crop">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </form>
+                    <form id="logosaveform" action="${saveurl}" method="post" image="logosaveform" onsubmit="brandingUpdateForm(this)" >
+                        <section class="field clearfix">
+                            <div class="column">
+                                <fieldset>
+                                    <input type="hidden" id="pid" name="pid" />
+                                    <input type="hidden" id="x" name="x" />
+                                    <input type="hidden" id="y" name="y" />
+                                    <input type="hidden" id="w" name="w" />
+                                    <input type="hidden" id="h" name="h" />
+                                </fieldset>
+                            </div>
+                        </section>
+                        <section class="action">
+                            <button type="submit" class="save primary" disabled="disabled" id="saveLogoBtn"><span>[@dws.txt key="form.action.savelogo" /]</span></button>
+                            <button type="submit" class="reset" id="resetLogoBtn" name="reset"><span>[@dws.txt key="form.action.resetlogo" /]</span></button>
+                            <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+                        </section>
+                    </form>
+                </div>
+            </div>
+        </li>
+        <li id="colors" class="expandable">
+            [#global formsess=colorformsess /]
+            <a class="setting">
+                <span class="label">[@dws.txt key="cpweb.setting.colors.title" /]</span>
+                <span class="edit">[@dws.txt key="cpweb.setting.edit" /]</span>
+                <span class="short">Set Customized Colors</span>
+            </a>
+            <div class="content">
+                <div class="label">[@dws.txt key="cpweb.setting.colors.title" /]</div>
+                <div class="form">
+                    [#global formPrefix="cpweb.colors.language" /]
+                    <form action="${helper.urlFor('branding.BrandingModule','colorChange',[org.id])}" method="post" enctype="multipart/form-data" id="colorform" onsubmit="brandingUpdateForm(this)">
+                        [@mbform.alertsection]
+                        [/@mbform.alertsection]
+                        <section class="field clearfix">
+                            <div class="column">
+                                <fieldset>
+                                    [@mbform.inputColor name="navcolor"/]
+                                    [@mbform.inputColor name="primarycolor" /]
+                                    [@mbform.inputColor name="secondarycolor" /]
+                                </fieldset>
+                            </div>
+                        </section>
+                        [@mbform.infosection]
+                        [/@mbform.infosection]
+                        <section class="action">
+                            <button type="submit" tabindex="100" class="save primary"><span>[@dws.txt key='form.action.savecolors' /]</span></button>
+                            <button type="submit" class="reset" id="resetColorBtn" name="reset" value="reset"><span>[@dws.txt key="form.action.resetcolors" /]</span></button>
+                            <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+                        </section>
+                    </form>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+[/@dws.skin]

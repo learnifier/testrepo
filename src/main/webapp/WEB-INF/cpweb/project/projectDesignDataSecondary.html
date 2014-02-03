@@ -1,0 +1,231 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#macro fieldValue name]${oldValues[name]!databankValues[name]!''}[/#macro]
+
+[#assign cpweb_head]
+${cpweb_head}
+[/#assign]
+
+[#assign setValueUrl = helper.urlFor('project.ProjectDatabankJsonModule','setValue',[prj.projectId]) /]
+
+
+[#assign foot]
+${cpweb_foot}
+<script type="text/javascript">
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');    
+
+    dpSettings = {
+        'defaultDate': "+1d",
+        'minDate': 0,
+        'showAnim': 'slideDown',
+        'dateFormat': 'yy-mm-dd',
+		'timeFormat': 'HH:mm',
+        'showOn': "both",
+        'buttonImage': "${cocoboxCdn}/cocobox/img/calendar-icon2.png",
+        'buttonImageOnly': true,
+		'onClose': function(dateText, instance) {
+			if(instance.inst != null) {
+				instance = instance.inst;
+			}
+
+			var pk = $('#'+instance.id).data('cid');	
+			var override = $('#'+instance.id).data('override');
+			var name = $('#'+instance.id).data('name');
+			var value = $('#'+instance.id).val();
+			log('value is ' , value);
+			var textfield = 'text'+instance.id.substring(1);
+
+			override = true;
+			
+			postSetValue(textfield, pk, override, name, value);
+
+		}
+    };
+	
+	var postSetValue = function(textfield, pk, override, name, value) {
+		$.ajax({
+			type: 'post',
+			url: "${setValueUrl}",
+			data: {'pk': pk, 'override': override, 'name': name, 'value': value},
+			success: function(data) {
+				var modifiedTextValue = data.stringValue.replace(/\:[0-9]{2}\s/, " ");
+				if(textfield != null) {
+					$('#'+textfield).text(modifiedTextValue);
+				}
+			}
+		});
+	};
+	
+	$('body').on('click', '.editspan', function() {
+		var hiddenid = $(this).data('hiddenid');
+		$('#'+hiddenid).datetimepicker('show');
+	});
+	
+	$('body').on('click', '.revertspan', function() {
+		var hiddenid = $(this).data('hiddenid');
+		var name = $('#'+hiddenid).data('name');
+		var pk = $('#'+hiddenid).data('cid');
+		var override = false; //time to revert, set override to false
+		var value = $('#'+hiddenid).val();
+		var textfield = 'text'+hiddenid.substring(1);
+		
+		postSetValue(textfield, pk, override, name, value );
+	});
+	
+	requirejs(['jqueryui-editable'], function() {
+		$('.editable').editable({
+			title: ''
+		});
+	});
+
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
+
+[@pInfo.projectInfo selected="details"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.designdatasecondary.title" /]</h2>
+
+<section id="designdata">
+
+    [#global formPrefix="cpweb" /]    
+        [@mbform.alertsection]
+        [/@mbform.alertsection]
+        [#if errorFields?size > 0]
+            <section class="alert">
+              <h1>[@dws.txt key="form.alert.title" /]</h1>
+              <ul>
+                  <li>Check your input in the fields marked in red as the input does not match the required format.</li>
+              </ul>
+            </section>
+        [/#if]
+        
+       [#if primaryFieldCount > 0 ]
+        <section class="action">
+           <h3><b>STEP 1</b> - Start by setting the required course details and then move on to step 2</h3>
+            <input type="hidden" name="orgId" value="${org.id}" />
+            <a href="${helper.urlFor('VerifyProjectDesignModule', 'verifyNewDesign', [prj.projectId])}" class="btn navBackgroundColor">[@dws.txt key='form.action.backtoprimary' /]</a>
+        </section>
+        [/#if]
+
+        <form action="${helper.urlFor('project.VerifyProjectDesignModule','updateNewDesign',[prj.projectId])}" name="createProjectGeneral" class="fullpage" method="post">
+            <section class="field clearfix design">
+            [#if primaryFieldCount > 0 ]
+               <h3><b>STEP 2</b> - Set dates and details below</h3>
+            [#else]
+                    [#if (!components??) || (components?size < 1)]
+                        <p>No dates or details can be set for this project</p>
+                   [#else]
+                        <p>Activate your course by adding important dates and information</p>
+                    [/#if]
+             [/#if]
+                <ul>
+                    [#if components??]
+                    [#list components as component]
+                    <li class="mainitem clearfix">
+                        [@displayComponent component /]
+                    </li>
+                    [/#list]
+                    [/#if]
+
+                </ul>
+            </section>
+        [@mbform.infosection]
+        [/@mbform.infosection]
+    </form>
+
+</section>
+
+[/@dws.skin]
+
+[#macro displayComponent component]
+
+[#if component.children?size > 0 || component.type == 'text']
+    <div class="text">
+        <h1>${component.properties.title!''}</h1>
+        <p class="desc">${component.properties.description!''}</p>
+    </div>
+    [#if component.children?size > 0]
+        [#list component.children as child]
+            [#if child.properties.splitContainerPosition?? && child.properties.splitContainerPosition == "top" ]
+                <div class="text">
+                    [#if child.properties["title"]??]<h1>${child.properties["title"]}</h1>[/#if]
+                    [#if child.properties["description"]??]<p class="desc">${child.properties["description"]}</p>[/#if]
+                    [@listComponentFields child /]
+                </div>
+            [/#if]
+         [/#list]
+         <ul class="subitems">
+            [#list component.children as child]
+                [#if !child.properties.splitContainerPosition?? || child.properties.splitContainerPosition != "top" ]
+                    <li class="subitem">[@displayComponent child /]</li>
+                [/#if]
+           [/#list]
+        </ul>
+    [/#if]
+[#else]
+    <div class="text">
+        [#if component.properties["title"]??]<h1>${component.properties["title"]}</h1>[/#if]
+        [#if component.properties["description"]??]<p class="desc">${component.properties["description"]}</p>[/#if]
+        [@listComponentFields component /]
+    </div>
+[/#if]
+
+[/#macro]
+
+[#macro listComponentFields component]
+[#if componentFieldSet[component.cid]??]
+[#local fields = componentFieldSet[component.cid] /]
+<div class="details clearfix">
+    <ul>
+        [#list fields as field]
+        <li class="${field.name}">[@listComponentField component field /]</li>
+        [/#list]
+    </ul>
+</div>
+[/#if]
+[/#macro]
+
+[#macro listComponentField component field]
+<label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
+[#assign extraAttrs = "" /]
+[#assign fieldType = "text"]
+[#if field.name == "starts" || field.name == "ends" || field.name == "due" || field.name == "enabledate"]
+	[#assign fieldType = "datetime" ]
+[/#if]
+[#if field.name = "duration"]
+  [#assign fieldType = "number"]
+  [#assign extraAttrs = "min='1'" /]
+[#elseif field.name = "phone"]
+  [#assign fieldType = "tel"]
+[#elseif field.name = "url" || field.name = "locUrl"]
+  [#assign fieldType = "url"]
+[/#if]
+
+[#assign fname = component.cid+'_'+field.name /]
+
+[#if fieldType == "datetime"]
+<span [#if !field.primaryField]class="editspan"[/#if] data-hiddenid="f${component.cid}_${field.name}" id="text${component.cid}_${field.name}">[#if field.stringValue?length > 0]${field.stringValue}[#else]Click to set a date[/#if]</span>
+<input type="hidden" id="f${component.cid}_${field.name}" data-cid="${component.cid}"  name="f${component.cid}_${field.name}" data-name="${field.name}" value="[@fieldValue fname /]" />
+[#else]
+<span [#if !field.primaryField]class="editable"[/#if] id="f${component.cid}_${field.name}" data-url="${setValueUrl}" data-pk="${component.cid}" data-name="${field.name}" name="f${component.cid}_${field.name}" data-value="[@fieldValue fname /]">${field.stringValue}</span>
+[/#if]
+
+[#if field.name = "duration"]
+<span style="font-weight: bold;">  min</span>
+[/#if]
+
+[#if field.dataType == "DATETIME" && field.primaryField == false]
+<span class="revertspan" data-hiddenid="f${component.cid}_${field.name}" title="revert to default setting"></span>
+[@mbform._onreadyJavascript]
+[#compress]
+requirejs(['jquery-ui-timepicker-addon'], function() {
+	$("#f${component.cid}_${field.name}").datetimepicker(dpSettings);
+});
+[/#compress]
+[/@]
+[/#if]
+[/#macro]
