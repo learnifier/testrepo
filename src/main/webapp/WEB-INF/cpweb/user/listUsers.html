@@ -31,7 +31,8 @@ ${cpweb_foot}
                     "sWidth": "50%",
                     "mDataProp": "name",
                     "fnRender": function ( oObj ) {
-                            return  '<a href="'+ oObj.aData.link + '">' +  oObj.aData.name +'</a> ';
+                            var name = (oObj.aData.name && oObj.aData.name.length > 0) ? oObj.aData.name.length : "(Name not set yet)";
+                            return  '<a href="'+ oObj.aData.link + '">' +  name +'</a> ';
                     },
                     "aTargets": [ 1 ]
                 },
