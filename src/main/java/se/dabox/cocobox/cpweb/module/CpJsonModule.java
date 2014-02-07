@@ -17,6 +17,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -221,8 +222,8 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                     generator.writeStartObject();
 
                     generator.writeNumberField("uid", userAccount.getUserId());
-                    generator.writeStringField("name", userAccount.
-                            getDisplayName());
+                    String name = StringUtils.trimToEmpty(userAccount.getDisplayName());
+                    generator.writeStringField("name", name);
                     generator.writeStringField("email", userAccount.
                             getPrimaryEmail());
                     generator.writeStringField("link",

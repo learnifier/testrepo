@@ -44,28 +44,27 @@ public class UserJsonModule extends AbstractJsonAuthModule {
         LazyProjectName projName = new LazyProjectName(getCocoboxCordinatorClient(cycle));
 
         try {
-            JsonGenerator generator = CpJsonModule.FACTORY.createJsonGenerator(
-                    baos);
-
-            generator.writeStartObject();
-
-            generator.writeArrayFieldStart("aaData");
-
-            for (ProjectParticipation ppart : participations) {
+            try (JsonGenerator generator
+                    = CpJsonModule.FACTORY.createJsonGenerator(
+                            baos)) {
                 generator.writeStartObject();
-                generator.writeNumberField("id", ppart.getParticipationId());
-                generator.writeStringField("projectname", projName.forProject(ppart.getProjectId()));
-                generator.writeStringField("projectlink", NavigationUtil.toProjectPageUrl(cycle,
-                        ppart.getProjectId()));
+                
+                generator.writeArrayFieldStart("aaData");
+                
+                for (ProjectParticipation ppart : participations) {
+                    generator.writeStartObject();
+                    generator.writeNumberField("id", ppart.getParticipationId());
+                    generator.writeStringField("projectname", projName.forProject(ppart.getProjectId()));
+                    generator.writeStringField("projectlink", NavigationUtil.toProjectPageUrl(cycle,
+                            ppart.getProjectId()));
+
+                    generator.writeEndObject();
+                }
+
+                generator.writeEndArray();
 
                 generator.writeEndObject();
             }
-
-            generator.writeEndArray();
-
-            generator.writeEndObject();
-
-            generator.close();
 
             return baos;
         } catch (IOException ex) {
