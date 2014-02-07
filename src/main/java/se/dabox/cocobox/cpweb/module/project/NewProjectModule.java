@@ -74,7 +74,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     private static final String CREATE_MAT_LIST = "createMatList";
     private static final String MAT_LIST_DETAILS = "matListDetails";
     private static final String PROCESS_SETUP = "processSetup";
-    private static final String ORGMAT = "orgmat";
+    private static final String ORGMAT = OrgMaterialConstants.NATIVE_SYSTEM;
     public static final String FORMSESS_ATTR = "createproject.formsess";
 
     /**
@@ -344,13 +344,12 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         List<String> ids = CollectionsUtil.transformListNotNull(Arrays.asList(strIds),
                 new Transformer<String, String>() {
-                    private static final String PRODDIR = "proddir";
-
+                    
                     @Override
                     public String transform(String obj) {
                         String[] selection = ID_SPLIT_PATTERN.split(obj);
 
-                        if (!PRODDIR.equals(selection[0])) {
+                        if (!ProductMaterialConstants.NATIVE_SYSTEM.equals(selection[0])) {
                             return null;
                         }
                         return selection[1];

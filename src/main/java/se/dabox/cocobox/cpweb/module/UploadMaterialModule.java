@@ -25,6 +25,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.common.ccbc.material.MutableOrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
+import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.contentrepo.util.ContentRepoUri;
 import se.dabox.service.contentrepo.util.URINormalizer;
@@ -109,7 +110,7 @@ public class UploadMaterialModule extends AbstractWebAuthModule {
         WebModuleRedirectRequestTarget target =
                 new WebModuleRedirectRequestTarget(CpMainModule.class,
                 "listMaterials", strOrgId);
-        target.setAnchor("orgmat");
+        target.setAnchor(OrgMaterialConstants.NATIVE_SYSTEM);
 
         return target;
     }

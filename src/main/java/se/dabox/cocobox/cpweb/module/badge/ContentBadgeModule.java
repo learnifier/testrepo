@@ -153,7 +153,7 @@ public class ContentBadgeModule extends AbstractModule {
             Template template = config.getTemplate("/jsbadge.ftl");
             WriterOutput wo = getWriterOutput();
 
-            HashMap<String, Object> map = new HashMap<String,Object>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put("endpoint", endpoint);
             map.put("link", link);
             map.put("orgmat", orgmat);
@@ -166,9 +166,7 @@ public class ContentBadgeModule extends AbstractModule {
             IOUtils.closeQuietly(wo.getWriter());
 
             return new BytesRequestTarget(wo.getOutputStream().toByteArray(), "text/javascript");
-        } catch (TemplateException ex) {
-            throw new RuntimeIOException("Failed to generate badge", ex);
-        } catch (IOException ex) {
+        } catch (TemplateException | IOException ex) {
             throw new RuntimeIOException("Failed to generate badge", ex);
         }
     }

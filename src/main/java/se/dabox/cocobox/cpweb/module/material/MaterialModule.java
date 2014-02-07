@@ -4,7 +4,6 @@
  */
 package se.dabox.cocobox.cpweb.module.material;
 
-import se.dabox.cocobox.cpweb.module.deeplink.*;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -22,6 +21,7 @@ import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.material.MutableOrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
+import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.ccbc.material.UpdateOrgMaterialRequest;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
@@ -86,7 +86,7 @@ public class MaterialModule extends AbstractWebAuthModule {
         WebModuleRedirectRequestTarget reqTarget =
                 new WebModuleRedirectRequestTarget(CpMainModule.class,
                 CpMainModule.LIST_MATERIALS, strOrgId);
-        reqTarget.setAnchor("orgmat");
+        reqTarget.setAnchor(OrgMaterialConstants.NATIVE_SYSTEM);
 
         return reqTarget;
     }

@@ -45,6 +45,7 @@ import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
+import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
 import se.dabox.service.proddir.data.FieldValue;
@@ -73,6 +74,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
      *
      *
      * @param cycle param strOrgId
+     * @param strOrgId
      *
      * @return
      *
@@ -503,7 +505,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                     return null;
                 }
 
-                if (!"proddir".equals(material.getNativeSystem())) {
+                if (!ProductMaterialConstants.NATIVE_SYSTEM.equals(material.getNativeSystem())) {
                     return null;
                 }
 

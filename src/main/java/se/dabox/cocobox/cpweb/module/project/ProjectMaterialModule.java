@@ -21,12 +21,14 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.ccbc.project.AllocatedCreditsProjectProductException;
 import se.dabox.service.common.ccbc.project.InDesignProjectProductException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectProductException;
 import se.dabox.service.common.ccbc.project.material.CanDeleteProjectProductResponse;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 
 /**
  *
@@ -60,11 +62,11 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
 
         String type = splitId[0];
         String id = splitId[1];
-
-        if ("proddir".equals(type)) {
-            return onAddProjectProduct(cycle, formsess, prj, id);
-        } else if ("orgmat".equals(type)) {
-            return onAddProjectOrgmat(cycle, prj, id);
+        switch (type) {
+            case ProductMaterialConstants.NATIVE_SYSTEM:
+                return onAddProjectProduct(cycle, formsess, prj, id);
+            case OrgMaterialConstants.NATIVE_SYSTEM:
+                return onAddProjectOrgmat(cycle, prj, id);
         }
 
         throw new IllegalStateException("Unable to handle type: " + type);
@@ -88,11 +90,11 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
 
         String type = splitId[0];
         String id = splitId[1];
-
-        if ("proddir".equals(type)) {
-            return onRemoveProjectProduct(cycle, prj, id);
-        } else if ("orgmat".equals(type)) {
-            return onRemoveOrgmat(cycle, prj, id);
+        switch (type) {
+            case ProductMaterialConstants.NATIVE_SYSTEM:
+                return onRemoveProjectProduct(cycle, prj, id);
+            case OrgMaterialConstants.NATIVE_SYSTEM:
+                return onRemoveOrgmat(cycle, prj, id);
         }
 
         throw new IllegalStateException("Unable to handle type: " + type);
@@ -122,7 +124,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
         }
 
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("status", "OK");
         map.put("location", NavigationUtil.toProjectMaterialPageUrl(cycle, prj.getProjectId()));
 
