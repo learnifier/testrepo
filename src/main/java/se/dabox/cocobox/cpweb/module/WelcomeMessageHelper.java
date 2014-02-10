@@ -96,7 +96,7 @@ public class WelcomeMessageHelper {
             return messages;
         }
 
-        Set<Long> userSet = new HashSet<Long>(userIds);
+        Set<Long> userSet = new HashSet<>(userIds);
         for (WelcomeMessage welcomeMessage : messages) {
             userSet.remove(welcomeMessage.getUserId());
         }
@@ -106,5 +106,8 @@ public class WelcomeMessageHelper {
         }
 
         return messages;
+    }
+
+    private WelcomeMessageHelper() {
     }
 }
