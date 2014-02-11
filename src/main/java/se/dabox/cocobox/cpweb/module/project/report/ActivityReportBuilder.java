@@ -155,6 +155,15 @@ class ActivityReportBuilder implements StatusSource {
 
         map.put("title", getActivityProperty(activity, "title"));
 
+        ActivityComponent pComp = activity.getPrimaryComponent();
+        if (pComp != null) {
+            ProductId productId = ComponentUtil.
+                    getProductId(pComp.getBasetype(), pComp.getSubtype());
+            if (productId != null) {
+                map.put("productId", productId.getId());
+            }
+        }
+
         boolean completed = activity.isCompleted();
         map.put("completed", completed);
         map.put("enabled", activity.isEnabled());
