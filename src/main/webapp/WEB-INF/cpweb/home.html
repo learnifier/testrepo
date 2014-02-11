@@ -13,6 +13,11 @@ ${cpweb_foot}
 
 <script>
     $('#tm_home').addClass('activeItem').prev().addClass('prevItem');
+    function showActionsList() {
+        $('#multiple-actions').slideUp();
+        $('#list-actions').slideDown();
+    }
+    
     $(document).ready(function() {
         require(['dabox-datatables','dabox-common', 'jquery.timeago'], function() {
             var actTable = $('#tw_actions').dataTable({
@@ -90,9 +95,14 @@ ${cpweb_foot}
                     $('#actions').slideDown();
                     $('.timeago').timeago();
                 }
+                if (itemCount > 1) {
+                    $('#multiple-actions').slideDown();
+                } else {
+                    $('#list-actions').slideDown();
+                }
             }
             });
-
+            
             var favTable = $('#tw_favorites').dataTable({
                 "sDom": 'rt',
                 "bPaginate": false,
@@ -233,12 +243,18 @@ ${cpweb_foot}
 
 <div class="infobox" id="actions" style="display: none;">
     <h1>Action</h1>
-    <p>Take action on the following issues. Reach out to tech support as needed.</p>
-    <section class="widget" id="sw_actions">
-        <table class="widget" id="tw_actions">
-            <tbody>
-            </tbody>
-        </table>
+    <section id="multiple-actions" style="display: none;">
+        <p>There are multiple issues on your account that you need to take action on.</p>
+        <a class="btn secondarybackgroundcolor" onclick="showActionsList();">Show Issues</a>
+    </section>
+    <section id="list-actions" style="display: none;">
+        <p>Take action on the following issues. Reach out to tech support as needed.</p>
+        <div class="widget" id="sw_actions">
+            <table class="widget" id="tw_actions">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </section>
 </div>
 
