@@ -125,6 +125,11 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                 max(bounces.size(), alerts.size()));
 
         for (MailBounceInfo mailBounce : bounces) {
+            OrgProject prj = ccbc.getProject(mailBounce.getProjectId());
+            if (prj == null || ProjectSubtypeConstants.IDPROJECT.equals(prj.getSubtype())) {
+                continue;
+            }
+
             ComboProjectAlert combo = getOrgCreate(map, mailBounce.getOrgId(), mailBounce.
                     getProjectId());
 
