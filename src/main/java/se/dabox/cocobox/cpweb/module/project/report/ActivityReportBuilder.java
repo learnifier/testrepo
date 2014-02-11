@@ -185,7 +185,7 @@ class ActivityReportBuilder implements StatusSource {
             }
         }
 
-        map.put("overdue", overdue);
+        map.put("overdue", overdue);        
         map.put("progressPercent", progressPercent);
 
         return map;
