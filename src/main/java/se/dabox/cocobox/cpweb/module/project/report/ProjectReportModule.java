@@ -59,4 +59,19 @@ public class ProjectReportModule extends AbstractProjectWebModule {
 		
         return new FreemarkerRequestTarget("/project/report/idProductReport.html", map);
     }
+    
+    @WebAction
+    public RequestTarget onSliiChallengeReport(RequestCycle cycle, String strProjectId) {
+        OrgProject project = getCocoboxCordinatorClient(cycle).
+                getProject(Long.valueOf(strProjectId));
+
+        checkPermission(cycle, project);
+
+        Map<String, Object> map = createMap();
+
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/report/sliiChallengeReport.html", map);
+    }
+    
 }
