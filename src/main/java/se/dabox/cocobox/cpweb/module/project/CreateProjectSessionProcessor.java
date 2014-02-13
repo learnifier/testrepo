@@ -3,15 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import com.google.common.base.Objects;
-import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
-import se.dabox.cocobox.cpweb.command.RecentTimezoneStringForOrgCommand;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
@@ -19,7 +16,6 @@ import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
-import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
@@ -39,11 +35,9 @@ import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
-import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.webutils.webfeature.WebFeatures;
 import se.dabox.util.ParamUtil;
-import se.dabox.util.RecentList;
 
 /**
  *
@@ -144,7 +138,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         if (nps.getOrgmats() != null) {
             for (Long orgMatId : nps.getOrgmats()) {
-                pmcClient.addProjectOrgMaterial(project.getProjectId(), orgMatId);
+                addProjectOrgMat(pmcClient, project, orgMatId);
             }
         }
 
@@ -221,6 +215,16 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         } catch (Exception ex) {
             LOGGER.warn("Unable to add product {} to project {}",
                     project.getProjectId(), prodId, ex);
+        }
+    }
+
+    private void addProjectOrgMat(ProjectMaterialCoordinatorClient pmcClient, OrgProject project,
+            Long orgMatId) {
+        try {
+            pmcClient.addProjectOrgMaterial(project.getProjectId(), orgMatId);
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to add orgmat {} to project {}",
+                    project.getProjectId(), orgMatId, ex);
         }
     }
 
