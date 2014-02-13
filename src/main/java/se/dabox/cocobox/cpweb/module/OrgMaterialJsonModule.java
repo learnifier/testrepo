@@ -40,6 +40,7 @@ import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
@@ -732,7 +733,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
     private static List<Product> filterValidProjectProducts(RequestCycle cycle, OrgProject project,
             List<Product> products) {
-        if (!project.getSubtype().equals("idproject")) {
+        if (!project.getSubtype().equals(ProjectSubtypeConstants.IDPROJECT)) {
             return products;
         }
 

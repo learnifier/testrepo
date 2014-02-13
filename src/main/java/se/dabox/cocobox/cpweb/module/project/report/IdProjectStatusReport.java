@@ -19,6 +19,7 @@ import se.dabox.service.common.ccbc.product.IdProjectProductUtil;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
+import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductTypeId;
 import se.dabox.util.ParamUtil;
@@ -39,7 +40,7 @@ public class IdProjectStatusReport extends AbstractProductReportBuilder<IdProjec
         this.product = product;
         ParamUtil.required(product, "product");
 
-        if (!product.isTypeInstance(new ProductTypeId("idproject"))) {
+        if (!product.isTypeInstance(CocoboxProductTypeConstants.IDPROJECT)) {
             throw new IllegalArgumentException("Product " + product.getId()
                     + " is not an idproject product. Is: " + product.getProductTypeId());
         }

@@ -22,6 +22,7 @@ import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
@@ -150,7 +151,7 @@ public class ParticipationIdProjectProductDeleteCheck {
         Set<ProductId> productIds = new HashSet<>();
 
         for (Product product : products) {
-            if (product.getProductTypeId().getId().equals("idproject")) {
+            if (product.getProductTypeId().equals(CocoboxProductTypeConstants.IDPROJECT)) {
                 productIds.add(product.getId());
             }
         }

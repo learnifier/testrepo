@@ -40,6 +40,7 @@ import se.dabox.service.common.ccbc.project.material.GetParticipationCrispProduc
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.material.Material;
+import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.common.proddir.material.ProductMaterialConverter;
@@ -289,7 +290,7 @@ public class ParticipationDetailsCommand {
         Map<String, String> partState = getParticipationState();
 
         for (Product product : products) {
-            if (!product.getProductTypeId().getId().equals("idproject")) {
+            if (!product.getProductTypeId().equals(CocoboxProductTypeConstants.IDPROJECT)) {
                 continue;
             }
 
