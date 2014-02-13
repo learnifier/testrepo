@@ -52,7 +52,7 @@ public class ParticipationIdProjectProductDeleteCheck {
         helper = new UserIdentifierHelper(context.getCycle());
         final OrgProject project = cocoboxCordinatorClient.getProject(projectId);
 
-        return ProjectTypeUtil.call(project.getType(),
+        return ProjectTypeUtil.call(project,
                 new ProjectTypeCallable<List<DeleteFailure>>() {
                     @Override
                     public List<DeleteFailure> callDesignedProject() {

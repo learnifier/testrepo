@@ -29,7 +29,7 @@ import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
-import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeRunnable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
@@ -149,21 +149,35 @@ class ProjectRosterJsonGenerator {
         }.encodeToStream(participations);
     }
 
-    private int percentage(OrgProject project, Integer completed,
-            ProjectParticipation participation) {
+    private int percentage(final OrgProject project, final Integer completed,
+            final ProjectParticipation participation) {
 
-        if (project.getType() != ProjectType.DESIGNED_PROJECT || !getDesignType().isActivityBased()) {
-            return PercentageCalculator.percentage(project.getProgressComponentCount(), completed);
-        }
+        return ProjectTypeUtil.call(project, new ProjectTypeCallable<Integer>() {
 
-        if (participation.getActivityCount() == null || participation.getActivitiesCompleted()
-                == null) {
-            return PercentageCalculator.percentage(project.getProgressComponentCount(), completed);
-        }
+            @Override
+            public Integer callMaterialListProject() {
+                return PercentageCalculator.percentage(project.getProgressComponentCount(), completed);
+            }
 
-        return PercentageCalculator.percentage(
-                participation.getActivityCount().intValue(),
-                participation.getActivitiesCompleted().intValue());
+            @Override
+            public Integer callDesignedProject() {
+                if (!getDesignType().isActivityBased()) {
+                    return PercentageCalculator.percentage(project.getProgressComponentCount(), completed);
+                }
+
+                if (participation.getActivityCount() == null || participation.
+                        getActivitiesCompleted()
+                        == null) {
+                    return PercentageCalculator.percentage(project.getProgressComponentCount(),
+                            completed);
+                }
+
+                return PercentageCalculator.percentage(
+                        participation.getActivityCount().intValue(),
+                        participation.getActivitiesCompleted().intValue());
+
+            }
+        });
     }
 
     public CourseDesignType getDesignType() {
@@ -243,7 +257,7 @@ class ProjectRosterJsonGenerator {
     }
 
     private void prepare() {
-        ProjectTypeUtil.run(project.getType(), new ProjectTypeRunnable() {
+        ProjectTypeUtil.run(project, new ProjectTypeRunnable() {
 
             @Override
             public void runDesignedProject() {

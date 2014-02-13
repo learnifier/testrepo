@@ -344,7 +344,7 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
             return null;
         }
         UserProductStatus row
-                = ProjectTypeUtil.call(projData.getProject().getType(),
+                = ProjectTypeUtil.call(projData.getProject(),
                         new ProjectTypeCallable<UserProductStatus>() {
 
                             @Override

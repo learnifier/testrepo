@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,8 @@ import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
-import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
+import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonUtils;
@@ -92,33 +92,43 @@ public abstract class AbstractProductReportBuilder<P> {
                 expireAfterAccess(2, TimeUnit.MINUTES).build(new CacheLoader<Long, ProjectData>() {
 
                     @Override
-                    public ProjectData load(Long key) throws Exception {
-                        OrgProject proj = ccbcClient.getProject(key);
+                    public ProjectData load(final Long key) throws Exception {
+                        final OrgProject proj = ccbcClient.getProject(key);
 
-                        if (proj.getType() == ProjectType.DESIGNED_PROJECT) {
-                            if (proj.getDesignId() == null || proj.getMasterDatabank() == null) {
-                                LOGGER.debug(
-                                        "Ignoring design project {} since it doesn't have a design",
-                                        key);
-                                return new ProjectData(null, null, null);
+                        return ProjectTypeUtil.call(proj, new ProjectTypeCallable<ProjectData>() {
+
+                            @Override
+                            public ProjectData callMaterialListProject() {
+                                return new ProjectData(proj, null, null);
                             }
 
-                            CourseDesignDefinition cdd;
-                            try {
-                                cdd
-                                        = new GetProjectCourseDesignCommand(cycle, null).forProject(
-                                                proj);
-                            } catch(IllegalStateException ex) {
-                                LOGGER.warn("Failed to get course definition for project {}: {}",
-                                        proj.getProjectId(), ex);
-                                return new ProjectData(null, null, null);
-                            }
-                            DatabankFacade df = new GetDatabankFacadeCommand(cycle).get(proj);
+                            @Override
+                            public ProjectData callDesignedProject() {
+                                if (proj.getDesignId() == null || proj.getMasterDatabank() == null) {
+                                    LOGGER.debug(
+                                            "Ignoring design project {} since it doesn't have a design",
+                                            key);
+                                    return new ProjectData(null, null, null);
+                                }
 
-                            return new ProjectData(proj, cdd, df);
-                        } else {
-                            return new ProjectData(proj, null, null);
-                        }
+                                CourseDesignDefinition cdd;
+                                try {
+                                    cdd
+                                            = new GetProjectCourseDesignCommand(cycle, null).
+                                            forProject(
+                                                    proj);
+                                } catch (IllegalStateException ex) {
+                                    LOGGER.
+                                            warn("Failed to get course definition for project {}: {}",
+                                                    proj.getProjectId(), ex);
+                                    return new ProjectData(null, null, null);
+                                }
+                                DatabankFacade df = new GetDatabankFacadeCommand(cycle).get(proj);
+
+                                return new ProjectData(proj, cdd, df);
+                            }
+                        });
+
                     }
                 });
 

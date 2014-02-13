@@ -399,7 +399,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
     }
 
     private String getProjectName(final RequestCycle cycle, final OrgProject project) {
-        return ProjectTypeUtil.call(project.getType(), new ProjectTypeCallable<String>() {
+        return ProjectTypeUtil.call(project, new ProjectTypeCallable<String>() {
 
             @Override
             public String callDesignedProject() {

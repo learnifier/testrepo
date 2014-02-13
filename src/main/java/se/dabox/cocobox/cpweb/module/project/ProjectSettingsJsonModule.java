@@ -15,7 +15,6 @@ import org.apache.commons.collections.map.Flat3Map;
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.dabox.cocobox.cpweb.command.RecentTimezoneStringForOrgCommand;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
@@ -211,8 +210,8 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
 
     private static final class ObjectStringContainer<T> {
 
-        private T obj;
-        private String value;
+        private final T obj;
+        private final String value;
 
         public ObjectStringContainer(T obj, String value) {
             this.obj = obj;

@@ -36,7 +36,6 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.proddir.data.Product;
-import se.dabox.service.proddir.data.ProductTypes;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
@@ -64,7 +63,7 @@ class ProgressComponentResolver {
 
     List<ProgressComponentInfo> resolve() {
 
-        return ProjectTypeUtil.call(project.getType(),
+        return ProjectTypeUtil.call(project,
                 new ProjectTypeCallable<List<ProgressComponentInfo>>() {
                     @Override
                     public List<ProgressComponentInfo> callDesignedProject() {
@@ -238,12 +237,8 @@ class ProgressComponentResolver {
     }
 
     private ProgressComponentHelper getProgressComponentHelper() {
-        if (cachedHelper == null) {
-            ProductDirectoryClient pdClient =
-                    CacheClients.getClient(cycle, ProductDirectoryClient.class);
-            ProductTypes types = pdClient.listTypes();
-
-            cachedHelper = new ProgressComponentHelper(cycle, types);
+        if (cachedHelper == null) {            
+            cachedHelper = new ProgressComponentHelper(cycle);
         }
 
         return cachedHelper;
