@@ -7,13 +7,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import net.unixdeveloper.druwa.DruwaApplication;
-import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.AroundInvoke;
 import net.unixdeveloper.druwa.module.InvocationContext;
-import net.unixdeveloper.druwa.request.BytesRequestTarget;
-import net.unixdeveloper.druwa.request.StringRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
+import net.unixdeveloper.druwa.request.binarysource.ByteArrayBinarySource;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.PrettyPrinter;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -54,7 +52,7 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
         try {
             jsonString =
                     mapper.writer((PrettyPrinter) null).writeValueAsString(map);
-            return new StringRequestTarget("text/json", jsonString);
+            return new JsonRequestTarget(jsonString);
         } catch (Exception ex) {
             throw new JsonEncodingException("Failed to encode map: "+map, ex);
         }
@@ -67,7 +65,7 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
         try {
             jsonString =
                     mapper.writer((PrettyPrinter) null).writeValueAsString(list);
-            return new StringRequestTarget("text/json", jsonString);
+            return new JsonRequestTarget(jsonString);
         } catch (Exception ex) {
             throw new JsonEncodingException("Failed to encode list: "+list, ex);
         }
@@ -80,13 +78,8 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     }
 
     protected static RequestTarget jsonTarget(byte[] data) {
-        String ct = "text/json";
-
-        RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
-        if (cycle.getRequest().getParameter("txt") != null) {
-            ct = "text/plain;charset=UTF-8";
-        }
-        return new BytesRequestTarget(data, ct);
+        return new JsonRequestTarget(new ByteArrayBinarySource(data, false),
+                JsonRequestTarget.DEFAULT_ENCODING);
     }
 
     protected static void writeLongNullField(JsonGenerator generator, String name,
