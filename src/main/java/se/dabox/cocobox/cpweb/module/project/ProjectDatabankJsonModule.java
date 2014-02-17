@@ -21,7 +21,7 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
-import net.unixdeveloper.druwa.request.StringRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.time.DateUtils.toCalendar;
 import org.slf4j.Logger;
@@ -173,7 +173,7 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
         map.put("status", "OK");
         map.put("stringValue", newValue);
 
-        return new StringRequestTarget("application/json", JsonUtils.encode(map));
+        return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
     private CourseDesignClient getCourseDesign(RequestCycle cycle) {

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.request.BytesRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.codehaus.jackson.JsonGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,7 +258,7 @@ public class ParticipationDetailsCommand {
             }
         }.encode();
 
-        return new BytesRequestTarget(jsonData, "application/json");
+        return new JsonRequestTarget(jsonData, JsonRequestTarget.DEFAULT_ENCODING);
     }
 
     private void getReports() {
