@@ -108,6 +108,11 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                         return DwsRealmHelper.getRealmConfiguration(cycle).getBooleanValue(
                                 CocoSiteConfKey.AUTOICAL_DEFAULT_SETTING);
                     }
+
+                    @Override
+                    public NewProjectRequest callSingleProductProject() {
+                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                    }
                 });
 
         OrgProject project = null;

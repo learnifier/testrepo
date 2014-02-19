@@ -86,6 +86,11 @@ public class ParticipationIdProjectProductDeleteCheck {
 
                         return helper.getName(participant.getUserId());
                     }
+
+                    @Override
+                    public List<DeleteFailure> callSingleProductProject() {
+                        return null;
+                    }
                 });
     }
 

@@ -264,6 +264,12 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 return new WebModuleRedirectRequestTarget(NewProjectModule.class,
                         MAT_LIST_DETAILS, strOrgId, nps.getUuid().toString());
             }
+
+            @Override
+            public RequestTarget callSingleProductProject() {
+                //Product should already been chosen
+                return nps.process(cycle, null);
+            }
         });
     }
 
@@ -559,6 +565,11 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
             @Override
             public void runMaterialListProject() {
+                //Do nothing
+            }
+
+            @Override
+            public void runSingleProductProject() {
                 //Do nothing
             }
         });

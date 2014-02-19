@@ -357,6 +357,11 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
                                 return getMatListParticipantRowData(projData, participant);
                             }
 
+                            @Override
+                            public UserProductStatus callSingleProductProject() {
+                                return callMaterialListProject();
+                            }
+
                         });
 
         //No data then return directly

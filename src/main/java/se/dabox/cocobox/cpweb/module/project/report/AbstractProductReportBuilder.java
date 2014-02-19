@@ -127,6 +127,11 @@ public abstract class AbstractProductReportBuilder<P> {
 
                                 return new ProjectData(proj, cdd, df);
                             }
+
+                            @Override
+                            public ProjectData callSingleProductProject() {
+                                return callMaterialListProject();
+                            }
                         });
 
                     }

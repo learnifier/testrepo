@@ -432,6 +432,11 @@ public class CpJsonModule extends AbstractJsonAuthModule {
             public String callMaterialListProject() {
                 return project.getName();
             }
+
+            @Override
+            public String callSingleProductProject() {
+                return project.getName();
+            }
         });
     }
 
