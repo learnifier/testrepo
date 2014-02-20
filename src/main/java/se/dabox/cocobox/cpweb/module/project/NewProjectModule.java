@@ -51,8 +51,10 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
 
@@ -64,8 +66,7 @@ import se.dabox.util.collections.Transformer;
 public class NewProjectModule extends AbstractWebAuthModule {
 
     private static final Pattern ID_SPLIT_PATTERN = Pattern.compile(Pattern.quote("|"));
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(NewProjectModule.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewProjectModule.class);
     /**
      * Action that start the setup for creating a new project.
      *
@@ -73,6 +74,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public static final String SETUP = "setup";
     private static final String CREATE_MAT_LIST = "createMatList";
     private static final String MAT_LIST_DETAILS = "matListDetails";
+    private static final String SPP_DETAILS = "singleProductProjectDetails";
     private static final String PROCESS_SETUP = "processSetup";
     private static final String ORGMAT = OrgMaterialConstants.NATIVE_SYSTEM;
     public static final String FORMSESS_ATTR = "createproject.formsess";
@@ -117,7 +119,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
      * Material list page. Set user visible title and description and which materials this project
      * should contain.
      *
-     * Processing is done in {@link #onCreate(net.unixdeveloper.druwa.RequestCycle, java.lang.String, java.lang.String)
+     * Processing is done in {@link #onCreateMatList(net.unixdeveloper.druwa.RequestCycle, java.lang.String, java.lang.String)
      * }. Redirects to {@link ProjectModule#onRoster(net.unixdeveloper.druwa.RequestCycle, java.lang.String)
      * }.
      *
@@ -151,7 +153,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
         map.put("org", org);
         map.put("formLink",
                 cycle.urlFor(NewProjectModule.class.getName(),
-                NewProjectModule.CREATE_MAT_LIST, strOrgId, strNpsId));
+                        NewProjectModule.CREATE_MAT_LIST, strOrgId, strNpsId));
         map.put("designProject", designProject);
 
         map.put("langs", getProjectLocales(cycle));
@@ -162,10 +164,62 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
 //        map.put("timezones", getTimezones(cycle));
 //        map.put("defaultTimezone", getDefaultTimezone(cycle));
+        map.put("nps", nps);
+
+        return new FreemarkerRequestTarget("/project/createProjectGeneralMatList.html",
+                map);
+    }
+
+    /**
+     * Single Product Project page. Set user visible title and description this project should
+     * contain.
+     *
+     * Processing is done in {@link #onCreateMatList(net.unixdeveloper.druwa.RequestCycle, java.lang.String, java.lang.String)
+     * }. Redirects to {@link ProjectModule#onRoster(net.unixdeveloper.druwa.RequestCycle, java.lang.String)
+     * }.
+     *
+     * @param cycle
+     * @param strOrgId
+     * @param strNpsId
+     *
+     * @return
+     */
+    @WebAction
+    public RequestTarget onSingleProductProjectDetails(RequestCycle cycle,
+            String strOrgId, String strNpsId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        NewProjectSession nps = (NewProjectSession) cycle.getSession().
+                getAttribute(NewProjectSession.getSessionName(strNpsId));
+
+        if (nps == null) {
+            LOGGER.warn("Invalid NPS id specified: {}", strNpsId);
+            return NavigationUtil.toCreateProject(cycle, strOrgId);
+        } else if (ProjectType.valueOf(nps.getType()) != ProjectType.SINGLE_PRODUCT_PROJECT) {
+            LOGGER.warn("Invalid NPS for SPP: {}", strNpsId);
+            return NavigationUtil.toCreateProject(cycle, strOrgId);
+        }
+
+        Map<String, Object> map = createMap();
+
+        boolean designProject = false;
+
+        map.put("formsess", getFormsess(cycle));
+        map.put("org", org);
+        map.put("formLink",
+                cycle.urlFor(NewProjectModule.class.getName(),
+                        NewProjectModule.CREATE_MAT_LIST, strOrgId, strNpsId));
+        map.put("designProject", designProject);
+
+        map.put("langs", getProjectLocales(cycle));
+        map.put("defaultLangLocale", getDefaultLangLocale(cycle));
+
+        map.put("countries", getProjectCountries(cycle));
+        map.put("defaultCountryLocale", getDefaultCountryLocale(cycle));
 
         map.put("nps", nps);
 
-        return new FreemarkerRequestTarget("/project/createProjectGeneral.html",
+        return new FreemarkerRequestTarget("/project/createProjectGeneralSpp.html",
                 map);
     }
 
@@ -201,8 +255,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public RequestTarget onProcessSetup(final RequestCycle cycle, final String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
-        final DruwaFormValidationSession<CreateProjectGeneral> formsess =
-                getValidationSession(CreateProjectGeneral.class, cycle);
+        final DruwaFormValidationSession<CreateProjectGeneral> formsess = getValidationSession(
+                CreateProjectGeneral.class, cycle);
 
         if (!formsess.process()) {
             return NavigationUtil.toCreateProject(cycle, strOrgId);
@@ -226,10 +280,36 @@ public class NewProjectModule extends AbstractWebAuthModule {
             return NavigationUtil.toCreateProject(cycle, strOrgId);
         }
 
-        long designId = formsess.getObject().getDesign();
+        String typeId = formsess.getObject().getDesign();
+        String productId = null;
+        //Default value is important. Checked by other pages (like the matlist details)
+        long designId = 0;
 
-        ProjectType projType = designId == 0 ? ProjectType.MATERIAL_LIST_PROJECT
-                : ProjectType.DESIGNED_PROJECT;
+        ProjectType projType = null;
+
+        if (typeId.startsWith(NewProjectJsonModule.CD_PREFIX)) {
+            projType = ProjectType.DESIGNED_PROJECT;
+            designId = Long.parseLong(typeId.substring(NewProjectJsonModule.CD_PREFIX.length()));
+        } else if (typeId.startsWith(NewProjectJsonModule.MATLIST_PREFIX)) {
+            projType = ProjectType.MATERIAL_LIST_PROJECT;
+            designId = 0;
+        } else if (typeId.startsWith(NewProjectJsonModule.SPP_PREFIX)) {
+            projType = ProjectType.SINGLE_PRODUCT_PROJECT;
+            productId = typeId.substring(NewProjectJsonModule.SPP_PREFIX.length());
+
+            if (!isValidSppProductId(cycle, productId)) {
+                formsess.addError(new ValidationError(ValidationConstraint.INVALID,
+                        "designId", "invalid"));
+                LOGGER.warn("Not a valid SPP product: {}", productId);
+            }
+        } else {
+            formsess.addError(new ValidationError(ValidationConstraint.INVALID,
+                    "designId", "invalid"));
+        }
+
+        if (formsess.isInError()) {
+            return NavigationUtil.toCreateProject(cycle, strOrgId);
+        }
 
         String type = projType.toString();
 
@@ -248,7 +328,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         final NewProjectSession nps = new NewProjectSession(type, orgmats, products, processor,
                 cancelUrl,
-                designId);
+                designId,
+                productId);
 
         nps.setCreateProjectGeneral(input);
         nps.storeInSession(cycle.getSession());
@@ -267,8 +348,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
             @Override
             public RequestTarget callSingleProductProject() {
-                //Product should already been chosen
-                return nps.process(cycle, null);
+                return new WebModuleRedirectRequestTarget(NewProjectModule.class,
+                        SPP_DETAILS, strOrgId, nps.getUuid().toString());
             }
         });
     }
@@ -283,10 +364,10 @@ public class NewProjectModule extends AbstractWebAuthModule {
      * @return
      */
     @WebAction(methods = HttpMethod.POST)
-    public RequestTarget onCreateMatList(RequestCycle cycle, String strOrgId, String strNpsId) {
+    public RequestTarget onCreateMatList(final RequestCycle cycle, String strOrgId, String strNpsId) {
         checkOrgPermission(cycle, strOrgId);
 
-        NewProjectSession nps = (NewProjectSession) cycle.getSession().
+        final NewProjectSession nps = (NewProjectSession) cycle.getSession().
                 getAttribute(NewProjectSession.getSessionName(strNpsId));
 
         if (nps == null) {
@@ -294,7 +375,15 @@ public class NewProjectModule extends AbstractWebAuthModule {
             return NavigationUtil.toCreateProject(cycle, strOrgId);
         }
 
-        DruwaFormValidationSession<MatListProjectDetailsForm> formsess = getFormsess(cycle);
+        ProjectType type = ProjectType.valueOf(nps.getType());
+
+        if (!(type == ProjectType.MATERIAL_LIST_PROJECT || type
+                == ProjectType.SINGLE_PRODUCT_PROJECT)) {
+            LOGGER.warn("Invalid project type for this action: {}/{}", strNpsId, type);
+            return NavigationUtil.toCreateProject(cycle, strOrgId);
+        }
+
+        final DruwaFormValidationSession<MatListProjectDetailsForm> formsess = getFormsess(cycle);
 
         if (!formsess.process()) {
             return toMatListDetails(strOrgId, strNpsId);
@@ -302,13 +391,29 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         final MatListProjectDetailsForm input = formsess.getObject();
 
-        String[] matIds = cycle.getRequest().getParameterValues("orgmat");
+        ProjectTypeUtil.run(type, new ProjectTypeRunnable() {
 
-        List<Long> orgMatIds = getOrgMatIdList(matIds);
-        List<String> prodIds = getProductIds(matIds);
+            @Override
+            public void runMaterialListProject() {
+                String[] matIds = cycle.getRequest().getParameterValues("orgmat");
 
-        nps.setOrgmats(orgMatIds);
-        nps.setProds(prodIds);
+                List<Long> orgMatIds = getOrgMatIdList(matIds);
+                List<String> prodIds = getProductIds(matIds);
+
+                nps.setOrgmats(orgMatIds);
+                nps.setProds(prodIds);
+            }
+
+            @Override
+            public void runDesignedProject() {
+                throw new UnsupportedOperationException("Not supported"); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void runSingleProductProject() {
+                //Do nothing
+            }
+        });
 
         return nps.process(cycle, input);
     }
@@ -350,7 +455,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         List<String> ids = CollectionsUtil.transformListNotNull(Arrays.asList(strIds),
                 new Transformer<String, String>() {
-                    
+
                     @Override
                     public String transform(String obj) {
                         String[] selection = ID_SPLIT_PATTERN.split(obj);
@@ -368,63 +473,63 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public static List<Locale> getProjectLocales(RequestCycle cycle) {
         return new LazyCacheConfigurationValueCmd<List<Locale>>(DwsRealmHelper.
                 getRealmConfiguration(cycle)).get("cocobox.project.langlocales",
-                new Transformer<String, List<Locale>>() {
-                    @Override
-                    public List<Locale> transform(String value) {
-                        String[] strLocales = value.split(" *, *");
-                        return CollectionsUtil.transformList(Arrays.asList(strLocales),
-                                new Transformer<String, Locale>() {
-                                    @Override
-                                    public Locale transform(String localeStr) {
-                                        return LocaleUtils.toLocale(localeStr);
-                                    }
-                                });
-                    }
-                });
+                        new Transformer<String, List<Locale>>() {
+                            @Override
+                            public List<Locale> transform(String value) {
+                                String[] strLocales = value.split(" *, *");
+                                return CollectionsUtil.transformList(Arrays.asList(strLocales),
+                                        new Transformer<String, Locale>() {
+                                            @Override
+                                            public Locale transform(String localeStr) {
+                                                return LocaleUtils.toLocale(localeStr);
+                                            }
+                                        });
+                            }
+                        });
     }
 
     public static List<Locale> getProjectCountries(RequestCycle cycle) {
         return new LazyCacheConfigurationValueCmd<List<Locale>>(DwsRealmHelper.
                 getRealmConfiguration(cycle)).get("cocobox.project.countrylocales",
-                new Transformer<String, List<Locale>>() {
-                    @Override
-                    public List<Locale> transform(String value) {
-                        String[] strLocales = value.split(" *, *");
-                        return CollectionsUtil.transformList(Arrays.asList(strLocales),
-                                new Transformer<String, Locale>() {
-                                    @Override
-                                    public Locale transform(String localeStr) {
-                                        return LocaleUtils.toLocale(localeStr);
-                                    }
-                                });
-                    }
-                });
+                        new Transformer<String, List<Locale>>() {
+                            @Override
+                            public List<Locale> transform(String value) {
+                                String[] strLocales = value.split(" *, *");
+                                return CollectionsUtil.transformList(Arrays.asList(strLocales),
+                                        new Transformer<String, Locale>() {
+                                            @Override
+                                            public Locale transform(String localeStr) {
+                                                return LocaleUtils.toLocale(localeStr);
+                                            }
+                                        });
+                            }
+                        });
     }
 
     private Locale getDefaultLangLocale(RequestCycle cycle) {
         return new LazyCacheConfigurationValueCmd<Locale>(DwsRealmHelper.
                 getRealmConfiguration(cycle)).get("cocobox.project.langlocale.default",
-                new Transformer<String, Locale>() {
-                    @Override
-                    public Locale transform(String value) {
-                        return LocaleUtils.toLocale(value);
-                    }
-                });
+                        new Transformer<String, Locale>() {
+                            @Override
+                            public Locale transform(String value) {
+                                return LocaleUtils.toLocale(value);
+                            }
+                        });
     }
 
     private Locale getDefaultCountryLocale(RequestCycle cycle) {
         return new LazyCacheConfigurationValueCmd<Locale>(DwsRealmHelper.
                 getRealmConfiguration(cycle)).get("cocobox.project.countrylocale.default",
-                new Transformer<String, Locale>() {
-                    @Override
-                    public Locale transform(String value) {
-                        return LocaleUtils.toLocale(value);
-                    }
-                });
+                        new Transformer<String, Locale>() {
+                            @Override
+                            public Locale transform(String value) {
+                                return LocaleUtils.toLocale(value);
+                            }
+                        });
     }
 
     private TimeZone getDefaultTimezone(RequestCycle cycle) {
-        if (1>0) {
+        if (1 > 0) {
             return null;
         }
 
@@ -433,15 +538,14 @@ public class NewProjectModule extends AbstractWebAuthModule {
 //        if (defaultTz == null) {
 //            return null;
 //        }
-
         return new LazyCacheConfigurationValueCmd<TimeZone>(DwsRealmHelper.
                 getRealmConfiguration(cycle)).get("cocobox.project.timezone.default",
-                new Transformer<String, TimeZone>() {
-                    @Override
-                    public TimeZone transform(String value) {
-                        return TimeZone.getTimeZone(value);
-                    }
-                });
+                        new Transformer<String, TimeZone>() {
+                            @Override
+                            public TimeZone transform(String value) {
+                                return TimeZone.getTimeZone(value);
+                            }
+                        });
     }
 
     private DruwaFormValidationSession<MatListProjectDetailsForm> getFormsess(RequestCycle cycle) {
@@ -471,14 +575,12 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
     private List<String> getDesignProducts(RequestCycle cycle, Long designId, MiniOrgInfo org) {
         //TODO: Verify that the design is a project design
-        CourseDesignClient cdClient =
-                CacheClients.getClient(cycle, CourseDesignClient.class);
+        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
         CourseDesign design = cdClient.getDesign(designId);
 
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
 
-        Set<String> productIds =
-                cdd.getAllProductIdStringSet();
+        Set<String> productIds = cdd.getAllProductIdStringSet();
 
         verifyProjectProductsExists(cycle, org, productIds);
 
@@ -486,8 +588,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     }
 
     private List<Long> getDesignOrgmats(RequestCycle cycle, Long designId) {
-        CourseDesignClient cdClient =
-                CacheClients.getClient(cycle, CourseDesignClient.class);
+        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
         CourseDesign design = cdClient.getDesign(designId);
 
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
@@ -501,8 +602,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
             Collection<String> productIds) {
 
         List<OrgProduct> orgProds = getCocoboxCordinatorClient(cycle).listOrgProducts(org.getId());
-        List<String> orgProdIds =
-                CollectionsUtil.transformList(orgProds, OrgProductTransformers.
+        List<String> orgProdIds = CollectionsUtil.transformList(orgProds, OrgProductTransformers.
                 getProductIdTransformer());
 
         HashSet<String> missing = new HashSet<>(productIds);
@@ -512,8 +612,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
             return;
         }
         //We have missing products
-        List<Product> missingProducts =
-                CacheClients.getClient(cycle, ProductDirectoryClient.class).getProducts(missing);
+        List<Product> missingProducts = CacheClients.getClient(cycle, ProductDirectoryClient.class).
+                getProducts(missing);
 
         StringBuilder sb = new StringBuilder(512);
         sb.append(
@@ -529,10 +629,10 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         cycle.getSession().setFlashAttribute(CpwebConstants.MISSING_PRODUCTS_FLASH, sb.toString());
-        
+
         throw new RetargetException(NavigationUtil.
                 toCreateProject(cycle, Long.toString(org.getId())));
-        
+
     }
 
     /**
@@ -547,12 +647,11 @@ public class NewProjectModule extends AbstractWebAuthModule {
             RequestCycle cycle,
             NewProjectSession nps) {
 
-        final DruwaFormValidationSession<CreateProjectGeneral> formsess =
-                getValidationSession(CreateProjectGeneral.class,
+        final DruwaFormValidationSession<CreateProjectGeneral> formsess = getValidationSession(
+                CreateProjectGeneral.class,
                 cycle);
 
-        ProjectType projType =
-                ProjectType.valueOf(nps.getType());
+        ProjectType projType = ProjectType.valueOf(nps.getType());
 
         ProjectTypeUtil.run(projType, new ProjectTypeRunnable() {
             @Override
@@ -618,5 +717,15 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 }
             }
         });
+    }
+
+    private boolean isValidSppProductId(RequestCycle cycle, String productId) {
+        Product product = ProductFetchUtil.getProduct(getProductDirectoryClient(cycle), productId);
+
+        if (product == null) {
+            return false;
+        }
+
+        return ProductUtils.isSingleProductProjectProduct(product);
     }
 }

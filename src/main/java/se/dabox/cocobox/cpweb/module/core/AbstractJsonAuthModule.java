@@ -12,6 +12,7 @@ import net.unixdeveloper.druwa.annotation.AroundInvoke;
 import net.unixdeveloper.druwa.module.InvocationContext;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.binarysource.ByteArrayBinarySource;
+import net.unixdeveloper.druwa.request.binarysource.ByteArrayOutputStreamBinarySource;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.PrettyPrinter;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -72,9 +73,8 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     }
 
     protected static RequestTarget jsonTarget(ByteArrayOutputStream baos) {
-        byte[] data = baos.toByteArray();
-
-        return jsonTarget(data);
+        return new JsonRequestTarget(new ByteArrayOutputStreamBinarySource(baos),
+                JsonRequestTarget.DEFAULT_ENCODING);
     }
 
     protected static RequestTarget jsonTarget(byte[] data) {

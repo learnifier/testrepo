@@ -14,7 +14,7 @@ ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');    
 
-    var listCourseDesigns = "${helper.urlFor('coursedesign.CourseDesignJsonModule', 'list', [org.id])?js_string}";
+    var listCourseDesigns = "${helper.urlFor('project.NewProjectJsonModule', 'newProjectTypes', [org.id])?js_string}";
 
     [#if session.hasFlashAttribute("missingProducts") ]
     $(function(){
@@ -31,15 +31,9 @@ ${cpweb_foot}
                     $("#prjtype").val('DESIGNED_PROJECT');
                     jQuery.post(listCourseDesigns, null, function(data) {
                         var extra = {
-                            "designId":0,
+                            "id":"ml-0",
                             "name":"Materials List",
-                            "createdBy":0,
-                            "created":0,
-                            "createdStr":"",
-                            "sticky":false,
-                            "enabled":true,
                             "description":"A simple format for designs that do not include activity due dates, live events, product groupings or a resource page",
-                            "editlink":"",
                             "thumbnail": "${cocoboxCdn}/cocobox/img/ml_default.png"
                         };
                         data.aaData.push(extra);
@@ -155,7 +149,7 @@ ${cpweb_head}
     [@mbform.infosection]
     [/@mbform.infosection]
     <section class="action crprj_actions">
-        <input type="hidden" name="orgId" value="${org.id}" />
+        <input type="hidden" name="orgId" value="${org.id?c}" />
         <input type="hidden" id="prjtype" name="prjtype" />
         <button tabindex="100" class="primary next" disabled="disabled" id="next_btn"><span>[@dws.txt key='form.action.next' /]</span></button>
         <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="cancel">[@dws.txt key="form.action.cancel" /]</a>

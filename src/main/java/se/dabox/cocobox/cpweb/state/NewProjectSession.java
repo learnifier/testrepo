@@ -10,7 +10,6 @@ import java.util.UUID;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebSession;
-import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.util.ParamUtil;
@@ -37,11 +36,13 @@ public class NewProjectSession implements Serializable {
     private final Long designId;
     private boolean editMode;
     private CreateProjectGeneral createProjectGeneral;
+    private String productId;
 
     public NewProjectSession(String type,
             List<Long> orgmats,
             List<String> products, NewProjectSessionProcessor processor, String cancelUrl,
-            Long designId) {
+            Long designId,
+            String productId) {
         ParamUtil.required(processor,"processor");
         this.type = type;
         this.orgmats = orgmats;
@@ -49,6 +50,7 @@ public class NewProjectSession implements Serializable {
         this.processor = processor;
         this.cancelTarget = cancelUrl;
         this.designId = designId;
+        this.productId = productId;
     }
 
     public boolean isEditMode() {
@@ -111,14 +113,19 @@ public class NewProjectSession implements Serializable {
         this.createProjectGeneral = createProjectGeneral;
     }
 
+    public String getProductId() {
+        return productId;
+    }
+
     @Override
     public String toString() {
         return "NewProjectSession{" + "uuid=" + uuid + ", created=" + created + ", type=" + type +
                 ", orgmats=" + orgmats + ", prods=" + prods + ", processor=" + processor +
                 ", cancelTarget=" + cancelTarget + ", designId=" + designId + ", editMode=" +
-                editMode + ", createProjectGeneral=" + createProjectGeneral + '}';
+                editMode + ", createProjectGeneral=" + createProjectGeneral + ", productId=" +
+                productId + '}';
     }
-
+    
     public RequestTarget process(RequestCycle cycle,
             MatListProjectDetailsForm matListDetails) {
         return processor.processSession(cycle, this, matListDetails);
