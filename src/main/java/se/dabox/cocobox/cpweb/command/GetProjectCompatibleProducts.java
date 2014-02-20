@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.command;
 
+import java.util.Collections;
 import java.util.List;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectType;
@@ -48,6 +49,12 @@ public class GetProjectCompatibleProducts {
                         return Boolean.parseBoolean(setting);
                     }
                 });
+            }
+
+            @Override
+            public List<Product> callSingleProductProject() {
+                //TODO: REMOVE THIS WHEN CREATING PROJECTS WORK
+                return callMaterialListProject();
             }
         });
     }

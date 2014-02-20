@@ -19,7 +19,7 @@ public class CreateProjectGeneral implements Serializable {
     private Locale projectlang;
     private Locale country;
     private TimeZone timezone;
-    private Long designId;
+    private String designId;
 
     @FormField
     public Locale getProjectlang() {
@@ -64,11 +64,11 @@ public class CreateProjectGeneral implements Serializable {
      * @return
      */
     @FormField
-    public Long getDesign() {
+    public String getDesign() {
         return designId;
     }
 
-    public void setDesign(Long designId) {
+    public void setDesign(String designId) {
         this.designId = designId;
     }
     

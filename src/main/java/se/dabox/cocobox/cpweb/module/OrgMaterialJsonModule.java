@@ -704,10 +704,26 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
     public static List<Material> getOrgMaterials(final RequestCycle cycle, final long orgId,
             OrgProject project, ProjectType projectType) {
+
+        List<Product> products = getOrgProducts(cycle, orgId, project, projectType);
+
         final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         List<OrgMaterial> orgMats =
                 ccbc.listOrgMaterial(orgId);
+
+        MaterialListFactory mlf = new MaterialListFactory(cycle, CocositeUserHelper.getUserLocale(
+                cycle));
+        mlf.addOrgMaterials(orgMats);
+        mlf.addProducts(products);
+        List<Material> materials = mlf.getList();
+        return materials;
+    }
+
+    public static List<Product> getOrgProducts(final RequestCycle cycle, final long orgId,
+            OrgProject project, ProjectType projectType) {
+        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
         List<Product> products = getGrantedProducts(cycle, ccbc.listOrgProducts(orgId));
         ProductTypeUtil.setTypes(getProductDirectoryClient(cycle), products);
 
@@ -723,12 +739,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             products = filterValidProjectProducts(cycle, project, products);
         }
 
-        MaterialListFactory mlf = new MaterialListFactory(cycle, CocositeUserHelper.getUserLocale(
-                cycle));
-        mlf.addOrgMaterials(orgMats);
-        mlf.addProducts(products);
-        List<Material> materials = mlf.getList();
-        return materials;
+        return products;
     }
 
     private static List<Product> filterValidProjectProducts(RequestCycle cycle, OrgProject project,

@@ -74,6 +74,11 @@ class ProgressComponentResolver {
                     public List<ProgressComponentInfo> callMaterialListProject() {
                         return materialListComponents();
                     }
+
+                    @Override
+                    public List<ProgressComponentInfo> callSingleProductProject() {
+                        return materialListComponents();
+                    }
                 });
 
     }

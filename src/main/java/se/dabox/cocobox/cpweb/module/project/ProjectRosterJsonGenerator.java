@@ -177,6 +177,11 @@ class ProjectRosterJsonGenerator {
                         participation.getActivitiesCompleted().intValue());
 
             }
+
+            @Override
+            public Integer callSingleProductProject() {
+                return PercentageCalculator.percentage(project.getProgressComponentCount(), completed);
+            }
         });
     }
 
@@ -289,6 +294,11 @@ class ProjectRosterJsonGenerator {
                 }
 
                 return new GetDatabankFacadeCommand(cycle).get(project);
+            }
+
+            @Override
+            public void runSingleProductProject() {
+                //Nothing to prepare
             }
 
         });

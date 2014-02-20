@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import java.util.Collections;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
@@ -55,7 +56,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     @Override
-    public RequestTarget processSession(final RequestCycle cycle, NewProjectSession nps,
+    public RequestTarget processSession(final RequestCycle cycle, final NewProjectSession nps,
             final MatListProjectDetailsForm matListDetails) {
 
         String strNpsId = nps.getUuid().toString();
@@ -108,6 +109,18 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                         return DwsRealmHelper.getRealmConfiguration(cycle).getBooleanValue(
                                 CocoSiteConfKey.AUTOICAL_DEFAULT_SETTING);
                     }
+
+                    @Override
+                    public NewProjectRequest callSingleProductProject() {
+                        nps.setProds(Collections.singletonList(nps.getProductId()));
+                        return NewProjectRequest.
+                                newSingleProductProject(
+                                        input.getProjectname(), orgId, input.getProjectlang(),
+                                        LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
+                                        input.getTimezone(), null, matListDetails.getUserTitle(),
+                                        matListDetails.getUserDescription(), nps.getProductId()
+                                );
+                    }
                 });
 
         OrgProject project = null;
@@ -130,7 +143,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             }
         }
 
-        if (aex != null) {
+        if (aex != null || project == null) {
             throw new IllegalStateException("Unable to create new project. Name already exists",
                         aex);
         }
