@@ -20,7 +20,7 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.codehaus.jackson.JsonGenerator;
-import se.dabox.cocobox.cpweb.command.GetProjectCompatibleProducts;
+import se.dabox.cocosite.product.GetProjectCompatibleProducts;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
