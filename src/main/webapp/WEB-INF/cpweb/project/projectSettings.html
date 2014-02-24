@@ -102,12 +102,15 @@ ${cpweb_foot}
     <h2>[@dws.txt key="cpweb.project.settings.title" /]</h2>
     <ul>
         [@dwsrt.feature feature="autoical"]
+        [#-- Only for Course design projects --]
+        [#if prj.type.ptype == 2]
         <li id="meeting-maker">
             <a class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
                 [@mbform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
             </a>
         </li>
+        [/#if]
         [/@dwsrt.feature]
 
         <li id="language">
