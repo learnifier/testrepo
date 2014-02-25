@@ -138,7 +138,7 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
                     inErrorParticipants.push(' ' + item.displayName);
                 }
                 // accessed but not completed
-                if (item.firstAccess !== null && item.status !== 100) {
+                if (item.activated && item.status !== 100) {
                     inProgress = inProgress + 1;
                     inProgressParticipants.push(' ' + item.displayName);
                 }
