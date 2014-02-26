@@ -5,6 +5,7 @@ package se.dabox.cocobox.cpweb.module.mail;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
+import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
@@ -71,6 +73,9 @@ public class MailJsonModule extends AbstractJsonAuthModule {
     }
 
     private byte[] toMailTemplateInfoJson(final RequestCycle cycle, final String strOrgId, final List<MailTemplate> templateList) {
+
+        final Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
         return new JsonEncoding() {
 
             @Override
@@ -90,6 +95,12 @@ public class MailJsonModule extends AbstractJsonAuthModule {
                     generator.writeBooleanField("enabled", template.isEnabled());
                     generator.writeStringField("editlink", NavigationUtil.toEmailPageUrl(cycle,
                       strOrgId, template.getId()));
+
+                    generator.writeStringField("locale", template.getLocale().toString());
+                    generator.writeStringField("localeStr",
+                            template.getLocale().getDisplayName(userLocale));
+                    generator.writeStringField("softid", template.getSoftId());
+
 
                     generator.writeEndObject();
                 }
