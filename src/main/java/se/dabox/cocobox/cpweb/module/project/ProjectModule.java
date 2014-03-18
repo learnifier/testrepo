@@ -32,22 +32,30 @@ import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
+import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
+import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
+import se.dabox.cocosite.coursedesign.GetProjectDatabankListCommand;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectProductMaterialHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
+import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.UpdateDesignRequest;
+import se.dabox.service.common.coursedesign.activity.MultiPageActivityCourse;
+import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
@@ -142,16 +150,45 @@ public class ProjectModule extends AbstractProjectWebModule {
         Map<String, Object> map = createMap();
 
         map.put("formsess", getValidationSession(AddMaterialForm.class, cycle));
-        List<Material> materials =
-                OrgMaterialJsonModule.getOrgMaterials(cycle, project.getOrgId(), project, null);
+        List<Material> materials = OrgMaterialJsonModule.getOrgMaterials(cycle, project.getOrgId(),
+                project, null);
         map.put("materials", materials);
         addCommonMapValues(map, project, cycle);
         map.put("addLink", cycle.urlFor(ProjectMaterialModule.class, "addMaterial", projectId));
-        map.
-                put("removeLink", cycle.urlFor(ProjectMaterialModule.class, "removeMaterial",
-                projectId));
+        map.put("removeLink", cycle.urlFor(ProjectMaterialModule.class, "removeMaterial",
+                                projectId));
 
         return new FreemarkerRequestTarget("/project/projectMaterials.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onRaps(RequestCycle cycle, String projectId, String strParticipationId) {
+        OrgProject project =
+                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+
+        long participationId = Long.parseLong(strParticipationId);
+
+        checkPermission(cycle, project);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+        Map<String, Object> map = createMap();
+        map.put("prj", project);
+        addCommonMapValues(map, project, cycle);
+
+        List<ParticipationProgress> progress
+                = CacheClients.getClient(cycle, CocoboxCordinatorClient.class).
+                getParticipationProgress(participationId);
+        DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
+        CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
+        
+        MultiPageActivityCourse actCourse
+                = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress,
+                        databankFacade, cdd);
+
+        map.put("actCourse", actCourse);
+
+        return new FreemarkerRequestTarget("/project/participationStatusRaw.html", map);
     }
 
     @WebAction
