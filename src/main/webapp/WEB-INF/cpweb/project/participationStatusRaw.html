@@ -29,7 +29,7 @@ ${cpweb_foot}
         <p>Tracking type: ${(act.progressTrackingType)!''}</p>
 
         <h5>Primary component</h5>
-        [#if (comp.primaryComponent??)]
+        [#if (act.primaryComponent??)]
           [@dumpComponent act.primaryComponent /]
         [/#if]
 
