@@ -43,7 +43,7 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountTransformers;
 import se.dabox.service.webutils.json.DataTablesJson;
-import se.dabox.service.webutils.webfeature.WebFeatures;
+import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.util.collections.CollectionsUtil;
 
 /**

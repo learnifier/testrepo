@@ -37,7 +37,7 @@ import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
-import se.dabox.service.webutils.webfeature.WebFeatures;
+import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.util.ParamUtil;
 
 /**

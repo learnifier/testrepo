@@ -65,7 +65,7 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.DataType;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
-import se.dabox.service.webutils.webfeature.WebFeatures;
+import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
 import se.dabox.util.collections.Predicate;
