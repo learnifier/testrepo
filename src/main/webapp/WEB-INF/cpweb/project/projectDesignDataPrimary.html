@@ -22,7 +22,107 @@ ${cpweb_foot}
 [/#assign]
 
 
+[#assign cpweb_head]
+
+<style>
+     
+      #pac-input {
+        background-color: #fff;
+        padding: 0 11px 0 13px;
+        width: 400px;
+        font-family: Helvetica Neue;
+        font-size: 15px;
+        font-weight: 300;
+        text-overflow: ellipsis;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+        margin-left: -1px;
+        padding-left: 14px;  /* Regular padding-left + 1. */
+        width: 401px;
+      }
+
+      .pac-container {
+        font-family: Helvetica Neue;
+        width: 200%;
+      }
+
+      #type-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #type-selector label {
+        font-family: Helvetica Neue;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+</style>
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+
+ <script>
+
+    $(document).ready(function() {
+        function initialize(elementId) {
+      
+            var input = document.getElementById(elementId);
+
+            var autocomplete = new google.maps.places.Autocomplete(input);
+
+            var infowindow = new google.maps.InfoWindow();
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                infowindow.close();
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    return;
+                }
+
+                var address = '';
+                if (place.address_components) {
+                    address = [
+                        (place.address_components[0] && place.address_components[0].short_name || ''),
+                        (place.address_components[1] && place.address_components[1].short_name || ''),
+                        (place.address_components[2] && place.address_components[2].short_name || '')
+                    ].join(' ');
+                }
+
+                infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+            });
+
+        }
+
+        $('input[type=location]').focus(function() {
+           //log('add maps to ', this.id); 
+           initialize(this.id);
+        });
+        
+        $('input[type=location]').keydown(function(event){
+            if(event.keyCode == 13) {
+              event.preventDefault();
+              return false;
+            }
+        });
+        
+    });
+
+ </script>
+
+
+[/#assign]
+
+
+
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
+
+<div style="margin: 20px 0px;">
+   <input id="pac-input" class="controls" type="text" placeholder="Enter a location">
+</div>
+
 
 <section id="designdata">
     <h1>[@dws.txt key="cpweb.designdata.title" /]<span> ${prj.name?xhtml}</span></h1>
@@ -124,6 +224,8 @@ ${cpweb_foot}
   [#assign fieldType = "tel"]
 [#elseif field.name = "url" || field.name = "locUrl"]
   [#assign fieldType = "url"]
+[#elseif field.name = "location"]
+  [#assign fieldType = "location"]
 [/#if]
 [#assign fname = component.cid+'_'+field.name /]
 <input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" class="[#if errorFields?seq_contains(fname)]invalid[/#if]" [#if field.mandatory]required[/#if] />
