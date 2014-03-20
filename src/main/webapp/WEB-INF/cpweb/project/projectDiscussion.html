@@ -1,0 +1,42 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<article class="projectdesign">
+
+[@pInfo.projectInfo selected="discussion"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.discussion.title" /]</h2>
+
+<section class="project-flirt-section">
+    <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
+    <script>
+                    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
+           f.startFlirting({
+               templates: {
+               }
+           });
+         $('.ccb-flirt-addpost textarea').focus(function(){
+             $(this).height(80);
+         })
+        });
+    </script>
+
+	
+</section>
+
+</article>
+
+
+
+[/@dws.skin]
+

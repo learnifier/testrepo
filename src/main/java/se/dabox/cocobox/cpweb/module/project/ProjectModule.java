@@ -192,6 +192,19 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     @WebAction
+    public RequestTarget onDiscussion(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+
+        checkPermission(cycle, project);
+
+        Map<String, Object> map = createMap();
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/projectDiscussion.html", map);
+    }
+
+    @WebAction
     public RequestTarget onDesign(RequestCycle cycle, String projectId) {
         OrgProject project =
                 getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));

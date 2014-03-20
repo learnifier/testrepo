@@ -102,6 +102,9 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
             [#if !isIdproject(prj)]
             <li class="[#if selected == 'schedule']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','task',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.schedule' /]</span></a></li>
             [/#if]
+            [#if project.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+            <li class="[#if selected == 'discussion']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','discussion',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.discussion' /]</span></a></li>
+            [/#if]
             
             [#if project.type.ptype == 2]
             <li class="[#if selected == 'design']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','design',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.design' /]</span></a></li>
