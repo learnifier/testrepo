@@ -206,7 +206,11 @@ public class MailModule extends AbstractWebAuthModule {
                 form.getDescription(),
                 form.getLang(), true,
                 template.getMainContent(),
-                template.getSubject(), template.getType(), false, userId, false);
+                template.getSubject(),
+                template.getType(),
+                false,
+                userId,
+                false);
 
         long bucketId = new GetOrgMailBucketCommand(cycle).forOrg(Long.valueOf(strOrgId));
 
