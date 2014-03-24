@@ -34,10 +34,10 @@ import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
-import se.dabox.cocosite.coursedesign.GetProjectDatabankListCommand;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
+import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
@@ -47,7 +47,6 @@ import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
-import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectProductMaterialHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
@@ -63,6 +62,7 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
+import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
@@ -85,7 +85,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -100,7 +100,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onRoster(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -117,10 +117,29 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
 
+    private OrgProject getProject(RequestCycle cycle, String projectId) throws NumberFormatException {
+        final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
+        OrgProject project =
+                cocoboxCordinatorClient.getProject(Long.valueOf(projectId));
+        if (project == null) {
+            return null;
+        }
+
+        if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.FLIRT)) {
+            if (project.getFlirtId() == null || project.getNewsFlirtId() == null) {
+                LOGGER.debug("Flirt ids are missing from project. Resyncing project");
+                cocoboxCordinatorClient.syncProjectState(project.getProjectId());
+                project = cocoboxCordinatorClient.getProject(project.getProjectId());
+            }
+        }
+
+        return project;
+    }
+
     @WebAction
     public RequestTarget onRegistration(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -141,7 +160,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onMaterials(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -164,7 +183,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onRaps(RequestCycle cycle, String projectId, String strParticipationId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         long participationId = Long.parseLong(strParticipationId);
 
@@ -194,7 +213,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onDiscussion(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -207,7 +226,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onDesign(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -266,7 +285,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onViewDesign(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -293,7 +312,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onTask(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
         checkPermission(cycle, project);
 
         Map<String, Object> map = createMap();
@@ -313,7 +332,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onSettings(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
@@ -329,7 +348,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onReports(RequestCycle cycle, String projectId) {
         OrgProject project =
-                getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
+                getProject(cycle, projectId);
 
         checkPermission(cycle, project);
 
