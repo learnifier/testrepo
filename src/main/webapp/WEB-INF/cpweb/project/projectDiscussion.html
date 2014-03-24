@@ -21,10 +21,12 @@ ${cpweb_foot}
 
     <h2>[@dws.txt key="cpweb.project.discussion.title" /]</h2>
 
-    <section class="project-flirt-section">
-        <h3>Announcements</h3>
+    <section class="project-flirt-section grid_8 alpha">
+        <h3><span class="glyphicon glyphicon-bullhorn"></span>Announcements</h3>
         <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
-        <h3>Discussions</h3>
+    </section>
+    <section class="project-flirt-section grid_8 omega">
+        <h3><span class="glyphicon glyphicon-comment primarycolor"></span>Discussions</h3>
         <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
         <script>
             require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
