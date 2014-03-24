@@ -24,7 +24,7 @@ import se.dabox.service.orgdir.client.OrgUnitInfo;
  *
  * @author Jerker Klang <jerker.klang@dabox.se>
  */
-public class BrandingOutput implements TemplateDirectiveModel {
+public class BrandingOutput extends AbstractBrandingOutput implements TemplateDirectiveModel {
 
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
@@ -46,14 +46,6 @@ public class BrandingOutput implements TemplateDirectiveModel {
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
 
         BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, "cpcss");
-    }
-
-    private long getOrgId(Object unwrappedObject) {
-        if (unwrappedObject instanceof MiniOrgInfo) {
-            return ((MiniOrgInfo)unwrappedObject).getId();
-        } else {
-            return ((OrgUnitInfo)unwrappedObject).getId();
-        }
     }
 
 }

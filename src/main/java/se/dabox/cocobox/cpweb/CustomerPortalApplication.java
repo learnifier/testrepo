@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.converter.ColorPickerConverter;
 import se.dabox.cocobox.cpweb.freemarker.CpwebModifyViewHandler;
+import se.dabox.cocobox.cpweb.freemarker.LearnifierBootstrap;
 import se.dabox.cocobox.cpweb.module.OrgSelectorModule;
 import se.dabox.cocosite.converter.DateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
@@ -44,6 +45,8 @@ public class CustomerPortalApplication extends DruwaApplication {
 
         DruwaFreemarker.getDruwaFreemarker(this).getConfig().addAutoInclude("/autoinclude.ftl");
         DruwaFreemarker.getDruwaFreemarker(this).addModifyViewDataHandler(new CpwebModifyViewHandler());
+        DruwaFreemarker.getDruwaFreemarker(this).getConfig().
+                setSharedVariable("learnifierBootstrap", LearnifierBootstrap.getInstance());
 
         getWebModuleRegistry().
                 addSearchPrefix("se.dabox.cocobox.cpweb.module");
