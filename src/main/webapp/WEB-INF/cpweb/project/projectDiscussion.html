@@ -2,6 +2,10 @@
 
 [#import "projectInfo.html" as pInfo /]
 
+[#assign cpweb_earlycss]
+[@learnifierBootstrap /]
+[/#assign]
+
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
@@ -9,30 +13,38 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName  earlycss=cpweb_earlycss]
 
 <article class="projectdesign">
 
-[@pInfo.projectInfo selected="discussion"][/@pInfo.projectInfo]
+    [@pInfo.projectInfo selected="discussion"][/@pInfo.projectInfo]
 
-<h2>[@dws.txt key="cpweb.project.discussion.title" /]</h2>
+    <h2>[@dws.txt key="cpweb.project.discussion.title" /]</h2>
 
-<section class="project-flirt-section">
-    <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
-    <script>
-                    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
-           f.startFlirting({
-               templates: {
-               }
-           });
-         $('.ccb-flirt-addpost textarea').focus(function(){
-             $(this).height(80);
-         })
-        });
-    </script>
+    <section class="project-flirt-section">
+        <h3>Announcements</h3>
+        <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
+        <h3>Discussions</h3>
+        <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
+        <script>
+            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
+                f.startSingleFlirt('${prj.newsFlirtId}', {
+                    templates: {
+                        emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+                    }
+                });
+                f.startSingleFlirt('${prj.flirtId}', {
+                    templates: {
+                        emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>"
+                    }
+                });
+                $('.ccb-flirt-addpost textarea').focus(function() {
+                    $(this).height(80);
+                })
+            });
+        </script>
 
-	
-</section>
+    </section>
 
 </article>
 
