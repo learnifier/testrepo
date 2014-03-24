@@ -44,26 +44,49 @@ ${cpweb_foot}
                         return;
                     }
                     
-                    var address = '';
-                    if (place.address_components) {
-                     
-                        address = [
-                            (place.address_components[0] && place.address_components[0].short_name || ''),
-                            (place.address_components[1] && place.address_components[1].short_name || ''),
-                            (place.address_components[2] && place.address_components[2].short_name || '')
-                        ].join(' ');
-                     
-                    }
+                    var mapsUrl = createMapsUrl(place);
+                    
+                    log(elementId);
+                    log(mapsUrl);
+                    log($(elementId).closest('.details').find('.locUrl input'));
+                    
+                    $('#'+elementId).closest('.details').find('.locUrl input').val(mapsUrl);
+                    
+                    
                 });
 
             }
 
-            $('input[type=location]').focus(function() {
+
+            function createMapsUrl(place) {
+                
+                var street,number,town = '';
+                
+                if (place.address_components) {
+                    street = (place.address_components[1] && place.address_components[1].short_name || '');
+                    number = (place.address_components[0] && place.address_components[0].short_name || '');
+                    town = (place.address_components[2] && place.address_components[2].short_name || '');
+                }
+
+                var long,lat; 
+                if(place.geometry.location) {
+                    lat = (place.geometry.location.A).toString().substring(0,9);
+                    long = (place.geometry.location.k).toString().substring(0,9);
+                }
+
+                var mapsBaseUrl = 'http://www.google.com/maps/place/',
+                    mapsUrl = mapsBaseUrl+encodeURIComponent(street) + ',' + number + ',' + encodeURIComponent(town) + '/@' + long + ',' + lat + ',17z';
+                return mapsUrl
+                
+            }
+
+
+            $('input[type=locUrlExtra]').focus(function() {
                //log('add maps to ', this.id); 
                initialize(this.id);
             });
 
-            $('input[type=location]').keydown(function(event){
+            $('input[type=locUrlExtra]').keydown(function(event){
                 if(event.keyCode == 13) {
                   event.preventDefault();
                   return false;
@@ -160,10 +183,22 @@ ${cpweb_foot}
 [#macro listComponentFields component]
 [#if componentFieldSet[component.cid]??]
 [#local fields = componentFieldSet[component.cid] /]
+
+
+
+
+
 <div class="details clearfix">
     <ul>
         [#list fields as field]
-        <li class="${field.name}">[@listComponentField component field /]</li>
+        [#if component.type = "ev_classroom"]
+            [#if field.name = "locUrl" ]
+                [#assign visibility = "hidden"]
+            [#else]
+                [#assign visibility = "visible"]
+            [/#if]
+        [/#if]
+        <li class="${field.name} ${visibility}">[@listComponentField component field /]</li>
         [/#list]
     </ul>
 </div>
@@ -171,7 +206,6 @@ ${cpweb_foot}
 [/#macro]
 
 [#macro listComponentField component field]
-<label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
 [#assign extraAttrs = "" /]
 [#assign fieldType = "text"]
 [#if field.name = "duration"]
@@ -180,11 +214,19 @@ ${cpweb_foot}
 [#elseif field.name = "phone"]
   [#assign fieldType = "tel"]
 [#elseif field.name = "url" || field.name = "locUrl"]
-  [#assign fieldType = "url"]
+    [#assign fieldType = "url"]
+    [#if (component.type = "ev_classroom") ]
+        [#assign fieldType = "hidden"]
+    [/#if]
+[#elseif field.name = "locUrlExtra"]
+  [#assign fieldType = "locUrlExtra"]
 [#elseif field.name = "location"]
   [#assign fieldType = "location"]
 [/#if]
 [#assign fname = component.cid+'_'+field.name /]
+[#if fieldType != "hidden"]
+<label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
+[/#if]
 <input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" class="[#if errorFields?seq_contains(fname)]invalid[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>

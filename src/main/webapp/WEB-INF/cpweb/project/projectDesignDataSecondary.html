@@ -182,7 +182,12 @@ ${cpweb_foot}
 <div class="details clearfix">
     <ul>
         [#list fields as field]
-        <li class="${field.name}">[@listComponentField component field /]</li>
+            [#if field.name = "locUrl" ]
+                [#assign visibility = "hidden"]
+            [#else]
+                [#assign visibility = "visible"]
+            [/#if]
+        <li class="${field.name} ${visibility}">[@listComponentField component field /]</li>
         [/#list]
     </ul>
 </div>
@@ -202,7 +207,7 @@ ${cpweb_foot}
 [#elseif field.name = "phone"]
   [#assign fieldType = "tel"]
 [#elseif field.name = "url" || field.name = "locUrl"]
-  [#assign fieldType = "url"]
+    [#assign fieldType = "url"]
 [/#if]
 
 [#assign fname = component.cid+'_'+field.name /]
