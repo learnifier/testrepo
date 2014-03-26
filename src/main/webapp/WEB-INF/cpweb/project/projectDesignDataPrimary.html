@@ -29,7 +29,7 @@ ${cpweb_foot}
 <script>
 
 
-    require(['async!http://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places'] , function() {
+    require(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places'] , function() {
     
         $(document).ready(function() {
             function initialize(elementId) {
@@ -191,12 +191,10 @@ ${cpweb_foot}
 <div class="details clearfix">
     <ul>
         [#list fields as field]
-        [#if component.type = "ev_classroom"]
-            [#if field.name = "locUrl" ]
+        [#if component.type = "ev_classroom" && field.name = "locUrl"]
                 [#assign visibility = "hidden"]
-            [#else]
+        [#else]
                 [#assign visibility = "visible"]
-            [/#if]
         [/#if]
         <li class="${field.name} ${visibility}">[@listComponentField component field /]</li>
         [/#list]
