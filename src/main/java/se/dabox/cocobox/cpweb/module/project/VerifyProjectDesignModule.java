@@ -508,8 +508,8 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
      * This returns the form field name.
      *
      * <p>
-     * <b>IMPORTANT</b> THIS IS NOT ALWAYS WHAT YOU WANT. SOMETIMES YOU WANT WITH THE f PREFIX AND
-     * SOMETIMES NOT</b></p>
+     * <b>IMPORTANT:</b> THIS IS NOT ALWAYS WHAT YOU WANT. SOMETIMES YOU WANT WITH THE f PREFIX AND
+     * SOMETIMES NOT</p>
      *
      * @param cid
      * @param fieldName
