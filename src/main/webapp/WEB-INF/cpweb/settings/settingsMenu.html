@@ -11,8 +11,10 @@
         <li id="sm_branding" [#if selected == 'branding']class="activeItem"[/#if]><a href="${helper.urlFor('branding.BrandingModule','logo',[org.id])}"><span>Branding</span></a></li>
         <li id="sm_emails" [#if selected == 'emails']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listEmails',[org.id])}"><span>Email Templates</span></a></li>
         <li id="sm_designs" [#if selected == 'designs']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listDesigns',[org.id])}"><span>Course Designs</span></a></li>
-        <li id="sm_prod_deeplinks" [#if selected == 'prod_deeplinks']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listProdDeeplinks',[org.id])}"><span>Direct Links - Purchased</span></a></li>
-        <li id="sm_orgmat_deeplinks" [#if selected == 'orgmat_deeplinks']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listOrgMatDeeplinks',[org.id])}"><span>Direct Links - Added</span></a></li>
+        [#if dwsrt.hasFeature('deeplink') ]
+            <li id="sm_prod_deeplinks" [#if selected == 'prod_deeplinks']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listProdDeeplinks',[org.id])}"><span>Direct Links - Purchased</span></a></li>
+            <li id="sm_orgmat_deeplinks" [#if selected == 'orgmat_deeplinks']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listOrgMatDeeplinks',[org.id])}"><span>Direct Links - Added</span></a></li>
+        [/#if]         
     </ul>
 </nav>
 
