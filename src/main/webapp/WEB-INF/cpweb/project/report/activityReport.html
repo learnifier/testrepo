@@ -10,60 +10,60 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dabox-ajax-longrun-gui','dabox-report-datatables', 'dabox-common', 'dabox-jquery'], function(lr) {
+        require(['dabox-ajax-longrun-gui', 'dabox-report-datatables', 'dabox-common', 'dabox-jquery'], function(lr) {
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
             var tableColSumTitle = ["Completed"];
             var tableJSON = [];
 
-            lr.guiLongRun('${helper.urlFor("project.report.ProjectReportJsonModule","activityReport",[prj.projectId])}'
-                    ,{
-				type: 'GET',
-                                progressTarget: '#loadingTh',
-				error: function() {
-					$('#r_project_activity').html($('<td class="errormessage">').text('We were unable to generate this report right now. Please, try again later.'));
-				},
-				success: function(data){
-					var activities = data.aaData[0].activities;
-					var activityCount = activities.length;
-					extractCols(activities, activityCount);
-					renderColDefs(activityCount);
-					initializeTable(data.aaData);
-			}});
-            
-            function extractCols(activities, activityCount){                
+            lr.guiLongRun('${helper.urlFor("project.report.ProjectReportJsonModule","activityReport",[prj.projectId])}', {
+                type: 'GET',
+                progressTarget: '#loadingTh',
+                error: function() {
+                    $('#r_project_activity').html($('<td class="errormessage">').text('We were unable to generate this report right now. Please, try again later.'));
+                },
+                success: function(data) {
+                    var activities = data.aaData[0].activities;
+                    var activityCount = activities.length;
+                    extractCols(activities, activityCount);
+                    renderColDefs(activityCount);
+                    initializeTable(data.aaData);
+                }});
+
+            function extractCols(activities, activityCount) {
                 for (var i = 0; i < activityCount; i++) {
-                        tableColTitles.push(activities[i].title);
-                        tableColIds.push("activities." + [i] + ".progressPercent");
+                    tableColTitles.push(activities[i].title);
+                    tableColIds.push("activities." + [i] + ".progressPercent");
                 };
                 // WHY ARE THESE NEEDED???
                 tableColTitles.push("Completed");
                 tableColIds.push(null);
             };
-            
+
             function renderColDefs(activityCount) {
                 //create JSON array for aoColumnDefs
                 for (var i = 0; i < tableColTitles.length; i++) {
                     tableJSON.push({
-                        "sTitle": "<span class='pop' title='" + tableColTitles[i] +  "'>" + cocobox.trunc(tableColTitles[i], 10) + "</span>",
+                        "sTitle": "<span class='pop' title='" + tableColTitles[i] + "'>" + cocobox.trunc(tableColTitles[i], 10) + "</span>",
                         "mDataProp": tableColIds[i],
                         "aTargets": [i],
-						"sDefaultContent": "0",
-						"fnCreatedCell": function(td, data, oData, row, col) {
-							if(oData.activities[col-1] != undefined) {
-								if(oData.activities[col-1].overdue) {
-									$(td).css('color','red');
-								}
-								
-								if(oData.activities[col-1].completed) {
-									$(td).css('color','#00C800');
-								}	
-									$(td).append('%');
-							}
-						}
+                        "sDefaultContent": "0",
+                        "fnCreatedCell": function(td, data, oData, row, col) {
+                            if (oData.activities[col - 1] != undefined) {
+                                if (oData.activities[col - 1].overdue) {
+                                    $(td).css('color', 'red');
+                                }
+
+                                if (oData.activities[col - 1].completed) {
+                                    $(td).css('color', '#00C800');
+                                }
+                                $(td).append('%');
+                            }
+                        }
                     });
-                };
+                }
+                ;
                 renderColSum(activityCount);
             };
 
@@ -71,78 +71,93 @@ ${cpweb_foot}
                 tableJSON.push({
                     "sTitle": tableColSumTitle,
                     "mDataProp": null,
-                    "aTargets": [activityCount+1],
+                    "aTargets": [activityCount + 1],
                     "fnRender": function() {
                         return  " <span class='completedSum'></span> of " + activityCount;
                     }
                 });
-                
             };
 
             function initializeTable(JSONdata) {
                 oTable = $('#r_project_activity').dataTable({
-					"sScrollX": "100%",
-					"sScrollXInner": "140%",
+                    "sScrollX": "100%",
+                    "sScrollXInner": "140%",
                     "aoColumnDefs": tableJSON,
                     "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
                     "oTableTools": {
                         "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
-                     },
+                        "aButtons": [
+                            {
+                                "sExtends": "csv",
+                                "bFooter": true
+                            },
+                            {
+                                "sExtends": "xls",
+                                "sButtonText": "Special columns",
+                                "mColumns": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+                            },
+                        ]
+                    },
                     "bPaginate": false,
-                    "aaSorting": [[0,'asc']],
-                    "aaData": JSONdata, 
-					
+                    "aaSorting": [[0, 'asc']],
+                    "aaData": JSONdata,
+                    "bDestroy": false,
                     "oLanguage": {
                         "sSearch": "",
                         "sEmptyTable": "<span class='emptytable'>No projects available on your account.</span>",
                         "sLoadingRecords": "<p>Loading report...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
                     },
                     "fnRowCallback": function(nRow, iDisplayIndex) {
-						var sumCompleted = 0;
-						for(var i = 0; i < iDisplayIndex.activities.length; i++) {						
-							if(iDisplayIndex.activities[i].completed === true) {
-									sumCompleted++;
-							}
-						}
-						$('.completedSum', nRow).text(sumCompleted);
-                    }, 
-					"fnInitComplete": function() {
-						$('.pop').tooltip();
-					}
+                        var sumCompleted = 0;
+                        for (var i = 0; i < iDisplayIndex.activities.length; i++) {
+                            if (iDisplayIndex.activities[i].completed === true) {
+                                sumCompleted++;
+                            }
+                        }
+                        $('.completedSum', nRow).text(sumCompleted);
+                    },
+                    "fnInitComplete": function() {
+                        $('.pop').tooltip();
+                    },
+                    "fnFooterCallback": function( nFoot, aData, iStart, iEnd, aiDisplay ) {
+                        //nFoot.getElementsByTagName('th')[0].innerHTML = "Starting index is "+iStart;
+                        log(nFoot, aData, iStart, iEnd, aiDisplay);
+                        var sumColumns = [];
+                        for (var i = 0; i < JSONdata[0].activities.length; i++) {
+                            sumColumns[i] = 0;
+                        }
+
+                        for (var j = 0; j < JSONdata.length; j++) {
+                            if (JSONdata[j].activities != null) {
+                                for (var h = 0; h < JSONdata[j].activities.length; h++) {
+                                    if (JSONdata[j].activities[h].completed === true) {
+                                        sumColumns[h] = sumColumns[h] + 1;
+                                    }
+                                }
+                            }
+                        }
+
+
+                        var nFootAbsoluteRow = $('#completed_absolute');
+                        var nFootRelativeRow = $('#completed_relative');
+
+                        $(nFootAbsoluteRow).append($('<th>').text('Completed'));
+                        $(nFootRelativeRow).append($('<th>').text('Completed (%)'));
+
+
+                        var participantsSum = parseInt(JSONdata.length);
+
+                        $.each(sumColumns, function(index, value) {
+                            $(nFootAbsoluteRow).append($('<td>').text(value));
+                            $(nFootRelativeRow).append($('<td>').text(((value / participantsSum) * 100).toFixed(2) + '%'));
+                        });
+
+
+                        $(nFootAbsoluteRow).append($('<td>'));
+                        $(nFootRelativeRow).append($('<td>'));
+                    }
                 });
-				
-				var sumColumns = [];
-				for(var i = 0; i < JSONdata[0].activities.length; i++ ) {
-					sumColumns[i] = 0;
-				}
 
-				for(var j = 0; j < JSONdata.length; j++) {
-					if(JSONdata[j].activities != null) {
-						for(var h = 0; h < JSONdata[j].activities.length; h++ ) {
-							if(JSONdata[j].activities[h].completed === true) {
-								sumColumns[h] = sumColumns[h] + 1;
-							}
-						}
-					}
-				}
-
-				var nFootAbsoluteRow =  $('#completed_absolute');
-				var nFootRelativeRow = $('#completed_relative');
-				
-				$(nFootAbsoluteRow).append($('<th>').text('Completed'));
-				$(nFootRelativeRow).append($('<th>').text('Completed (%)'));
-
-
-				var participantsSum = parseInt(JSONdata.length);
-
-				$.each(sumColumns, function(index, value) {
-					$(nFootAbsoluteRow).append($('<td>').text(value));
-					$(nFootRelativeRow).append($('<td>').text( ((value/participantsSum)*100).toFixed(2) + '%'));
-				});
-				
-				$(nFootAbsoluteRow).append($('<td>'));
-				$(nFootRelativeRow).append($('<td>'));
-								
             };
         });
     });
@@ -167,12 +182,12 @@ ${cpweb_head}
         <thead>
         </thead>
         <tbody>
-			<tr><th id="loadingTh"></th></tr>
+            <tr><th id="loadingTh"></th></tr>
         </tbody>
-		<tfoot class="summary">
-			<tr id="completed_absolute"></tr>
-			<tr id="completed_relative"></tr>
-		</tfoot>
+        <tfoot class="summary">
+            <tr id="completed_absolute"></tr>
+            <tr id="completed_relative"></tr>
+        </tfoot>
     </table>
 </section>
 
