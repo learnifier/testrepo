@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.9</version>
+            <version>${poi.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
@@ -90,7 +90,17 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.9</version>
+            <version>${poi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -116,7 +126,7 @@
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
-            <version>1.9.0</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>se.dabox.service</groupId>
@@ -155,7 +165,7 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
             <type>jar</type>
-        </dependency>
+        </dependency>        
     </dependencies>
 
     <build>
@@ -210,11 +220,11 @@
                         <file>
                             <name>js/createProject-min.js</name>
                             <developmentName>js/createProject.js</developmentName>
-                        </file>                        
+                        </file>
                         <file>
                             <name>js/projectGraphs-min.js</name>
                             <developmentName>js/projectGraphs.js</developmentName>
-                        </file>                        
+                        </file>
                     </files>
                 </configuration>
             </plugin>
@@ -224,6 +234,7 @@
     <properties>
         <druwa.version>0.3-SNAPSHOT</druwa.version>
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+        <poi.version>3.10-FINAL</poi.version>
     </properties>
 
     <profiles>
