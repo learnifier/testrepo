@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,8 +36,8 @@ public class RosterReader {
     private int givenNameCol = 0;
     private int surnameCol = 1;
     private int emailCol = 2;
-    private List<RosterError> errors = new ArrayList<RosterError>();
-    private List<Contact> contacts = new ArrayList<Contact>();
+    private final List<RosterError> errors = new ArrayList<>();
+    private List<Contact> contacts = new ArrayList<>();
     private EmailValidator emailValidator = SimpleEmailValidator.getInstance();
 
     public List<Contact> readContacts(InputStream inputStream) {
@@ -101,9 +102,7 @@ public class RosterReader {
         try {
             LOGGER.debug("Trying to open workbook from stream: {}", is);
             workbook = WorkbookFactory.create(is);
-        } catch (IOException ex) {
-            throw new RosterFormatException("Failed to read workbook", ex);
-        } catch (InvalidFormatException ex) {
+        } catch (IOException | InvalidFormatException | POIXMLException ex) {
             throw new RosterFormatException("Failed to read workbook.", ex);
         }
     }
