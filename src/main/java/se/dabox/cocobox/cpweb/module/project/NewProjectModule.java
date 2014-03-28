@@ -34,7 +34,9 @@ import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
+import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.ccbc.org.OrgProduct;
@@ -53,6 +55,9 @@ import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
+import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.orgdir.client.OrgUnitInfo;
+import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.collections.CollectionsUtil;
@@ -106,6 +111,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         map.put("timezones", OrgProjectTimezoneFactory.newRecentList(cycle, org.getId()));
         map.put("defaultTimezone", getDefaultTimezone(cycle));
+
+        map.put("orgMatListSupport", getMatListSupportSetting(cycle, org));
 
         map.put("orgmats", getCocoboxCordinatorClient(cycle).listOrgMaterial(
                 org.getId()));
@@ -727,5 +734,25 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         return ProductUtils.isSingleProductProjectProduct(product);
+    }
+
+    private Boolean getMatListSupportSetting(RequestCycle cycle, MiniOrgInfo miniOrg) {
+        if (!WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.MATERIALLIST)) {
+            return Boolean.FALSE;
+        }
+
+        OrganizationDirectoryClient odClient
+                = CacheClients.getClient(cycle, OrganizationDirectoryClient.class);
+        
+        OrgUnitInfo org = odClient.getOrgUnitInfo(miniOrg.getId());
+
+        String strValue = org.getProfileValue(CocoSiteConstants.ORG_PROFILE,
+                CocoSiteConstants.ORG_MATLISTSUPPORT);
+
+        if (strValue == null) {
+            return Boolean.FALSE;
+        }
+
+        return Boolean.valueOf(strValue);
     }
 }
