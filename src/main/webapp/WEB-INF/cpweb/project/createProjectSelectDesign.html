@@ -30,13 +30,15 @@ ${cpweb_foot}
         require(['jsrender'] , function(){
                     $("#prjtype").val('DESIGNED_PROJECT');
                     jQuery.post(listCourseDesigns, null, function(data) {
-                        var extra = {
-                            "id":"ml-0",
-                            "name":"Materials List",
-                            "description":"A simple format for designs that do not include activity due dates, live events, product groupings or a resource page",
-                            "thumbnail": "${cocoboxCdn}/cocobox/img/ml_default.png"
-                        };
-                        data.aaData.push(extra);
+                        [#if orgMatListSupport]
+                            var extra = {
+                                "id":"ml-0",
+                                "name":"Materials List",
+                                "description":"A simple format for designs that do not include activity due dates, live events, product groupings or a resource page",
+                                "thumbnail": "${cocoboxCdn}/cocobox/img/ml_default.png"
+                            };
+                            data.aaData.push(extra);
+                        [/#if]
                         $("#crprj_designslist ul").html(
                         $("#courseDesignBox").render(data.aaData)
                     );
