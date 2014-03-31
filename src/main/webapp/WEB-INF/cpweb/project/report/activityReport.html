@@ -24,7 +24,6 @@ ${cpweb_foot}
                     $('#r_project_activity').html($('<td class="errormessage">').text('We were unable to generate this report right now. Please, try again later.'));
                 },
                 success: function(data) {
-                    
                     data.aaData = manipulateData(data.aaData);
                     
                     var activities = data.aaData[0].activities;
@@ -38,9 +37,7 @@ ${cpweb_foot}
             
              //Use this to summarize the data on each row before the init of the dataTable
             function manipulateData(JSONdata) {
-                
-                log(JSONdata);
-                
+               
                 $.each(JSONdata, function(index, element) {
                     var completed = 0;
                     if(element.activities) {
@@ -49,9 +46,7 @@ ${cpweb_foot}
                                completed++;
                            } 
                         });
-                        log(element.activities);
                         
-                        log(completed)
                         element.activities.push({
                             'title': 'Completed',
                             'progressPercent': completed
@@ -60,8 +55,6 @@ ${cpweb_foot}
                     }
                 });
                 
-                log(JSONdata);
-
                 return JSONdata;
             };
             
@@ -93,7 +86,6 @@ ${cpweb_foot}
                                 
                                 if(col == activityCount) {
                                     var textAfter = ' of ' + (activityCount-1).toString();
-                                    log(textAfter);
                                     $(td).append(textAfter);
                                 } else {
                                     $(td).append('%');
@@ -112,7 +104,13 @@ ${cpweb_foot}
                     "aoColumnDefs": tableJSON,
                     "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
                     "oTableTools": {
-                        "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf"
+                        "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
+                        "aButtons": [
+                            {"sExtends": 'pdf',
+                            "bFooter": true
+                            }
+                        
+                        ]   
                     },
                     "bPaginate": false,
                     "aaSorting": [[0, 'asc']],
@@ -174,8 +172,6 @@ ${cpweb_foot}
                 });
 
             };
-            
-    
        });
     });
 </script>
