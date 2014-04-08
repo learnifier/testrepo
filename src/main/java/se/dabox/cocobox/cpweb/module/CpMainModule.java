@@ -176,17 +176,6 @@ public class CpMainModule extends AbstractWebAuthModule {
     }
 
     @WebAction
-    public RequestTarget onListProjectsTest(RequestCycle cycle, String strOrgId) {
-        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-
-        Map<String, Object> map = createMap();
-
-        map.put("org", org);
-
-        return new FreemarkerRequestTarget("/project/listProjectsTest.html", map);
-    }
-
-    @WebAction
     public RequestTarget onListUsers(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 

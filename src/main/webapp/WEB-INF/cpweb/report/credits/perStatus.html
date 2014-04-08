@@ -22,7 +22,7 @@
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mDataProp": "thumbnail",
+                    "mData": "thumbnail",
                     "sClass": "thumbnail",
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
@@ -35,14 +35,14 @@
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": "id",
+                    "mData": "id",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.id;
                     }
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mDataProp": "title",
+                    "mData": "title",
                     "sWidth": "55%",
                     "fnRender": function ( oObj ) {
                         return  '<span title="' + oObj.aData.title  + '">' + cocobox.trunc(oObj.aData.title , 30) + '</span>';
@@ -50,7 +50,7 @@
                 },
                 {
                     "aTargets": [ 3 ],
-                    "mDataProp": "totalCredits",
+                    "mData": "totalCredits",
                     "bUseRendered": false,
                     "sClass": "center",
                     "fnRender": function ( oObj ) {
@@ -59,7 +59,7 @@
                 },
                 {
                     "aTargets": [ 4 ],
-                    "mDataProp": "usedCredits",
+                    "mData": "usedCredits",
                     "bUseRendered": false,
                     "sClass": "center",
                     "fnRender": function ( oObj ) {
@@ -68,7 +68,7 @@
                 },
                 {
                     "aTargets": [ 5 ],
-                    "mDataProp": "expiredCredits",
+                    "mData": "expiredCredits",
                     "bUseRendered": false,
                     "sClass": "center",
                     "fnRender": function ( oObj ) {
@@ -77,7 +77,7 @@
                 },
                 {
                     "aTargets": [ 6 ],
-                    "mDataProp": "availCredits",
+                    "mData": "availCredits",
                     "bUseRendered": false,
                     "sClass": "center available",
                     "fnRender": function ( oObj ) {

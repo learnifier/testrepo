@@ -28,7 +28,7 @@ var listDeeplinksOrgMats = (function() {
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mDataProp": "type",
+                    "mData": "type",
                     "sClass": "type",
                     "fnRender": function ( oObj ) {
                         if (oObj.aData.thumbnail) {
@@ -40,7 +40,7 @@ var listDeeplinksOrgMats = (function() {
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": "title",
+                    "mData": "title",
                     "fnRender": function ( oObj ) {
                         var desc = oObj.aData.desc || "";
 
@@ -50,7 +50,7 @@ var listDeeplinksOrgMats = (function() {
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mDataProp": "activeLinks",
+                    "mData": "activeLinks",
                     "sClass": "control activelinks",
                     "fnRender": function ( oObj ) {
                         var active = oObj.aData.activeLinks;

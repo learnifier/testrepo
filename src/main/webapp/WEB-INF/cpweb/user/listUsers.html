@@ -16,7 +16,7 @@ ${cpweb_foot}
             "aoColumnDefs": [ 
                 {
                     "bSortable": false,
-                    "mDataProp": null,
+                    "mData": null,
                     "fnRender": function ( oObj ) {
 
                         if (oObj.aData.imagelink24) {
@@ -29,7 +29,7 @@ ${cpweb_foot}
                 },
                 {
                     "sWidth": "50%",
-                    "mDataProp": "name",
+                    "mData": "name",
                     "fnRender": function ( oObj ) {
                             var name = (oObj.aData.name && oObj.aData.name.length > 0) ? oObj.aData.name : "(Name not set yet)";
                             return  '<a href="'+ oObj.aData.link + '">' +  name +'</a> ';
@@ -37,13 +37,14 @@ ${cpweb_foot}
                     "aTargets": [ 1 ]
                 },
                 {
-                    "mDataProp": "email",
+                    "mData": "email",
                     "aTargets": [ 2 ]
                 }
             ],
             "sAjaxSource": "${helper.urlFor('CpJsonModule','listUsers',[org.id])}",                      
             "iDisplayLength": 25,
             "sPaginationType": "full_numbers",
+            "bDeferRender": true,
             "oLanguage": {
                 "sSearch": "",
                 "sZeroRecords": "No user matches your query",

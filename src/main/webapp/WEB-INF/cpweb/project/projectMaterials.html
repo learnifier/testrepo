@@ -23,7 +23,7 @@ ${cpweb_foot}
                 "aoColumnDefs": [
                     {
                         "aTargets": [ 0 ],
-                        "mDataProp": "type",
+                        "mData": "type",
                         "sClass": "type",
                         "fnRender": function ( oObj ) {
                             if (oObj.aData.thumbnail==null ){
@@ -36,7 +36,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [ 1 ],
-                        "mDataProp": "title",
+                        "mData": "title",
                         "fnRender": function ( oObj ) {
                             var desc = oObj.aData.desc || "";
                             return  '<h1>' + oObj.aData.title + '</h1><p>'
@@ -46,7 +46,7 @@ ${cpweb_foot}
 
                     {
                         "aTargets": [ 2 ],
-                        "mDataProp": null,
+                        "mData": null,
                         "fnRender" : function ( oObj) {
 
                             if(oObj.aData.crispAdminAvailable) {
@@ -59,7 +59,7 @@ ${cpweb_foot}
 
                     {
                         "aTargets": [ 3 ],
-                        "mDataProp": null,
+                        "mData": null,
                         "fnRender": function ( oObj ) {
                             return  '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+oObj.aData.system+'|'+oObj.aData.id+'" /><button type="submit">Remove</button></form>';
                         }

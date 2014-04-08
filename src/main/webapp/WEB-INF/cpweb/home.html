@@ -28,7 +28,7 @@ ${cpweb_foot}
                     {
                         "sWidth": "64",
                         "bSortable": false,
-                        "mDataProp": null,
+                        "mData": null,
                         "sClass": "thumbnail",
                         "fnRender": function ( oObj ) {
                             return  '<a href="'+ oObj.aData.link + '"><img src="'+ oObj.aData.thumbnail + '" alt="' + oObj.aData.projectName +' thumbnail" /></a>';
@@ -39,7 +39,7 @@ ${cpweb_foot}
                     {
                         "sWidth": "500",
                         "bSortable": false,
-                        "mDataProp": null,
+                        "mData": null,
                         "sClass": "info",
                         "fnRender": function ( oObj ) {
                             var template = '<a href="'+ oObj.aData.link + '"><p class="name">' + oObj.aData.projectName +'</p>';
@@ -64,7 +64,7 @@ ${cpweb_foot}
                     },
                     {
                         "sWidth": "150",
-                        "mDataProp": "oldest",
+                        "mData": "oldest",
                         "bSortable": false,
                         "sClass": "date",
                         "fnRender": function ( oObj ) {
@@ -74,7 +74,7 @@ ${cpweb_foot}
                     },
                     {
                        "sWidth": "120",
-                       "mDataProp": null,
+                       "mData": null,
                         "bSortable": false,
                         "sClass": "action-button",
                         "fnRender": function ( oObj ) {
@@ -110,7 +110,7 @@ ${cpweb_foot}
                 "aoColumnDefs": [
                     {
                         "bSortable": false,
-                        "mDataProp": null,
+                        "mData": null,
                         "sWidth": "5%",
                         "fnRender": function ( oObj ) {
                             if (oObj.aData.favorite) {
@@ -126,7 +126,7 @@ ${cpweb_foot}
                     {
                         "sWidth": "95%",
                         "bSortable": false,
-                        "mDataProp": "name",
+                        "mData": "name",
                         "sClass": "favdetails",
                         "fnRender": function ( oObj ) {
                             return  '<a href="'+ oObj.aData.link + '"><p>' + oObj.aData.name +'</p>' +

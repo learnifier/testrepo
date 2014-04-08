@@ -36,14 +36,14 @@ var listDeeplinksProducts = (function() {
                 "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mDataProp": null,
+                    "mData": null,
                     "fnRender": function ( oObj ) {
                         return oObj.aData.amount;
                     }
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": null,
+                    "mData": null,
                     "sClass": "control activelinks",
                     "fnRender": function ( oObj ) {
                         if (oObj.aData.createdBy === '') {
@@ -55,14 +55,14 @@ var listDeeplinksProducts = (function() {
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mDataProp": "created",
+                    "mData": "created",
                     "fnRender": function ( oObj ) {
                         return oObj.aData.createdStr;
                     }
                 },
                 {
                     "aTargets": [ 3 ],
-                    "mDataProp": null,
+                    "mData": null,
                     "bSortable": false,
                     "sClass": "",
                     "fnRender": function ( oObj ) {
@@ -108,7 +108,7 @@ var listDeeplinksProducts = (function() {
             "aoColumnDefs": [
             {
                 "aTargets": [ 0 ],
-                "mDataProp": "type",
+                "mData": "type",
                 "sClass": "type",
                 "fnRender": function ( oObj ) {
                     if (oObj.aData.thumbnail) {
@@ -120,7 +120,7 @@ var listDeeplinksProducts = (function() {
             },
             {
                 "aTargets": [ 1 ],
-                "mDataProp": "title",
+                "mData": "title",
                 "fnRender": function ( oObj ) {
                     var desc = oObj.aData.desc || "";
                     return  '<h1>' + oObj.aData.title + '</h1><p class="lang">'
@@ -129,7 +129,7 @@ var listDeeplinksProducts = (function() {
             },
             {
                 "aTargets": [ 2 ],
-                "mDataProp": "activeLinks",
+                "mData": "activeLinks",
                 "sClass": "control activelinks",
                 "fnRender": function ( oObj ) {
                     if ( oObj.aData.allowDeeplink ) {

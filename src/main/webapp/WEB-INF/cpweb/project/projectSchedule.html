@@ -14,11 +14,11 @@ ${cpweb_foot}
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mDataProp": "mailTemplateName"
+                    "mData": "mailTemplateName"
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": "targetFilter",
+                    "mData": "targetFilter",
                     "fnRender": function ( oObj ) {
                         if ( oObj.aData.targetFilter == 'all' ) {
                             return '[@dws.txt key="cpweb.project.schedule.target.all" /]'
@@ -33,11 +33,11 @@ ${cpweb_foot}
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mDataProp": "scheduledString"
+                    "mData": "scheduledString"
                 },
                 {
                     "aTargets": [ 3 ],
-                    "mDataProp": "status",
+                    "mData": "status",
                     "bUseRendered": false,
                     "fnRender": function ( oObj ) {
                         if ( oObj.aData.status == 'N' ) {
@@ -57,7 +57,7 @@ ${cpweb_foot}
                 },
                 {
                     "aTargets": [ 4 ],
-                    "mDataProp": null,
+                    "mData": null,
                     
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
@@ -71,7 +71,7 @@ ${cpweb_foot}
                 },
 				{
                     "aTargets": [ 5 ],
-                    "mDataProp": null,
+                    "mData": null,
                     
                     "bSortable": false,
                     "fnRender": function ( oObj ) {

@@ -19,14 +19,14 @@ ${cpweb_foot}
                 {
                    "aTargets": [ 0 ],
                    "sWidth": "70%",
-                    "mDataProp": "name",
+                    "mData": "name",
                     "fnRender": function ( oObj ) {
                         return  '<a href="'+ oObj.aData.editlink + '" title="' + oObj.aData.description  + '">' + oObj.aData.name +'</a> ';
                     }
                  },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": null,
+                    "mData": null,
                     "sClass": "control",
                     "fnRender": function ( oObj ) {
                         if ( oObj.aData.sticky ) {
@@ -38,7 +38,7 @@ ${cpweb_foot}
                 },
 				{
                     "aTargets": [ 2 ],
-                    "mDataProp": "localeStr",
+                    "mData": "localeStr",
                     "sClass": "language"
                 }
             ],

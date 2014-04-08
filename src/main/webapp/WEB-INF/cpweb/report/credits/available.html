@@ -15,21 +15,21 @@
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mDataProp": "orderNo",
+                    "mData": "orderNo",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.orderNo;
                     }
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": "created",
+                    "mData": "created",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.createdStr;
                     }
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mDataProp": "baseproduct",
+                    "mData": "baseproduct",
                     "fnRender": function ( oObj ) {
                         var kitId = oObj.aData.baseproduct;
                         var productId= '${product.id.id}';
@@ -42,7 +42,7 @@
                 },
                 {
                     "aTargets": [ 3 ],
-                    "mDataProp": "amount",
+                    "mData": "amount",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.amount;
                     }

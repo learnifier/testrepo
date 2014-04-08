@@ -21,7 +21,7 @@
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mDataProp": "projectName",
+                    "mData": "projectName",
                     "sWidth": "60%",
                     "fnRender": function ( oObj ) {
                         return  '<a href="${helper.urlFor('project.report.ProjectReportModule','activityReport')}/' +  oObj.aData.projectId + '">' + oObj.aData.projectName + '</a>';
@@ -29,7 +29,7 @@
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mDataProp": "totalCount",
+                    "mData": "totalCount",
                     "sClass": "center",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.totalCount;
@@ -37,7 +37,7 @@
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mDataProp": "invitedCount",
+                    "mData": "invitedCount",
                     "sClass": "center",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.invitedCount;
@@ -45,7 +45,7 @@
                 },
                 {
                     "aTargets": [ 3 ],
-                    "mDataProp": "completedCount",
+                    "mData": "completedCount",
                     "sClass": "center completed",
                     "fnRender": function ( oObj ) {
                         return  oObj.aData.completedCount;

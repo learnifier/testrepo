@@ -71,7 +71,7 @@ ${cpweb_foot}
                 for (var i = 0; i < tableColTitles.length; i++) {
                     tableJSON.push({
                         "sTitle": "<span class='pop' title='" + tableColTitles[i] + "'>" + cocobox.trunc(tableColTitles[i], 10) + "</span>",
-                        "mDataProp": tableColIds[i],
+                        "mData": tableColIds[i],
                         "aTargets": [i],
                         "sDefaultContent": "0",
                         "fnCreatedCell": function(td, data, oData, row, col) {

@@ -54,12 +54,12 @@ ${cpweb_foot}
                 //create JSON array for aoColumnDefs
                 tableJSON.push({
                     "sTitle": "Name",
-                    "mDataProp": "displayName",
+                    "mData": "displayName",
                     "aTargets": [0]
                 },
                 {
                     "sTitle": "Completed",
-                    "mDataProp": tableColIds[1],
+                    "mData": tableColIds[1],
                     "aTargets": [1],
                     "sDefaultContent": "0",
                     "fnRender": function(oObj, data){
@@ -75,7 +75,7 @@ ${cpweb_foot}
                 },
                 {
                     "sTitle": "Completion rate (%)",
-                    "mDataProp": tableColIds[2],
+                    "mData": tableColIds[2],
                     "aTargets": [2],
                     "sDefaultContent": "0",
                     "fnRender": function(oObj, data){

@@ -30,7 +30,7 @@ var listMaterialsProducts = (function() {
             "aoColumnDefs": [
             {
                 "aTargets": [ 0 ],
-                "mDataProp": "type",
+                "mData": "type",
                 "sClass": "type",
                 "fnRender": function ( oObj ) {
                     if (oObj.aData.thumbnail) {
@@ -42,7 +42,7 @@ var listMaterialsProducts = (function() {
             },
             {
                 "aTargets": [ 1 ],
-                "mDataProp": "title",
+                "mData": "title",
                 "fnRender": function ( oObj ) {
                     var desc = oObj.aData.desc || "";
                     return  '<h1>' + oObj.aData.title + '</h1><p class="lang">'

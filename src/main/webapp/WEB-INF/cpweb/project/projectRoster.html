@@ -46,7 +46,7 @@ ${cpweb_foot}
                 "aoColumnDefs": [
                     {
                         "aTargets": [0],
-                        "mDataProp": null,
+                        "mData": null,
                         "bSortable": false,
                         "sWidth": 12,
                         "fnRender": function(oObj) {
@@ -55,7 +55,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [1],
-                        "mDataProp": "participationLink",
+                        "mData": "participationLink",
                         "bSortable": false,
                         "sWidth": 16,
                         "fnRender": function(oObj) {
@@ -83,7 +83,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [2],
-                        "mDataProp": "displayName",
+                        "mData": "displayName",
                         "sWidth": 250,
                         "useRendered": false,
                         "fnRender": function(oObj) {
@@ -92,7 +92,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [3],
-                        "mDataProp": "firstEmail",
+                        "mData": "firstEmail",
                         "fnRender": function(oObj) {
                             if (oObj.aData.firstEmailStr) {
                                 return  oObj.aData.firstEmailStr;
@@ -105,7 +105,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [4],
-                        "mDataProp": "lastEmail",
+                        "mData": "lastEmail",
                         "fnRender": function(oObj) {
                             if (oObj.aData.sending) {
                                 return "Sending..."
@@ -118,7 +118,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [5],
-                        "mDataProp": "lastAccess",
+                        "mData": "lastAccess",
                         "fnRender": function(oObj) {
 
                             if (oObj.aData.lastAccess) {
@@ -130,7 +130,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [6],
-                        "mDataProp": "status",
+                        "mData": "status",
                         "sWidth": 120,
                         "fnRender": function(oObj) {
                             return  '<div class="progress"><div class="bar" style="width:' + oObj.aData.status +
@@ -139,7 +139,7 @@ ${cpweb_foot}
                     },
                     {
                         "aTargets": [7],
-                        "mDataProp": null,
+                        "mData": null,
                         "bSortable": false,
                         "useRendered": false,
                         "sWidth": 25,
