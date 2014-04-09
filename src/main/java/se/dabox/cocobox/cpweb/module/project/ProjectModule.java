@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
@@ -121,8 +122,10 @@ public class ProjectModule extends AbstractProjectWebModule {
         final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
         OrgProject project =
                 cocoboxCordinatorClient.getProject(Long.valueOf(projectId));
+        
         if (project == null) {
-            return null;
+            LOGGER.info("Project {} missing. Redirecting to cpweb main page", projectId);
+            throw new RetargetException(NavigationUtil.toMain(cycle));
         }
 
         if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.FLIRT)) {

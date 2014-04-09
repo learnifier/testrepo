@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.module.WebModuleInfo;
+import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
 import se.dabox.cocobox.cpweb.module.CpMainModule;
@@ -55,6 +56,40 @@ public final class NavigationUtil {
     public static String toOrgMainUrl(RequestCycle cycle, String strOrgId) {
         return cycle.urlFor(CpMainModule.class, "home",
                 strOrgId);
+    }
+
+    /**
+     * Url to the main page of the cpweb. The processing will redirect the user
+     * to the first matching rule.
+     *
+     * <ul>
+     * <li>If the user is a Back Office admin a direct will be made to the back office main
+     * page.</li>
+     * <li>If the user has access to only one client they are redirected to the main page for that
+     * client.</li>
+     * <li>If the user has access to multiple clients they will be redirected to the client picker.
+     * </li>
+     * <li>If the current user doesn't have access to any clients a redirect will be made to the
+     * userweb main page. </li>
+     * </ul>
+     *
+     * @param cycle The current request cycle
+     * @return A url to the main page
+     */
+    public static String toMainUrl(RequestCycle cycle) {
+        return cycle.urlFor(CpMainModule.class, "home");
+    }
+
+    /**
+     * Returns a RequestTarget that redirects to the main page.
+     *
+     * @param cycle The current request cycle
+     * @return A url to the main page
+     *
+     * @see #toMainUrl(net.unixdeveloper.druwa.RequestCycle)
+     */
+    public static RequestTarget toMain(RequestCycle cycle) {
+        return new RedirectUrlRequestTarget(toMainUrl(cycle));
     }
 
     public static String toProjectPageUrl(RequestCycle cycle, long projectId) {
