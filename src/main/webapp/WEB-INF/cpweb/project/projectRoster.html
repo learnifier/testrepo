@@ -435,7 +435,7 @@ ${cpweb_head}
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false">Activate</button>
         [/@security.boAdminBlock]
-        [@dwsrt.feature feature="autoical"][#if prj.autoIcal]Calender invitations are ON. <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>[/#if][/@dwsrt.feature]
+        [@dwsrt.feature feature="autoical"][#if prj.autoIcal]Calendar invitations are ON. <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>[/#if][/@dwsrt.feature]
     </section>
 
     <section class="list">
