@@ -403,17 +403,6 @@ public class ProjectModule extends AbstractProjectWebModule {
                 addTemplates(templates);
     }
 
-    private List<Long> getOrgMatIds(ProjectMaterialCoordinatorClient pmcClient, long projectId) {
-        List<OrgMaterial> orgmats = pmcClient.getProjectOrgMaterials(projectId);
-
-        return CollectionsUtil.transformList(orgmats, new Transformer<OrgMaterial, Long>() {
-            @Override
-            public Long transform(OrgMaterial obj) {
-                return obj.getOrgMaterialId();
-            }
-        });
-    }
-
     private long copyDesignToStage(RequestCycle cycle, OrgProject project) {
         CourseDesignClient cdClient =
                 Clients.getClient(cycle, CourseDesignClient.class);

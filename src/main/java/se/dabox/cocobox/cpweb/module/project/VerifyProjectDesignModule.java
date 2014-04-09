@@ -53,6 +53,7 @@ import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
+import se.dabox.service.common.coursedesign.ComponentUtil;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.DatabankFacade;
@@ -64,8 +65,12 @@ import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.DataType;
+import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
 import se.dabox.util.collections.Predicate;
@@ -249,6 +254,8 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
                         getTimezone(), cdd);
 
         relenableUpdate.update();
+
+        updateDefaultDurationValues(cycle, cdd, databank, fieldMapSet);
 
         saveDatabank(cycle, ccbc, project, databank);
 
@@ -706,5 +713,64 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
 
     private boolean isAutoRedirect(RequestCycle cycle) {
         return "t".equals(cycle.getRequest().getParameter("auto"));
+    }
+
+    /**
+     * Add values for all duration values that aren't set.
+     * 
+     * @param cycle The current request cycle
+     * @param cdd The design
+     * @param databank The databank
+     */
+    private void updateDefaultDurationValues(RequestCycle cycle, CourseDesignDefinition cdd,
+            Set<DatabankEntry> databank,
+            Map<String, Set<ExtendedComponentFieldName>> fieldMapSet) {
+        final String wantedFieldName = "duration";
+        
+        for (Map.Entry<String, Set<ExtendedComponentFieldName>> entry : fieldMapSet.entrySet()) {
+            for (ExtendedComponentFieldName fieldName : entry.getValue()) {
+                
+                if (!fieldName.getName().equals(wantedFieldName)) {
+                    continue;
+                }
+
+                if (containsField(databank, fieldName)) {
+                    continue;
+                }
+
+                ProductId pid = ComponentUtil.getProductId(fieldName.getComponent());
+
+                if (pid == null) {
+                    continue;
+                }
+
+                String productDuration = getProductDuration(cycle, pid);
+
+                if (!StringUtils.isBlank(productDuration)) {
+                    databank.add(new StandardDatabankEntry(fieldName.getCid(), wantedFieldName,
+                            productDuration, 0));
+                }
+            }
+        }
+    }
+
+    private boolean containsField(Set<DatabankEntry> databank, ExtendedComponentFieldName fieldName) {
+        for (DatabankEntry databankEntry : databank) {
+            if (databankEntry.getCid().equals(fieldName.getCid()) && databankEntry.getName().equals(
+                    fieldName.getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private String getProductDuration(RequestCycle cycle, ProductId pid) {
+        ProductDirectoryClient pdClient
+                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+        Product product = ProductFetchUtil.getExistingProduct(pdClient, pid);
+
+        return product.getFieldSingleValue("duration");
     }
 }

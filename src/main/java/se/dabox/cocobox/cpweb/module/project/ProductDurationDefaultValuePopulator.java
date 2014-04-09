@@ -17,9 +17,11 @@ import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
+import se.dabox.service.common.coursedesign.ComponentUtil;
 import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
 
@@ -40,10 +42,12 @@ public class ProductDurationDefaultValuePopulator {
 
     void populate(Map<String, String> defaultValueMap,
             Map<String, Set<ExtendedComponentFieldName>> fieldMapSet,
-            List<Component> components) {
+            List<Component> componenents) {
+
+        List<Component> allComponents = ComponentUtil.getFlatList(componenents);
 
         Map<String, String> productDurationMap = getProductDurationMap();
-        Map<String,Component> componentMap = getComponentMap(components);
+        Map<String,Component> componentMap = getComponentMap(allComponents);
 
         for (Map.Entry<String, Set<ExtendedComponentFieldName>> entry : fieldMapSet.entrySet()) {
             final String name = entry.getKey() + '_' + DURATION;
@@ -57,13 +61,17 @@ public class ProductDurationDefaultValuePopulator {
                 continue;
             }
 
-            String productId = getProductId(componentMap.get(entry.getKey()));
+            Component comp = componentMap.get(entry.getKey());
+            ProductId productId = null;
+            if (comp != null) {
+                productId = ComponentUtil.getProductId(comp);
+            }
 
             if (productId == null) {
                 continue;
             }
 
-            String productDefaultDuration = productDurationMap.get(productId);
+            String productDefaultDuration = productDurationMap.get(productId.getId());
             if (productDefaultDuration != null) {
                 
                 defaultValueMap.put(name, productDefaultDuration);
