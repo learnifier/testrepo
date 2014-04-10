@@ -26,6 +26,7 @@ import se.dabox.service.common.ccbc.project.TemporalComponentExtractor;
 import se.dabox.service.common.ccbc.project.TemporalProgressComponent;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.coursedesign.ComponentUtil;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.ProgressComponentHelper;
@@ -34,8 +35,10 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
@@ -231,14 +234,11 @@ class ProgressComponentResolver {
                 });
     }
 
-    private Product getProduct(String productId) {
+    private Product getProduct(ProductId productId) {
         ProductDirectoryClient pdClient =
                 CacheClients.getClient(cycle, ProductDirectoryClient.class);
 
-        Product product = pdClient.getProduct(productId);
-        ProductTypeUtil.setType(pdClient, product);
-
-        return product;
+        return ProductFetchUtil.getProduct(pdClient, productId);
     }
 
     private ProgressComponentHelper getProgressComponentHelper() {
@@ -295,9 +295,11 @@ class ProgressComponentResolver {
     }
 
     private Product getComponentProduct(Component comp) {
-        String subtype = comp.getSubtype();
+        ProductId productId = ComponentUtil.getProductId(comp);
 
-        String productId = subtype.split(Pattern.quote("|"), 2)[1];
+        if (productId == null) {
+            return null;
+        }
 
         return getProduct(productId);
     }
