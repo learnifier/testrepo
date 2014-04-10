@@ -214,7 +214,7 @@ class ProgressComponentResolver {
                 new Transformer<ProjectProduct, ProgressComponentInfo>() {
                     @Override
                     public ProgressComponentInfo transform(ProjectProduct item) {
-                        Product product = getProduct(item.getProductId());
+                        Product product = getProduct(new ProductId(item.getProductId()));
                         ProgressComponentHelper helper = getProgressComponentHelper();
 
                         if (!helper.isTrackingEnabledForProduct(product)) {
