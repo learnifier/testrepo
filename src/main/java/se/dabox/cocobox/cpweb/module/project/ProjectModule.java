@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -219,6 +220,16 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
+
+
+        List<ParticipationProgress> progress = Collections.emptyList();
+        DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
+        CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
+
+        MultiPageActivityCourse actCourse
+                = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress,
+                        databankFacade, cdd);
+        map.put("course", actCourse);
 
         return new FreemarkerRequestTarget("/project/projectDiscussion.html", map);
     }

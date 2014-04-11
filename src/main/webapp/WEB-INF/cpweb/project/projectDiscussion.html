@@ -11,6 +11,18 @@ ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 </script>
+
+<script>
+    var activityNames = {};
+    [#compress]
+        [#list course.activityList as activity]
+            [#if activity.primaryComponent??]
+              activityNames["${activity.primaryComponent.cid}"] = { "name": "${activity.primaryComponent.properties.title?js_string}" };
+            [/#if]
+        [/#list]
+    [/#compress]
+</script>
+
 [/#assign]
 
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName  earlycss=cpweb_earlycss]
@@ -37,7 +49,18 @@ ${cpweb_foot}
                 });
                 f.startSingleFlirt('${prj.flirtId}', {
                     templates: {
-                        emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>"
+                        emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
+                        header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
+                    },
+                    success: function(data) {
+                        var len = data.posts.length;
+                        for(var i = 0; i<len; i++) {
+                            var post = data.posts[i];
+                            if (!activityNames[post.tag]) {
+                                continue;
+                            }
+                            post.activityName = activityNames[post.tag].name;
+                        }
                     }
                 });
                 $('.ccb-flirt-addpost textarea').focus(function() {
