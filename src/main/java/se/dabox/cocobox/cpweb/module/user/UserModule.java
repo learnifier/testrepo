@@ -21,6 +21,7 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.ValueUtils;
 
 /**
@@ -39,8 +40,7 @@ public class UserModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
-        Locale userLocale = ValueUtils.coalesce(CocositeUserHelper.getUserAccountUserLocale(user),
-                CocoSiteConstants.DEFAULT_LOCALE);
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
         String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
