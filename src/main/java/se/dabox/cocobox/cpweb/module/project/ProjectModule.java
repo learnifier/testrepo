@@ -223,8 +223,10 @@ public class ProjectModule extends AbstractProjectWebModule {
 
 
         List<ParticipationProgress> progress = Collections.emptyList();
-        DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
-        CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
+        DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).
+                setFallbackToStageDatabank(true).get(project);
+        CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).
+                setFallbackToStageDesign(true).forProject(project);
 
         MultiPageActivityCourse actCourse
                 = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress,
