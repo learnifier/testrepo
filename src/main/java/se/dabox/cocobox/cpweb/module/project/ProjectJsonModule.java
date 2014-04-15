@@ -18,6 +18,7 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections.map.Flat3Map;
 import org.codehaus.jackson.JsonGenerator;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.ListProjectParticipationsRequest;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.project.MailBounce;
@@ -87,8 +89,14 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 Clients.getClient(cycle, UserAccountService.class).
                 getUserGroupAccounts(prj.getUserGroupId());
 
-        List<ProjectParticipation> participations =
-                ccbc.listProjectParticipations(new ListProjectParticipationsRequest(prjId, true));
+        List<ProjectParticipation> participations;
+
+        try {
+            participations = ccbc.listProjectParticipations(new ListProjectParticipationsRequest(
+                    prjId, true));
+        } catch (NotFoundException nfe) {
+            return new ErrorCodeRequestTarget(404);
+        }
 
         String strOrgId = Long.toString(prj.getOrgId());
 
