@@ -185,7 +185,8 @@ public class SendMailModule extends AbstractWebAuthModule {
 
         return GetHintedMailTemplateCommand.getHintedTemplate(mtClient, stickyTemplateHint,
                 mailBucket,
-                parentBucket);
+                parentBucket,
+                null);
     }
 
     private List<UserAccount> getReceivers(RequestCycle cycle, SendMailSession sms) {
