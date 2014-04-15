@@ -58,5 +58,5 @@ ${cpweb_foot}
         [#return /]
     [/#if]
 
-    type=${comp.type}, cid=${comp.cid}, completed=${comp.completed?c}, tracking=${comp.progressTrackingType}, due=${comp.dueDateInfo}
+    type=${comp.type}, cid=${comp.cid}, completed=${comp.completed?c}, tracking=${comp.progressTrackingType}, due=${comp.dueDateInfo}, title=${(comp.properties.title?xhtml)!''}
 [/#macro]
