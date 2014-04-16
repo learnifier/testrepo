@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
+import java.util.Locale;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -18,10 +19,14 @@ import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.cocosite.mail.GetGenericMailBucketCommand;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.dws.client.JacksonHelper;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.mailsender.mailtemplate.GetHintedMailTemplateCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
+import se.dabox.service.login.client.CocoboxUserAccount;
+import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.login.client.UserAccountService;
 
 /**
  * Module that completes the admin registration. This logic is in a separate module
@@ -82,20 +87,26 @@ public class AdminRegistrationCompletionModule extends AbstractWebAuthModule {
         SendMailSession session = SendMailSession.createSimple(awmp);
         session.addReceiver(userId);
 
-        SendMailTemplate template = getWelcomeMailTemplate(cycle, orgId);
+        SendMailTemplate template = getWelcomeMailTemplate(cycle, orgId, userId);
 
         awmp.processSendMail(cycle, session, template);
     }
 
-    private SendMailTemplate getWelcomeMailTemplate(RequestCycle cycle, long orgId) {
+    private SendMailTemplate getWelcomeMailTemplate(RequestCycle cycle, long orgId, long userId) {
 
         MailTemplateServiceClient mtClient = getMailTemplateClient(cycle);
         long parentBucket = new GetGenericMailBucketCommand(cycle).getId();
         long bucket = new GetOrgMailBucketCommand(cycle).forOrg(orgId);
 
+        UserAccountService uaClient = CacheClients.getClient(cycle, UserAccountService.class);
+
+        UserAccount user = uaClient.getUserAccount(userId);
+        CocoboxUserAccount acc = new CocoboxUserAccount(user);
+        Locale locale = acc.getLocale();
+
         MailTemplate template =
                 GetHintedMailTemplateCommand.getHintedTemplate(mtClient,
-                CpwebConstants.ADMIN_WELCOME_MAIL_HINT, bucket, parentBucket);
+                CpwebConstants.ADMIN_WELCOME_MAIL_HINT, bucket, parentBucket, locale);
 
         if (template == null) {
             throw new IllegalStateException("Failed to locate welcome mail template for org: "+orgId);
