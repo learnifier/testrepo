@@ -100,7 +100,7 @@ public class CreateCpUserAccountCommand {
                 uas.updateUserProfileValue(userAccount.getUserId(),
                         CocoSiteConstants.UA_PROFILE,
                         CocoSiteConstants.UA_LOCALE,
-                        locale.toString());
+                        locale.toLanguageTag());
 
                 return uas.getUserAccount(userAccount.getUserId());
             }

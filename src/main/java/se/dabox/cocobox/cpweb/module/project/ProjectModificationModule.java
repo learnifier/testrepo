@@ -60,6 +60,7 @@ import se.dabox.service.common.tx.OperationFailureException;
 import se.dabox.service.common.tx.UTComplexTxOperation;
 import se.dabox.service.common.tx.ValidationFailureException;
 import se.dabox.service.common.tx.VerificationStatus;
+import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.CreateBasicUserAccountRequest;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
@@ -458,9 +459,15 @@ public class ProjectModificationModule extends AbstractWebAuthModule {
                                     givenName,
                                     surname,
                                     email);
-                    ua = Clients.getClient(cycle, UserAccountService.class)
-                            .createBasicUserAccount(
-                                    create);
+                    final UserAccountService uaClient
+                            = Clients.getClient(cycle, UserAccountService.class);
+                    ua = uaClient.createBasicUserAccount(create);
+                    
+                    uaClient.updateUserProfileValue(ua.getUserId(),
+                            CocoboxUserAccount.PROFILE_COCOBOX, 
+                            CocoboxUserAccount.LOCALE,
+                            prj.getLocale().toLanguageTag());
+
                 }
 
                 ccbcClient.newProjectParticipant(prj.getProjectId(), ua.getUserId());
