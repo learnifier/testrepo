@@ -12,7 +12,6 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.apache.commons.collections.map.Flat3Map;
-import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
@@ -24,6 +23,7 @@ import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.HybridLocaleUtils;
 
 /**
  *
@@ -169,7 +169,7 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
     }
 
     private ObjectStringContainer<Locale> getProjectLocale(RequestCycle cycle, String fieldValue) {
-        Locale locale = LocaleUtils.toLocale(fieldValue);
+        Locale locale = HybridLocaleUtils.toLocale(fieldValue);
 
         List<Locale> locales =
                 NewProjectModule.getProjectLocales(cycle);
@@ -184,7 +184,7 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
     }
 
     private ObjectStringContainer<Locale> getProjectCountry(RequestCycle cycle, String fieldValue) {
-        Locale locale = LocaleUtils.toLocale(fieldValue);
+        Locale locale = HybridLocaleUtils.toLocale(fieldValue);
 
         List<Locale> locales =
                 NewProjectModule.getProjectCountries(cycle);

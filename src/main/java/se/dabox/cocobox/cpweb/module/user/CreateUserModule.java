@@ -20,7 +20,6 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +38,12 @@ import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
-import se.dabox.service.common.context.DwsRealmHelper;
-import se.dabox.service.common.context.command.LazyCacheConfigurationValueCmd;
+import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.common.tx.ValidationFailureException;
 import se.dabox.service.common.tx.VerificationStatus;
 import se.dabox.service.login.client.SetUserAccountNameRequest;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -298,14 +295,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     }
 
     private Locale getDefaultUserLocale(RequestCycle cycle) {
-        return new LazyCacheConfigurationValueCmd<Locale>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.useraccount.locale.default",
-                new Transformer<String, Locale>() {
-                    @Override
-                    public Locale transform(String value) {
-                        return LocaleUtils.toLocale(value);
-                    }
-                });
+        return new GetUserDefaultLocaleCommand().getLocale(cycle);
     }
 
     private boolean userExistsWithEmail(RequestCycle cycle, String email) {

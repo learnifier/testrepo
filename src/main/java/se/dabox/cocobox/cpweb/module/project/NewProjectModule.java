@@ -25,7 +25,6 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
-import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpwebConstants;
@@ -51,6 +50,7 @@ import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
@@ -61,6 +61,7 @@ import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductUtils;
+import se.dabox.util.HybridLocaleUtils;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
 
@@ -493,7 +494,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
                                         new Transformer<String, Locale>() {
                                             @Override
                                             public Locale transform(String localeStr) {
-                                                return LocaleUtils.toLocale(localeStr);
+                                                return HybridLocaleUtils.toLocale(localeStr);
                                             }
                                         });
                             }
@@ -501,14 +502,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     }
 
     private Locale getDefaultLangLocale(RequestCycle cycle) {
-        return new LazyCacheConfigurationValueCmd<Locale>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.langlocale.default",
-                        new Transformer<String, Locale>() {
-                            @Override
-                            public Locale transform(String value) {
-                                return LocaleUtils.toLocale(value);
-                            }
-                        });
+        return new GetUserDefaultLocaleCommand().getLocale(cycle);
     }
 
     private Locale getDefaultCountryLocale(RequestCycle cycle) {
@@ -517,7 +511,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
                         new Transformer<String, Locale>() {
                             @Override
                             public Locale transform(String value) {
-                                return LocaleUtils.toLocale(value);
+                                return HybridLocaleUtils.toLocale(value);
                             }
                         });
     }
