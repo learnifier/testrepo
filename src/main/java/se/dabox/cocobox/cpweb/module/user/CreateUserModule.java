@@ -36,7 +36,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.event.UserAccountChangedListenerUtil;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.user.GetUserLocalesCommand;
+import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.context.DwsRealmHelper;
