@@ -51,6 +51,7 @@ import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
@@ -478,21 +479,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     }
 
     public static List<Locale> getProjectLocales(RequestCycle cycle) {
-        return new LazyCacheConfigurationValueCmd<List<Locale>>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.langlocales",
-                        new Transformer<String, List<Locale>>() {
-                            @Override
-                            public List<Locale> transform(String value) {
-                                String[] strLocales = value.split(" *, *");
-                                return CollectionsUtil.transformList(Arrays.asList(strLocales),
-                                        new Transformer<String, Locale>() {
-                                            @Override
-                                            public Locale transform(String localeStr) {
-                                                return LocaleUtils.toLocale(localeStr);
-                                            }
-                                        });
-                            }
-                        });
+        return new GetUserLocalesCommand().getLocales(cycle);
     }
 
     public static List<Locale> getProjectCountries(RequestCycle cycle) {

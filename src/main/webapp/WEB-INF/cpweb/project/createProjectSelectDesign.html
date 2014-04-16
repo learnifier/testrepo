@@ -130,10 +130,10 @@ ${cpweb_head}
                     </div>
                     <div id="settings_expanded" style="display: none;">
 
-                        [#assign defaultValue = formsess.getDefaultValue('projectlang')!defaultLangLocale /]
+                        [#assign defaultValue = formsess.getDefaultValue('projectlang')!defaultLangLocale.toLanguageTag() /]
                         [@mbform.select name="projectlang" class="input_full" tabindex="5"]
                         [#list langs as lang]
-                        [@mbform.option value=lang defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@mbform.option]
+                        [@mbform.option value=lang.toLanguageTag() defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@mbform.option]
                         [/#list]
                         [/@mbform.select]
                         

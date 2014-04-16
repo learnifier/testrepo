@@ -165,8 +165,6 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         checkPermission(cycle, project);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-
         Map<String, Object> map = createMap();
 
         map.put("formsess", getValidationSession(AddMaterialForm.class, cycle));
