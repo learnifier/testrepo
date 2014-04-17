@@ -92,7 +92,7 @@ define([], function() {
             ajax.data = ajaxData;
             ajax.success = function() {
                 rowData.favorite = !rowData.favorite;
-                $('#listprojects').dataTable().fnUpdate(rowData, tr);
+                $('#listprojects').dataTable().fnUpdate(rowData, tr, undefined, false);
             };
 
             if (rowData.favorite) {
