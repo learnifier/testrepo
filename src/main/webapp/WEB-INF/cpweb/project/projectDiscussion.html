@@ -41,7 +41,7 @@ ${cpweb_foot}
         <h3><span class="glyphicon glyphicon-comment primarycolor"></span>Discussions</h3>
         <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
         <script>
-            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
+            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
                 f.startSingleFlirt('${prj.newsFlirtId}', {
                     templates: {
                         emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
