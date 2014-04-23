@@ -37,25 +37,25 @@ ${cpweb_head}
 
                 var autocomplete = new google.maps.places.Autocomplete(input);
 
+                var mapsUrl;
+
                 google.maps.event.addListener(autocomplete, 'place_changed', function() {
                     var place = autocomplete.getPlace();
                     if (!place.geometry) {
                         return;
                     }
                     
-                    var mapsUrl = createMapsUrl(place);
-                    
+                    mapsUrl = createMapsUrl(place);
+
                     log(elementId);
                     log(mapsUrl);
                     log($(elementId).closest('.details').find('.locUrl input'));
-                    
+
                     $('#'+elementId).closest('.details').find('.locUrl input').val(mapsUrl);
-                    
-                    
+
                 });
-
+                    
             }
-
 
             function createMapsUrl(place) {
                 
@@ -80,11 +80,17 @@ ${cpweb_head}
             }
 
 
-            $('input[type=locUrlExtra]').focus(function() {
-               //log('add maps to ', this.id); 
+            $('input[type=locUrlExtra]').focus(function() { 
                initialize(this.id);
             });
-
+            
+            $('input[type=locUrlExtra]').blur(function() { 
+               
+                if($(this).val() == '' ) {
+                    $(this).closest('.details').find('.locUrl input').val('');
+                }
+            });
+            
             $('input[type=locUrlExtra]').keydown(function(event){
                 if(event.keyCode == 13) {
                   event.preventDefault();
@@ -94,6 +100,30 @@ ${cpweb_head}
 
         }); 
     });
+    
+    
+    require(['jquery.validate'], function() {
+    
+        $.validator.addMethod("place", function(value, element) {
+            
+            //log('element is',  element);
+            return ($(element).closest('.details').find('.locUrl input').val() !=  '' );
+            
+        
+        }, "Please, choose a Google Place.");
+
+        var validator = $("form[name=createProjectGeneral]").validate({
+            rules: {
+                "input[type=locUrlExtra]": {
+                    place: true
+                } 
+            }
+        });
+        validator.element( "input[type=locUrlExtra]");
+       
+    });
+    
+    
 
  </script>
 
@@ -224,7 +254,7 @@ ${cpweb_head}
 [#if fieldType != "hidden"]
 <label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
 [/#if]
-<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" class="[#if errorFields?seq_contains(fname)]invalid[/#if]" [#if field.mandatory]required[/#if] />
+<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" class="[#if errorFields?seq_contains(fname)]invalid[/#if][#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
 [/#if]
