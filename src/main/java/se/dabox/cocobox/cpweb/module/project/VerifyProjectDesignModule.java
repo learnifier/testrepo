@@ -381,7 +381,8 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
                 project.getInviteLimit(), project.isInvitePossible(),
                 info.getUserTitle(),
                 info.getUserDescription(),
-                project.isAutoIcal());
+                project.isAutoIcal(),
+                project.isSocial());
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
 

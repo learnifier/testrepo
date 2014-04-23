@@ -248,7 +248,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 inviteLimit, project.isInvitePossible(),
                 project.getUserTitle(),
                 project.getUserDescription(),
-                project.isAutoIcal());
+                project.isAutoIcal(),
+                project.isSocial());
 
         ccbc.updateOrgProject(upr);
 
@@ -299,7 +300,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 project.getInviteLimit(), project.isInvitePossible(),
                 project.getUserTitle(),
                 project.getUserDescription(),
-                project.isAutoIcal());
+                project.isAutoIcal(),
+                project.isSocial());
 
         ccbc.updateOrgProject(upr);
 
@@ -329,7 +331,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 project.getInviteLimit(), enabled,
                 project.getUserTitle(),
                 project.getUserDescription(),
-                project.isAutoIcal());
+                project.isAutoIcal(),
+                project.isSocial());
 
         ccbc.updateOrgProject(upr);
 
@@ -373,7 +376,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                     project.isSelfRegistrationEnabled(),
                     project.getUserTitle(),
                     project.getUserDescription(),
-                    enabled);
+                    enabled,
+                    project.isSocial());
 
             ccbc.updateOrgProject(upr);
 

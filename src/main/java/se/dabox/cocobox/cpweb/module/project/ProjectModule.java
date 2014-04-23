@@ -439,7 +439,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
                 stageDatabank, project.getNote(), project.getInvitePassword(), project.
                 getInviteLimit(), project.isInvitePossible(), project.getUserTitle(), project.
-                getUserDescription(),project.isAutoIcal()));
+                getUserDescription(),project.isAutoIcal(), project.isSocial()));
 
         project.setStageDatabank(stageDatabank);
 

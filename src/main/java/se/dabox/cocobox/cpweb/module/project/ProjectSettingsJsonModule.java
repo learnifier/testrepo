@@ -123,7 +123,7 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         UpdateProjectRequest upr = new UpdateProjectRequest(projectId, name, locale, updatedBy,
                 country, timezone, designId, stageDesignId, masterDatabank, stageDatabank, note,
                 invitePassword, inviteLimit, selfRegistrationEnabled, userTitle, userDescription,
-                autoIcal);
+                autoIcal, prj.isSocial());
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
 

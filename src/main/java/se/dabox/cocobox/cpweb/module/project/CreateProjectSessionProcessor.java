@@ -214,7 +214,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                 getLocale(), userId, project.getCountry(), project.getTimezone(), null, newDesignId,
                 null, newDatabank, project.getNote(), project.getInvitePassword(), project.
                 getInviteLimit(), project.isSelfRegistrationEnabled(), userTitle, userDesc, project.
-                isAutoIcal());
+                isAutoIcal(), project.isSocial());
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
     }
