@@ -60,6 +60,15 @@ ${cpweb_foot}
         });
     }
 
+    var setSocial = function(socialSetting) {
+
+        $.ajax({
+            type: 'POST',
+            url: "${helper.urlFor('project.ProjectJsonModule','setSocialSetting',[prj.projectId])}",
+            data: {enabled: socialSetting}
+        });
+    };
+
 
     $('#meeting-maker input').click( function() {
         var clicked = $(this).val();
@@ -89,6 +98,12 @@ ${cpweb_foot}
             }
         )
         }
+    });
+
+    $('#socialfeatures input').click( function() {
+        var clicked = $(this).val();
+
+        setSocial(clicked === 'true');
     });
 </script>
 [/#assign]
@@ -134,6 +149,18 @@ ${cpweb_foot}
                 <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
+
+        [@dwsrt.feature feature="social"]
+        [#-- Only for Course design projects --]
+        [#if prj.type.ptype == 2]
+        <li id="socialfeatures">
+            <a class="setting">
+                <span class="label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
+                [@mbform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
+            </a>
+        </li>
+        [/#if]
+        [/@dwsrt.feature]
     </ul>
 </div>
 

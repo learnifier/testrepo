@@ -403,6 +403,46 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
+    public RequestTarget onSetSocialSetting(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        UpdateProjectRequest upr = new UpdateProjectRequest(
+                project.getProjectId(),
+                project.getName(),
+                project.getLocale(),
+                userId,
+                project.getCountry(),
+                project.getTimezone(),
+                project.getDesignId(),
+                project.getStageDesignId(),
+                project.getMasterDatabank(),
+                project.getStageDatabank(),
+                project.getNote(),
+                project.getInvitePassword(),
+                project.getInviteLimit(),
+                project.isSelfRegistrationEnabled(),
+                project.getUserTitle(),
+                project.getUserDescription(),
+                project.isAutoIcal(),
+                enabled);
+
+        ccbc.updateOrgProject(upr);
+        
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+
+    @WebAction
     public RequestTarget onListCountries(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
