@@ -117,6 +117,14 @@ ${cpweb_head}
                 "input[type=locUrlExtra]": {
                     place: true
                 } 
+            }, 
+            errorClass: "error bg-danger",
+            errorPlacement: function(error, element) {
+                if (element.hasClass('hasDatepicker')) {
+                    element.closest("li").find('span').html(error);
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
         validator.element( "input[type=locUrlExtra]");
