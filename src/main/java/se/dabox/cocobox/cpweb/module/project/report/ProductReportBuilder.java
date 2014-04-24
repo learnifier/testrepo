@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project.report;
 
+import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;

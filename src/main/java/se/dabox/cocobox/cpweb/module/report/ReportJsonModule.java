@@ -21,7 +21,7 @@ import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirect
 import se.dabox.cocobox.cpweb.module.project.report.IdProjectStatusReport;
 import se.dabox.cocobox.cpweb.module.project.report.ProductReportBuilder;
 import se.dabox.cocobox.cpweb.module.project.report.ProjectReportModule;
-import se.dabox.cocobox.cpweb.module.project.report.StatusCallable;
+import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.common.DwsConstants;
 import se.dabox.service.common.ajaxlongrun.AjaxJob;

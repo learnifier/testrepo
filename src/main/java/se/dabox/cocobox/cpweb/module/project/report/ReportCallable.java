@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project.report;
 
+import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import net.unixdeveloper.druwa.ServiceApplication;
 import se.dabox.service.common.RealmBackgroundCallable;
 

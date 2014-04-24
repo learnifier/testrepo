@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project.report;
 
+import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
