@@ -137,10 +137,10 @@ ${cpweb_head}
                         [/#list]
                         [/@mbform.select]
                         
-                        [#assign defaultValue = formsess.getDefaultValue('country')!defaultCountryLocale /]
+                        [#assign defaultValue = formsess.getDefaultValue('country')!defaultCountryLocale.toLanguageTag() /]
                         [@mbform.select name="country" class="input_full" tabindex="6"]
                         [#list countries as country]
-                        [@mbform.option value=country defaultValue=defaultValue]${country.getDisplayCountry(userLocale)?xhtml}[/@mbform.option]
+                        [@mbform.option value=country.toLanguageTag() defaultValue=defaultValue]${country.getDisplayCountry(userLocale)?xhtml}[/@mbform.option]
                         [/#list]
                         [/@mbform.select]
                     </div>

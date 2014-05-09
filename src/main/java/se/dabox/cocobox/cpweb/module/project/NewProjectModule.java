@@ -3,14 +3,17 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -34,6 +37,7 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -149,7 +153,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
         if (nps == null) {
             LOGGER.warn("Invalid NPS id specified: {}", strNpsId);
             return NavigationUtil.toCreateProject(cycle, strOrgId);
-        } else if (nps.getDesignId().longValue() != 0) {
+        } else if (nps.getDesignId() != 0) {
             LOGGER.warn("Invalid NPS for matlist configuration: {}", strNpsId);
             return NavigationUtil.toCreateProject(cycle, strOrgId);
         }
@@ -484,21 +488,38 @@ public class NewProjectModule extends AbstractWebAuthModule {
     }
 
     public static List<Locale> getProjectCountries(RequestCycle cycle) {
-        return new LazyCacheConfigurationValueCmd<List<Locale>>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.countrylocales",
-                        new Transformer<String, List<Locale>>() {
-                            @Override
-                            public List<Locale> transform(String value) {
-                                String[] strLocales = value.split(" *, *");
-                                return CollectionsUtil.transformList(Arrays.asList(strLocales),
-                                        new Transformer<String, Locale>() {
-                                            @Override
-                                            public Locale transform(String localeStr) {
-                                                return HybridLocaleUtils.toLocale(localeStr);
-                                            }
-                                        });
-                            }
-                        });
+        String[] countries = Locale.getISOCountries();
+
+        List<Locale> list
+                = CollectionsUtil.transformList(Arrays.asList(countries), new Transformer<String, Locale>() {
+                    
+                    @Override
+                    public Locale transform(String item) {
+                        return new Locale("und",item);
+                    }
+                });
+
+        final Locale sortLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        final Collator collator = Collator.getInstance(sortLocale);
+
+        Collections.sort(list, new Comparator<Locale>() {
+
+            @Override
+            public int compare(Locale o1, Locale o2) {
+                String o1Country = o1.getDisplayCountry(sortLocale);
+                String o2Country = o2.getDisplayCountry(sortLocale);
+                int res = collator.compare(o1Country, o2Country);
+
+                if (res != 0) {
+                    return res;
+                }
+
+                return o1.toLanguageTag().compareTo(o2.toLanguageTag());
+            }
+        });
+
+        return list;
     }
 
     private Locale getDefaultLangLocale(RequestCycle cycle) {
