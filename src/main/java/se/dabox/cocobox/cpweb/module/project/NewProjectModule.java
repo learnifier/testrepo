@@ -283,8 +283,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
                     "projectlang", "invalidlang"));
         }
 
-        if (!getProjectCountries(cycle).contains(input.
-                getCountry())) {
+        if (!validCountry(cycle, input.getCountry())) {
             formsess.addError(new ValidationError(ValidationConstraint.INVALID,
                     "country", "invalidlang"));
         }
@@ -436,53 +435,6 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 MAT_LIST_DETAILS, strOrgId, npsId);
     }
 
-    private List<Long> getOrgMats(RequestCycle cycle) {
-        String[] strIds = cycle.getRequest().getParameterValues(ORGMAT);
-
-        if (strIds == null) {
-            return Collections.emptyList();
-        }
-
-        List<Long> ids = CollectionsUtil.transformListNotNull(Arrays.asList(strIds),
-                new Transformer<String, Long>() {
-                    @Override
-                    public Long transform(String obj) {
-                        String[] selection = ID_SPLIT_PATTERN.split(obj);
-
-                        if (!ORGMAT.equals(selection[0])) {
-                            return null;
-                        }
-                        return Long.valueOf(selection[1]);
-                    }
-                });
-
-        return ids;
-    }
-
-    private List<String> getProducts(RequestCycle cycle) {
-        String[] strIds = cycle.getRequest().getParameterValues(ORGMAT);
-
-        if (strIds == null) {
-            return Collections.emptyList();
-        }
-
-        List<String> ids = CollectionsUtil.transformListNotNull(Arrays.asList(strIds),
-                new Transformer<String, String>() {
-
-                    @Override
-                    public String transform(String obj) {
-                        String[] selection = ID_SPLIT_PATTERN.split(obj);
-
-                        if (!ProductMaterialConstants.NATIVE_SYSTEM.equals(selection[0])) {
-                            return null;
-                        }
-                        return selection[1];
-                    }
-                });
-
-        return ids;
-    }
-
     public static List<Locale> getProjectLocales(RequestCycle cycle) {
         return new GetUserLocalesCommand().getLocales(cycle);
     }
@@ -495,7 +447,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
                     
                     @Override
                     public Locale transform(String item) {
-                        return new Locale("und",item);
+                        return new Locale("",item);
                     }
                 });
 
@@ -756,5 +708,17 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         return Boolean.valueOf(strValue);
+    }
+
+    private boolean validCountry(RequestCycle cycle, Locale country) {
+        List<Locale> countries = getProjectCountries(cycle);
+
+        for (Locale locale : countries) {
+            if (locale.equals(country)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
