@@ -3,13 +3,14 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.apache.commons.collections.map.Flat3Map;
 import org.slf4j.Logger;
@@ -34,6 +35,9 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ProjectSettingsJsonModule.class);
+
+    private static final Set<ProjectType> TITLEDESC_CHANGE_TYPES =
+            EnumSet.of(ProjectType.MATERIAL_LIST_PROJECT, ProjectType.SINGLE_PRODUCT_PROJECT);
 
     @WebAction
     public RequestTarget onChangeSetting(RequestCycle cycle, String strProjectId) {
@@ -86,14 +90,14 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
                 note = fieldValue;
                 break;
             case "usertitle":
-                if (prj.getType() != ProjectType.MATERIAL_LIST_PROJECT) {
-                    return returnSettingError(cycle, "Must be a matlist project");
+                if (!TITLEDESC_CHANGE_TYPES.contains(prj.getType())) {
+                    return returnSettingError(cycle, "Incorrect project type");
                 }
                 userTitle = fieldValue;
                 break;
             case "userdesc":
-                if (prj.getType() != ProjectType.MATERIAL_LIST_PROJECT) {
-                    return returnSettingError(cycle, "Must be a matlist project");
+                if (!TITLEDESC_CHANGE_TYPES.contains(prj.getType())) {
+                    return returnSettingError(cycle, "Incorrect project type");
                 }
                 userDescription = fieldValue;
                 break;
