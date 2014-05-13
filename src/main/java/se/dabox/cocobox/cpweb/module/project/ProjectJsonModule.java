@@ -460,7 +460,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         for (Locale locale : countries) {
             @SuppressWarnings("unchecked")
             Map<String,String> map = new Flat3Map();
-            map.put("value", locale.toString());
+            map.put("value", locale.toLanguageTag());
             map.put("text", locale.getDisplayCountry(userLocale));
             retval.add(map);
         }
@@ -486,7 +486,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         for (Locale locale : countries) {
             @SuppressWarnings("unchecked")
             Map<String,String> map = new Flat3Map();
-            map.put("value", locale.toString());
+            map.put("value", locale.toLanguageTag());
             map.put("text", locale.getDisplayName(userLocale));
             retval.add(map);
         }

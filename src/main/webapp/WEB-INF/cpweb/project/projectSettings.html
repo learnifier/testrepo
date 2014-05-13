@@ -32,7 +32,7 @@ ${cpweb_foot}
         'url': settingsUrl,
         'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
         'pk': 'locale',
-        'value': "${prj.locale}"
+        'value': "${prj.locale.toLanguageTag()}"
     });
 
     cpweb.editable($('#country .editable-content'),
@@ -42,7 +42,7 @@ ${cpweb_foot}
         'url': settingsUrl,
         'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
         'pk': 'country',
-        'value': "${prj.country}"
+        'value': "${prj.country.toLanguageTag()}"
     });
     
     cpweb.editable($('#timezone .editable-content'),
