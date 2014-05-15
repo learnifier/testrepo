@@ -5,15 +5,9 @@
 [#assign cpweb_head]
 ${cpweb_head}
 <!--[if lt IE 9]>
-<script>
-require(['${contextPath}/js/IE9.js'], function() {
-    
-    log('will use ie9.js to support some much wanted css-selectors');
 
-});
+<script src="${contextPath}/js/IE9.js"></script>
 
-
-</script>
 <![endif]-->
 [/#assign]
 
