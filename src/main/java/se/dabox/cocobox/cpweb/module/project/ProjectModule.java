@@ -191,7 +191,6 @@ public class ProjectModule extends AbstractProjectWebModule {
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         Map<String, Object> map = createMap();
-        map.put("prj", project);
         addCommonMapValues(map, project, cycle);
 
         List<ParticipationProgress> progress
