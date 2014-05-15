@@ -8,12 +8,24 @@ ${cpweb_head}
 
 <script src="${contextPath}/js/IE9.js"></script>
 
+
+require(['jquery-ui'], function() {
+    $('#meeting-maker-buttonset').buttonset();
+    $('#socialfeatures-buttonset').buttonset();
+});
+    
+    
+
+
 <![endif]-->
 [/#assign]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
+    
+    
+    
     "use strict";
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
@@ -131,7 +143,9 @@ ${cpweb_foot}
         <li id="meeting-maker">
             <a class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
-                [@mbform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
+                <span id="meeting-maker-buttonset">
+                    [@mbform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
+                </span>
             </a>
         </li>
         [/#if]
@@ -165,7 +179,9 @@ ${cpweb_foot}
         <li id="socialfeatures">
             <a class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
-                [@mbform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
+                <span id="socialfeatures-buttonset">
+                    [@mbform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
+                </span>
             </a>
         </li>
         [/#if]
