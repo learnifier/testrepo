@@ -4,10 +4,17 @@
 
 [#assign cpweb_head]
 ${cpweb_head}
-<!--[if lt IE 9]>
 
-<script src="${contextPath}/js/IE9.js"></script>
-log('tset')
+<!--[if lt IE 9]>
+<style>
+
+.toggle-button input {
+    position: static; !important
+}
+
+</style>
+
+
 <![endif]-->
 [/#assign]
 
@@ -169,7 +176,6 @@ ${cpweb_foot}
             <a class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
                 [@mbform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
-                ${prj.social?string}
             </a>
         </li>
         [/#if]
