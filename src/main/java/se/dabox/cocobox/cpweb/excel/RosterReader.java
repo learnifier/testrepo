@@ -191,9 +191,17 @@ public class RosterReader {
             return Double.toString(cell.getNumericCellValue());
         }
 
+        if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+            LOGGER.warn("Formula cell in spreadsheet {}:{}", row.getRowNum(), colIndex);
+            return null;
+        }
+
+
         if (cell.getCellType() != Cell.CELL_TYPE_STRING) {
             //Return invalid value?
         }
+
+
 
         return StringUtils.trim(cell.getStringCellValue());
     }
