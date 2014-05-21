@@ -7,8 +7,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.AroundInvoke;
+import net.unixdeveloper.druwa.annotation.WebActionExceptionHandler;
 import net.unixdeveloper.druwa.module.InvocationContext;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.binarysource.ByteArrayBinarySource;
@@ -21,6 +23,7 @@ import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserRoleCheckAfterLoginListener;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
+import se.dabox.service.webutils.json.JsonExceptionHandler;
 import se.dabox.service.webutils.login.WebLoginCheck;
 import se.dabox.service.webutils.login.nlogin.JavascriptNewLoginChecker;
 
@@ -89,5 +92,10 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
         } else {
             generator.writeNumberField(name, value);
         }
+    }
+
+    @WebActionExceptionHandler
+    public RequestTarget exceptionHandler(RequestCycle cycle, RequestTarget target, Exception ex) {
+        return JsonExceptionHandler.exceptionHandler(cycle, target, ex);
     }
 }
