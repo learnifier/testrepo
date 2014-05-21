@@ -47,9 +47,11 @@ ${cpweb_head}
                     
                     mapsUrl = createMapsUrl(place);
 
-                    log(elementId);
-                    log(mapsUrl);
-                    log($(elementId).closest('.details').find('.locUrl input'));
+                    //log(elementId);
+                    //log(mapsUrl);
+                    //log($(elementId).closest('.details').find('.locUrl input'));
+
+                    $('#'+elementId).next('label.error').remove();
 
                     $('#'+elementId).closest('.details').find('.locUrl input').val(mapsUrl);
 
@@ -127,7 +129,7 @@ ${cpweb_head}
                 }
             }
         });
-        validator.element( "input[type=locUrlExtra]");
+        //validator.element( "input[type=locUrlExtra]");
        
     });
     
