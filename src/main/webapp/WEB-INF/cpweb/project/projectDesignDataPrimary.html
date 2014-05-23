@@ -103,9 +103,41 @@ ${cpweb_head}
         }); 
     });
     
-    
     require(['jquery.validate'], function() {
+       
+        $.validator.addMethod("place", function(value, element) {
+            //log('element is',  element);
+            return (!(($(element).closest('.details').find('.locUrlExtra input').val().length > 0) && ($(element).closest('.details').find('.locUrl input').val().length == 0 )));
+        
+        }, "Please, choose a Google Place.");
+        
+        
+        
+                
+        var validator =  $("form[name=createProjectGeneral]").validate({
+            errorClass: "error bg-danger",
+            errorPlacement: function(error, element) {
+                if (element.hasClass('hasDatepicker')) {
+                    element.closest("li").find('span').html(error);
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+        
+        $('input[type=locUrlExtra]').rules('add', {
+            place: true,
+            required: false
+        });
+        
+        validator.element("input[type=locUrlExtra]");
+        
+    });
     
+    
+    /*
+    require(['jquery.validate'], function() {
+  
         $.validator.addMethod("place", function(value, element) {
             
             //log('element is',  element);
@@ -117,8 +149,12 @@ ${cpweb_head}
         var validator = $("form[name=createProjectGeneral]").validate({
             rules: {
                 "input[type=locUrlExtra]": {
-                    place: true
-                } 
+                    place: true,
+                    required: false
+                }, 
+                "input[type=locUrl]": {
+                    required: false
+                }
             }, 
             errorClass: "error bg-danger",
             errorPlacement: function(error, element) {
@@ -129,10 +165,10 @@ ${cpweb_head}
                 }
             }
         });
-        //validator.element( "input[type=locUrlExtra]");
+        validator.element("input[type=locUrlExtra]");
        
     });
-    
+    */
     
 
  </script>
