@@ -46,6 +46,7 @@ import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
+import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
@@ -498,6 +499,14 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 if (crispAdminLink != null) {
                     generator.writeStringField("crispAdminLink", crispAdminLink.link);
                     generator.writeStringField("crispName", crispAdminLink.name);
+                }
+                if (material instanceof ProductMaterial) {
+                    ProductMaterial prodMat = (ProductMaterial) material;
+                    final Product product = prodMat.getProduct();
+                    generator.writeBooleanField("anonymous", product.isAnonymous());
+                    generator.writeBooleanField("projectProduct", product.isProjectProduct());
+                    generator.writeBooleanField("ouProduct", product.isOrgUnitProduct());
+                    generator.writeBooleanField("realmProduct", product.isRealmProduct());
                 }
             }
 
