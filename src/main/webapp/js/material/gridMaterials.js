@@ -153,5 +153,16 @@ require(['jquery'], function() {
         });
 
     };
+    
+    $('#materials-grid ').on('click', '.body' , function() {
+        log('clicked grid-entry ' , this );
+        $(this).toggleClass('hover');
+    });
+    
+    
+    $('#materials-grid').on('click', '.info-hover' , function() {
+        $(this).parent().removeClass('hover');
+    });
+    
 
 });
