@@ -134,6 +134,22 @@ public class CpMainModule extends AbstractWebAuthModule {
     }
 
     @WebAction
+    public RequestTarget onGridMaterials(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        Map<String, Object> map = createMap();
+
+        map.put("org", org);
+        map.put("formsess", getValidationSession(Blank.class, cycle));
+        map.put("linkformsess", getValidationSession(AddLinkCreditsForm.class, cycle));
+        map.put("addLinkCreditsFormLink", cycle.
+                urlFor(ProductMaterialJsonModule.class, "addCredits", strOrgId));
+
+        return new FreemarkerRequestTarget("/material/gridMaterials.html", map);
+    }
+    
+    
+    @WebAction
     public RequestTarget onListProdDeeplinks(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
