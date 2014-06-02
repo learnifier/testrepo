@@ -125,6 +125,27 @@ ${cpweb_foot}
         });
     });
 </script>
+
+<script>
+    require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
+        log("anonprodcreate loaded");
+    });
+
+    $("#addbtn").click(function() {
+        CcbAnonymousProductUpload.open(function(pid) {
+            if (pid) {
+                alert("Product selected: "+pid);
+            } else {
+                alert("No product selected (abort?)");
+            }
+        }, {
+            scope: "P${org.id}"         
+        });
+
+    });
+</script>
+
+
 [/#assign]
 
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
@@ -138,19 +159,26 @@ ${cpweb_foot}
     <form action="${addLink}" name="addMaterial" id="addMaterial" class="fullpage" method="post">
         [@mbform.alertsection]
         [/@mbform.alertsection]
-        <section class="field">
-            <div class="ui-widget">
+        <section class="field container_16">
+            <div class="ui-widget grid_8">
                 [@mbform.select name="materialId" class="input_full" tabindex="1"]
                     <option value=""></option>
                     [#list materials?sort_by("title") as mat]
                         [@mbform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@mbform.option]
                     [/#list]
                 [/@mbform.select]
+                
+                <button type="submit">Add</button>
+            </div>
+            <div class="field inputtext grid_8">
+                <label for="addprojmat">Add material for project</label> 
+                <div class="ui-helper-hidden" data-anoncreateprodelement="show">
+                    <div class="btn navBackgroundColor" id="addbtn">Upload Material</div>
+                </div>
             </div>
         </section>
         [@mbform.infosection]
         [/@mbform.infosection]
-        <button type="submit">Add</button>
     </form>
 </section>
 
