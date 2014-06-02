@@ -27,6 +27,13 @@ require(['jquery'], function() {
 
     require(['handlebars'], function() {
 
+        Handlebars.registerHelper('if_eq', function(a, b, opts) {
+            if(a == b) 
+                return opts.fn(this);
+            else
+                return opts.inverse(this);
+        });
+      
 
         $.when(
                 $.ajax({
@@ -155,14 +162,11 @@ require(['jquery'], function() {
     };
     
     $('#materials-grid ').on('click', '.body' , function() {
-        log('clicked grid-entry ' , this );
         $(this).toggleClass('hover');
     });
     
-    
-    $('#materials-grid').on('click', '.info-hover' , function() {
-        $(this).parent().removeClass('hover');
+    $('#materials-grid ').on('click', '.settings' , function() {
+        $(this).find('.settings-actions').toggle();
     });
     
-
 });
