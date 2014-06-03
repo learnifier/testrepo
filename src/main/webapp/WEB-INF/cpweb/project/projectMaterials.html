@@ -128,15 +128,16 @@ ${cpweb_foot}
 
 <script>
     require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
-        log("anonprodcreate loaded");
+        //log("anonprodcreate loaded");
     });
 
     $("#addbtn").click(function() {
         CcbAnonymousProductUpload.open(function(pid) {
             if (pid) {
-                alert("Product selected: "+pid);
+                //everything fine, reload page to make product show up in the list
+                window.location.href=window.location.href;
             } else {
-                alert("No product selected (abort?)");
+                //do nothing
             }
         }, {
             scope: "P${prj.projectId?c}"
