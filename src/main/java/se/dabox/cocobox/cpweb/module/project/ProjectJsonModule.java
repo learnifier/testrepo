@@ -9,9 +9,11 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -58,6 +60,7 @@ import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductTransformers;
 import se.dabox.service.webutils.druwa.FormbeanJsRequestTargetFactory;
 import se.dabox.service.webutils.freemarker.text.LangServiceClientFactory;
 import se.dabox.service.webutils.json.JsonEncoding;
@@ -76,6 +79,28 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ProjectJsonModule.class);
+
+    private static List<Material> getMissingProducts(
+            List<String> prodIdList,
+            List<Product> existingProductsList) {
+        
+        Set<String> prodIdSet = new LinkedHashSet<>(prodIdList);
+        Set<String> existingIdSet = CollectionsUtil.transform(existingProductsList,
+                ProductTransformers.getIdStringTransformer());
+
+        //Remove all existing
+        prodIdSet.removeAll(existingIdSet);
+
+        //Now only missing ids are left
+
+        return CollectionsUtil.transformList(prodIdSet, new Transformer<String, Material>() {
+
+            @Override
+            public Material transform(String item) {
+                return new MissingProductMaterial(item);
+            }
+        });
+    }
 
     @WebAction
     public RequestTarget onProjectRoster(RequestCycle cycle, String strProjectId)
@@ -601,18 +626,21 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
     }
 
-    private static List<Product> getProjectProducts(RequestCycle cycle, long projectId) {
+    private static ProductMaterialCombo getProjectProducts(RequestCycle cycle, long projectId) {
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         List<ProjectProduct> projProducts = pmcClient.getProjectProducts(projectId);
-        List<String> prodIds =
 
-        CollectionsUtil.transformList(projProducts, ProjectProductTransformers.
+        List<String> prodIds = CollectionsUtil.transformList(projProducts, ProjectProductTransformers.
                 getProductIdStrTransformer());
 
         final ProductDirectoryClient pdClient =
                 Clients.getClient(cycle, ProductDirectoryClient.class);
 
-        return pdClient.getProducts(true, prodIds);
+        List<Product> existingProducts = pdClient.getProducts(true, prodIds);
+
+        List<Material> missing = getMissingProducts(prodIds, existingProducts);
+
+        return new ProductMaterialCombo(existingProducts, missing);
     }
 
     public static List<Material> getProjectMaterials(ProjectMaterialCoordinatorClient pmcClient,
@@ -621,13 +649,14 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         List<OrgMaterial> orgMats = pmcClient.getProjectOrgMaterials(prjId);
 
-        List<Product> products = getProjectProducts(cycle, prjId);
+        ProductMaterialCombo productCombo = getProjectProducts(cycle, prjId);
 
         MaterialListFactory mlf =
                 new MaterialListFactory(cycle, CocositeUserHelper.getUserLocale(cycle));
 
         mlf.addOrgMaterials(orgMats);
-        mlf.addProducts(products);
+        mlf.addProducts(productCombo.products);
+        mlf.addMaterials(productCombo.missing);
         List<Material> materials = mlf.getList();
 
         return materials;
@@ -685,5 +714,15 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         section.put("children", otherList);
 
         return section;
+    }
+
+    private static class ProductMaterialCombo {
+        public final List<Product> products;
+        public final List<Material> missing;
+
+        public ProductMaterialCombo(List<Product> products, List<Material> missing) {
+            this.products = products;
+            this.missing = missing;
+        }
     }
 }

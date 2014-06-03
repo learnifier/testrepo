@@ -15,6 +15,8 @@ import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
@@ -36,6 +38,8 @@ import se.dabox.service.common.proddir.material.ProductMaterialConstants;
  */
 @WebModuleMountpoint("/project.material")
 public class ProjectMaterialModule extends AbstractJsonAuthModule {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ProjectMaterialModule.class);
 
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onAddMaterial(final RequestCycle cycle, String strProjectId) {
@@ -106,11 +110,17 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
 
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
 
-        CanDeleteProjectProductResponse canResp =
-                pmcClient.canDeleteProjectProduct(prj.getProjectId(), productId);
+        try {
+            CanDeleteProjectProductResponse canResp = pmcClient.canDeleteProjectProduct(prj.
+                    getProjectId(), productId);
 
-        if (!canResp.isDeletePossible()) {
-            return jsonTarget(Collections.singletonMap("status", "error.candenied"));
+            if (!canResp.isDeletePossible()) {
+                return jsonTarget(Collections.singletonMap("status", "error.candenied"));
+            }
+        } catch(NotFoundException nfe) {
+            LOGGER.debug("Project {} or product {} doesn't exist. Can delete check ignored",
+                    prj.getProjectId(),
+                    productId);
         }
 
         try {
