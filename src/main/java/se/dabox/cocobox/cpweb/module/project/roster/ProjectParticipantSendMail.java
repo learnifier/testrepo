@@ -39,8 +39,7 @@ import se.dabox.util.collections.Transformer;
  */
 public class ProjectParticipantSendMail extends AbstractRosterListCommand {
 
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(ProjectParticipantSendMail.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectParticipantSendMail.class);
     private SendMailSession sms;
     private Map<Long, ProjectParticipation> partMap;
 
@@ -52,8 +51,7 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
 
         final long projectId = context.getAttribute("projectId", Long.class);
 
-        OrgProject prj =
-                context.getAttribute("project", OrgProject.class);
+        OrgProject prj = context.getAttribute("project", OrgProject.class);
 
         OrgUnitInfo org = getOrg(context.getCycle(), prj.getOrgId());
 
@@ -77,9 +75,9 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
             }
         };
 
-        UrlRequestTargetGenerator cancelTarget =
-                new UrlRequestTargetGenerator(NavigationUtil.toProjectPageUrl(context.getCycle(),
-                projectId));
+        UrlRequestTargetGenerator cancelTarget = new UrlRequestTargetGenerator(NavigationUtil.
+                toProjectPageUrl(context.getCycle(),
+                        projectId));
 
         sms = new SendMailSession(new ProjectSendMailProcessor(projectId, org.getId()),
                 target, cancelTarget);
@@ -89,14 +87,10 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
     }
 
     private Map<Long, ProjectParticipation> getParticipationMap(ListformContext context) {
-        OrgProject prj =
-                context.getAttribute("project", OrgProject.class);
-        CocoboxCordinatorClient ccbc =
-                getCocobocCordinatorClient(context);
-        List<ProjectParticipation> parts =
-                ccbc.listProjectParticipations(prj.getProjectId());
-        Map<Long, ProjectParticipation> map =
-                CollectionsUtil.createMap(parts,
+        OrgProject prj = context.getAttribute("project", OrgProject.class);
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(context);
+        List<ProjectParticipation> parts = ccbc.listProjectParticipations(prj.getProjectId());
+        Map<Long, ProjectParticipation> map = CollectionsUtil.createMap(parts,
                 new Transformer<ProjectParticipation, Long>() {
                     @Override
                     public Long transform(ProjectParticipation obj) {
@@ -121,8 +115,7 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
     protected RequestTarget getRequestTarget(ListformContext context,
             List<Long> values) {
 
-        OrgProject prj =
-                context.getAttribute("project", OrgProject.class);
+        OrgProject prj = context.getAttribute("project", OrgProject.class);
 
         sms.storeInSession(context.getCycle());
 
@@ -133,9 +126,9 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
         return sms;
     }
 
-    private CocoboxCordinatorClient getCocobocCordinatorClient(ListformContext context) {
-        CocoboxCordinatorClient ccbc =
-                context.getAttribute("ccbcClient", CocoboxCordinatorClient.class);
+    private CocoboxCordinatorClient getCocoboxCordinatorClient(ListformContext context) {
+        CocoboxCordinatorClient ccbc = context.getAttribute("ccbcClient",
+                CocoboxCordinatorClient.class);
         return ccbc;
     }
 
@@ -144,16 +137,20 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
                 orgId);
     }
 
-    private List<CreditAllocationFailure> creditCheck(final ListformContext context, final OrgUnitInfo org,
+    private List<CreditAllocationFailure> creditCheck(final ListformContext context,
+            final OrgUnitInfo org,
             final long projectId,
             final List<Long> values) {
 
-        OrgProject project = getCocobocCordinatorClient(context).getProject(projectId);
+        final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(context);
+
+        OrgProject project = cocoboxCordinatorClient.getProject(projectId);
 
         return ProjectTypeUtil.callSubtype(project,
                 new ProjectSubtypeCallable<List<CreditAllocationFailure>>() {
                     @Override
                     public List<CreditAllocationFailure> callMainProject() {
+
                         CpCreditCheck ccc = new CpCreditCheck(context.getCycle(), org, projectId);
                         List<CreditAllocationFailure> failures = ccc.getCreditFailures(values);
                         return failures;
