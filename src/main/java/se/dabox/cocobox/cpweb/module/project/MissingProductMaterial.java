@@ -5,6 +5,11 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import java.util.Locale;
+import net.unixdeveloper.druwa.DruwaService;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
+import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
+import se.dabox.service.common.ccbc.material.OrgMaterialConverter;
+import se.dabox.service.common.config.ConfigCacheCdnImage;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 
@@ -51,7 +56,8 @@ class MissingProductMaterial implements Material {
 
     @Override
     public String getThumbnail(int heightWidth) {
-        return null;
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+        return new ConfigCacheCdnImage(OrgMaterialConverter.DEFAULT_THUMBNAIL).getUrl(cycle);
     }
 
     @Override
