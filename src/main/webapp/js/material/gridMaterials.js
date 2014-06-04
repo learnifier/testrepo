@@ -1,27 +1,7 @@
 
+
 require(['jquery'], function() {
-
-
-    /*
-     
-     listMaterialsProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-     listMaterialsProducts.newOrgMatUrl = "${helper.urlFor('material.ProductMaterialJsonModule','newProdLink',[org.id])}";
-     listMaterialsProducts.deleteOrgMatLinkUrl = "${helper.urlFor('material.ProductMaterialJsonModule','deleteLink',[org.id])}";
-     listMaterialsProducts.contextPath = "${contextPath}";
-     listMaterialsProducts.sLang = "Search purchased materials";
-     
-     listMaterialsOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
-     listMaterialsOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-     listMaterialsOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
-     listMaterialsOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
-     listMaterialsOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
-     listMaterialsOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
-     listMaterialsOrgMats.contextPath = "${contextPath}";
-     listMaterialsOrgMats.sLang = "Search added materials";
-     
-     */
-
-
+   
     var orgMats;
     var purchMats;
 
@@ -36,31 +16,31 @@ require(['jquery'], function() {
       
 
         $.when(
-                $.ajax({
-                    url: listOrgMatsUrl,
-                    success: function(data) {
-                        orgMats = data;
+            $.ajax({
+                url: listOrgMatsUrl,
+                success: function(data) {
+                    orgMats = data;
 
-                        $.each(orgMats.aaData, function(index, object) {
-                            object.materialType = 'added';
-                        });
+                    $.each(orgMats.aaData, function(index, object) {
+                        object.materialType = 'added';
+                    });
+                }
+            }),
+            
+            $.ajax({
+                url: listPurchasedMatsUrl,
+                success: function(data) {
+                    purchMats = data;
 
-                    }
-                }),
-        $.ajax({
-            url: listPurchasedMatsUrl,
-            success: function(data) {
-                purchMats = data;
 
+                    $.each(purchMats.aaData, function(index, object) {
+                        object.materialType = 'purchased';
+                    });
 
-                $.each(purchMats.aaData, function(index, object) {
-                    object.materialType = 'purchased';
-                });
+                }
+            })
 
-            }
-        })
-
-                ).then(function() {
+        ).then(function() {
             log('purchMats ', purchMats);
             log('orgMats', orgMats);
 
@@ -168,5 +148,11 @@ require(['jquery'], function() {
     $('#materials-grid ').on('click', '.settings' , function() {
         $(this).find('.settings-actions').toggle();
     });
+    
+    $('#materials-grid').on('mouseleave', '.body', function() {
+       $(this).find('.settings-actions').hide(); 
+    });
+    
+    
     
 });
