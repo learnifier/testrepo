@@ -5,10 +5,6 @@
 [#assign head]
 ${cpweb_head}
 
-<style>
-
-
-</style>
 
 [/#assign]
 
@@ -24,6 +20,24 @@ ${cpweb_foot}
             <div class="body" style="background: url('{{thumbnail}}') no-repeat">
                 <div class="info">
                     <h1 class="title">{{title}}</h1>
+                    
+                </div>
+                <div class="info-hover">
+                
+                    {{#if_eq this.materialType 'added'}}
+                        <div class="settings">
+                            <div class="settings-actions">
+                                <a onclick="deleteOrgMat({{id}})">delete</a>
+                                <a href="${helper.urlFor('material.MaterialModule','edit',[org.id])}/{{id}}">edit</a>
+                            </div> 
+                        </div>
+                    {{/if_eq}}
+                    
+                    <h1 class="title">
+                        {{#if_eq this.materialType 'added'}}<a href="{{viewLink}}">{{/if_eq}}
+                            {{title}}
+                        {{#if_eq this.materialType 'added'}}</a>{{/if_eq}}
+                    </h1>        
                     <p class="description">{{desc}}</p>
                 </div>
             </div>
@@ -35,8 +49,83 @@ ${cpweb_foot}
 
 
 <script>
+                    
+    
+    /*
+     
+     listMaterialsProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+     listMaterialsProducts.newOrgMatUrl = "${helper.urlFor('material.ProductMaterialJsonModule','newProdLink',[org.id])}";
+     listMaterialsProducts.deleteOrgMatLinkUrl = "${helper.urlFor('material.ProductMaterialJsonModule','deleteLink',[org.id])}";
+     listMaterialsProducts.contextPath = "${contextPath}";
+     listMaterialsProducts.sLang = "Search purchased materials";
+     
+     listMaterialsOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
+     listMaterialsOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+     listMaterialsOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
+     listMaterialsOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+     listMaterialsOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
+     listMaterialsOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
+     listMaterialsOrgMats.contextPath = "${contextPath}";
+     listMaterialsOrgMats.sLang = "Search added materials";
+     
+     */
+    
     var listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
     var listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
+    
+    var deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}";
+    var editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+    
+    var deleteOrgMat = function(orgMatId) {
+        var ajaxData = {"orgmatid": orgMatId};
+        var ajaxSettings = {};
+        ajaxSettings.data = ajaxData;
+        ajaxSettings.success = processDeleteOrgMatAjaxResponse;
+        require(['dabox-common'], function() {
+            cocobox.confirmationDialog("Delete material",
+                    "Do you want to permanently delete this material?",
+                    function() {
+                        cocobox.ajaxPost(deleteOrgMatUrl, ajaxSettings);
+                    }
+            );
+        });
+
+    };
+    
+    var processDeleteOrgMatAjaxResponse = function(data) {
+        log('Ajax response', data);
+
+        if (data.status == "OK") {
+            //Delete row with error
+            deleteOrgMatRow(data);
+        } else {
+            displayDeleteOrgMatError(data);
+        }
+    };
+   
+    var displayDeleteOrgMatError = function(data) {
+        var lines = [];
+        lines.push("This material cannot be deleted due to the foilowing reason.");
+        lines.push("");
+        if (data.activeLinkCount > 0) {
+            lines.push("This material has an active access link");
+            lines.push();
+        }
+
+        var pns = data.linkedProjectNames;
+        if (pns && pns.length > 0) {
+            lines.push("This material is used in the following projects:");
+            lines.push();
+            for(var i = 0; i<pns.length; i++) {
+                var pn = pns[i];
+                lines.push(pn);
+            }
+        }
+
+        cocobox.infoDialog("Unable to delete material", lines);
+    };
+    
+    
 </script>
 
 <script src="${contextPath}/js/material/gridMaterials.js"></script>
