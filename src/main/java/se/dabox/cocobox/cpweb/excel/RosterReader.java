@@ -102,7 +102,7 @@ public class RosterReader {
         try {
             LOGGER.debug("Trying to open workbook from stream: {}", is);
             workbook = WorkbookFactory.create(is);
-        } catch (IOException | InvalidFormatException | POIXMLException ex) {
+        } catch (IOException | InvalidFormatException | POIXMLException | IllegalArgumentException ex) {
             throw new RosterFormatException("Failed to read workbook.", ex);
         }
     }
