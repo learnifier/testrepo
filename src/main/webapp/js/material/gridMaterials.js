@@ -14,7 +14,11 @@ require(['jquery'], function() {
                 return opts.inverse(this);
         });
       
-
+        Handlebars.registerPartial('video', $('#video-partial').html());
+        Handlebars.registerPartial('audio', $('#audio-partial').html());
+        Handlebars.registerPartial('file', $('#file-partial').html());
+        Handlebars.registerPartial('general', $('#general-partial').html());
+      
         $.when(
             $.ajax({
                 url: listOrgMatsUrl,

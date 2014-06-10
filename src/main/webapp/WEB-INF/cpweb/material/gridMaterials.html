@@ -12,6 +12,47 @@ ${cpweb_head}
 [#assign foot]
 ${cpweb_foot}
 
+<script id="video-partial" type="text/x-handlebars-template">
+    
+    <div class="video">
+        <p>Wow, so video!</p>
+        <p class="title">{{title}}</p>
+    </div>
+    
+</script>
+
+<script id="audio-partial" type="text/x-handlebars-template">
+    
+    <div class="audio">
+        <p>Doge, so audio!</p>
+        <p class="title">{{title}}</p>
+    </div>
+    
+</script>
+
+<script id="file-partial" type="text/x-handlebars-template">
+    
+    <div class="file">
+        <p>Doge, so file!</p>
+        <p class="title">{{title}}</p>
+    </div>
+    
+</script>
+
+<script id="general-partial" type="text/x-handlebars-template">
+    
+    <div class="general">
+        <p>Doge, so general!</p>
+        <p class="title">{{title}}</p>
+    </div>
+    
+</script>
+
+
+
+
+
+
 <script id="grid-entry-template" type="text/x-handlebars-template">
     
     <div id="grid-entries">
@@ -19,7 +60,23 @@ ${cpweb_foot}
         <div class="grid-entry" data-index="{{@index}}" data-type="{{type}}" data-materialtype="{{materialType}}">
             <div class="body" style="background: url('{{thumbnail}}') no-repeat">
                 <div class="info">
-                    <h1 class="title">{{title}}</h1>
+                    
+                    {{#if_eq this.type 'vimeo2video'}}
+                        {{> video}}
+                    {{/if_eq}}
+                            
+                    {{#if_eq this.type 'brightcovevideo'}}
+                        {{> video}}
+                    {{/if_eq}}
+                    
+                    
+                    {{#if_eq this.type 'audioplayer'}}
+                        {{> audio}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'genericfile'}}
+                        {{> file}}
+                    {{/if_eq}}
                     
                 </div>
                 <div class="info-hover">
@@ -40,6 +97,12 @@ ${cpweb_foot}
                     </h1>        
                     <p class="description">{{desc}}</p>
                 </div>
+        
+                <div> 
+                
+                    
+                </div> 
+        
             </div>
         </div>
         {{/each}}
