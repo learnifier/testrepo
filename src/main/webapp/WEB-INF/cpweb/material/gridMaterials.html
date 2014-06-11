@@ -13,44 +13,28 @@ ${cpweb_head}
 ${cpweb_foot}
 
 <script id="video-partial" type="text/x-handlebars-template">
-    
     <div class="video">
-        <p>Wow, so video!</p>
         <p class="title">{{title}}</p>
     </div>
-    
 </script>
 
 <script id="audio-partial" type="text/x-handlebars-template">
-    
     <div class="audio">
-        <p>Doge, so audio!</p>
         <p class="title">{{title}}</p>
     </div>
-    
 </script>
 
 <script id="file-partial" type="text/x-handlebars-template">
-    
     <div class="file">
-        <p>Doge, so file!</p>
         <p class="title">{{title}}</p>
     </div>
-    
 </script>
 
 <script id="general-partial" type="text/x-handlebars-template">
-    
     <div class="general">
-        <p>Doge, so general!</p>
         <p class="title">{{title}}</p>
-    </div>
-    
+    </div>    
 </script>
-
-
-
-
 
 
 <script id="grid-entry-template" type="text/x-handlebars-template">
@@ -58,34 +42,62 @@ ${cpweb_foot}
     <div id="grid-entries">
         {{#each aaData}}
         <div class="grid-entry" data-index="{{@index}}" data-type="{{type}}" data-materialtype="{{materialType}}">
-            <div class="body" style="background: url('{{thumbnail}}') no-repeat">
+            <div class="body" style="background-image: url('{{thumbnail}}')">
                 <div class="info">
                     
                     {{#if_eq this.type 'vimeo2video'}}
                         {{> video}}
                     {{/if_eq}}
-                            
+                    
+                    {{#if_eq this.type 'vimeovideo'}}
+                        {{> video}}
+                    {{/if_eq}}
+                    
                     {{#if_eq this.type 'brightcovevideo'}}
                         {{> video}}
                     {{/if_eq}}
                     
-                    
                     {{#if_eq this.type 'audioplayer'}}
                         {{> audio}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'file'}}
+                        {{> file}}
                     {{/if_eq}}
                     
                     {{#if_eq this.type 'genericfile'}}
                         {{> file}}
                     {{/if_eq}}
                     
+                    {{#if_eq this.type 'pdf'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'powerpoint'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'idproject'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'daboxasmt'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'mobileapp'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    
                 </div>
                 <div class="info-hover">
                 
                     {{#if_eq this.materialType 'added'}}
-                        <div class="settings">
+                        <div class="settings clearfix">
                             <div class="settings-actions">
-                                <a onclick="deleteOrgMat({{id}})">delete</a>
-                                <a href="${helper.urlFor('material.MaterialModule','edit',[org.id])}/{{id}}">edit</a>
+                                <a class="btn deletebutton" onclick="deleteOrgMat({{id}})">delete</a>
+                                <a class="btn editbutton" href="${helper.urlFor('material.MaterialModule','edit',[org.id])}/{{id}}">edit</a>
                             </div> 
                         </div>
                     {{/if_eq}}
