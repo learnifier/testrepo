@@ -140,7 +140,21 @@ public class ParticipationIdProjectProductDeleteCheck {
             return true;
         }
 
-        return subParticipants.isEmpty();
+        //No participants, no problems
+        if (subParticipants.isEmpty()) {
+            return true;
+        } else if (subParticipants.size() != 1) {
+            //There are more than one participant remaining, this is problematic
+            return false;
+        } else {
+            //We can remove the subproject if the only remaining user is the same user as the owner
+            //(the user we're checking right now).
+
+            ProjectParticipation part = cocoboxCordinatorClient.getProjectParticipation(
+                    participationId);
+
+            return subParticipants.get(0).getUserId() == part.getUserId();
+        }
     }
 
     private Set<ProductId> getIdProductIds(ListformContext context, OrgProject project) {
