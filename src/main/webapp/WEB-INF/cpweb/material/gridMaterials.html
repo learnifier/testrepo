@@ -4,10 +4,10 @@
 
 [#assign head]
 ${cpweb_head}
-
-
 [/#assign]
 
+
+[#assign pagetitle='gridMaterials' /]
 
 [#assign foot]
 ${cpweb_foot}
@@ -96,7 +96,11 @@ ${cpweb_foot}
                     {{#if_eq this.materialType 'added'}}
                         <div class="settings clearfix">
                         
-                            <div class="settings-caret"></div>
+                            <div class="settings-button">
+                                <div class="caret-button">
+                                    <span class="caret"></span>
+                                </div>
+                            </div>
                         
                             <div class="settings-actions">
                                 <a class="btn deletebutton" onclick="deleteOrgMat({{id}})">delete</a>
@@ -219,15 +223,19 @@ ${cpweb_foot}
 <a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn btn-add navBackgroundColor">Add Material</a>
 <h1>Materials</h1>
 
-
-<ul class="grid-filter" id="materials-grid-filter">
-    <li><a class="filter" data-filter="all">All</a></li>
-    <li><a class="filter" data-filter="added">Added</a></li>
-    <li><a class="filter" data-filter="purchased">Purchased</a></li>
-    <li><a class="filter" data-filter="audio">Audio</a></li>
-    <li><a class="filter" data-filter="video">Video</a></li>
-    <li><a class="filter" data-filter="docs">Documents</a></li>
-</ul>
+<div class='grid-header'>
+    <div class='list-toggle'>[#include 'listToggle.html' /]</div>
+    <div class='filter'>
+        <ul class="grid-filter" id="materials-grid-filter">
+            <li><a class="filter" data-filter="all">All</a></li>
+            <li><a class="filter" data-filter="added">Added</a></li>
+            <li><a class="filter" data-filter="purchased">Purchased</a></li>
+            <li><a class="filter" data-filter="audio">Audio</a></li>
+            <li><a class="filter" data-filter="video">Video</a></li>
+            <li><a class="filter" data-filter="docs">Documents</a></li>
+        </ul>
+    </div>
+</div>
 
 <div id="materials-grid" class="grid-list">
 </div>
