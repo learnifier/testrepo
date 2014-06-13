@@ -47,7 +47,7 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
 
     <div class="itemicon">
         <p>Project</p>
-        <h1>${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier(participationOwner.userId)!''?xhtml}</h1>
+        <h1>${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
 
         <p>invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml}
 
