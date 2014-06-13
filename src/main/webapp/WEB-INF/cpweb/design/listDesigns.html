@@ -1,6 +1,6 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
+[#import "/material/materialsMenu.html" as mMenu /]
 
 [#assign listDetails]
 <div id="listitem"> 
@@ -54,7 +54,7 @@
 [#assign foot]
 ${cpweb_foot}
 <script>
-    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
 </script>
 <script>
     $(document).ready(function() {
@@ -104,7 +104,7 @@ ${cpweb_foot}
 [/#assign]
 
 [#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="designs"][/@sMenu.settingsMenu]
+    [@mMenu.materialsMenu selected="designs"][/@mMenu.materialsMenu]
 [/#assign]
 
 

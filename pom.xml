@@ -208,14 +208,6 @@
                             <developmentName>js/listDeeplinksOrgMats.js</developmentName>
                         </file>
                         <file>
-                            <name>js/listMaterialsProducts-min.js</name>
-                            <developmentName>js/listMaterialsProducts.js</developmentName>
-                        </file>
-                        <file>
-                            <name>js/listMaterialsOrgMats-min.js</name>
-                            <developmentName>js/listMaterialsOrgMats.js</developmentName>
-                        </file>
-                        <file>
                             <name>js/createProject-min.js</name>
                             <developmentName>js/createProject.js</developmentName>
                         </file>

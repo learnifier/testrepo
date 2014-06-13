@@ -2,19 +2,104 @@
 
 [#import "/material/materialsMenu.html" as mMenu /]
 
-[#!-- Netbean hint
-<script src="../../js/listMaterialsProducts.js">
+[#assign cpweb_head]
+
+
+<script src="../../js/listMaterials.js">
 </script>
-<script src="../../js/listMaterialsOrgMats.js">
-</script> -->
+
+${cpweb_head}
+
+<link rel="stylesheet" type="text/css" href="${cocoboxCdn}/cocobox/css/bootstrap3.min.css">
+<link rel="stylesheet" type="text/css" href="${cocoboxCdn}/cocobox/js/libs/dataTables/css/dataTables.bootstrap.css">
+
+<style>
+    div.dataTables_info {
+    color: #999;
+    font-size: 12px;
+    padding-top: 0;
+    line-height: 40px;
+    }
+    div.dataTables_paginate {
+    font-size: 12px;
+    text-transform: uppercase;
+    }
+    table.dataTable thead > tr > th {
+    font-weight: normal;
+    text-transform: uppercase;
+    color: #999;
+    font-size: 12px;
+    padding-left: 8px;
+    }
+    table.dataTable tbody {
+    border-bottom: 2px solid #ddd;
+    }
+    .pagination>li>a, .pagination>li>span {
+    border-radius: 50%;
+    margin: 0 2px;
+    }
+    .pagination>li:first-child>a, .pagination>li:first-child>span,
+    .pagination>li:last-child>a, .pagination>li:last-child>span {
+    border-radius: 4px;
+    }
+
+</style>
+
+[/#assign]
+
+
+[#assign pagetitle='listMaterials' /]
 
 [#assign foot]
 ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
 
-    require(['dabox-datatables'], function() {
+    require(['dataTables-bootstrap'], function() {
+        var pub = {
+            listUrl: "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}"
+        };
+            
+        var pTable = $('#materialstable').dataTable({
+            "sDom": 'frtip',
+            "bPaginate": true,
+            "aaSorting": [[1,'asc']],
+            "sAjaxSource": pub.listUrl,
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mData": "type",
+                    "fnRender": function(oObj) {
+                        return oObj.aData.type;
+                    } 
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mData": "title",
+                    "fnRender": function(oObj) {
+                        return oObj.aData.title;
+                    }
+                }
+            ],
 
+            
+            "sPaginationType": "full_numbers",
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "No materials matches your query",
+                "sEmptyTable": "<span class='emptytable'>No purchased products</span>",
+                "sLoadingRecords": "<p>Loading materials...</p><img src='../../img/spinner-threedots.gif' />"
+            },
+            "fnInitComplete": function() {
+                var nMaterialsProducts = pTable._('tr').length;
+                $('#sm_purchased span').append('<span class="count">' + nMaterialsProducts + '</span>');
+            }
+
+        });
+        
+        
+       
+        /*
         listMaterialsProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
         listMaterialsProducts.newOrgMatUrl = "${helper.urlFor('material.ProductMaterialJsonModule','newProdLink',[org.id])}";
         listMaterialsProducts.deleteOrgMatLinkUrl = "${helper.urlFor('material.ProductMaterialJsonModule','deleteLink',[org.id])}";
@@ -33,16 +118,9 @@ ${cpweb_foot}
         listMaterialsOrgMats.sLang = "Search added materials";
 
         listMaterialsOrgMats.init();
+        */
     });
-    
-    $( "#ctxnav li" ).click(function(){
-        if (!$(this).hasClass('activeItem')) {
-            $( ".matlist" ).toggle();
-            $( "#ctxnav li" ).toggleClass('activeItem');
-        } 
-        }
-    )
-    
+ 
 </script>
 [/#assign]
 
@@ -54,36 +132,18 @@ ${cpweb_foot}
  
 <a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn btn-add navBackgroundColor">Add Material</a>
 <h1>Materials</h1>
-<div id="listmaterialstabs">
-    <div id="tab_orgmats" class="matlist">
-        <section class="list">
-            <table class="list" id="listmaterials">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </section>
-    </div>
-    <div id="tab_products" class="matlist" style="display: none;">
-        <section class="list">
-            <table class="list" id="listproducts">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </section>
-    </div>
+<div class='grid-header'>
+    <div class='list-toggle'>[#include 'listToggle.html' /]</div>
+</div>
+<div id="listmaterials">
+    <table id="materialstable" class="table table-bordered table-striped table-hover ">
+        <thead>
+            <th>type</th>
+            <th>title</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
 
 [/@dws.skin]
-
