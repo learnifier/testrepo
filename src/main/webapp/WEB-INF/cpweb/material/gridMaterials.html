@@ -95,6 +95,9 @@ ${cpweb_foot}
                 
                     {{#if_eq this.materialType 'added'}}
                         <div class="settings clearfix">
+                        
+                            <div class="settings-caret"></div>
+                        
                             <div class="settings-actions">
                                 <a class="btn deletebutton" onclick="deleteOrgMat({{id}})">delete</a>
                                 <a class="btn editbutton" href="${helper.urlFor('material.MaterialModule','edit',[org.id])}/{{id}}">edit</a>
@@ -226,8 +229,6 @@ ${cpweb_foot}
     <li><a class="filter" data-filter="docs">Documents</a></li>
 </ul>
 
-<a id="masonry">masonry</a>
-<a id="fitrows">fit rows</a>
 <div id="materials-grid" class="grid-list">
 </div>
 
