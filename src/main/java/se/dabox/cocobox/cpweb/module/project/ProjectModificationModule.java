@@ -35,7 +35,7 @@ import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
 import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.model.project.task.CreateMailTaskSendMailProcessor;
 import se.dabox.cocobox.cpweb.model.project.task.EditMailTaskSendMailProcessor;
-import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.UrlRequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.project.roster.ActivateParticipant;
@@ -76,7 +76,7 @@ import se.dabox.util.collections.CollectionsUtil;
  * @author Jerker Klang <jerker.klang@dabox.se>
  */
 @WebModuleMountpoint("/project.mod")
-public class ProjectModificationModule extends AbstractWebAuthModule {
+public class ProjectModificationModule extends AbstractJsonAuthModule {
 
     public static final String ADD_TASK = "addTask";
     public static final String EDIT_TASK = "editTask";
@@ -171,7 +171,7 @@ public class ProjectModificationModule extends AbstractWebAuthModule {
         checkOrgPermission(cycle, strOrgId);
 
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        List<ProjectParticipation> participants = null;
+        List<ProjectParticipation> participants;
         try {
             participants = ccbc.listProjectParticipations(Long.valueOf(
                     strProjectId));
