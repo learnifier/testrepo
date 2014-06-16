@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +38,7 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
+import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.ccbc.material.OrgMaterialLink;
 import se.dabox.service.common.ccbc.material.UpdateOrgMaterialLink;
 import se.dabox.service.common.ccbc.org.OrgProduct;
@@ -56,7 +56,6 @@ import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
-import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductPredicates;
@@ -487,24 +486,33 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 return field.getSingleValue();
             }
 
-            private String getProductTypeTitle(LangBundle bundle, ProductTypeId productTypeId) {
-                String productType = productTypeId.getId();
-
-                String name = productType;
-
-                String keyName = "pdweb.product.type." + productType;
-
-                if (bundle.hasKey(keyName)) {
-                    name = bundle.getKey(keyName);
-                }
-
-                return name;
-            }
-
-            
-
-
         }.encodeToStream(sortedProducts);
+    }
+
+    private String getProductTypeTitle(LangBundle bundle, ProductTypeId productTypeId) {
+        String productType = productTypeId.getId();
+
+        String name = productType;
+
+        String keyName = "pdweb.product.type." + productType;
+
+        if (bundle.hasKey(keyName)) {
+            name = bundle.getKey(keyName);
+        }
+
+        return name;
+    }
+
+    private String getMaterialTypeTitle(LangBundle bundle, Material material) {
+        
+        if (OrgMaterialConstants.NATIVE_SYSTEM.equals(material.getNativeSystem())) {
+            return bundle.getKey("cpweb.materialtype.orgmat");
+        } else if (material instanceof ProductMaterial) {
+            ProductMaterial prodMat = (ProductMaterial) material;
+            return getProductTypeTitle(bundle, prodMat.getProduct().getProductTypeId());
+        }
+        
+        return material.getNativeType();
     }
 
     private LangBundle getLangBundle(RequestCycle cycle) {
@@ -519,9 +527,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 return bundle;
             }
 
-    public static ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
+    public ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
             final String strProjectId,
             final List<Material> materials) {
+
+        final LangBundle bundle = getLangBundle(cycle);
 
         return new DataTablesJson<Material>() {
             @Override
@@ -530,6 +540,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 generator.writeStringField("title", material.getTitle());
                 generator.writeStringField("system", material.getNativeSystem());
                 generator.writeStringField("type", material.getNativeType());
+                generator.writeStringField("typeTitle", getMaterialTypeTitle(bundle, material));
                 generator.writeStringField("desc", material.getDescription());
                 generator.writeStringField("locale", material.getLocale().toString());
                 generator.writeStringField("thumbnail", material.getThumbnail(64));
@@ -583,6 +594,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
                 return new CrispAdminLinkInfo(link, ctx.getDescription().getInfo().getName());
             }
+
         }.encodeToStream(materials);
     }
 
