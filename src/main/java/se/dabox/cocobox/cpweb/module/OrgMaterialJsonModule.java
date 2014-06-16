@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,6 +33,9 @@ import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
+import se.dabox.dws.client.langservice.LangBundle;
+import se.dabox.dws.client.langservice.LangService;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
@@ -52,9 +56,11 @@ import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
+import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductPredicates;
+import se.dabox.service.proddir.data.ProductTypeId;
 import se.dabox.service.tokenmanager.client.AccountBalance;
 import se.dabox.service.tokenmanager.client.AccountBalanceTransformers;
 import se.dabox.service.tokenmanager.client.TokenManagerClient;
@@ -411,7 +417,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final Map<Long, List<OrgProductLink>> productLinkMap = getProductLinkMap(cycle,
                 orgProdIdMap.values());
 
-        List<Product> sortedProducts = sortProducts(cycle, products);
+        final List<Product> sortedProducts = sortProducts(cycle, products);
+
+        final LangBundle bundle = getLangBundle(cycle);
+
 
         return new DataTablesJson<Product>() {
             @Override
@@ -421,6 +430,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 generator.writeStringField("id", product.getId().getId());
                 generator.writeStringField("title", getSingleValue(product, "webtitle"));
                 generator.writeStringField("type", product.getProductTypeId().getId());
+                generator.writeStringField("typeTitle", getProductTypeTitle(bundle, product.getProductTypeId()));
                 generator.writeStringField("desc", getSingleValue(product, "webdescription"));
                 generator.writeStringField("crlink", getSingleValue(product, "crurl"));
 
@@ -431,10 +441,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
                 generator.writeStringField("weblink", "");
                 generator.writeNumberField("createdBy", 0);
-                //writeDateField("created", material.getCreatedBy());
-//                writeLongNullField(generator, "updatedBy",
-//                        material.getUpdatedBy());
-//                generator.writeNumberField("updated", material.getUpdatedBy());
                 generator.writeStringField("viewLink",
                         cycle.urlFor(CpMainModule.class.getName(),
                         "viewOrgMaterial",
@@ -480,8 +486,38 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
                 return field.getSingleValue();
             }
+
+            private String getProductTypeTitle(LangBundle bundle, ProductTypeId productTypeId) {
+                String productType = productTypeId.getId();
+
+                String name = productType;
+
+                String keyName = "pdweb.product.type." + productType;
+
+                if (bundle.hasKey(keyName)) {
+                    name = bundle.getKey(keyName);
+                }
+
+                return name;
+            }
+
+            
+
+
         }.encodeToStream(sortedProducts);
     }
+
+    private LangBundle getLangBundle(RequestCycle cycle) {
+                LangService lsClient = CacheClients.getClient(cycle, LangService.class);
+
+                Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+                LangBundle bundle
+                        = lsClient.getLangBundle(CocoSiteConstants.DEFAULT_LANG_BUNDLE, userLocale.
+                                toString(), true);
+
+                return bundle;
+            }
 
     public static ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
             final String strProjectId,
