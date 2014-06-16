@@ -66,12 +66,13 @@ ${cpweb_foot}
             "aaSorting": [[1,'asc']],
             "sAjaxSource": pub.listUrl,
             "aoColumnDefs": [
+                
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "typeTitle",
+                    "aTargets": [0],
+                    "mData": null, 
                     "fnRender": function(oObj) {
-                        return oObj.aData.type;
-                    } 
+                        return "<span class='product-thumbnail' style='background-image: url(" +  oObj.aData.thumbnail + ")'></span>";
+                    }
                 },
                 {
                     "aTargets": [ 1 ],
@@ -82,6 +83,13 @@ ${cpweb_foot}
                 },
                 {
                     "aTargets": [ 2 ],
+                    "mData": "typeTitle",
+                    "fnRender": function(oObj) {
+                        return oObj.aData.type;
+                    } 
+                },
+                {
+                    "aTargets": [ 3 ],
                     "mData": null,
                     "fnRender": function(oObj) {
                         if(oObj.aData.system == 'orgmat') {
@@ -221,8 +229,9 @@ ${cpweb_foot}
     <table id="materialstable" class="table table-bordered table-striped table-hover ">
         <thead>
             <tr>
-                <th>type</th>
-                <th>title</th>
+                <th></th>
+                <th>name</th>
+                <th>kind</th>
                 <th>actions</th>
             </tr>
         </thead>
