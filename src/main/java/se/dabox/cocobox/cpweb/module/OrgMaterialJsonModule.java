@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -20,7 +22,6 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.codehaus.jackson.JsonGenerator;
-import se.dabox.cocosite.product.GetProjectCompatibleProducts;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
@@ -30,7 +31,7 @@ import se.dabox.cocosite.converter.cds.CdsUtil;
 import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
-import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
+import se.dabox.cocosite.product.GetProjectCompatibleProducts;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
@@ -42,6 +43,7 @@ import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
@@ -409,6 +411,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final Map<Long, List<OrgProductLink>> productLinkMap = getProductLinkMap(cycle,
                 orgProdIdMap.values());
 
+        List<Product> sortedProducts = sortProducts(cycle, products);
+
         return new DataTablesJson<Product>() {
             @Override
             protected void encodeItem(Product product) throws IOException {
@@ -476,7 +480,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
                 return field.getSingleValue();
             }
-        }.encodeToStream(products);
+        }.encodeToStream(sortedProducts);
     }
 
     public static ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
@@ -758,6 +762,29 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }
 
         return CollectionsUtil.sublist(products, ProductPredicates.getIdProjectValidProduct());
+    }
+
+    private List<Product> sortProducts(RequestCycle cycle, List<Product> products) {
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        final Collator col = Collator.getInstance(userLocale);
+        col.setStrength(Collator.PRIMARY);
+
+        List<Product> sortedList = new ArrayList<>(products);
+        Collections.sort(sortedList, new Comparator<Product>() {
+
+            @Override
+            public int compare(Product o1, Product o2) {
+                int diff = col.compare(o1.getTitle(), o2.getTitle());
+
+                if (diff == 0) {
+                    diff = o1.getId().compareTo(o2.getId());
+                }
+
+                return diff;
+            }
+        });
+
+        return sortedList;
     }
 
     private static class CrispAdminLinkInfo {
