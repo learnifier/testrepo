@@ -24,6 +24,11 @@ ${cpweb_head}
     font-size: 12px;
     text-transform: uppercase;
     }
+    div.dataTables_paginate paginate_active {
+    color: white;
+    background-color: #017fd6;
+    border: none;
+    }
     table.dataTable thead > tr > th {
     font-weight: normal;
     text-transform: uppercase;
@@ -76,17 +81,11 @@ ${cpweb_foot}
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mData": "title",
-                    "fnRender": function(oObj) {
-                        return oObj.aData.title;
-                    }
+                    "mData": "title"
                 },
                 {
                     "aTargets": [ 2 ],
-                    "mData": "typeTitle",
-                    "fnRender": function(oObj) {
-                        return oObj.aData.type;
-                    } 
+                    "mData": "typeTitle"
                 },
                 {
                     "aTargets": [ 3 ],
