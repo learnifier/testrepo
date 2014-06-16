@@ -13,7 +13,7 @@ ${cpweb_head}
 <link rel="stylesheet" type="text/css" href="${cocoboxCdn}/cocobox/css/bootstrap3.min.css">
 <link rel="stylesheet" type="text/css" href="${cocoboxCdn}/cocobox/js/libs/dataTables/css/dataTables.bootstrap.css">
 
-<style>
+<style type="text/css">
     div.dataTables_info {
     color: #999;
     font-size: 12px;
@@ -57,7 +57,7 @@ ${cpweb_foot}
 
     require(['dataTables-bootstrap'], function() {
         var pub = {
-            listUrl: "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}"
+            listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}"
         };
             
         var pTable = $('#materialstable').dataTable({
@@ -68,7 +68,7 @@ ${cpweb_foot}
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mData": "type",
+                    "mData": "typeTitle",
                     "fnRender": function(oObj) {
                         return oObj.aData.type;
                     } 
@@ -78,6 +78,17 @@ ${cpweb_foot}
                     "mData": "title",
                     "fnRender": function(oObj) {
                         return oObj.aData.title;
+                    }
+                },
+                {
+                    "aTargets": [ 2 ],
+                    "mData": null,
+                    "fnRender": function(oObj) {
+                        if(oObj.aData.system == 'orgmat') {
+                            return "<select data-action='action' data-id='" + oObj.aData.id + "'><option value=''>Actions</option><option value='edit'>edit</option><option value='delete'>delete</option></select>"
+                        } else {
+                            return '';
+                        }
                     }
                 }
             ],
@@ -97,6 +108,77 @@ ${cpweb_foot}
 
         });
         
+        
+        $('#materialstable').on('change', 'select[data-action=action]', function() {
+           
+            var id = $(this).data('id');
+            
+            var action = $(this).val();
+            
+            if(action == 'delete') {
+                deleteOrgMat(id);
+            } else if (action == 'edit') {
+                window.location.href = editOrgMatUrl + '/' + id;
+            }
+            
+            $(this).val('');
+            
+        });
+        
+        
+        var deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}";
+        var editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+    
+        
+        var deleteOrgMat = function(orgMatId) {
+            var ajaxData = {"orgmatid": orgMatId};
+            var ajaxSettings = {};
+            ajaxSettings.data = ajaxData;
+            ajaxSettings.success = processDeleteOrgMatAjaxResponse;
+            require(['dabox-common'], function() {
+                cocobox.confirmationDialog("Delete material",
+                        "Do you want to permanently delete this material?",
+                        function() {
+                            cocobox.ajaxPost(deleteOrgMatUrl, ajaxSettings);
+                        }
+                );
+            });
+
+        };
+
+        var processDeleteOrgMatAjaxResponse = function(data) {
+            log('Ajax response', data);
+
+            if (data.status == "OK") {
+                //Delete row with error
+                deleteOrgMatRow(data);
+            } else {
+                displayDeleteOrgMatError(data);
+            }
+        };
+
+        var displayDeleteOrgMatError = function(data) {
+            var lines = [];
+            lines.push("This material cannot be deleted due to the foilowing reason.");
+            lines.push("");
+            if (data.activeLinkCount > 0) {
+                lines.push("This material has an active access link");
+                lines.push();
+            }
+
+            var pns = data.linkedProjectNames;
+            if (pns && pns.length > 0) {
+                lines.push("This material is used in the following projects:");
+                lines.push();
+                for(var i = 0; i<pns.length; i++) {
+                    var pn = pns[i];
+                    lines.push(pn);
+                }
+            }
+
+            cocobox.infoDialog("Unable to delete material", lines);
+        };
+
         
        
         /*
@@ -141,6 +223,7 @@ ${cpweb_foot}
             <tr>
                 <th>type</th>
                 <th>title</th>
+                <th>actions</th>
             </tr>
         </thead>
         <tbody>
