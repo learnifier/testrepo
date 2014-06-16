@@ -3,7 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.material;
 
-import se.dabox.cocobox.cpweb.module.material.*;
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.Collections;
@@ -178,7 +177,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
             return formbeanResp.getRequestTarget(formsess);
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         OrgProductLink mainLink = ccbc.getOrgProductLink(linkId);
 
@@ -286,7 +285,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
                 getCocoboxCordinatorClient(cycle).getOrgProductLinkTokens(orgProductLinkId);
 
         List<OrgProductLinkToken> liveTokens = CollectionsUtil.sublist(allTokens,
-                new NotPredicate<OrgProductLinkToken>(OrgProductLinkTokenPredicates.
+                new NotPredicate<>(OrgProductLinkTokenPredicates.
                 getDeletedPredicate()));
 
         ByteArrayOutputStream baos = OrgProductLinkTokenJson.encode(cycle, liveTokens);
@@ -338,9 +337,10 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
             }
         }
 
+        final TokenManagerClient tmClient = CacheClients.getClient(cycle, TokenManagerClient.class);
+
         AccountBalance balance =
-                CacheClients.getClient(cycle, TokenManagerClient.class).getAccountBalance(orgProd.
-                getTokenManagerAccountId());
+                tmClient.getAccountBalance(orgProd.getTokenManagerAccountId());
 
         Map<String, Object> responseMap = createMap();
         responseMap.put("available", balance.getAvailable());

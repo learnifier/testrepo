@@ -404,8 +404,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final String cdnUrl = getConfValue(cycle, "contentrepo.cocoboxpub.puburl");
 
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-
         final ThumbnailGeneratorFactory factory = new StandardThumbnailGeneratorFactory(cdnUrl);
 
         final Map<Long, List<OrgProductLink>> productLinkMap = getProductLinkMap(cycle,
@@ -423,7 +421,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 generator.writeStringField("crlink", getSingleValue(product, "crurl"));
 
                 generator.writeStringField("thumbnail", factory.createThumbnailGenerator(null,
-                        product).getThumbnail(64));
+                        product).getThumbnail(256));
 
                 generator.writeStringField("weblink", "");
                 generator.writeNumberField("createdBy", 0);
