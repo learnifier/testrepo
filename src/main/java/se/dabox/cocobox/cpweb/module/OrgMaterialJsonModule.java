@@ -421,6 +421,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 generator.writeStringField("crlink", getSingleValue(product, "crurl"));
 
                 generator.writeStringField("thumbnail", factory.createThumbnailGenerator(null,
+                        product).getThumbnail(64));
+                generator.writeStringField("thumbnailx256", factory.createThumbnailGenerator(null,
                         product).getThumbnail(256));
 
                 generator.writeStringField("weblink", "");
