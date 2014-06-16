@@ -489,7 +489,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }.encodeToStream(sortedProducts);
     }
 
-    private String getProductTypeTitle(LangBundle bundle, ProductTypeId productTypeId) {
+    private static String getProductTypeTitle(LangBundle bundle, ProductTypeId productTypeId) {
         String productType = productTypeId.getId();
 
         String name = productType;
@@ -503,7 +503,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return name;
     }
 
-    private String getMaterialTypeTitle(LangBundle bundle, Material material) {
+    private static String getMaterialTypeTitle(LangBundle bundle, Material material) {
         
         if (OrgMaterialConstants.NATIVE_SYSTEM.equals(material.getNativeSystem())) {
             return bundle.getKey("cpweb.materialtype.orgmat");
@@ -515,7 +515,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return material.getNativeType();
     }
 
-    private LangBundle getLangBundle(RequestCycle cycle) {
+    private static LangBundle getLangBundle(RequestCycle cycle) {
                 LangService lsClient = CacheClients.getClient(cycle, LangService.class);
 
                 Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
@@ -527,7 +527,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 return bundle;
             }
 
-    public ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
+    /**
+     * Creates a material list json response. This method is used by other classes.
+     *
+     * @param cycle
+     * @param strProjectId
+     * @param materials
+     * @return
+     */
+    public static ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
             final String strProjectId,
             final List<Material> materials) {
 
