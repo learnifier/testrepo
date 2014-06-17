@@ -73,6 +73,22 @@ public class CpMainModule extends AbstractWebAuthModule {
     }
 
     @WebAction
+    public RequestTarget onTrainerportal(RequestCycle cycle, String id) {
+        if (id == null) {
+            return NavigationUtil.toOrgSelector();
+        }
+
+        Map<String, Object> map = createMap();
+
+        MiniOrgInfo org = secureGetMiniOrg(cycle, id);
+
+        map.put("org", org);
+        map.put("welcomeMessage", WelcomeMessageHelper.getWelcomeMessage(cycle, org.getId()));
+
+        return new FreemarkerRequestTarget("/tpweb/trainer-portal.html", map);
+    }
+    
+    @WebAction
     @WebActionMountpoint("/search")
     public RequestTarget onSearch(RequestCycle cycle, String id) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, id);

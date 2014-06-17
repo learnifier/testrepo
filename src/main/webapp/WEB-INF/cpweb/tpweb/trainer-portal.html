@@ -1,0 +1,33 @@
+[#ftl strip_text="true" /]
+
+
+
+[#assign sidebarnav]
+[#include "sidebarnav.html"]
+[/#assign]
+
+[#assign upweb_earlycss]
+[@learnifierBootstrap /]
+[/#assign]
+
+
+[#assign topbar]
+[#include "topbar-home.html"]
+[/#assign]
+
+
+[#assign topbar]
+[#include "topbar-clientnav.html"]
+[/#assign]
+
+
+[#assign topbar]
+[#include "topbar-search.html"]
+[/#assign]
+
+
+
+[@dws.skin skin="TPAuth" sidebarnav=sidebarnav topbar=topbar]
+
+
+[/@dws.skin]

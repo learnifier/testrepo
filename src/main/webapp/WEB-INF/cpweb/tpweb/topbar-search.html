@@ -1,0 +1,9 @@
+[#ftl strip_text="true" /]
+
+[#import "topbar.html" as tp /]
+
+[#assign searchsegment]
+[#include "search.html" /]
+[/#assign]
+
+[@tp.topbar left=searchsegment center="foo" right="bar" /]
