@@ -8,23 +8,21 @@ import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
-import freemarker.template.utility.DeepUnwrap;
 import java.io.IOException;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
+import se.dabox.cocosite.branding.freemarker.AbstractOrgBrandingOutput;
 import se.dabox.cocosite.branding.freemarker.BrandingOutputUtil;
 import se.dabox.cocosite.branding.freemarker.RealmBrandingOutput;
-import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.branding.client.Branding;
-import se.dabox.service.orgdir.client.OrgUnitInfo;
 
 /**
  *
  * @author Jerker Klang <jerker.klang@dabox.se>
  */
-public class BrandingOutput extends AbstractBrandingOutput implements TemplateDirectiveModel {
+public class BrandingOutput extends AbstractOrgBrandingOutput implements TemplateDirectiveModel {
 
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
@@ -33,13 +31,11 @@ public class BrandingOutput extends AbstractBrandingOutput implements TemplateDi
         RealmBrandingOutput.addRealmBranding(env);
         RealmBrandingOutput.addFavIcons(env);
 
-        TemplateModel orgModel = env.getVariable("org");
+        Long orgId = getOrgId(env);
 
-        if (orgModel == null) {
+        if (orgId == null) {
             return;
         }
-
-        long orgId = getOrgId(DeepUnwrap.unwrap(orgModel));
         
         RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
 

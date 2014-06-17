@@ -146,8 +146,8 @@ public abstract class AbstractAuthModule extends AbstractModule {
      *
      * <p>This method always return an OrganizationUnitInfo or throws an exception</p>
      *
-     * @param cycle    The current request cycle
-     * @param strOrgId The organization unit id in a String representation.
+     * @param cycle The current request cycle
+     * @param orgId The organization unit id.
      *
      * @return An organization unit.
      */

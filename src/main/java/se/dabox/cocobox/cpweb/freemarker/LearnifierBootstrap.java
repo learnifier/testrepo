@@ -17,6 +17,7 @@ import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
+import se.dabox.cocosite.branding.freemarker.AbstractOrgBrandingOutput;
 import se.dabox.cocosite.branding.freemarker.BrandingOutputUtil;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.branding.client.BrandingClient;
@@ -28,7 +29,7 @@ import se.dabox.service.client.CacheClients;
  *
  * @author Jerker Klang <jerker.klang@dabox.se>
  */
-public class LearnifierBootstrap extends AbstractBrandingOutput implements TemplateDirectiveModel {
+public class LearnifierBootstrap extends AbstractOrgBrandingOutput implements TemplateDirectiveModel {
     private static final LearnifierBootstrap INSTANCE = new LearnifierBootstrap();
 
     public static final String NAME = "learnifierBootstrap";
@@ -50,13 +51,11 @@ public class LearnifierBootstrap extends AbstractBrandingOutput implements Templ
     }
 
     private Branding getBranding(Environment env) throws TemplateModelException {
-        TemplateModel orgModel = env.getVariable("org");
-
-        if (orgModel == null) {
+        Long orgId = getOrgId(env);
+        
+        if (orgId == null) {
             return getRealmBranding();
         }
-
-        long orgId = getOrgId(DeepUnwrap.unwrap(orgModel));
 
         RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
 
