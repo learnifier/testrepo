@@ -433,9 +433,7 @@ ${cpweb_head}
                 return false">Delete</button>
         [@security.boAdminBlock]
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
-                    return false"
-                    ${prj.invitePossible?string('','disabled="disabled"')}
-                    >Activate</button>
+                    return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
         [/@security.boAdminBlock]
         [@dwsrt.feature feature="autoical"][#if prj.autoIcal]Calendar invitations are ON. <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>[/#if][/@dwsrt.feature]
     </section>
