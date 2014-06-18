@@ -118,18 +118,18 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
                 notInvitedParticipants.push(item.displayName);
             } else {
                 
-                if (item.firstAccess === null) {
-                    // invited but not accessed
-                    invited = invited + 1;
-                    invitedParticipants.push(' ' + item.displayName);
-                } else if (item.activated && item.status !== 100) {
+                if (item.status === 100) {
+                    completed = completed + 1;
+                    completedParticipants.push(' ' + item.displayName);
+                } else if (item.activated && item.status > 0 && item.status !== 100) {
                     // accessed but not completed
                     inProgress = inProgress + 1;
                     inProgressParticipants.push(' ' + item.displayName);
-                } else if (item.status === 100) {
-                    completed = completed + 1;
-                    completedParticipants.push(' ' + item.displayName);
-                }
+                } else if (item.firstAccess === null) {
+                    // invited but not accessed
+                    invited = invited + 1;
+                    invitedParticipants.push(' ' + item.displayName);
+                } 
                 
                 if (item.bounced === true) {
                     bounced = bounced + 1;

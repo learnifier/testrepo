@@ -158,7 +158,7 @@ class ProjectRosterJsonGenerator {
     private int percentage(final OrgProject project, final Integer completed,
             final ProjectParticipation participation) {
 
-        return ProjectTypeUtil.call(project, new ProjectTypeCallable<Integer>() {
+        Integer ival = ProjectTypeUtil.call(project, new ProjectTypeCallable<Integer>() {
 
             @Override
             public Integer callMaterialListProject() {
@@ -190,6 +190,8 @@ class ProjectRosterJsonGenerator {
             }
 
         });
+
+        return ival == null ? 0 : ival;
     }
 
     public CourseDesignType getDesignType() {
