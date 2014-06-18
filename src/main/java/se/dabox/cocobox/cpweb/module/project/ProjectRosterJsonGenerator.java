@@ -27,12 +27,16 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
+import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductStatus;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeRunnable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
+import se.dabox.service.common.ccbc.project.material.FetchMode;
+import se.dabox.service.common.ccbc.project.material.GetParticipationCrispProductStatusRequest;
+import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CourseDesignType;
 import se.dabox.service.common.coursedesign.DatabankFacade;
@@ -45,6 +49,7 @@ import se.dabox.service.login.client.UserAccountTransformers;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.util.collections.CollectionsUtil;
+import se.dabox.util.collections.MapUtil;
 
 /**
  * Generates the project roster json.
@@ -60,6 +65,7 @@ class ProjectRosterJsonGenerator {
     private CourseDesignDefinition cdd;
     private DatabankFacade databankFacade;
     private List<ProjectParticipation> participations;
+    private Map<Long, Integer> sppProgressMap;
 
     ByteArrayOutputStream toJson(
             final RequestCycle cycle, List<ProjectParticipation> participations,
@@ -180,8 +186,9 @@ class ProjectRosterJsonGenerator {
 
             @Override
             public Integer callSingleProductProject() {
-                return PercentageCalculator.percentage(project.getProgressComponentCount(), completed);
+                return sppProgressMap.get(participation.getParticipationId());
             }
+
         });
     }
 
@@ -298,9 +305,50 @@ class ProjectRosterJsonGenerator {
 
             @Override
             public void runSingleProductProject() {
-                //Nothing to prepare
+                initProgressMap();
             }
 
         });
+    }
+
+    private void initProgressMap() {
+        if (sppProgressMap != null) {
+            return;
+        }
+
+        String productId = getSingleProjectProduct();
+
+        Map<Long,Integer> map = MapUtil.createHash(participations);
+
+        ProjectMaterialCoordinatorClient pmcClient
+                = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
+
+        for (ProjectParticipation projectParticipation : participations) {
+            //Do not try to fetch participations that are not activated
+            if (!projectParticipation.isActivated()) {
+                continue;
+            }
+
+            final long participationId = projectParticipation.getParticipationId();
+
+            GetParticipationCrispProductStatusRequest req
+                    = new GetParticipationCrispProductStatusRequest(participationId, productId);
+            req.setFetchMode(FetchMode.AUTO);
+
+            List<ParticipationCrispProductStatus> statuses
+                    = pmcClient.getParticipationCrispProductStatus(req);
+
+            ParticipationCrispProductStatus status = CollectionsUtil.singleItemOrNull(statuses);
+
+            if (status != null) {
+                map.put(participationId, status.getProgress());
+            }
+        }
+
+        sppProgressMap = map;
+    }
+
+    private String getSingleProjectProduct() {
+        return project.getProductId().getId();
     }
 }
