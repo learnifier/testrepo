@@ -68,13 +68,4 @@ public class LearnifierBootstrap extends AbstractOrgBrandingOutput implements Te
         return branding;
     }
 
-    private Branding getRealmBranding() {
-        RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
-        long brandingId = new GetRealmBrandingId(cycle).getBrandingId();
-
-        BrandingClient brandingClient = CacheClients.getClient(cycle, BrandingClient.class);
-
-        return brandingClient.getBranding(brandingId);
-    }
-
 }
