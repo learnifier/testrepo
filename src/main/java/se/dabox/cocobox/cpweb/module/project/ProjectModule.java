@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import se.dabox.cocosite.project.UpdateRecentProjectList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -133,6 +134,8 @@ public class ProjectModule extends AbstractProjectWebModule {
                 project = cocoboxCordinatorClient.getProject(project.getProjectId());
             }
         }
+
+        new UpdateRecentProjectList(cycle).addProject(project.getProjectId());
 
         return project;
     }
