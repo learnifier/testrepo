@@ -237,7 +237,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             pmcClient.addProjectProduct(project.getProjectId(), prodId);
         } catch (Exception ex) {
             LOGGER.warn("Unable to add product {} to project {}",
-                    project.getProjectId(), prodId, ex);
+                    prodId, project.getProjectId(), ex);
             if (failures == null) {
                 failures = new ArrayList<>();
             }
