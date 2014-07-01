@@ -3,7 +3,9 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
@@ -14,6 +16,8 @@ import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
+import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
+import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
@@ -50,6 +54,8 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             LoggerFactory.getLogger(CreateProjectSessionProcessor.class);
     private static final long serialVersionUID = 1L;
     private final long orgId;
+
+    private List<ProjectProductFailure> failures;
 
     public CreateProjectSessionProcessor(long orgId) {
         this.orgId = orgId;
@@ -157,7 +163,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         if (nps.getProds() != null) {
             for (String prodId : nps.getProds()) {
-                addProjectProduct(pmcClient, project, prodId);
+                addProjectProduct(cycle, pmcClient, project, prodId);
             }
         }
 
@@ -169,6 +175,10 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                 strNpsId));
 
         updateRecentTimezone(cycle, npr);
+
+        if (failures != null) {
+            cycle.getSession().setFlashAttribute(ProjectProductFailure.VIEWSESSION_NAME, failures);
+        }
 
         if (ptype == ProjectType.DESIGNED_PROJECT) {
             return new WebModuleRedirectRequestTarget(VerifyProjectDesignModule.class,
@@ -219,8 +229,8 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
     }
 
-    private void addProjectProduct(ProjectMaterialCoordinatorClient pmcClient, OrgProject project,
-            String prodId)
+    private void addProjectProduct(RequestCycle cycle, ProjectMaterialCoordinatorClient pmcClient,
+            OrgProject project, String prodId)
             throws DeniedException, ProjectProductException {
 
         try {
@@ -228,6 +238,12 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         } catch (Exception ex) {
             LOGGER.warn("Unable to add product {} to project {}",
                     project.getProjectId(), prodId, ex);
+            if (failures == null) {
+                failures = new ArrayList<>();
+            }
+            ProjectProductFailure failure
+                    = new ProjectProductFailureFactory(cycle).newFailure(prodId, ex);
+            failures.add(failure);
         }
     }
 

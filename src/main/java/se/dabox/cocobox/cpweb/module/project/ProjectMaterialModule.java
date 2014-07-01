@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
+import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -191,6 +194,11 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
             }
 
             formsess.addError(error);
+        } catch(CrispException cex) {
+            ProjectProductFailure failure = new ProjectProductFailureFactory(cycle).newFailure(
+                    productId, cex);
+            cycle.getSession().setFlashAttribute(ProjectProductFailure.VIEWSESSION_NAME,
+                    Collections.singletonList(failure));
         }
 
         return NavigationUtil.toProjectMaterialPage(cycle, prjId);
