@@ -42,7 +42,7 @@ public abstract class AbstractReport {
                 StandardLineEnhancersFactory.newInstance(cycle);
 
         try {
-            reportLines = new ArrayList<Map<String, Object>>();
+            reportLines = new ArrayList<>();
 
             beforeLoop();
 

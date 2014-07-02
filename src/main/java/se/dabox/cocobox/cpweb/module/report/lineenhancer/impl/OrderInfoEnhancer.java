@@ -32,6 +32,8 @@ public class OrderInfoEnhancer implements LineEnhancer {
         Object oOrderId = line.get(LineConstants.ORDER_ID);
 
         if (oOrderId == null) {
+            line.put(LineConstants.ORDER_NO, "(Manual correction)");
+            line.put(LineConstants.BASEPRODUCT, "");
             return;
         }
 
@@ -64,5 +66,7 @@ public class OrderInfoEnhancer implements LineEnhancer {
                 return;
             }
         }
+
+        line.put(LineConstants.BASEPRODUCT, "(Correction)");
     }
 }

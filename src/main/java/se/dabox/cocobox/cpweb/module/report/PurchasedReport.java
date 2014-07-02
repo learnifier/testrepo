@@ -25,7 +25,7 @@ public class PurchasedReport extends AbstractReport {
 
     @Override
     protected Iterable<Token> tokenFilter(Iterable<Token> tokens) {
-        return TokenFilter.tokenSource("kbcolp").filter(tokens);
+        return TokenFilter.tokenSourceAny("kbcolp", "manual").filter(tokens);
     }
 
     @Override
