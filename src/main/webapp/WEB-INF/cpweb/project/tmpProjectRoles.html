@@ -1,0 +1,38 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+${cpweb_head}
+
+<!--[if lt IE 9]>
+<style>
+
+.toggle-button input {
+    position: static; !important
+}
+
+</style>
+
+
+<![endif]-->
+[/#assign]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+[/#assign]
+
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="settings"][/@pInfo.projectInfo]
+
+[#list projectRoles?keys as projectRoleId]
+${projectRoleId}: ${projectRoles[projectRoleId]}
+    <a href="${helper.urlFor('project.ProjectJsonModule','assignRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Assign</a>
+    <a href="${helper.urlFor('project.ProjectJsonModule','deleteRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Revoke</a>
+    <br/>
+[/#list]
+
+[/@dws.skin]
+

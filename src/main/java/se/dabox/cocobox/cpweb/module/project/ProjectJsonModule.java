@@ -21,6 +21,7 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.apache.commons.collections.map.Flat3Map;
 import org.codehaus.jackson.JsonGenerator;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectTask;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.ccbc.project.role.ProjectUserRoleModification;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -536,6 +538,48 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         response.add(timezoneSection("All timezones", timeZones.getOtherList()));
 
         return jsonTarget(response);
+    }
+
+    @WebAction
+    public RequestTarget onAssignRole(RequestCycle cycle, String strProjectId, String strUserId,
+            String roleId) {
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj);
+
+        long caller = LoginUserAccountHelper.getCurrentCaller();
+        long userId = caller;
+
+        ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
+                roleId);
+
+        boolean response = ccbc.addProjectUserRole(mod);
+
+        return new StringRequestTarget("Role assigned: "+response+"\nRemember to logout and login again.");
+    }
+
+    @WebAction
+    public RequestTarget onDeleteRole(RequestCycle cycle, String strProjectId, String strUserId,
+            String roleId) {
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj);
+
+        long caller = LoginUserAccountHelper.getCurrentCaller();
+        long userId = caller;
+
+        ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
+                roleId);
+
+        boolean response = ccbc.deleteProjectUserRole(mod);
+
+        return new StringRequestTarget("Role revoked: "+response+"\nRemember to logout and login again.");
     }
 
     private byte[] toTaskJson(
