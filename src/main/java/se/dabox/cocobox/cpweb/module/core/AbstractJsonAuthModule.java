@@ -20,8 +20,6 @@ import org.codehaus.jackson.PrettyPrinter;
 import org.codehaus.jackson.map.ObjectMapper;
 import se.dabox.cocobox.cpweb.JsonEncodingException;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
-import se.dabox.cocosite.branding.GetCachedBrandingCommand;
-import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserRoleCheckAfterLoginListener;
 import se.dabox.cocosite.user.MiniUserAccountHelperContext;
