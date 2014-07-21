@@ -16,9 +16,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocosite.branding.freemarker.BrandingOutputUtil;
 import se.dabox.cocosite.branding.freemarker.RealmBrandingOutput;
-import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.branding.client.Branding;
-import se.dabox.service.orgdir.client.OrgUnitInfo;
 
 /**
  *

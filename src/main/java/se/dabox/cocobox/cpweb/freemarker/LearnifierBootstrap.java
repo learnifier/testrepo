@@ -11,6 +11,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
@@ -18,6 +19,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.branding.freemarker.BrandingOutputUtil;
+import se.dabox.cocosite.user.MiniUserAccountHelperContext;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.branding.client.BrandingClient;
 import se.dabox.service.client.CacheClients;
@@ -45,6 +47,8 @@ public class LearnifierBootstrap extends AbstractBrandingOutput implements Templ
 
         Branding branding = getBranding(env);
 
+        setLetterBubbleColor(branding);
+
         RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
         BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, CSS_NAME);
     }
@@ -65,7 +69,7 @@ public class LearnifierBootstrap extends AbstractBrandingOutput implements Templ
         if (branding != null && !branding.getGeneratedData().containsKey(CSS_NAME)) {
             return getRealmBranding();
         }
-
+        
         return branding;
     }
 
@@ -76,6 +80,13 @@ public class LearnifierBootstrap extends AbstractBrandingOutput implements Templ
         BrandingClient brandingClient = CacheClients.getClient(cycle, BrandingClient.class);
 
         return brandingClient.getBranding(brandingId);
+    }
+
+    private void setLetterBubbleColor(Branding branding) {
+        Color color = branding.getMetadataColor("cpPrimaryColor");
+        if (color != null) {
+            MiniUserAccountHelperContext.getCycleContext().setLetterBubbleBgColor(color);
+        }
     }
 
 }
