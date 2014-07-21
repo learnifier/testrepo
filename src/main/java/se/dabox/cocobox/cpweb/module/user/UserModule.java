@@ -108,9 +108,11 @@ public class UserModule extends AbstractWebAuthModule {
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String role = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 
+        long orgId = Long.parseLong(strOrgId);
+
         UserAccount user = getUserAccountService(cycle).getUserAccount(userId);
 
-        Set<String> roles = UserAccountRoleCheck.getCpRoles(user, userId, true);
+        Set<String> roles = UserAccountRoleCheck.getCpRoles(user, orgId, true);
         final Map<String, String> cpRoles = new CocoboxRoleUtil().getCpRoles(cycle);        
 
         if (!cpRoles.containsKey(role)) {
