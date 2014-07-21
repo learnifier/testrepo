@@ -10,18 +10,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
+import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.client.CacheClients;
@@ -35,6 +42,8 @@ import se.dabox.service.login.client.UserAccountService;
  */
 @WebModuleMountpoint("/user")
 public class UserModule extends AbstractWebAuthModule {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(UserModule.class);
 
     public static final String OVERVIEW_ACTION = "overview";
 
@@ -45,6 +54,9 @@ public class UserModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
+
+        checkOrgUserAccess(cycle, org, user);
+
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
@@ -90,6 +102,34 @@ public class UserModule extends AbstractWebAuthModule {
         return new FreemarkerRequestTarget("/user/userRoles.html", map);
     }
 
+    @WebAction
+    public RequestTarget onAddRole(RequestCycle cycle, String strOrgId) {
+        checkOrgPermission(cycle, strOrgId);
+        long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
+        String role = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
+
+        UserAccount user = getUserAccountService(cycle).getUserAccount(userId);
+
+        Set<String> roles = UserAccountRoleCheck.getCpRoles(user, userId, true);
+        final Map<String, String> cpRoles = new CocoboxRoleUtil().getCpRoles(cycle);        
+
+        if (!cpRoles.containsKey(role)) {
+            throw new IllegalStateException("Non existing client role: "+role);
+        }
+
+        roles.add(role);
+
+        String roleString = StringUtils.join(roles, ',');
+
+        CharSequence valueName = OrgRoleName.forOrg(userId);
+
+        getUserAccountService(cycle).updateUserProfileValue(userId,
+                CocoSiteConstants.UA_PROFILE, valueName, roleString);
+
+        return new WebModuleRedirectRequestTarget(UserModule.class, "roles", strOrgId,
+                Long.toString(userId));
+    }
+
     private UserAccountService getUserAccountService(RequestCycle cycle) {
         return CacheClients.getClient(cycle, UserAccountService.class);
     }
@@ -114,6 +154,10 @@ public class UserModule extends AbstractWebAuthModule {
         });
         
         return infoList;
+    }
+
+    private void checkOrgUserAccess(RequestCycle cycle, MiniOrgInfo org, UserAccount user) {
+
     }
 
     public static class RoleInfo {
