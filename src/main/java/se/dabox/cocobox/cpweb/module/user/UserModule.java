@@ -63,22 +63,30 @@ public class UserModule extends AbstractWebAuthModule {
     }
 
     @WebAction
-    public RequestTarget onRoles(RequestCycle cycle, String strUserId) {
+    public RequestTarget onRoles(RequestCycle cycle, String strOrgId, String strUserId) {
         UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
+
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
         List<RoleInfo> roles = getRoles(cycle);
 
         Map<String, Object> map = createMap();
+        CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
+        String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
 
         map.put("user", user);
+        map.put("role", userRole);
         map.put("locale", userLocale);
         map.put("roles", roles);
 
+        
         map.put("userimg", InfoCacheHelper.getInstance(cycle).getMiniUserInfo(user.getUserId()).
                 getThumbnail());
 
+        map.put("org", org);
+        
         return new FreemarkerRequestTarget("/user/userRoles.html", map);
     }
 

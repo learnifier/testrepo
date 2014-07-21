@@ -4,41 +4,51 @@
 [#import "userOverviewMenu.html" as userMenu]
 
 
-
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
-</script>
-
-<script>
-    $(document).ready(function() {
-        require(['dabox-datatables'], function() {
-        var oTable = $('#listparticipations').dataTable({
+$(document).ready(function() {
+        var oTable = $('#userroleslist').dataTable({
             "sDom": 'rt<"dataTables_footer clearfix"i>',
-            "bPaginate": false,
-            "aaSorting": [[1,'asc']],
-            "aoColumnDefs": [ 
+            "bPaginate": false,            
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [
                 {
-                    "mData": "projectname",
+                    "aTargets": [ 0 ],
+                    "mData": "name",
                     "fnRender": function ( oObj ) {
-                        return  '<a href="'+ oObj.aData.projectlink + '" style="display:block;">' + oObj.aData.projectname +'</a> ';
-                    },
-                    "aTargets": [ 0 ]
+                        return  '<span title="' +oObj.aData.name + '">' + cocobox.trunc(oObj.aData.name, 20) + '</span>';
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mData": null,
+                    "sWidth": "10%",
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        [#if security.hasPermission("BO_EDIT_USER")]
+                          return '<button onclick="deleteMember(\'' +  oObj.aData.uuid +'\')">Delete</button>';
+                        [#else]
+                          return '';
+                        [/#if]
+                    }
                 }
+
+
             ],
                         
-            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[user.userId])}",
+            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listBoRoles',[user.userId?c])}",
+             
             "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
-                "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                "sEmptyTable": "<span class='emptytable'>${user.displayName?xhtml} has no roles assigned </span>",
+                "sLoadingRecords": "<p>Loading roles...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
-        });
-                
+ 
     } );
-
+    
 </script>
+
 [/#assign]
 
 [#assign head]
@@ -73,9 +83,8 @@ ${cpweb_head}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot]
 
-<section id="useroverview">
     <section id="userinfo">
         <div id="itemactions">
             [#if role == "clientadmin"]
@@ -104,14 +113,23 @@ ${cpweb_head}
         </div>
     </section>
 
-    [@userMenu.userOverviewMenu selected="participations"][/@userMenu.userOverviewMenu]
+    [@userMenu.userOverviewMenu selected="roles"][/@userMenu.userOverviewMenu]
     
-    <h2>Participations</h2>
+    <h2>Roles</h2>
+    
+    
+    [#list roles as role]
+    
+    ${role}
+    
+    [/#list]
+    
     <section class="list">
-        <table class="list" id="listparticipations">
+        <table class="list" id="userroleslist">
             <thead>
                 <tr>
-                    <th>Project Name</th>
+                    <th>Role</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -119,7 +137,7 @@ ${cpweb_head}
         </table>
     </section>
     
-</section>
+    
 
 [/@dws.skin]
 
