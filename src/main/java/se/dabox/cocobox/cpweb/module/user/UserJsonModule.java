@@ -5,7 +5,10 @@ package se.dabox.cocobox.cpweb.module.user;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -14,8 +17,14 @@ import org.codehaus.jackson.JsonGenerator;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.CpJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocosite.security.UserAccountRoleCheck;
+import se.dabox.cocosite.security.role.CocoboxRoleUtil;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.io.RuntimeIOException;
+import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.webutils.json.DataTablesJson;
 
 /**
  *
@@ -32,6 +41,32 @@ public class UserJsonModule extends AbstractJsonAuthModule {
                 getCocoboxCordinatorClient(cycle).listProjectParticipationsForUserId(userId);
 
         return jsonTarget(toJsonResponse(cycle, participations));
+    }
+
+    @WebAction
+    public RequestTarget onListRoles(final RequestCycle cycle, String strOrgId, String strUserId) {
+        long userId = Long.valueOf(strUserId);
+        long orgId = Long.valueOf(strOrgId);
+        checkOrgPermission(cycle, orgId);
+
+        UserAccount account = getUserAccount(cycle, userId);
+
+        Set<String> roles = UserAccountRoleCheck.getCpRoles(account, orgId);
+        final Map<String, String> cpRoles = new CocoboxRoleUtil().getCpRoles(cycle);
+        
+        for (Iterator<String> it = roles.iterator(); it.hasNext();) {
+            if (!cpRoles.containsKey(it.next())) {
+                it.remove();
+            }
+        }
+
+        return jsonTarget(new DataTablesJson<String>() {
+            @Override
+            protected void encodeItem(String uuid) throws IOException {
+                generator.writeStringField("uuid", uuid);
+                generator.writeStringField("name", cpRoles.get(uuid));
+            }
+        }.encodeToStream(roles));
     }
 
     private ByteArrayOutputStream toJsonResponse(
@@ -70,6 +105,12 @@ public class UserJsonModule extends AbstractJsonAuthModule {
         } catch (IOException ex) {
             throw new RuntimeIOException("Failed to encode JSON", ex);
         }
+    }
+
+    private UserAccount getUserAccount(RequestCycle cycle, long userId) {
+        UserAccountService uaClient = CacheClients.getClient(cycle, UserAccountService.class);
+
+        return uaClient.getUserAccount(userId);
     }
 
 }
