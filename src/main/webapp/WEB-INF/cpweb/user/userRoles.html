@@ -8,6 +8,9 @@
 ${cpweb_foot}
 <script>
 $(document).ready(function() {
+    require(['dataTables/jquery.dataTables.min'], function() {
+            
+       
         var oTable = $('#userroleslist').dataTable({
             "sDom": 'rt<"dataTables_footer clearfix"i>',
             "bPaginate": false,            
@@ -37,15 +40,16 @@ $(document).ready(function() {
 
             ],
                         
-            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listBoRoles',[user.userId?c])}",
+            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listRoles',[org.id, user.userId?c])}",
              
             "oLanguage": {
                 "sEmptyTable": "<span class='emptytable'>${user.displayName?xhtml} has no roles assigned </span>",
                 "sLoadingRecords": "<p>Loading roles...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
+    });
  
-    } );
+});
     
 </script>
 
@@ -53,32 +57,7 @@ $(document).ready(function() {
 
 [#assign head]
 ${cpweb_head}
-<style>
-    #logoform {
-        display: block;
-        margin: 20px auto;
-        padding: 15px; 
-    }
-    .progress {
-        position:relative;
-        width:400px;
-        border: 1px solid #ddd;
-        padding: 1px;
-        border-radius: 3px;
-        display: none;
-    }
-    .bar {
-        background-color: #B4F5B4;
-        width:0%; 
-        height:20px;
-        border-radius: 3px; 
-    }
-    .percent {
-        position:absolute;
-        display:inline-block;
-        top:3px;
-        left:48%; 
-    }
+
 </style>
 
 [/#assign]
@@ -117,12 +96,29 @@ ${cpweb_head}
     
     <h2>Roles</h2>
     
-    
-    [#list roles as role]
-    
-    ${role}
-    
-    [/#list]
+    <section id="addrole">
+        <div id="manual">
+            
+            <form action="${helper.urlFor('user.UserModule','addRole', [org.id])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post">
+                <section class="field">
+                    <div id="selector_wrapper">
+                        <label for="roles">Roles</label>
+                        <select name="role" class="input_full">
+                            [#list roles?sort_by('name') as role]
+                            <option value="${role.uuid}">${role.name?xhtml}</option>
+                            [/#list]
+                        </select>
+                    </div>
+                </section>
+                <section class="action">
+                    <input type="hidden" name="userId" value="${user.userId?c}" />
+                    <input type="submit" value="[@dws.txt key='form.action.addrole' /]"  tabindex="4" class="add" />
+                    <span id="addsuccess">The role has been assigned to ${user.displayName?xhtml}</span>
+                </section>  
+            </form>
+        </div>
+    </section>
+
     
     <section class="list">
         <table class="list" id="userroleslist">
