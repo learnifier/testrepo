@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.core;
 
 import java.util.Locale;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
@@ -14,8 +15,11 @@ import se.dabox.cocobox.cpweb.security.UserOrgSecurityCheck;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.Permission;
+import se.dabox.cocosite.security.UserPermissionFetcher;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -54,6 +58,27 @@ public abstract class AbstractAuthModule extends AbstractModule {
     protected void checkOrgPermission(RequestCycle cycle, long orgId) {
         checkOrgPermission(cycle, Long.toString(orgId));
     }
+
+    protected void checkOrgPermission(RequestCycle cycle, String strOrgId, Permission permission) {
+        checkOrgPermission(cycle, Long.parseLong(strOrgId), permission);
+    }
+
+    protected void checkOrgPermission(RequestCycle cycle, long orgId, Permission permission) {
+        checkOrgPermission(cycle, orgId);
+
+        UserAccount acc = LoginUserAccountHelper.getUserAccount(cycle);
+        Set<Permission> roles = new UserPermissionFetcher(cycle).getUserPermission(acc, orgId);
+
+        if (!roles.contains(permission)) {
+            String msg = String.format("Access denied to %s ou=%d (uid=%d). Permission %s required.",
+                    cycle.getRequest().getRequestUrl(),
+                    orgId,
+                    acc.getUserId(),
+                    permission);
+            handleAccessDenied(cycle, msg);
+        }
+    }
+
 
     protected long getCurrentUser(RequestCycle cycle) {
         return LoginUserAccountHelper.getUserId(cycle);

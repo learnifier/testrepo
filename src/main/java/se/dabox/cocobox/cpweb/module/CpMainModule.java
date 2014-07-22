@@ -26,6 +26,7 @@ import se.dabox.cocobox.cpweb.formdata.material.AddLinkCreditsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.deeplink.ProductMaterialJsonModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.context.DwsRealmHelper;
@@ -245,6 +246,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onListEmails(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_LIST_EMAILS);
 
         Map<String, Object> map = createMap();
 
@@ -256,6 +258,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onListDesigns(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_LIST_COURSEDESIGNS);
 
         Map<String, Object> map = createMap();
 
