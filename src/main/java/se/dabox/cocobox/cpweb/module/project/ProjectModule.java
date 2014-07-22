@@ -360,6 +360,23 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     @WebAction
+    public RequestTarget onRoles(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+
+        Map<String, Object> map = createMap();
+
+        addCommonMapValues(map, project, cycle);
+
+        map.put("projectRoles", new CocoboxRoleUtil().getProjectRoles(cycle));
+        map.put("userAccount", LoginUserAccountHelper.getUserAccount(cycle));
+
+        return new FreemarkerRequestTarget("/project/projectRoles.html", map);
+    }
+
+    @WebAction
     public RequestTarget onTmpRoles(RequestCycle cycle, String projectId) {
         OrgProject project =
                 getProject(cycle, projectId);
