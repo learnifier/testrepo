@@ -48,8 +48,6 @@ public class CustomerPortalApplication extends DruwaApplication {
         DruwaFreemarker.getDruwaFreemarker(this).addModifyViewDataHandler(new CpwebModifyViewHandler());
         DruwaFreemarker.getDruwaFreemarker(this).getConfig().
                 setSharedVariable("learnifierBootstrap", LearnifierBootstrap.getInstance());
-
-        MiniUserAccountHelper.setDefaultLetterBubble(true);
         
         getWebModuleRegistry().
                 addSearchPrefix("se.dabox.cocobox.cpweb.module");
