@@ -21,6 +21,7 @@ import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.module.WebModuleInfo;
+import net.unixdeveloper.druwa.request.StringRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.model.project.task.CreateMailTaskSendMailProcessor;
 import se.dabox.cocobox.cpweb.model.project.task.EditMailTaskSendMailProcessor;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.UrlRequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.project.roster.ActivateParticipant;
@@ -43,6 +45,7 @@ import se.dabox.cocobox.cpweb.module.project.roster.ProjectParticipantSendMail;
 import se.dabox.cocobox.cpweb.module.project.roster.RosterDeleteParticipant;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
@@ -54,6 +57,7 @@ import se.dabox.service.common.ccbc.OverlimitException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectTask;
+import se.dabox.service.common.ccbc.project.role.ProjectUserRoleModification;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.tx.OperationFailureException;
@@ -359,6 +363,57 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         return jsResponse.getSuccessfulRedirect(url);
     }
 
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onAssignRole(RequestCycle cycle, String strProjectId) {
+
+        long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
+        String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj);
+
+        long caller = LoginUserAccountHelper.getCurrentCaller();
+
+        ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
+                roleId);
+
+        boolean response = ccbc.addProjectUserRole(mod);
+
+        LOGGER.info("Adding role {} in project {} for {} (caller {}): {}",
+                roleId, strProjectId, userId, caller, response);
+
+        return toProjectRolePage(cycle, strProjectId);
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onDeleteRole(RequestCycle cycle, String strProjectId) {
+
+        long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
+        String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj);
+
+        long caller = LoginUserAccountHelper.getCurrentCaller();        
+
+        ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
+                roleId);
+
+        boolean response = ccbc.deleteProjectUserRole(mod);
+
+        LOGGER.info("Revoking role {} in project {} for {} (caller {}): {}",
+                roleId, strProjectId, userId, caller, response);
+
+        return toProjectRolePage(cycle, strProjectId);
+    }
+
     private WebModuleRedirectRequestTarget toRoster(String projectId) {
         return new WebModuleRedirectRequestTarget(ProjectModule.class, "roster",
                 projectId);
@@ -498,5 +553,9 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         }
 
         return null;
+    }
+
+    private RequestTarget toProjectRolePage(RequestCycle cycle, String strProjectId) {
+        return new WebModuleRedirectRequestTarget(ProjectModule.class, "roles", strProjectId);
     }
 }
