@@ -20,7 +20,7 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
 <section id="projectinfo">
     <div id="itemactions">
 
-        [#if !isIdproject() ]
+        [#if portalSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
         <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
             <button class="delete"><span>Delete</span></button>
         </form>
