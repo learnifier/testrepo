@@ -33,21 +33,18 @@ ${cpweb_foot}
             minimumInputLength: 1,
             ajax: { 
                 url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
-                dataType: 'jsonp',
+                dataType: 'json',
                 data: function (term, page) {
                     return {
                         term: term, // search term
                         page_limit: 10
                     };
                 },
-                results: function (data, page) { // parse the results into the format expected by Select2.
-                    // since we are using custom formatting functions we do not need to alter remote JSON data
+                results: function (data, page) { 
+                    log('men men ' , data);
                     return {results: data.results};
                 }
-            },
-            formatResult: function(data) {
-                return data;
-            } 
+            }
         }); 
     });
     
