@@ -27,6 +27,7 @@ ${cpweb_foot}
     
     
     require(['select2.min'], function() {
+        
        $("#userSelect").select2({
             placeholder: "Search for a user",
             minimumInputLength: 1,
@@ -35,7 +36,7 @@ ${cpweb_foot}
                 dataType: 'jsonp',
                 data: function (term, page) {
                     return {
-                        q: term, // search term
+                        term: term, // search term
                         page_limit: 10
                     };
                 },
@@ -44,9 +45,9 @@ ${cpweb_foot}
                     return {results: data.results};
                 }
             },
-            initSelection: function(element, callback) {
-
-            }
+            formatResult: function(data) {
+                return data;
+            } 
         }); 
     });
     
@@ -61,8 +62,8 @@ ${cpweb_foot}
 
 [#list projectRoles?keys as projectRoleId]
 ${projectRoleId}: ${projectRoles[projectRoleId]}
-    <a href="${helper.urlFor('project.ProjectJsonModule','assignRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Assign</a>
-    <a href="${helper.urlFor('project.ProjectJsonModule','deleteRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Revoke</a>
+    [#-- <a href="${helper.urlFor('project.ProjectJsonModule','assignRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Assign</a>
+    <a href="${helper.urlFor('project.ProjectJsonModule','deleteRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Revoke</a> --]
     <br/>
 [/#list]
 
