@@ -41,9 +41,15 @@ ${cpweb_foot}
                     };
                 },
                 results: function (data, page) { 
-                    log('men men ' , data);
                     return {results: data.results};
                 }
+            },
+            initSelection: function(element, callback) {
+                log(element);
+                log(callback);
+            },
+            formatSelection: function(data) {
+                return 'selected user: ' + data.text;
             }
         }); 
     });
