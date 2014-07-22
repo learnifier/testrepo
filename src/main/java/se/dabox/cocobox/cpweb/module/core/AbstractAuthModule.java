@@ -66,17 +66,31 @@ public abstract class AbstractAuthModule extends AbstractModule {
     protected void checkOrgPermission(RequestCycle cycle, long orgId, Permission permission) {
         checkOrgPermission(cycle, orgId);
 
-        UserAccount acc = LoginUserAccountHelper.getUserAccount(cycle);
-        Set<Permission> roles = new UserPermissionFetcher(cycle).getUserPermission(acc, orgId);
+        boolean authorized = hasOrgPermission(cycle, orgId, permission);
 
-        if (!roles.contains(permission)) {
+        if (!authorized) {
             String msg = String.format("Access denied to %s ou=%d (uid=%d). Permission %s required.",
                     cycle.getRequest().getRequestUrl(),
                     orgId,
-                    acc.getUserId(),
+                    LoginUserAccountHelper.getUserId(cycle),
                     permission);
             handleAccessDenied(cycle, msg);
         }
+    }
+
+    /**
+     * Checks if the user has a permission in an org unit.
+     *
+     * @param cycle
+     * @param orgId
+     * @param permission
+     * @return
+     */
+    protected boolean hasOrgPermission(RequestCycle cycle, long orgId, Permission permission) {
+        UserAccount acc = LoginUserAccountHelper.getUserAccount(cycle);
+        Set<Permission> roles = new UserPermissionFetcher(cycle).getUserPermission(acc, orgId);
+
+        return !roles.contains(permission);
     }
 
 

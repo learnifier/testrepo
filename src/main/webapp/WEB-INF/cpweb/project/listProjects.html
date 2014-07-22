@@ -23,7 +23,9 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth2" head=cpweb_head foot=foot orgName=orgName]
 
+[@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
 <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-add navBackgroundColor">Add Project</a>
+[/@]
 <h1>Projects</h1>
 <section class="list">
     <table class="list" id="listprojects">

@@ -35,6 +35,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.event.UserAccountChangedListenerUtil;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.security.role.RoleUuidNamePair;
@@ -67,6 +68,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onCreate(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_USER);
 
         String formLink = cycle.urlFor(CreateUserModule.class, ACTION_DO_CREATE, strOrgId);
         DruwaFormValidationSession<CreateUser> formsess =
@@ -78,6 +80,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onEdit(RequestCycle cycle, String strOrgId, String strUserId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_USER);
 
         UserAccount userAccount =
                 getUserAccountService(cycle).getUserAccount(Long.valueOf(
@@ -116,6 +119,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     public RequestTarget onDoSave(final RequestCycle cycle, String strOrgId, String strUserId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         final UserAccountService uaService = getUserAccountService(cycle);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_USER);
 
         UserAccount userAccount =
                 uaService.getUserAccount(Long.valueOf(
@@ -213,6 +217,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onDoCreate(final RequestCycle cycle, String strOrgId) {
         final MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_USER);
 
         DruwaFormValidationSession<CreateUser> formsess =
                 getValidationSession(CreateUser.class, cycle);

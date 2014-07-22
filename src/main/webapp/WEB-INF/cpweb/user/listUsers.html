@@ -63,7 +63,9 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth2" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
+[@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
 <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-add navBackgroundColor">Add User</a>
+[/@]
 <h1>Users</h1>
 <section class="list">
     <table class="list" id="listusers">
