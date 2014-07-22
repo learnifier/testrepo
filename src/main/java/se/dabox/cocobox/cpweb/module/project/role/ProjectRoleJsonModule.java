@@ -116,7 +116,7 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
 
         List<UserAccount> uas = getUserAccountService(ctx).
                 searchUserAccounts(account.getUserId(), ctx.term,
-                null, null, CocoboxSecurityConstants.BOADMIN_ROLES, 0,
+                null, null, CocoboxSecurityConstants.BOADMIN_LOGIN_ROLE, 0,
                 MAX_RESULT);
 
         return uas;
