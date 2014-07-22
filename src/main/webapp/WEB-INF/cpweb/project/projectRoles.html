@@ -15,17 +15,6 @@ ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
     
-    
-    $(document).ready(function() {
-       $.ajax({
-           url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
-           success: function(data) {
-               log(data);
-           }
-       });
-    });
-    
-    
     require(['select2.min'], function() {
         
        $("#userSelect").select2({
@@ -44,15 +33,40 @@ ${cpweb_foot}
                     return {results: data.results};
                 }
             },
-            initSelection: function(element, callback) {
-                log(element);
-                log(callback);
+            formatResult: function(data) {
+                return '<span>' + data.text + '</span><br/><span>' + data.email + ' </span>' ;
             },
             formatSelection: function(data) {
-                return 'selected user: ' + data.text;
+                
+                $('#userSelect').attr('value', data.id);
+                
+                return '<p value="' + data.id + '"> selected user: ' + data.text + '</p>';
             }
         }); 
     });
+    
+    
+    function assign() {
+        var id = $('#userSelect').val();
+        log(id);
+        
+        var role = $('#userRole').val();
+        log(role);
+        
+        $.ajax({
+            url: "${helper.urlFor('project.ProjectModificationModule','assignRole',[prj.projectId])}",
+            method: "POST",
+            data: {
+                userId: id,
+                role: role
+            },
+            success: function(data) {
+                log(data);
+            }
+        });
+        
+    }
+    
     
 </script>
 [/#assign]
@@ -63,15 +77,18 @@ ${cpweb_foot}
 
 <h2>[@dws.txt key="cpweb.project.roles.title" /]</h2>
 
-[#list projectRoles?keys as projectRoleId]
-${projectRoleId}: ${projectRoles[projectRoleId]}
-    [#-- <a href="${helper.urlFor('project.ProjectJsonModule','assignRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Assign</a>
-    <a href="${helper.urlFor('project.ProjectJsonModule','deleteRole',[prj.projectId, security.userAccount.userId, projectRoleId])}">Revoke</a> --]
-    <br/>
-[/#list]
+<form method="POST" action="${helper.urlFor('project.ProjectModificationModule','assignRole',[prj.projectId])}">
+    <input name="userId" type="number" id="userSelect" class="bigdrop">
 
-<div id="userSelect" class="bigdrop"></div>
-
+    
+    [#list projectRoles?values as pr]
+    <label>${pr}
+    <input type="radio" name="role" value="${pr}">
+    </label>
+    [/#list]
+    
+    <button type="submit">Assign</button>    
+</form>
 
 [/@dws.skin]
 
