@@ -3,12 +3,9 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -61,9 +58,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     public static final String ACTION_VIEW_CREATE = "create";
     public static final String ACTION_VIEW_EDIT = "edit";
     public static final String ACTION_DO_CREATE = "doCreate";
-    public static final String ACTION_DO_SAVE = "doSave";
-    private static final Set<String> VALID_ROLES =
-            new HashSet<>(Arrays.asList(CpAdminRoles.CLIENT_ADMIN, CpAdminRoles.NONE));
+    public static final String ACTION_DO_SAVE = "doSave";    
 
     @WebAction
     public RequestTarget onCreate(RequestCycle cycle, String strOrgId) {

@@ -90,7 +90,7 @@ public abstract class AbstractAuthModule extends AbstractModule {
         UserAccount acc = LoginUserAccountHelper.getUserAccount(cycle);
         Set<Permission> roles = new UserPermissionFetcher(cycle).getUserPermission(acc, orgId);
 
-        return !roles.contains(permission);
+        return roles.contains(permission);
     }
 
 
