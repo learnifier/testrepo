@@ -4,7 +4,9 @@
 
 <nav id="ctxnav">
     <ul>
+        [@portalSecurity.permissionBlock permission="CP_LIST_ORGMATS"]
         <li id="sm_materials" [#if selected == 'materials']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule', 'listMaterials',[org.id])}"><span>Materials</span></a></li>
+        [/@]
         [@portalSecurity.permissionBlock permission="CP_LIST_EMAILS"]
         <li id="sm_emails" [#if selected == 'emails']class="activeItem"[/#if]><a href="${helper.urlFor('CpMainModule','listEmails',[org.id])}"><span>Email Templates</span></a></li>
         [/@]

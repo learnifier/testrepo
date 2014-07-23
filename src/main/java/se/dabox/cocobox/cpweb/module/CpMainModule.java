@@ -138,6 +138,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onListMaterials(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_LIST_ORGMATS);
 
         Map<String, Object> map = createMap();
 
@@ -153,6 +154,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onGridMaterials(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_LIST_ORGMATS);
 
         Map<String, Object> map = createMap();
 

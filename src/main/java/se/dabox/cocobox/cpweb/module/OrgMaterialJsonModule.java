@@ -32,6 +32,7 @@ import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
@@ -77,6 +78,7 @@ import se.dabox.util.converter.ConversionContext;
  */
 @WebModuleMountpoint("/orgmats.json")
 public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
+    private static final AccountBalance FAKE_BALANCE = new AccountBalance(-1, 0, 0, 0);
 
     /**
      * Produces a JSON response for the table component containing orgMaterial information.
@@ -458,6 +460,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 generator.writeNumberField("linkCredits", calculateLinkCredits(links));
 
                 AccountBalance balance = balances.get(product.getId().getId());
+                if (balance == null) {
+                    balance = FAKE_BALANCE;
+                }
                 generator.writeNumberField("availCredits", balance.getAvailable());
                 generator.writeNumberField("expiredCredits", balance.getExpired());
                 generator.writeNumberField("usedCredits", balance.getUsed());
@@ -734,7 +739,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         Set<Product> deeplinkSet = CollectionsUtil.subset(products, DeeplinkProductFilter.
                 getInstance());
 
-        Map<String, AccountBalance> balances = getAccountBalanceMap(cycle, orgId, orgProds);
+        Map<String, AccountBalance> balances = Collections.emptyMap();
+        
+        if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_ACCOUNTBALANCE)) {
+            balances = getAccountBalanceMap(cycle, orgId, orgProds);
+        }
         Map<String, Long> orgProdIdMap = getOrgProdIdMap(orgProds);
 
         ByteArrayOutputStream baos = toJsonObjectProducts(cycle, strOrgId, products, balances,

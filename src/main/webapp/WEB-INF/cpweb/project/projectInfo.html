@@ -100,7 +100,9 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
             [/#if]
 
             [#if !isIdproject(prj)]
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_TASK"]
             <li class="[#if selected == 'schedule']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','task',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.schedule' /]</span></a></li>
+            [/@]
             [/#if]
             [#if project.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
             <li class="[#if selected == 'discussion']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','discussion',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.discussion' /]</span></a></li>
@@ -112,9 +114,13 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
             
             <li class="[#if selected == 'reports']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','reports',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.reports' /]</span></a></li>
             [#if project.type.ptype == 1 || project.type.ptype == 2]
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
             <li class="[#if selected == 'materials']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
+            [/@]
             [/#if]
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
             <li class="[#if selected == 'registration']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
+            [/@]
             <li class="[#if selected == 'settings']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             <li class="[#if selected == 'projectadmin']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
         </ul>

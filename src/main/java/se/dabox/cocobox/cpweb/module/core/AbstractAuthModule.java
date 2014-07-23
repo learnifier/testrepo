@@ -11,6 +11,7 @@ import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocobox.cpweb.security.UserOrgSecurityCheck;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
@@ -18,6 +19,8 @@ import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.Permission;
 import se.dabox.cocosite.security.UserPermissionFetcher;
 import se.dabox.cocosite.security.project.ProjectPermissionCheck;
+import se.dabox.cocosite.user.MiniUserAccountHelperContext;
+import se.dabox.service.branding.client.Branding;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
@@ -55,6 +58,8 @@ public abstract class AbstractAuthModule extends AbstractModule {
                     userId);
             handleAccessDenied(cycle, msg);
         }
+
+        activateOrgBranding(cycle, Long.parseLong(strOrgId));
     }
 
     protected void checkOrgPermission(RequestCycle cycle, long orgId) {
@@ -77,6 +82,20 @@ public abstract class AbstractAuthModule extends AbstractModule {
                     LoginUserAccountHelper.getUserId(cycle),
                     permission);
             handleAccessDenied(cycle, msg);
+        }
+    }
+
+    private void activateOrgBranding(RequestCycle cycle, long orgId) {
+        Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
+        if (branding != null) {
+            setLetterBubbleColor(branding);
+        }
+    }
+
+    private void setLetterBubbleColor(Branding branding) {
+        java.awt.Color color = branding.getMetadataColor("cpPrimaryColor");
+        if (color != null) {
+            MiniUserAccountHelperContext.getCycleContext().setLetterBubbleBgColor(color);
         }
     }
 

@@ -102,32 +102,4 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
         return JsonExceptionHandler.exceptionHandler(cycle, target, ex);
     }
 
-    @Override
-    protected void checkOrgPermission(RequestCycle cycle, String strOrgId) {
-        super.checkOrgPermission(cycle, strOrgId);
-        activateOrgBranding(cycle, Long.valueOf(strOrgId));
-
-    }
-
-    @Override
-    protected void checkOrgPermission(RequestCycle cycle, long orgId) {
-        super.checkOrgPermission(cycle, orgId);
-        activateOrgBranding(cycle, orgId);
-
-    }
-
-    private void activateOrgBranding(RequestCycle cycle, long orgId) {
-        Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
-        if (branding != null) {
-            setLetterBubbleColor(branding);
-        }
-    }
-
-    private void setLetterBubbleColor(Branding branding) {
-        java.awt.Color color = branding.getMetadataColor("cpPrimaryColor");
-        if (color != null) {
-            MiniUserAccountHelperContext.getCycleContext().setLetterBubbleBgColor(color);
-        }
-    }
-
 }

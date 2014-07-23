@@ -28,7 +28,7 @@ ${cpweb_foot}
                 }
             ],
                         
-            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[user.userId])}",
+            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[org.id, user.userId])}",
             "oLanguage": {
                 "sEmptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
                 "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"

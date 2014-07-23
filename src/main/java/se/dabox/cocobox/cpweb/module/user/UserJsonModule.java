@@ -24,6 +24,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
@@ -44,7 +45,11 @@ public class UserJsonModule extends AbstractJsonAuthModule {
             LoggerFactory.getLogger(UserJsonModule.class);
 
     @WebAction
-    public RequestTarget onListUserParticipations(RequestCycle cycle, String strUserId) {
+    public RequestTarget onListUserParticipations(RequestCycle cycle, String strOrgId, String strUserId) {
+        long orgId = secureGetMiniOrg(cycle, strOrgId).getId();
+        checkOrgPermission(cycle, orgId);
+        checkOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_USER);
+
         long userId = Long.valueOf(strUserId);
 
         List<ProjectParticipation> participations =
@@ -56,8 +61,8 @@ public class UserJsonModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onListRoles(final RequestCycle cycle, String strOrgId, String strUserId) {
         long userId = Long.valueOf(strUserId);
-        long orgId = Long.valueOf(strOrgId);
-        checkOrgPermission(cycle, orgId);
+        long orgId = secureGetMiniOrg(cycle, strOrgId).getId();
+        checkOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_USER);
 
         UserAccount account = getUserAccount(cycle, userId);
 
@@ -81,12 +86,14 @@ public class UserJsonModule extends AbstractJsonAuthModule {
 
     @WebAction
     public RequestTarget onRemoveCpRole(RequestCycle cycle, String strOrgId) {
-
+        
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String role = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         long orgId = org.getId();
+        checkOrgPermission(cycle, orgId, CocoboxPermissions.CP_EDIT_USER);
+
         UserAccount user = getUserAccount(cycle, userId);
 
         Set<String> roles = UserAccountRoleCheck.getCpRoles(user, orgId, true);

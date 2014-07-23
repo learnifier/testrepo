@@ -50,9 +50,11 @@ ${cpweb_foot}
             </tr>
         </thead>
         <tbody>
+            [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
             <tr>
                 <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
             </tr>
+            [/@]
             <tr>
                 <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
             </tr>

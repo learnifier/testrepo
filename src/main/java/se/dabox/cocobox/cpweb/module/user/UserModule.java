@@ -28,6 +28,7 @@ import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
@@ -52,6 +53,7 @@ public class UserModule extends AbstractWebAuthModule {
     public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String strUserId) {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
 
         UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
 
@@ -79,6 +81,7 @@ public class UserModule extends AbstractWebAuthModule {
         UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
 
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
@@ -105,6 +108,8 @@ public class UserModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onAddRole(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_USER);
+
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String role = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 

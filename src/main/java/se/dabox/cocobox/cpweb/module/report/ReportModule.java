@@ -13,6 +13,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.proddir.data.Product;
 
 /**
@@ -39,6 +40,7 @@ public class ReportModule extends AbstractWebAuthModule {
     public RequestTarget onCreditStatus(RequestCycle cycle, String strOrgId) {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_ACCOUNTBALANCE);
 
         Map<String, Object> map = createMap();
         map.put("org", org);
