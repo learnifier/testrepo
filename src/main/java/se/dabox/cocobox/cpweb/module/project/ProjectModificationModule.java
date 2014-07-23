@@ -21,6 +21,7 @@ import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.module.WebModuleInfo;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
@@ -48,6 +49,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
+import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.Clients;
@@ -369,6 +371,11 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
+
+        if (!new CocoboxRoleUtil().getProjectRoles(cycle).containsKey(roleId)) {
+            String msg = String.format("Invalid project role id: %s", roleId);
+            return new ErrorCodeRequestTarget(400, msg);
+        }
 
         long prjId = Long.valueOf(strProjectId);
 
