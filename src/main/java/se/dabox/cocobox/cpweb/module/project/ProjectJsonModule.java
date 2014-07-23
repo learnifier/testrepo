@@ -233,7 +233,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onProjectAdmins(RequestCycle cycle, String strProjectId) {
+    public RequestTarget onListProjectRoleUsers(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
