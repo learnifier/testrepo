@@ -39,6 +39,7 @@ import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
@@ -257,6 +258,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getCocoboxCordinatorClient(cycle).getProject(Long.valueOf(projectId));
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT_COURSEDESIGN);
 
         long designId;
 
@@ -374,23 +376,6 @@ public class ProjectModule extends AbstractProjectWebModule {
         map.put("userAccount", LoginUserAccountHelper.getUserAccount(cycle));
 
         return new FreemarkerRequestTarget("/project/projectRoles.html", map);
-    }
-
-    @WebAction
-    public RequestTarget onTmpRoles(RequestCycle cycle, String projectId) {
-        OrgProject project =
-                getProject(cycle, projectId);
-
-        checkPermission(cycle, project);
-
-        Map<String, Object> map = createMap();
-
-        addCommonMapValues(map, project, cycle);
-
-        map.put("projectRoles", new CocoboxRoleUtil().getProjectRoles(cycle));
-        map.put("userAccount", LoginUserAccountHelper.getUserAccount(cycle));
-
-        return new FreemarkerRequestTarget("/project/tmpProjectRoles.html", map);
     }
 
     @WebAction

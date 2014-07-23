@@ -35,6 +35,9 @@ public class CpwebModifyViewHandler implements ModifyViewDataHandler {
 
     private void activateProjectSecurityNamespace(ViewDataEvent event) {
         OrgProject project = (OrgProject) event.getMap().get("project");
+        if (project == null) {
+            project = (OrgProject) event.getMap().get("prj");
+        }
         if (project != null) {
             ProjectPermissionCheck check = ProjectPermissionCheck.fromCycle(event.getCycle());
             event.getMap().put("projectSecurity",

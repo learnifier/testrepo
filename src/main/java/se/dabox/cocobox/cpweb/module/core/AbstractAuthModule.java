@@ -17,8 +17,10 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.Permission;
 import se.dabox.cocosite.security.UserPermissionFetcher;
+import se.dabox.cocosite.security.project.ProjectPermissionCheck;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
@@ -91,6 +93,21 @@ public abstract class AbstractAuthModule extends AbstractModule {
         Set<Permission> roles = new UserPermissionFetcher(cycle).getUserPermission(acc, orgId);
 
         return roles.contains(permission);
+    }
+
+    protected void checkProjectPermission(RequestCycle cycle, OrgProject project,
+            Permission permission) {
+        boolean authorized = ProjectPermissionCheck.fromCycle(cycle).checkPermission(project,
+                permission);
+
+        if (!authorized) {
+            String msg = String.format("Access denied to %s prj=%d (uid=%d). Permission %s required.",
+                    cycle.getRequest().getRequestUrl(),
+                    project.getProjectId(),
+                    LoginUserAccountHelper.getUserId(cycle),
+                    permission);
+            handleAccessDenied(cycle, msg);
+        }
     }
 
 

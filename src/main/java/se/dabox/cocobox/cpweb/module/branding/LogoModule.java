@@ -28,6 +28,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.event.BrandingChangedListenerUtil;
 import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.client.CacheClients;
@@ -63,6 +64,7 @@ public class LogoModule extends AbstractJsonAuthModule {
     public RequestTarget onUploadImage(RequestCycle cycle, String strOrgId) {
 
         checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_BRANDING);
 
         FileUpload image = cycle.getRequest().getFileUpload("image");
 
@@ -93,6 +95,7 @@ public class LogoModule extends AbstractJsonAuthModule {
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onSaveImage(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_BRANDING);
 
         String reset = cycle.getRequest().getParameter("reset");
         if (reset != null) {
@@ -146,6 +149,7 @@ public class LogoModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onResetImage(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_BRANDING);
 
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(org.getId());
 
