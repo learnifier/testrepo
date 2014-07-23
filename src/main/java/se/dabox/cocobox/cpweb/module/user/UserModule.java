@@ -104,7 +104,7 @@ public class UserModule extends AbstractWebAuthModule {
 
     @WebAction
     public RequestTarget onAddRole(RequestCycle cycle, String strOrgId) {
-        checkOrgPermission(cycle, strOrgId);
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String role = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 
@@ -123,7 +123,7 @@ public class UserModule extends AbstractWebAuthModule {
 
         String roleString = StringUtils.join(roles, ',');
 
-        CharSequence valueName = OrgRoleName.forOrg(userId);
+        CharSequence valueName = OrgRoleName.forOrg(org.getId());
 
         getUserAccountService(cycle).updateUserProfileValue(userId,
                 CocoSiteConstants.UA_PROFILE, valueName, roleString);

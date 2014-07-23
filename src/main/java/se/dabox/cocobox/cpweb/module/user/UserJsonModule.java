@@ -23,6 +23,7 @@ import se.dabox.cocobox.cpweb.module.CpJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
+import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
@@ -84,7 +85,8 @@ public class UserJsonModule extends AbstractJsonAuthModule {
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String role = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 
-        long orgId = Long.parseLong(strOrgId);
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        long orgId = org.getId();
         UserAccount user = getUserAccount(cycle, userId);
 
         Set<String> roles = UserAccountRoleCheck.getCpRoles(user, orgId, true);
@@ -104,7 +106,7 @@ public class UserJsonModule extends AbstractJsonAuthModule {
             roleString = StringUtils.join(roles, ',');
         }
 
-        CharSequence valueName = OrgRoleName.forOrg(userId);
+        CharSequence valueName = OrgRoleName.forOrg(orgId);
 
         getUserAccountService(cycle).updateUserProfileValue(userId,
                 CocoSiteConstants.UA_PROFILE, valueName, roleString);
