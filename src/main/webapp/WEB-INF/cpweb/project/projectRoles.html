@@ -81,8 +81,8 @@ ${cpweb_foot}
     <input name="userId" type="number" id="userSelect" class="bigdrop">
 
     
-    [#list projectRoles?values as pr]
-    <label>${pr}
+    [#list projectRoles?keys as pr]
+    <label>${projectRoles[pr]}
     <input type="radio" name="role" value="${pr}">
     </label>
     [/#list]
