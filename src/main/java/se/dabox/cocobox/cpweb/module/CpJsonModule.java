@@ -30,6 +30,7 @@ import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.project.ProjectThumbnail;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.client.CacheClients;
@@ -101,8 +102,11 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         long userId = LoginUserAccountHelper.getUserId(cycle);
         List<Long> favoriteIds = ccbc.getFavorites(userId, orgId);
 
-        List<OrgProject> projects =
-                ccbc.searchOrgProjects(userId, term, Collections.singletonList(orgId));
+        List<OrgProject> projects = Collections.emptyList();
+
+        if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_LIST_PROJECTS)) {
+            projects = ccbc.searchOrgProjects(userId, term, Collections.singletonList(orgId));
+        }
 
         ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects, favoriteIds);
 
@@ -204,8 +208,12 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         final long userId = LoginUserAccountHelper.getUserId(cycle);
         final String orgRole = OrgRoleName.forOrg(org.getId()).toString();
 
-        List<UserAccount> uas = getUserAccountService(cycle).searchUserAccounts(userId, query,
-                CocoSiteConstants.UA_PROFILE, orgRole, CocoboxSecurityConstants.USER_ROLE);
+        List<UserAccount> uas = Collections.emptyList();
+
+        if (hasOrgPermission(cycle, Long.parseLong(strOrgId), CocoboxPermissions.CP_LIST_USERS)) {
+            uas = getUserAccountService(cycle).searchUserAccounts(userId, query,
+                    CocoSiteConstants.UA_PROFILE, orgRole, CocoboxSecurityConstants.USER_ROLE);
+        }
 
         return jsonTarget(toJsonUserAccounts(cycle, uas, org.getId()));
     }

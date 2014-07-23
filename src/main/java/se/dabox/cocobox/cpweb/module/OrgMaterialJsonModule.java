@@ -115,9 +115,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        List<OrgMaterial> materials =
-                getCocoboxCordinatorClient(cycle).searchOrgMaterial(userId, term, Collections.
-                singletonList(orgId));
+        List<OrgMaterial> materials = Collections.emptyList();
+        
+        if (hasOrgPermission(cycle, userId, CocoboxPermissions.CP_LIST_ORGMATS)) {
+            materials = getCocoboxCordinatorClient(cycle).searchOrgMaterial(userId, term,
+                    Collections.
+                    singletonList(orgId));
+        }
 
         sortOrgMats(cycle, materials);
 
@@ -168,8 +172,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
-        List<OrgProduct> orgProds =
-                getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
+        List<OrgProduct> orgProds = Collections.emptyList();
+        
+        if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_LIST_ORGMATS)) {
+                orgProds = getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
+        }
 
         final long userId = LoginUserAccountHelper.getUserId(cycle);
         final String basetype = getConfValue(cycle, CocoSiteConstants.PRODUCT_BASETYPE);
