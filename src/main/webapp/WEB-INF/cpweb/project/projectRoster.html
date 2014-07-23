@@ -171,9 +171,11 @@ ${cpweb_foot}
             });
         };
 
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         require(['jquery.form', 'dabox-common', 'dabox-formbeanjs'], function() {
             $("#uploadRoster").ajaxForm(cocobox.getAjaxFormbeanHandler("uploadRoster"));
         });
+        [/@]
 
         $("#cball").click(function(ev) {
             if (this.checked) {
@@ -246,7 +248,7 @@ ${cpweb_foot}
                 }
             }
         });
-    }
+    };
 
     var showRow = function() {
         require(['dabox-datatables', 'jsrender'], function() {
@@ -293,7 +295,7 @@ ${cpweb_foot}
 
             });
         });
-    }
+    };
 
 
     function showUploadRoster() {
@@ -337,8 +339,8 @@ ${cpweb_foot}
         if ( Modernizr.canvas === true ) {
                 chartAnimation = true;
         }
-        var dataUrl = '${helper.urlFor('ProjectJsonModule','projectRoster', [prj.projectId?c])}';
-            pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
+        var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
+        pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
     });
 
 </script>
@@ -399,9 +401,9 @@ ${cpweb_head}
     </ul>
 </section>
 
-
 <h2>[@dws.txt key="cpweb.project.participants.title" /]</h2>
 
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
 <section id="addtoroster">
     <div id="upload" style="float: right;">
         <button type="button" onclick="showUploadRoster();
@@ -422,6 +424,7 @@ ${cpweb_head}
         </form>
     </div>
 </section>
+[/@]
 
 <form method="post" id="projectrosterform" action="${helper.urlFor('ProjectModificationModule','listCommand')}">
     [@mbform.listformFields /]
@@ -429,8 +432,10 @@ ${cpweb_head}
     <section class="listactions">
         <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');
                 return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'delete');
                 return false">Delete</button>
+        [/@]
         [@security.boAdminBlock]
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false">Activate</button>
@@ -459,7 +464,9 @@ ${cpweb_head}
     </section>
 </form>
 
-[#include "rosterUpload.html" /]
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
+  [#include "rosterUpload.html" /]
+[/@]
 
 [#include "bounceInfo.html" /]
 

@@ -22,7 +22,6 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.module.WebModuleInfo;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
-import net.unixdeveloper.druwa.request.StringRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
 import org.slf4j.Logger;
@@ -49,6 +48,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.dws.client.langservice.LangBundle;
@@ -303,6 +303,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         Long projectId = Long.valueOf(strProjectId);
         OrgProject prj = getCocoboxCordinatorClient(cycle).getProject(projectId);
         checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_EDIT_PROJECT_ROSTER);
 
         DruwaFormValidationSession<UploadRosterForm> formsess = getValidationSession(
                 UploadRosterForm.class, cycle);

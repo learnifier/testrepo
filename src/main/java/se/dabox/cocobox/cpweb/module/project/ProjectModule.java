@@ -90,6 +90,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -105,6 +106,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -148,6 +150,8 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT_SELFREG);
 
         Map<String, Object> map = createMap();
         DruwaFormValidationSession<SetRegPasswordForm> pwformsess = getPwFormsess(cycle, project);
@@ -169,6 +173,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -192,8 +197,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         long participationId = Long.parseLong(strParticipationId);
 
         checkPermission(cycle, project);
-
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
@@ -219,6 +223,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
@@ -244,6 +249,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
@@ -304,6 +310,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         long designId = project.getLatestDesignId();
 
@@ -330,6 +337,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         OrgProject project =
                 getProject(cycle, projectId);
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -351,6 +359,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -367,6 +376,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -384,6 +394,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -407,8 +418,9 @@ public class ProjectModule extends AbstractProjectWebModule {
         long prjId = Long.valueOf(strProjectId);
 
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
 
@@ -418,7 +430,7 @@ public class ProjectModule extends AbstractProjectWebModule {
             return new RedirectUrlRequestTarget(link);
         } catch (Exception ex) {
             Product product = getProductDirectoryClient(cycle).getProduct(productId);
-            ErrorState state = new ErrorState(prj.getOrgId(), product, ex, prjId);
+            ErrorState state = new ErrorState(project.getOrgId(), product, ex, prjId);
             return NavigationUtil.getIntegrationErrorPage(cycle, state);
         }
     }
