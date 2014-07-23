@@ -116,6 +116,7 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
             [/#if]
             <li class="[#if selected == 'registration']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
             <li class="[#if selected == 'settings']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
+            <li class="[#if selected == 'projectadmin']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
         </ul>
     </nav>
 </section>
