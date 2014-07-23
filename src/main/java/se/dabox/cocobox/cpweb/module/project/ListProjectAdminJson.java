@@ -37,9 +37,9 @@ public class ListProjectAdminJson {
     private Map<Long, Set<String>> userRolesMap;
     private OrgProject prj;
     private List<MiniUserInfo> users;
-    private List<RoleUuidNamePair> cpRoles;
+    private List<RoleUuidNamePair> projectRoles;
     private String strProjectId;
-    private Map<String, String> cpRoleMap;
+    private Map<String, String> projectRolesMap;
 
 
     ListProjectAdminJson(RequestCycle cycle, CocoboxCordinatorClient ccbc) {
@@ -76,7 +76,7 @@ public class ListProjectAdminJson {
 
                     @Override
                     public String transform(ProjectUserRole item) {
-                        if (cpRoleMap.containsKey(item.getRole())) {
+                        if (projectRolesMap.containsKey(item.getRole())) {
                             return item.getRole();
                         }
 
@@ -128,7 +128,7 @@ public class ListProjectAdminJson {
                 if (userRoles == null) {
                     userRoles = Collections.emptySet();
                 }
-                for (RoleUuidNamePair roleUuidNamePair : cpRoles) {
+                for (RoleUuidNamePair roleUuidNamePair : projectRoles) {
                     if (!userRoles.contains(roleUuidNamePair.getUuid())) {
                         continue;
                     }
@@ -147,8 +147,8 @@ public class ListProjectAdminJson {
 
     private void getCpRoles() {
         final CocoboxRoleUtil cru = new CocoboxRoleUtil();
-        cpRoleMap = cru.getCpRoles(cycle);
-        cpRoles = cru.toSortedRoleUuidNamePairList(cycle, cpRoleMap);
+        projectRolesMap = cru.getProjectRoles(cycle);
+        projectRoles = cru.toSortedRoleUuidNamePairList(cycle, projectRolesMap);
     }
 
 }
