@@ -11,7 +11,7 @@ ${cpweb_foot}
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
     var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
     var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
-    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}";
+    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?type=${projectStatus}";
 
     require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
        //No initialization needed
@@ -26,8 +26,15 @@ ${cpweb_foot}
 [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
 <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-add navBackgroundColor">Add Project</a>
 [/@]
+
 <h1>Projects</h1>
 <section class="list">
+
+    <a class="${(projectStatus == 'NEW')?string('selected','')}" href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=NEW">${ctext("project.status.NEW")?xml}</a> |
+    <a class="${(projectStatus == 'ACTIVE')?string('selected','')}" href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=ACTIVE">${ctext("project.status.ACTIVE")?xml}</a> |
+    <a class="${(projectStatus == 'DISABLED')?string('selected','')}" href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=DISABLED">${ctext("project.status.DISABLED")?xml}</a>
+
+
     <table class="list" id="listprojects">
         <thead>
             <tr>
