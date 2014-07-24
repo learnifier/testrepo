@@ -11,6 +11,16 @@ cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-
 cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
 cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
 
+cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
+{type: 'select',
+    source: [
+    {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
+    {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
+    {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
+    ]
+}
+);
+
 [/@mbform._onreadyJavascript]
 
 
@@ -81,6 +91,7 @@ cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .e
     [/#if]
      <div class="itemdetails">
         <ul>
+            <li><span class="label">Status</span><span class="setting clearfix" id="project-status"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="status" data-value="${project.status}">${ctext("project.status."+project.status)?xhtml}</span><span class="editable-control">Edit</span></span></li>
             <li><span class="label">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="note">${project.note!""?xhtml}</span><span class="editable-control">Edit</span></span></li>
             [#if project.type.ptype == 2]
                 <li><span class="label">Learner Portal Name</span><span class="setting clearfix">${project.displayUserTitle!""?xhtml}</span></li>
