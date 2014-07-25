@@ -50,7 +50,6 @@ import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectTask;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
-import se.dabox.service.common.ccbc.project.role.ProjectUserRoleSearch;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;

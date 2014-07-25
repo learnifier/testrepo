@@ -389,7 +389,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
                 roleId);
 
-        boolean response = ccbc.addProjectUserRole(mod);
+        boolean response = ccbc.grantProjectUserRole(mod);
 
         LOGGER.info("Adding role {} in project {} for {} (caller {}): {}",
                 roleId, strProjectId, userId, caller, response);
@@ -398,7 +398,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
     }
 
     @WebAction(methods = HttpMethod.POST)
-    public RequestTarget onDeleteRole(RequestCycle cycle, String strProjectId) {
+    public RequestTarget onRevokeRole(RequestCycle cycle, String strProjectId) {
 
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
@@ -414,7 +414,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
                 roleId);
 
-        boolean response = ccbc.deleteProjectUserRole(mod);
+        boolean response = ccbc.revokeProjectUserRole(mod);
 
         LOGGER.info("Revoking role {} in project {} for {} (caller {}): {}",
                 roleId, strProjectId, userId, caller, response);

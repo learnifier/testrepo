@@ -137,7 +137,7 @@ public class ListProjectAdminJson {
                     generator.writeStringField("role", roleUuidNamePair.getUuid());
                     generator.writeStringField("roleName", roleUuidNamePair.getName());
                     generator.writeStringField("deleteRoleLink", cycle.urlFor(
-                            ProjectModificationModule.class, "deleteRole", strProjectId));
+                            ProjectModificationModule.class, "revokeRole", strProjectId));
                     generator.writeEndObject();
                 }
                 generator.writeEndArray();
