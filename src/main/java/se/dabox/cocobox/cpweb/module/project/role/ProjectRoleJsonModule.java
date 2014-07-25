@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -41,12 +43,16 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
 
         String query = cycle.getRequest().getParameter("term");
 
-        //TOOD: Handle too short answers
-        SearchContext ctx = new SearchContext(cycle, query, miniOrg);
+        List<UserAccount> matching;
+        
+        if (query.length() < 2) {
+            matching = Collections.emptyList();
+        } else {
+            SearchContext ctx = new SearchContext(cycle, query, miniOrg);
+            matching = getJsonUsers(ctx);
+        }
 
-        List<UserAccount> matching = getJsonUsers(ctx);
-
-        return toJson(ctx, matching);
+        return toJson(matching);
     }
 
     private List<UserAccount> getJsonUsers(SearchContext ctx) {
@@ -56,12 +62,12 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
     }
 
     private List<UserAccount> getMatching(SearchContext ctx) {
-        List<UserAccount> all = new ArrayList<>();
+        Set<UserAccount> all = new HashSet<>();
 
         all.addAll(findClientMatching(ctx));
         all.addAll(findBoMatching(ctx));
 
-        return all;
+        return new ArrayList<>(all);
     }
 
     private List<UserAccount> findClientMatching(SearchContext ctx) {
@@ -80,7 +86,7 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
         return uaClient;
     }
 
-    private RequestTarget toJson(SearchContext ctx, List<UserAccount> users) {
+    private RequestTarget toJson(List<UserAccount> users) {
         final DataTablesJson<UserAccount> dataTablesJson
                 = new DataTablesJson<UserAccount>() {
 

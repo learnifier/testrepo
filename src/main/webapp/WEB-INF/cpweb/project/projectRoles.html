@@ -19,7 +19,7 @@ ${cpweb_foot}
         
        $("#userSelect").select2({
             placeholder: "Search for a user",
-            minimumInputLength: 1,
+            minimumInputLength: 2,
             ajax: { 
                 url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
                 dataType: 'json',
