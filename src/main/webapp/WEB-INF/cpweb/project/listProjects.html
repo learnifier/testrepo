@@ -29,12 +29,14 @@ ${cpweb_foot}
 
 <h1>Projects</h1>
 <section class="list">
-
-    <a class="${(projectStatus == 'NEW')?string('selected','')}" href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=NEW">${ctext("project.status.NEW")?xml}</a> |
-    <a class="${(projectStatus == 'ACTIVE')?string('selected','')}" href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=ACTIVE">${ctext("project.status.ACTIVE")?xml}</a> |
-    <a class="${(projectStatus == 'DISABLED')?string('selected','')}" href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=DISABLED">${ctext("project.status.DISABLED")?xml}</a>
-
-
+    <nav id="itemnav" style="margin-bottom: 10px;">
+        <ul>
+            <li class="${(projectStatus == 'NEW')?string('activeItem','')}"><a  href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=NEW"><span>${ctext("project.status.NEW")?xml}</span></a></li>
+            <li class="${(projectStatus == 'ACTIVE')?string('activeItem','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=ACTIVE"><span>${ctext("project.status.ACTIVE")?xml}</span></a></li>
+            <li class="${(projectStatus == 'DISABLED')?string('activeItem','')}" ><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=DISABLED"><span>${ctext("project.status.DISABLED")?xml}</span></a></li>
+        </ul>
+    </nav>
+    
     <table class="list" id="listprojects">
         <thead>
             <tr>
