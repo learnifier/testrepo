@@ -1,0 +1,15 @@
+[#ftl strip_text="true" /]
+
+
+
+[#macro userOverviewMenu selected ]
+
+
+<nav id="itemnav">
+    <ul>
+        <li [#if selected == 'participations']class="activeItem"[/#if]><a href="${helper.urlFor('user.UserModule','overview', [org.id, user.userId])}"><span>Participations</span></a></li>
+        <li [#if selected == 'roles']class="activeItem"[/#if]><a href="${helper.urlFor('user.UserModule','roles', [org.id, user.userId])}"><span>Roles</span></a></li>
+    </ul>    
+</nav>
+
+[/#macro]

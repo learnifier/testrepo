@@ -24,6 +24,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.coursedesign.BucketCourseDesignInfo;
@@ -47,7 +48,8 @@ public class DesignModule extends AbstractWebAuthModule {
     public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String designId) {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
+        
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(designId));
 
         Map<String, Object> map = createMap();
@@ -68,6 +70,12 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         boolean copyMode = !StringUtils.isEmpty(strCopy);
+
+        if (copyMode) {
+            checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_COPY_COURSEDESIGN);
+        } else {
+            checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_COURSEDESIGN);
+        }
 
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
 
@@ -108,6 +116,11 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         boolean copyMode = !StringUtils.isEmpty(strCopy);
+        if (copyMode) {
+            checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_COPY_COURSEDESIGN);
+        } else {
+            checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_COURSEDESIGN);
+        }
 
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
 
@@ -128,6 +141,7 @@ public class DesignModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onDelete(RequestCycle cycle, String strOrgId, String strDesignId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_DELETE_COURSEDESIGN);
 
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
 
@@ -146,6 +160,7 @@ public class DesignModule extends AbstractWebAuthModule {
     public RequestTarget onEditDesign(RequestCycle cycle, String strOrgId, String strDesignId) {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_COURSEDESIGN);
 
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
 
@@ -171,6 +186,7 @@ public class DesignModule extends AbstractWebAuthModule {
     public RequestTarget onView(RequestCycle cycle, String strOrgId, String strDesignId) {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
 
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
 

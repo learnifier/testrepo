@@ -90,12 +90,7 @@ public class CreateCpUserAccountCommand {
 
                 uas.addUserRole(userAccount.getUserId(), CocoboxSecurityConstants.USER_ROLE);
 
-                CharSequence orgRoleName = OrgRoleName.forOrg(orgId);
-
-                uas.updateUserProfileValue(userAccount.getUserId(),
-                        CocoSiteConstants.UA_PROFILE,
-                        orgRoleName,
-                        role);
+                addAdminRole(userAccount);
 
                 uas.updateUserProfileValue(userAccount.getUserId(),
                         CocoSiteConstants.UA_PROFILE,
@@ -103,6 +98,15 @@ public class CreateCpUserAccountCommand {
                         locale.toLanguageTag());
 
                 return uas.getUserAccount(userAccount.getUserId());
+            }
+
+            private void addAdminRole(UserAccount userAccount) {
+                CharSequence orgRoleName = OrgRoleName.forOrg(orgId);
+
+                uas.updateUserProfileValue(userAccount.getUserId(),
+                        CocoSiteConstants.UA_PROFILE,
+                        orgRoleName,
+                        role);
             }
 
             @Override

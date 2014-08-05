@@ -26,6 +26,7 @@ import se.dabox.cocobox.maileditor.initdata.MeInitData;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.service.common.mailsender.mailtemplate.CreateMailTemplateRequest;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
@@ -46,8 +47,8 @@ public class MailModule extends AbstractWebAuthModule {
     @DefaultWebAction
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String templateId) {
-
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_EMAIL);
 
         final MailTemplate template =
                 getOrgMailTemplate(cycle, Long.valueOf(templateId), org.getId());
@@ -68,6 +69,12 @@ public class MailModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         boolean copyMode = !StringUtils.isEmpty(strCopy);
+
+        if (copyMode) {
+            checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_COPY_EMAIL);
+        }  else {
+            checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_EMAIL);
+        }
 
         final MailTemplate template = getOrgMailTemplate(cycle, Long.valueOf(templateId), org.
                 getId());
@@ -103,6 +110,8 @@ public class MailModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_DELETE_EMAIL);
+
         MailTemplate template = getOrgMailTemplate(cycle, Long.valueOf(templateId), org.getId());
 
         if (template == null || template.isStickyCheck()) {
@@ -126,6 +135,12 @@ public class MailModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         boolean copyMode = !StringUtils.isEmpty(strCopy);
+
+        if (copyMode) {
+            checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_COPY_EMAIL);
+        } else {
+            checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_EMAIL);
+        }
 
         final MailTemplate template = getOrgMailTemplate(cycle, Long.valueOf(templateId), org.
                 getId());

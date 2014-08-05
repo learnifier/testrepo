@@ -19,6 +19,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DefaultCocositeInitialization;
 import se.dabox.cocosite.login.LoginHandler;
 import se.dabox.cocosite.module.account.picture.PictureModule;
+import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.common.ccbc.mailfilter.MailFilterTarget;
 import se.dabox.service.webutils.druwa.DwsWebsiteConstants;
 import se.dabox.service.webutils.druwa.DwsWebsiteHelper;
@@ -47,7 +48,7 @@ public class CustomerPortalApplication extends DruwaApplication {
         DruwaFreemarker.getDruwaFreemarker(this).addModifyViewDataHandler(new CpwebModifyViewHandler());
         DruwaFreemarker.getDruwaFreemarker(this).getConfig().
                 setSharedVariable("learnifierBootstrap", LearnifierBootstrap.getInstance());
-
+        
         getWebModuleRegistry().
                 addSearchPrefix("se.dabox.cocobox.cpweb.module");
         getWebModuleRegistry().

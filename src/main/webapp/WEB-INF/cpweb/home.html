@@ -261,7 +261,9 @@ ${cpweb_foot}
 
 <section class="column" style="width: 520px; margin-right: 20px; float: left;">
 
+    [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
     <div class="infobox clearfix">
+        [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
         <section id="new-project">
             <h1>New Project</h1>
             <p>Get started with a new project by following the simple step-by-step instructions.</p>
@@ -269,6 +271,8 @@ ${cpweb_foot}
                 <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-strong secondarybackgroundcolor">Add Project</a>
             </p>
         </section>
+        [/@]
+        [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
         <section id="manage-projects">
             <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="home-box-link-h2">View All Projects</a>
             <h1>Manage Projects</h1>
@@ -280,14 +284,19 @@ ${cpweb_foot}
                 </table>
             </section>
         </section>
+        [/@]
     </div>
+    [/#if]
+    [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
     <div class="infobox clearfix">
         <h2>Upload your materials</h2>
         <p>Add your own training materials to tailor the learning to your needs.</p>
         <div class="btn-center-wrapper">
             <a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn navBackgroundColor">Upload Material</a>
+        </div>
     </div>
-    </div>
+    [/@]
+    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
     <div class="infobox clearfix">
         <h2>Invite an administrator</h2>
         <p>Invite additional administrators to manage projects from this portal.</p>
@@ -295,6 +304,7 @@ ${cpweb_foot}
             <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn navBackgroundColor">Invite Administrator</a>
         </div>
     </div>
+    [/@]
 </section>
 
 <section class="column" style="width: 400px; float: left;">
@@ -309,6 +319,8 @@ ${cpweb_foot}
         [@wm.welcomeBox welcomeMessage /]
     </div>
     [/#if]
+
+    [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
     <div class="infobox clearfix" id="balance">
         <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="home-box-link-h3">See Full Report</a>
         <h2>Your Account Status</h2>
@@ -324,6 +336,7 @@ ${cpweb_foot}
                 </li>
             </ul>   
     </div>
+    [/@]
 
 </section>
 

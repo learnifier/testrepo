@@ -20,6 +20,7 @@ import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.webutils.json.JsonEncoding;
 
@@ -63,6 +64,7 @@ public class MailJsonModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onListTemplates(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_LIST_EMAILS);
 
         long bucketId = new GetOrgMailBucketCommand(cycle).forOrg(org.getId());
 

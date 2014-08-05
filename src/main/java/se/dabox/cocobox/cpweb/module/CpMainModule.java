@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.WebSession;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -26,7 +27,9 @@ import se.dabox.cocobox.cpweb.formdata.material.AddLinkCreditsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.deeplink.ProductMaterialJsonModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
+import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.login.client.LoginService;
@@ -71,7 +74,7 @@ public class CpMainModule extends AbstractWebAuthModule {
 
         return new FreemarkerRequestTarget("/home.html", map);
     }
-
+    
     @WebAction
     @WebActionMountpoint("/search")
     public RequestTarget onSearch(RequestCycle cycle, String id) {
@@ -121,6 +124,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onListMaterials(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_LIST_ORGMATS);
 
         Map<String, Object> map = createMap();
 
@@ -136,6 +140,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onGridMaterials(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_LIST_ORGMATS);
 
         Map<String, Object> map = createMap();
 
@@ -187,6 +192,7 @@ public class CpMainModule extends AbstractWebAuthModule {
         Map<String, Object> map = createMap();
 
         map.put("org", org);
+        map.put("projectStatus", getProjectStatus(cycle.getRequest()));
 
         return new FreemarkerRequestTarget("/project/listProjects.html", map);
     }
@@ -229,6 +235,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onListEmails(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_LIST_EMAILS);
 
         Map<String, Object> map = createMap();
 
@@ -240,6 +247,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onListDesigns(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_LIST_COURSEDESIGNS);
 
         Map<String, Object> map = createMap();
 
@@ -297,4 +305,19 @@ public class CpMainModule extends AbstractWebAuthModule {
     private String getLogoutTargetUrl(RequestCycle cycle, OrgUnitInfo org) {
         return getConfValue(cycle, "cpweb.logout.url");
     }
+
+    private String getProjectStatus(WebRequest request) {
+        String type = request.getParameter("type");
+
+        if (type == null) {
+            return ProjectStatus.ACTIVE.name();
+        } else {
+            try {
+                return ProjectStatus.valueOf(type).name();
+            } catch (IllegalArgumentException ex) {
+                return ProjectStatus.ACTIVE.name();
+            }
+        }
+    }
+    
 }

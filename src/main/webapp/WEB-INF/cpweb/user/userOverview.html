@@ -1,6 +1,10 @@
 [#ftl strip_text="true" /]
 
 
+[#import "userOverviewMenu.html" as userMenu]
+
+
+
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
@@ -21,10 +25,10 @@ ${cpweb_foot}
                         return  '<a href="'+ oObj.aData.projectlink + '" style="display:block;">' + oObj.aData.projectname +'</a> ';
                     },
                     "aTargets": [ 0 ]
-                },
+                }
             ],
                         
-            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[user.userId])}",
+            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[org.id, user.userId])}",
             "oLanguage": {
                 "sEmptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
                 "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
@@ -95,12 +99,12 @@ ${cpweb_head}
             <ul>
                 <li><span class="label">Email</span><span class="setting clearfix">${user.primaryEmail?xhtml}</span></li>
                 <li><span class="label">Language</span><span class="setting clearfix">${locale.getDisplayName(userLocale)?xhtml}</span></li>
-                <li><span class="label">Role</span><span class="setting clearfix">[@dws.txt key="cpweb.useroverview." + role!"role_na" /]</span></li>
             </ul>
         </div>
     </section>
 
-
+    [@userMenu.userOverviewMenu selected="participations"][/@userMenu.userOverviewMenu]
+    
     <h2>Participations</h2>
     <section class="list">
         <table class="list" id="listparticipations">
@@ -113,7 +117,7 @@ ${cpweb_head}
             </tbody>
         </table>
     </section>
-
+    
 </section>
 
 [/@dws.skin]

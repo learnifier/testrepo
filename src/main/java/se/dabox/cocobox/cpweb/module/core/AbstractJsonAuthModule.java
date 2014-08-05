@@ -19,8 +19,11 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.PrettyPrinter;
 import org.codehaus.jackson.map.ObjectMapper;
 import se.dabox.cocobox.cpweb.JsonEncodingException;
+import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserRoleCheckAfterLoginListener;
+import se.dabox.cocosite.user.MiniUserAccountHelperContext;
+import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
 import se.dabox.service.webutils.json.JsonExceptionHandler;
@@ -98,4 +101,5 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     public RequestTarget exceptionHandler(RequestCycle cycle, RequestTarget target, Exception ex) {
         return JsonExceptionHandler.exceptionHandler(cycle, target, ex);
     }
+
 }

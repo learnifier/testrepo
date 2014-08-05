@@ -35,26 +35,29 @@ ${cpweb_head}
 <section id="designoverview">
     <section id="designinfo">
         <div id="itemactions">
-            [#if !info.sticky]
+            [#if !info.sticky && portalSecurity.hasPermission("CP_DELETE_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','delete',[org.id, designId])}" method="post" id="deleteForm">
                 <button id="deleteBtn">Delete</button>
             </form>
             [/#if]
 
-            [#if !info.sticky]
+            [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','editDesign',[org.id, designId])}" method="post">
                 <button>Edit Course Design</button>
             </form>
             [/#if]
 
-            [#if !info.sticky]
+            [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId])}" method="post">
                 <button type="submit">Edit Settings</button>
             </form>
             [/#if]
+
+            [@portalSecurity.permissionBlock permission="CP_COPY_COURSEDESIGN"]
             <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId,'t'])}" method="post">
                 <button>Create copy</button>
             </form>
+            [/@]
 
             <form action="${helper.urlFor('coursedesign.DesignModule','view',[org.id, designId])}" method="post">
                 <button>View</button>

@@ -52,24 +52,26 @@ ${cpweb_head}
 <section id="emailoverview">
     <section id="emailinfo">
         <div id="itemactions">
-            [#if !template.stickyCheck]
+            [#if !template.stickyCheck && portalSecurity.hasPermission("CP_DELETE_EMAIL")]
             <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
                 <button type="submit" id="deleteBtn">Delete</button>
             </form>
             [/#if]
-            [#if !template.stickyCheck]
+            [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
             <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
                 <button type="submit">Edit Email</button>
             </form>
             [/#if]
-            [#if !template.stickyCheck]
+            [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
             <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
                 <button type="submit">Edit Settings</button>
             </form>
             [/#if]
+            [@portalSecurity.permissionBlock permission="CP_COPY_EMAIL"]
             <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
                 <button type="submit">Copy to New</button>
             </form>
+            [/@]
         </div>
         <div class="itemicon">
             <p>Email Template</p><h1>${template.name?xhtml}</h1>

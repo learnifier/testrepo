@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -39,6 +38,7 @@ import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
@@ -103,6 +103,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onSetup(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -146,6 +147,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public RequestTarget onMatListDetails(RequestCycle cycle,
             String strOrgId, String strNpsId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT_MATERIAL);
 
         NewProjectSession nps = (NewProjectSession) cycle.getSession().
                 getAttribute(NewProjectSession.getSessionName(strNpsId));
@@ -201,6 +204,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public RequestTarget onSingleProductProjectDetails(RequestCycle cycle,
             String strOrgId, String strNpsId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
 
         NewProjectSession nps = (NewProjectSession) cycle.getSession().
                 getAttribute(NewProjectSession.getSessionName(strNpsId));
@@ -240,6 +244,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public RequestTarget onCreateProjectRequired(RequestCycle cycle,
             String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
 
         Map<String, Object> map = createMap();
 
@@ -267,6 +272,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onProcessSetup(final RequestCycle cycle, final String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
 
         final DruwaFormValidationSession<CreateProjectGeneral> formsess = getValidationSession(
                 CreateProjectGeneral.class, cycle);
@@ -378,6 +384,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onCreateMatList(final RequestCycle cycle, String strOrgId, String strNpsId) {
         checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_CREATE_PROJECT);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_CREATE_PROJECT_MATERIAL);
 
         final NewProjectSession nps = (NewProjectSession) cycle.getSession().
                 getAttribute(NewProjectSession.getSessionName(strNpsId));
@@ -692,6 +700,10 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
     private Boolean getMatListSupportSetting(RequestCycle cycle, MiniOrgInfo miniOrg) {
         if (!WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.MATERIALLIST)) {
+            return Boolean.FALSE;
+        }
+
+        if (!hasOrgPermission(cycle, miniOrg.getId(), CocoboxPermissions.CP_CREATE_PROJECT_MATERIAL)) {
             return Boolean.FALSE;
         }
 

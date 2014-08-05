@@ -4,18 +4,27 @@
 package se.dabox.cocobox.cpweb.module.core;
 
 import java.util.Locale;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocobox.cpweb.security.UserOrgSecurityCheck;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.Permission;
+import se.dabox.cocosite.security.UserPermissionFetcher;
+import se.dabox.cocosite.security.project.ProjectPermissionCheck;
+import se.dabox.cocosite.user.MiniUserAccountHelperContext;
+import se.dabox.service.branding.client.Branding;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.Project;
+import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -49,11 +58,77 @@ public abstract class AbstractAuthModule extends AbstractModule {
                     userId);
             handleAccessDenied(cycle, msg);
         }
+
+        activateOrgBranding(cycle, Long.parseLong(strOrgId));
     }
 
     protected void checkOrgPermission(RequestCycle cycle, long orgId) {
         checkOrgPermission(cycle, Long.toString(orgId));
     }
+
+    protected void checkOrgPermission(RequestCycle cycle, String strOrgId, Permission permission) {
+        checkOrgPermission(cycle, Long.parseLong(strOrgId), permission);
+    }
+
+    protected void checkOrgPermission(RequestCycle cycle, long orgId, Permission permission) {
+        checkOrgPermission(cycle, orgId);
+
+        boolean authorized = hasOrgPermission(cycle, orgId, permission);
+
+        if (!authorized) {
+            String msg = String.format("Access denied to %s ou=%d (uid=%d). Permission %s required.",
+                    cycle.getRequest().getRequestUrl(),
+                    orgId,
+                    LoginUserAccountHelper.getUserId(cycle),
+                    permission);
+            handleAccessDenied(cycle, msg);
+        }
+    }
+
+    private void activateOrgBranding(RequestCycle cycle, long orgId) {
+        Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
+        if (branding != null) {
+            setLetterBubbleColor(branding);
+        }
+    }
+
+    private void setLetterBubbleColor(Branding branding) {
+        java.awt.Color color = branding.getMetadataColor("cpPrimaryColor");
+        if (color != null) {
+            MiniUserAccountHelperContext.getCycleContext().setLetterBubbleBgColor(color);
+        }
+    }
+
+    /**
+     * Checks if the user has a permission in an org unit.
+     *
+     * @param cycle
+     * @param orgId
+     * @param permission
+     * @return
+     */
+    protected boolean hasOrgPermission(RequestCycle cycle, long orgId, Permission permission) {
+        UserAccount acc = LoginUserAccountHelper.getUserAccount(cycle);
+        Set<Permission> roles = new UserPermissionFetcher(cycle).getUserPermission(acc, orgId);
+
+        return roles.contains(permission);
+    }
+
+    protected void checkProjectPermission(RequestCycle cycle, OrgProject project,
+            Permission permission) {
+        boolean authorized = ProjectPermissionCheck.fromCycle(cycle).checkPermission(project,
+                permission);
+
+        if (!authorized) {
+            String msg = String.format("Access denied to %s prj=%d (uid=%d). Permission %s required.",
+                    cycle.getRequest().getRequestUrl(),
+                    project.getProjectId(),
+                    LoginUserAccountHelper.getUserId(cycle),
+                    permission);
+            handleAccessDenied(cycle, msg);
+        }
+    }
+
 
     protected long getCurrentUser(RequestCycle cycle) {
         return LoginUserAccountHelper.getUserId(cycle);

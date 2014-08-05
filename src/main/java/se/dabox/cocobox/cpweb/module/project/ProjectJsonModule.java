@@ -232,6 +232,19 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
+    public RequestTarget onListProjectRoleUsers(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj);
+
+        ListProjectAdminJson json = new ListProjectAdminJson(cycle, ccbc);
+
+        return jsonTarget(json.forProject(prj));
+    }
+
+    @WebAction
     public RequestTarget onSetInvitationCreditLimit(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 

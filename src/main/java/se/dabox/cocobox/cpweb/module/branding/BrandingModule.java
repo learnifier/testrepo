@@ -21,6 +21,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.event.BrandingChangedListenerUtil;
 import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.cache.GlobalCacheManager;
 import se.dabox.service.common.context.Configuration;
@@ -38,6 +39,7 @@ public class BrandingModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onLogo(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_BRANDING);
 
         Map<String, Object> map = createMap();
         map.put("org", org);
@@ -56,6 +58,7 @@ public class BrandingModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onColorChange(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_BRANDING);
 
         String reset = cycle.getRequest().getParameter("reset");
         if (reset != null) {
@@ -90,6 +93,7 @@ public class BrandingModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onResetColors(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_BRANDING);
 
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(org.getId());
 

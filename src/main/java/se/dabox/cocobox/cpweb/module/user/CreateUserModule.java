@@ -3,12 +3,9 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -35,6 +32,10 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.event.UserAccountChangedListenerUtil;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.security.UserAccountRoleCheck;
+import se.dabox.cocosite.security.role.CocoboxRoleUtil;
+import se.dabox.cocosite.security.role.RoleUuidNamePair;
 import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
@@ -57,13 +58,12 @@ public class CreateUserModule extends AbstractWebAuthModule {
     public static final String ACTION_VIEW_CREATE = "create";
     public static final String ACTION_VIEW_EDIT = "edit";
     public static final String ACTION_DO_CREATE = "doCreate";
-    public static final String ACTION_DO_SAVE = "doSave";
-    private static final Set<String> VALID_ROLES =
-            new HashSet<>(Arrays.asList(CpAdminRoles.CLIENT_ADMIN, CpAdminRoles.NONE));
+    public static final String ACTION_DO_SAVE = "doSave";    
 
     @WebAction
     public RequestTarget onCreate(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_USER);
 
         String formLink = cycle.urlFor(CreateUserModule.class, ACTION_DO_CREATE, strOrgId);
         DruwaFormValidationSession<CreateUser> formsess =
@@ -75,6 +75,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onEdit(RequestCycle cycle, String strOrgId, String strUserId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_USER);
 
         UserAccount userAccount =
                 getUserAccountService(cycle).getUserAccount(Long.valueOf(
@@ -113,6 +114,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     public RequestTarget onDoSave(final RequestCycle cycle, String strOrgId, String strUserId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         final UserAccountService uaService = getUserAccountService(cycle);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_USER);
 
         UserAccount userAccount =
                 uaService.getUserAccount(Long.valueOf(
@@ -142,7 +144,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
             emailChanged = true;
         }
 
-        if (!VALID_ROLES.contains(form.getRole())) {
+        if (!isValidRole(form.getRole())) {
             formsess.addError(new ValidationError(ValidationConstraint.CONSISTENCY, "role",
                     "invalidrole"));
             return toEditUserPage(strOrgId, strUserId);
@@ -163,15 +165,6 @@ public class CreateUserModule extends AbstractWebAuthModule {
         if (emailChanged) {
             uaService.updateUserProfileValue(userAccount.getUserId(), "email", "email", form.
                     getEmail());
-        }
-
-        String orgRoleName = OrgRoleName.forOrg(org.getId()).toString();
-
-        if (!form.getRole().equals(userAccount.getProfileValue(strUserId, orgRoleName))) {
-            uaService.updateUserProfileValue(userAccount.getUserId(),
-                    CocoSiteConstants.UA_PROFILE, orgRoleName,
-                    form.getRole()
-                    );
         }
 
         UserAccountChangedListenerUtil.triggerEvent(cycle, userAccount.getUserId());
@@ -206,6 +199,12 @@ public class CreateUserModule extends AbstractWebAuthModule {
         map.put("userLocales", getUserLocales(cycle));
         map.put("defaultUserLocale", getDefaultUserLocale(cycle));
         map.put("editMode", editMode);
+        if (!editMode) {
+            CocoboxRoleUtil cru = new CocoboxRoleUtil();
+            List<RoleUuidNamePair> roles
+                    = cru.toSortedRoleUuidNamePairList(cycle, cru.getCpRoles(cycle));
+            map.put("roles", roles);
+        }
 
         return new FreemarkerRequestTarget("/user/createUser.html", map);
     }
@@ -213,13 +212,14 @@ public class CreateUserModule extends AbstractWebAuthModule {
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onDoCreate(final RequestCycle cycle, String strOrgId) {
         final MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_USER);
 
         DruwaFormValidationSession<CreateUser> formsess =
                 getValidationSession(CreateUser.class, cycle);
 
         if (!formsess.process()) {
-            return new WebModuleRedirectRequestTarget(CreateUserModule.class,
-                    ACTION_VIEW_CREATE, strOrgId);
+            return new WebModuleRedirectRequestTarget(CreateUserModule.class, ACTION_VIEW_CREATE,
+                    strOrgId);
         }
 
         final CreateUser form = formsess.getObject();
@@ -241,7 +241,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
             throw vfe;
         }
         
-        if (form.getRole().equals(CpAdminRoles.CLIENT_ADMIN)) {
+        if (!form.getRole().equals(CpAdminRoles.NONE)) {
             return sendAdminInvitationWithMailPage(cycle, org.getId(), adminAccount.getUserId());
         }
 
@@ -325,11 +325,8 @@ public class CreateUserModule extends AbstractWebAuthModule {
             return new RedirectUrlRequestTarget(NavigationUtil.toOrgUsersUrl(cycle, strOrgId));
         }
 
-        CharSequence roleName = OrgRoleName.forOrg(orgId);
-        String role = ua.getProfileValue(CocoSiteConstants.UA_PROFILE,roleName.toString());
-
-        if (!CpAdminRoles.CLIENT_ADMIN.equals(role)) {
-            LOGGER.warn("User doesn't have a client admin role. Had {} in {}", role, orgId);
+        if (!UserAccountRoleCheck.isCpAdmin(ua, orgId)) {
+            LOGGER.warn("User doesn't have a client admin role in ou {}", orgId);
             return new RedirectUrlRequestTarget(NavigationUtil.toUserPageUrl(cycle, strOrgId, userId));
         }
 
@@ -340,5 +337,9 @@ public class CreateUserModule extends AbstractWebAuthModule {
             LOGGER.debug("Password not set for new admin: {}", ua);
             return createNewAccountMail(cycle, ua, strOrgId);
         }
+    }
+
+    private boolean isValidRole(String role) {
+        return true;
     }
 }

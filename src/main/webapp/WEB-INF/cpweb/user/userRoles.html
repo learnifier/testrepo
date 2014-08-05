@@ -1,0 +1,159 @@
+[#ftl strip_text="true" /]
+
+
+[#import "userOverviewMenu.html" as userMenu]
+
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+$(document).ready(function() {
+    
+    require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
+       
+        var oTable = $('#userroleslist').dataTable({
+            "sDom": 'rt<"dataTables_footer clearfix"i>',
+            "bPaginate": false,            
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mData": "name",
+                    "fnRender": function ( oObj ) {
+                        return  '<span title="' +oObj.aData.name + '">' + cocobox.trunc(oObj.aData.name, 20) + '</span>';
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mData": null,
+                    "sWidth": "10%",
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        [#if security.hasPermission("BO_EDIT_USER")]
+                          return '<button onclick="deleteMember(\'' +  oObj.aData.uuid +'\')">Delete</button>';
+                        [#else]
+                          return '';
+                        [/#if]
+                    }
+                }
+
+
+            ],
+                        
+            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listRoles',[org.id, user.userId?c])}",
+             
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>${user.displayName?xhtml} has no roles assigned </span>",
+                "sLoadingRecords": "<p>Loading roles...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+       
+
+        
+    });
+ 
+});
+
+ 
+function reloadMemberList(data) {
+    var oTable = $('#userroleslist').dataTable();
+    oTable.fnClearTable();
+    log(data.aaData);
+    oTable.fnAddData(data.aaData);
+};
+
+function deleteMember(role) {
+    cocobox.confirmationDialog("Delete role", "Do you want to delete this role for ${user.displayName?xhtml}?", function() { 
+        var ajaxData = {userId: ${user.userId?c}, 'role': role};
+        cocobox.ajaxPost("${helper.urlFor('user.UserJsonModule','removeCpRole', [org.id?c])}", {
+            data: ajaxData,
+            success: reloadMemberList
+        });
+    });
+    return false;
+};   
+   
+</script>
+
+[/#assign]
+
+[#assign head]
+${cpweb_head}
+
+</style>
+
+[/#assign]
+
+[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot]
+
+    <section id="userinfo">
+        <div id="itemactions">
+            [#if role == "clientadmin"]
+                <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
+                    <button>Resend invitation</button>
+                </form>
+            [/#if]
+            <form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
+                <button>Edit</button>
+            </form>
+        </div>
+        <div id="usericon">
+            [#if userimg??]
+            <img src="${userimg}" alt="${user.displayName?xhtml} Profile Image"/>
+            [#else]
+            <img src="${cocoboxCdn}/cocobox/img/cp/userImage_64x64.png" alt="${user.displayName?xhtml} Profile Image" />
+            [/#if]
+            <p>User</p><h1>${user.displayName?xhtml}</h1>
+        </div>
+        <div class="itemdetails">
+            <ul>
+                <li><span class="label">Email</span><span class="setting clearfix">${user.primaryEmail?xhtml}</span></li>
+                <li><span class="label">Language</span><span class="setting clearfix">${locale.getDisplayName(userLocale)?xhtml}</span></li>
+            </ul>
+        </div>
+    </section>
+
+    [@userMenu.userOverviewMenu selected="roles"][/@userMenu.userOverviewMenu]
+    
+    <h2>Roles</h2>
+    
+    <section id="addrole">
+        <div id="manual">
+            
+            <form action="${helper.urlFor('user.UserModule','addRole', [org.id])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post">
+                <section class="field">
+                    <div id="selector_wrapper">
+                        <label for="roles">Roles</label>
+                        <select name="role" class="input_full">
+                            [#list roles?sort_by('name') as role]
+                            <option value="${role.uuid}">${role.name?xhtml}</option>
+                            [/#list]
+                        </select>
+                    </div>
+                </section>
+                <section class="action">
+                    <input type="hidden" name="userId" value="${user.userId?c}" />
+                    <input type="submit" value="[@dws.txt key='form.action.addrole' /]"  tabindex="4" class="add" />
+                </section>  
+            </form>
+        </div>
+    </section>
+
+    
+    <section class="list">
+        <table class="list" id="userroleslist">
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+    
+    
+
+[/@dws.skin]
+

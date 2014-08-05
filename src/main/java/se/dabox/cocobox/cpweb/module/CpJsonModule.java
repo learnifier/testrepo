@@ -30,11 +30,13 @@ import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.project.ProjectThumbnail;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.OrgUser;
+import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.alert.ProjectAlertInfo;
 import se.dabox.service.common.ccbc.alert.ProjectAlertRequest;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
@@ -54,6 +56,7 @@ import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
+import se.dabox.util.collections.Predicate;
 import se.dabox.util.collections.Transformer;
 import se.dabox.util.collections.ValueUtils;
 
@@ -83,6 +86,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                 ccbc.listOrgProjects(orgId);
         projects = CollectionsUtil.sublist(projects, OrgProjectPredicates.
                 getSubtypePredicate(ProjectSubtypeConstants.MAIN));
+        projects = filterProjects(cycle.getRequest().getParameter("type"), projects);
 
         ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects, favoriteIds);
 
@@ -101,8 +105,11 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         long userId = LoginUserAccountHelper.getUserId(cycle);
         List<Long> favoriteIds = ccbc.getFavorites(userId, orgId);
 
-        List<OrgProject> projects =
-                ccbc.searchOrgProjects(userId, term, Collections.singletonList(orgId));
+        List<OrgProject> projects = Collections.emptyList();
+
+        if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_LIST_PROJECTS)) {
+            projects = ccbc.searchOrgProjects(userId, term, Collections.singletonList(orgId));
+        }
 
         ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects, favoriteIds);
 
@@ -204,8 +211,12 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         final long userId = LoginUserAccountHelper.getUserId(cycle);
         final String orgRole = OrgRoleName.forOrg(org.getId()).toString();
 
-        List<UserAccount> uas = getUserAccountService(cycle).searchUserAccounts(userId, query,
-                CocoSiteConstants.UA_PROFILE, orgRole, CocoboxSecurityConstants.USER_ROLE);
+        List<UserAccount> uas = Collections.emptyList();
+
+        if (hasOrgPermission(cycle, Long.parseLong(strOrgId), CocoboxPermissions.CP_LIST_USERS)) {
+            uas = getUserAccountService(cycle).searchUserAccounts(userId, query,
+                    CocoSiteConstants.UA_PROFILE, orgRole, CocoboxSecurityConstants.USER_ROLE);
+        }
 
         return jsonTarget(toJsonUserAccounts(cycle, uas, org.getId()));
     }
@@ -438,6 +449,35 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                 return project.getName();
             }
         });
+    }
+
+    private List<OrgProject> filterProjects(String parameter, List<OrgProject> projects) {
+        final ProjectStatus status = decodeStatus(parameter);
+
+        if (status == null) {
+            return projects;
+        }
+
+        return CollectionsUtil.sublist(projects, new Predicate<OrgProject>() {
+
+            @Override
+            public boolean evalute(OrgProject item) {
+                return item.getStatus() == status;
+            }
+        });
+
+    }
+
+    private ProjectStatus decodeStatus(String parameter) {
+        if (parameter == null) {
+            return null;
+        }
+
+        try {
+            return ProjectStatus.valueOf(parameter);
+        } catch(IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private static class ComboProjectAlert implements Comparable<ComboProjectAlert> {

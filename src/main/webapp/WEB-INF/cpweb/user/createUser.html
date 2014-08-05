@@ -19,11 +19,21 @@ ${cpweb_foot}
     <section class="field clearfix">
         <div class="column">
             <fieldset>
-                [#assign defaultValue = formsess.getDefaultValue('role')!'clientadmin' /]
-                [@mbform.select name="role" class="input_full" tabindex="1"]
-                    [@mbform.option value="none"]None[/@mbform.option]
-                    [@mbform.option value="clientadmin" defaultValue=defaultValue]Client Administrator[/@mbform.option]
-                [/@mbform.select]
+
+                [#if editMode]
+                <input type="hidden" name="role" value="edit" />
+                [#else]
+
+                    [#assign defaultValue = formsess.getDefaultValue('role')!'clientadmin' /]
+                    [@mbform.select name="role" class="input_full" tabindex="1"]
+                        [@mbform.option value="" selected="selected" disabled="disabled"][/@mbform.option]
+                        [@mbform.option value="none"]None[/@mbform.option]
+                        [#list roles as role]
+                            [@mbform.option value=role.uuid]${role.name?xhtml}[/@mbform.option]
+                        [/#list]
+                    [/@mbform.select]
+
+                [/#if]
 
                 [@mbform.inputText name="firstname" class="input_full"  tabindex="2" maxlength="64" /]
 

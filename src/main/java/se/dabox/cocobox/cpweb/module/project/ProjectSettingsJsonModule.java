@@ -21,6 +21,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
@@ -82,6 +83,8 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         String userDescription = prj.getUserDescription();
         boolean autoIcal = prj.isAutoIcal();
 
+        ProjectStatus status = prj.getStatus();
+
         boolean match = true;
         switch (fieldName) {
             case "name":
@@ -117,6 +120,13 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
                 country = countryc.getObj();
                 stringValue = countryc.getValue();
                 break;
+            case "status":
+                try {
+                    status = ProjectStatus.valueOf(fieldValue);
+                } catch (IllegalArgumentException ex) {
+                    return returnSettingError(cycle, "Invalid status");
+                }
+                break;
             default:
                 match = false;
         }
@@ -133,6 +143,13 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
 
         new RecentTimezoneUpdateCommand(cycle).updateRecentTimezone(prj.getOrgId(), timezone);
+
+        se.dabox.service.common.ccbc.project.update.UpdateProjectRequest updateEx =
+                new se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder(updatedBy, projectId).
+                        setStatus(status).
+                        createUpdateProjectRequest();
+
+        getCocoboxCordinatorClient(cycle).updateOrgProject(updateEx);
 
         if (stringValue == null) {
             stringValue = fieldValue;

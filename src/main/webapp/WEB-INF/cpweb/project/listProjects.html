@@ -11,7 +11,7 @@ ${cpweb_foot}
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
     var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
     var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
-    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}";
+    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?type=${projectStatus}";
 
     require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
        //No initialization needed
@@ -23,9 +23,20 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth2" head=cpweb_head foot=foot orgName=orgName]
 
+[@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
 <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-add navBackgroundColor">Add Project</a>
+[/@]
+
 <h1>Projects</h1>
 <section class="list">
+    <nav id="itemnav" style="margin-bottom: 10px;">
+        <ul>
+            <li class="${(projectStatus == 'NEW')?string('activeItem','')}"><a  href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=NEW"><span>${ctext("project.status.NEW")?xml}</span></a></li>
+            <li class="${(projectStatus == 'ACTIVE')?string('activeItem','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=ACTIVE"><span>${ctext("project.status.ACTIVE")?xml}</span></a></li>
+            <li class="${(projectStatus == 'DISABLED')?string('activeItem','')}" ><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=DISABLED"><span>${ctext("project.status.DISABLED")?xml}</span></a></li>
+        </ul>
+    </nav>
+    
     <table class="list" id="listprojects">
         <thead>
             <tr>
