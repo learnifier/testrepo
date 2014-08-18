@@ -23,7 +23,6 @@ import se.dabox.cocosite.user.MiniUserAccountHelperContext;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
