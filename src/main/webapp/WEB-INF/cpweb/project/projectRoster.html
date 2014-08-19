@@ -430,8 +430,10 @@ ${cpweb_head}
     [@mbform.listformFields /]
     <input type="hidden" name="projectId" value="${prj.projectId?c}" />
     <section class="listactions">
-        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');
+        [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
+        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
                 return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
+        [/@]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'delete');
                 return false">Delete</button>

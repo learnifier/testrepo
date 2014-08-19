@@ -21,6 +21,8 @@ import se.dabox.cocobox.cpweb.module.project.ProjectSendMailProcessor;
 import se.dabox.cocobox.cpweb.module.project.credit.CpCreditCheck;
 import se.dabox.cocobox.cpweb.module.project.credit.CreditAllocationFailure;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
+import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.security.Permission;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -37,7 +39,8 @@ import se.dabox.util.collections.Transformer;
  *
  * @author Jerker Klang <jerker.klang@dabox.se>
  */
-public class ProjectParticipantSendMail extends AbstractRosterListCommand {
+public class ProjectParticipantSendMail extends AbstractRosterListCommand implements
+        PermissionListformCommand<Long> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectParticipantSendMail.class);
     private SendMailSession sms;
@@ -161,5 +164,10 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand {
                         return Collections.emptyList();
                     }
                 });
+    }
+
+    @Override
+    public List<Permission> getPermissionsRequired() {
+        return Collections.singletonList(CocoboxPermissions.CP_SEND_MAIL_PROJECT);
     }
 }

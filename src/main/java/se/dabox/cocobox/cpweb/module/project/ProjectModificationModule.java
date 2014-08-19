@@ -41,6 +41,7 @@ import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordin
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.UrlRequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.project.roster.ActivateParticipant;
+import se.dabox.cocobox.cpweb.module.project.roster.PermissionListformCommand;
 import se.dabox.cocobox.cpweb.module.project.roster.ProjectParticipantSendMail;
 import se.dabox.cocobox.cpweb.module.project.roster.RosterDeleteParticipant;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
@@ -49,6 +50,7 @@ import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.security.Permission;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.dws.client.langservice.LangBundle;
@@ -72,6 +74,7 @@ import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.druwa.FormbeanJsRequestTargetFactory;
 import se.dabox.service.webutils.freemarker.text.LangServiceClientFactory;
+import se.dabox.service.webutils.listform.ListformCommand;
 import se.dabox.service.webutils.listform.ListformContext;
 import se.dabox.service.webutils.listform.LongListformProcessor;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -91,7 +94,25 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
     private final LongListformProcessor rosterProcessor;
 
     public ProjectModificationModule() {
-        rosterProcessor = new LongListformProcessor();
+        rosterProcessor = new LongListformProcessor() {
+
+            @Override
+            protected void beforeProcess(ListformContext context, ListformCommand<Long> cmd) {
+                super.beforeProcess(context, cmd);
+
+                if (cmd instanceof PermissionListformCommand) {
+                    PermissionListformCommand plc = (PermissionListformCommand) cmd;
+                    List<Permission> perms = plc.getPermissionsRequired();
+                    RequestCycle cycle = context.getCycle();
+                    OrgProject project = context.getAttribute("project", OrgProject.class);
+
+                    for (Permission permission : perms) {
+                        checkProjectPermission(cycle, project, permission);
+                    }
+                }
+            }
+
+        };
         rosterProcessor.addCommand("delete", new RosterDeleteParticipant());
         rosterProcessor.addCommand("send", new ProjectParticipantSendMail());
         rosterProcessor.addCommand("activate", new ActivateParticipant());
@@ -369,7 +390,6 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onAssignRole(RequestCycle cycle, String strProjectId) {
-
         long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
         String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 
@@ -383,6 +403,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
 
         long caller = LoginUserAccountHelper.getCurrentCaller();
 
@@ -408,6 +429,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
 
         long caller = LoginUserAccountHelper.getCurrentCaller();        
 
