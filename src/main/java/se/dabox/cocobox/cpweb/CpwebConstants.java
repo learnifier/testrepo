@@ -3,6 +3,8 @@
  */
 package se.dabox.cocobox.cpweb;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
@@ -22,6 +24,14 @@ public final class CpwebConstants {
      * for the last project sendout.
      */
     public static final String SEND_PARTICIPATIONS_FLASH = "sendParticipationsFlash";
+
+    public static final long LINKACTION_LIFETIME = TimeUnit.MINUTES.toMillis(5);
+
+    /**
+     * Name of the conf value that contains the upweb linkaction endpoint
+     *
+     */
+    public static final String UPWEB_LINKACTION_ENDPOINT = "upweb-dev.linkaction.endpoint";
 
     private CpwebConstants() {
     }

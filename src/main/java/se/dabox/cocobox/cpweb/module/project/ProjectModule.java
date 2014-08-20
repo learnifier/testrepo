@@ -18,10 +18,12 @@ import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
+import net.unixdeveloper.druwa.util.UrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.coursebuilder.initdata.InitData;
 import se.dabox.cocobox.coursebuilder.initdata.InitDataBuilder;
+import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.account.ChangePassword;
 import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
@@ -43,12 +45,14 @@ import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
+import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
@@ -439,7 +443,27 @@ public class ProjectModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onImpersonate(RequestCycle cycle, String strParticipationId) {
         //TODO: Enforce project permission check
-        return new StringRequestTarget("OK "+strParticipationId);        
+
+        ProjectParticipation part
+                = getCocoboxCordinatorClient(cycle).getProjectParticipationByStringId(
+                        strParticipationId);
+        OrgProject project = getProject(cycle, Long.toString(part.getProjectId()));
+        checkPermission(cycle, project);
+
+        ImpersonateParticipationLinkAction action = new ImpersonateParticipationLinkAction(
+                part.getParticipationId());
+
+        long caller = LoginUserAccountHelper.getCurrentCaller();
+
+        String randId = getRandomDataClient(cycle).addRandomData(caller, action,
+                CpwebConstants.LINKACTION_LIFETIME);
+
+        String endpoint = getConfValue(cycle, CpwebConstants.UPWEB_LINKACTION_ENDPOINT);
+
+        UrlBuilder builder = new UrlBuilder(endpoint+'/'+randId);
+        builder.addParameter("ts", Long.toString(System.currentTimeMillis()));
+
+        return new RedirectUrlRequestTarget(builder.toString());
     }
 
     private TemplateLists getLists(RequestCycle cycle, long mailBucket) {
