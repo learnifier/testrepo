@@ -445,8 +445,8 @@ public class ProjectModule extends AbstractProjectWebModule {
         //TODO: Enforce project permission check
 
         ProjectParticipation part
-                = getCocoboxCordinatorClient(cycle).getProjectParticipationByStringId(
-                        strParticipationId);
+                = getCocoboxCordinatorClient(cycle).getProjectParticipation(Long.valueOf(
+                                strParticipationId));
         OrgProject project = getProject(cycle, Long.toString(part.getProjectId()));
         checkPermission(cycle, project);
 
