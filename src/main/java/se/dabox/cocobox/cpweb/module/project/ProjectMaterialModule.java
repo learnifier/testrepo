@@ -37,7 +37,7 @@ import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.material")
 public class ProjectMaterialModule extends AbstractJsonAuthModule {

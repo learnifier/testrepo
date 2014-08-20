@@ -32,7 +32,7 @@ import se.dabox.util.ParamUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/coursedesign.json")
 public class CourseDesignJsonModule extends AbstractJsonAuthModule {

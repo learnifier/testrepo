@@ -5,7 +5,7 @@ package se.dabox.cocobox.cpweb.module.branding;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AbstractLogoModule {
 

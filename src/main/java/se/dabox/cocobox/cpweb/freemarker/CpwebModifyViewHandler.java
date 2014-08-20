@@ -15,7 +15,7 @@ import se.dabox.service.orgdir.client.OrgUnitInfo;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CpwebModifyViewHandler implements ModifyViewDataHandler {
     public static final String FREEMARKER_ATTRIBUTE_NAME_INFOHELPER = "infoHelper";

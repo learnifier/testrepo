@@ -8,7 +8,7 @@ import se.dabox.util.ParamUtil;
 /**
  * Container of a sender of an email. Can contain both name and always an e-mail address.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class MailSender {
     private final String name;

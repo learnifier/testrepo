@@ -48,7 +48,7 @@ import se.dabox.service.login.client.UserAccountService;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/user.create")
 public class CreateUserModule extends AbstractWebAuthModule {

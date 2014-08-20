@@ -10,7 +10,7 @@ import se.dabox.util.converter.impl.RawConverter;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class ColorPickerConverter implements RawConverter {
     private static final Pattern COLOR_PATTERN = Pattern.compile("#[0-9A-F]{6}");

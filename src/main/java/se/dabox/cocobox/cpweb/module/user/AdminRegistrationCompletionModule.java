@@ -32,7 +32,7 @@ import se.dabox.service.login.client.UserAccountService;
  * Module that completes the admin registration. This logic is in a separate module
  * from the first because this requires the user to be logged in
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/registration2")
 public class AdminRegistrationCompletionModule extends AbstractWebAuthModule {

@@ -10,7 +10,7 @@ import java.util.TimeZone;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class DateTimeFormatter {
     private final DateFormat formatter;

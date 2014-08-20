@@ -5,7 +5,7 @@ package se.dabox.cocobox.cpweb.excel;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CellCoordinate {
     private final int row;

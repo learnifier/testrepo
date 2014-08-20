@@ -20,7 +20,7 @@ import se.dabox.service.branding.client.Branding;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class BrandingOutput extends AbstractOrgBrandingOutput implements TemplateDirectiveModel {
 

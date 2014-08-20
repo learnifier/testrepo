@@ -26,7 +26,7 @@ import se.dabox.service.webutils.json.JsonEncoding;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/mail.json")
 public class MailJsonModule extends AbstractJsonAuthModule {

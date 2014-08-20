@@ -74,7 +74,7 @@ import se.dabox.util.converter.ConversionContext;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/orgmats.json")
 public class OrgMaterialJsonModule extends AbstractJsonAuthModule {

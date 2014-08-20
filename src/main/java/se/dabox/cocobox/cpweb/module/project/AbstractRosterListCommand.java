@@ -11,7 +11,7 @@ import se.dabox.service.webutils.listform.ListformContext;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public abstract class AbstractRosterListCommand extends AbstractIteratingListformProcessor<Long>{
 

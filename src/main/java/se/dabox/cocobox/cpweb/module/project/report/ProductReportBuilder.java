@@ -44,7 +44,7 @@ import se.dabox.util.collections.MapUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class ProductReportBuilder extends AbstractProductReportBuilder<UserProductStatus> {
 

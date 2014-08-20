@@ -22,7 +22,7 @@ import se.dabox.service.proddir.data.ProductId;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
 

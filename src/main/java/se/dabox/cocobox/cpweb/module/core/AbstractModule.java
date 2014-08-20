@@ -31,7 +31,7 @@ import se.dabox.service.webutils.druwa.DwsWebsiteConstants;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public abstract class AbstractModule {
 

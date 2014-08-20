@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public interface LineEnhancer {
 

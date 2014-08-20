@@ -15,7 +15,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class UserOrgSecurityCheck extends WebSessionCacheAdapter<Boolean>{
     private static final UserOrgSecurityCheck INSTANCE = new UserOrgSecurityCheck();

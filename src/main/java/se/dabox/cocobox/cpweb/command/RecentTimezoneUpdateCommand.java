@@ -17,7 +17,7 @@ import se.dabox.util.RecentList;
  * Command that update the recent timezone string for a org unit. The string
  * is only updated if the timezone is non-null and the recent string differ from the existing.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class RecentTimezoneUpdateCommand {
 

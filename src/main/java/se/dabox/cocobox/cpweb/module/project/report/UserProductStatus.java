@@ -10,7 +10,7 @@ import se.dabox.service.proddir.data.ProductId;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class UserProductStatus {
     private final long userId;

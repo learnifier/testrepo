@@ -24,7 +24,7 @@ import se.dabox.service.common.ccbc.project.OrgProject;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public final class NavigationUtil {
 

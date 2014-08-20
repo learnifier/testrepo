@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CreditAllocationFailure implements Serializable {
     private static final long serialVersionUID = 1L;

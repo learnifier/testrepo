@@ -9,7 +9,7 @@ import se.dabox.cocobox.coursebuilder.initdata.InitData;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class GotoDesignBuilder {
 

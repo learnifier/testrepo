@@ -19,7 +19,7 @@ import se.dabox.service.tokenmanager.client.TokenManagerClient;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public abstract class AbstractReport {
     private static final Logger LOGGER =

@@ -17,7 +17,7 @@ import se.dabox.service.webutils.json.DataTablesJson;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 class OrgProductLinkTokenJson {
 

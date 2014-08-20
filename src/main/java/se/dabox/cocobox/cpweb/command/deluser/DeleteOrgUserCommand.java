@@ -18,7 +18,7 @@ import se.dabox.service.login.client.UserAccountService;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class DeleteOrgUserCommand {
     private static final Logger LOGGER =

@@ -15,7 +15,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractModule;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/error")
 public class ErrorModule extends AbstractModule {

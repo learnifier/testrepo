@@ -10,7 +10,7 @@ import se.dabox.cocosite.module.account.picture.PostUpdateImageAction;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 class CpPostUpdateImageAction implements PostUpdateImageAction {
 

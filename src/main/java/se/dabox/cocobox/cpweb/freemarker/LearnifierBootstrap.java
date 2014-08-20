@@ -29,7 +29,7 @@ import se.dabox.service.client.CacheClients;
  * Client Portal freemarker directive that outputs the learnifier bootstrap file.
  * The file is either the client one (if it exists) or the realm wide.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class LearnifierBootstrap extends AbstractOrgBrandingOutput implements TemplateDirectiveModel {
     private static final LearnifierBootstrap INSTANCE = new LearnifierBootstrap();

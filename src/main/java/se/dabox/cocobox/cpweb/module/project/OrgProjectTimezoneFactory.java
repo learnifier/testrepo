@@ -17,7 +17,7 @@ import se.dabox.util.RecentList;
 /**
  * Factory that creates RecentList instances for project timezones.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public final class OrgProjectTimezoneFactory {
     

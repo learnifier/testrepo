@@ -82,7 +82,7 @@ import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.mod")
 public class ProjectModificationModule extends AbstractJsonAuthModule {

@@ -36,7 +36,7 @@ import se.dabox.util.collections.Predicate;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.createjs")
 public class NewProjectJsonModule extends AbstractJsonAuthModule {

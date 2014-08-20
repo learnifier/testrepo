@@ -42,7 +42,7 @@ import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 class ActivityReportBuilder implements StatusSource {
 

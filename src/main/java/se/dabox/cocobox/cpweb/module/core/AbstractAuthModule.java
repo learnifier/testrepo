@@ -30,7 +30,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public abstract class AbstractAuthModule extends AbstractModule {
 

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class LineEnhancers {
     private LineEnhancerContext ctx = new StandardLineEnhancerContext();

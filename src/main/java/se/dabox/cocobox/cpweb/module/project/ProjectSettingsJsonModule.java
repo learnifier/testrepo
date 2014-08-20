@@ -30,7 +30,7 @@ import se.dabox.util.HybridLocaleUtils;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.sjs")
 public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {

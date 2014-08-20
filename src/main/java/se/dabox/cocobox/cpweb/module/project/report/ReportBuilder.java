@@ -6,7 +6,7 @@ package se.dabox.cocobox.cpweb.module.project.report;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 abstract class ReportBuilder {
 

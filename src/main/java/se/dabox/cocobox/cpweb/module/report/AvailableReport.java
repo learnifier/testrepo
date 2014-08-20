@@ -12,7 +12,7 @@ import se.dabox.service.tokenmanager.client.TokenFilter;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AvailableReport extends AbstractReport {
     private static final Logger LOGGER =

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class SimpleEmailValidator implements EmailValidator {
     private static final Pattern PATTERN = Pattern.compile("[^@]+@[^@]+");

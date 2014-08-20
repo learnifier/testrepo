@@ -25,7 +25,7 @@ import se.dabox.util.collections.Transformer;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class ProjectSendMailProcessor implements SendMailProcessor, SendMailVerifier {
     private static final long serialVersionUID = 2L;

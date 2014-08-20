@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public final class OrgMaterialTypes {
 

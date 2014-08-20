@@ -15,7 +15,7 @@ import se.dabox.service.common.orderhandler.OrderLine;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class OrderInfoEnhancer implements LineEnhancer {
 

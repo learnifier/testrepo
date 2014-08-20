@@ -14,7 +14,7 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 abstract class AbstractMailSendMailProcessor implements SendMailProcessor, Serializable {
     private static final long serialVersionUID = 1L;

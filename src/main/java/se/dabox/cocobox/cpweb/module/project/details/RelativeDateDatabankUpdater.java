@@ -30,7 +30,7 @@ import se.dabox.service.coursedesign.validator.impl.TypeHandler;
  * there is a override flag (databank value name is the same and a trailing _override)
  * is stored in the databank.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class RelativeDateDatabankUpdater {
     private static final Logger LOGGER =

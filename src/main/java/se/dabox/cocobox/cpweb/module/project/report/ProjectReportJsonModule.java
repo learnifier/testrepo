@@ -26,7 +26,7 @@ import se.dabox.service.proddir.data.Product;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.reportjs")
 public class ProjectReportJsonModule extends AbstractJsonAuthModule {

@@ -12,7 +12,7 @@ import se.dabox.cocobox.cpweb.state.SendMailTemplate;
  * Interface for classes that processes the send mail operation.
  * Note that implementations must be serializable.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public interface SendMailProcessor extends Serializable {
 

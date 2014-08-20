@@ -5,7 +5,7 @@ package se.dabox.cocobox.cpweb.module.coursedesign;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public final class DesignTechInfo {
 

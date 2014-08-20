@@ -9,7 +9,7 @@ import se.dabox.service.common.ccbc.mailfilter.MailFilterTarget;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AddTaskForm implements Serializable {
 

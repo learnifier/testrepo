@@ -20,7 +20,7 @@ import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class StartPageModule extends AbstractModule {
 

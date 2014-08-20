@@ -8,7 +8,7 @@ import se.dabox.service.common.coursedesign.CourseDesign;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class BucketCourseDesign {
     private CourseDesign design;

@@ -22,7 +22,7 @@ import se.dabox.service.webutils.json.JsonErrorMessageException;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.jspart")
 public class ParticipationJsonModule extends AbstractJsonAuthModule {

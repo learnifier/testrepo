@@ -5,7 +5,7 @@ package se.dabox.cocobox.cpweb.module.project.partdetails;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 class IdProjectModel {
     private final String title;

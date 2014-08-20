@@ -26,7 +26,7 @@ import se.dabox.service.webutils.druwa.DwsWebsiteHelper;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CustomerPortalApplication extends DruwaApplication {
     private static final Logger LOGGER =

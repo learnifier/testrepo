@@ -7,7 +7,7 @@ import se.dabox.service.tokenmanager.client.Token;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 class TokenUtil {
 

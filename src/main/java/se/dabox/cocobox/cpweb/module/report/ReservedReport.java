@@ -9,7 +9,7 @@ import se.dabox.service.tokenmanager.client.TokenStatus;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class ReservedReport extends AbstractResCoReport {
 

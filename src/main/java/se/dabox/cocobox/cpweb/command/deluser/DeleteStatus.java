@@ -5,7 +5,7 @@ package se.dabox.cocobox.cpweb.command.deluser;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public enum DeleteStatus {
 

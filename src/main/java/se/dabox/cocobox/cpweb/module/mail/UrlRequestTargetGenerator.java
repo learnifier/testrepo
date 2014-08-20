@@ -9,7 +9,7 @@ import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class UrlRequestTargetGenerator implements RequestTargetGenerator {
     private final String url;

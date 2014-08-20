@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class PreviewState implements Serializable, HttpSessionBindingListener {
     private static final long serialVersionUID = 3L;

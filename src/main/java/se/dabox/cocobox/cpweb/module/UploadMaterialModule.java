@@ -32,7 +32,7 @@ import se.dabox.service.contentrepo.util.URINormalizer;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/uploadorgmat")
 public class UploadMaterialModule extends AbstractWebAuthModule {

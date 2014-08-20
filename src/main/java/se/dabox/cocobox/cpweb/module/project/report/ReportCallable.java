@@ -9,7 +9,7 @@ import se.dabox.service.common.RealmBackgroundCallable;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  * @param <T>
  */
 public abstract class ReportCallable<T> extends RealmBackgroundCallable<T> implements

@@ -79,7 +79,7 @@ import se.dabox.util.collections.ValueUtils;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.vd")
 public class VerifyProjectDesignModule extends AbstractWebAuthModule {

@@ -19,7 +19,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CreateMailTaskSendMailProcessor extends AbstractMailSendMailProcessor {
     private static final long serialVersionUID = 2L;

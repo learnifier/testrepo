@@ -46,7 +46,7 @@ import se.dabox.util.ParamUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CreateProjectSessionProcessor implements NewProjectSessionProcessor {
 

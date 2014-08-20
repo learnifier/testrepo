@@ -26,7 +26,7 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
  * Updater that check all components for a enable condition of time and if it relative and
  * calculates the relative date accordingly. Fields with an override flag is not updated.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class RelativeEnableDatabankUpdater {
 

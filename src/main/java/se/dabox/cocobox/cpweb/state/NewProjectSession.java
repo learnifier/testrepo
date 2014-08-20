@@ -16,7 +16,7 @@ import se.dabox.util.ParamUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class NewProjectSession implements Serializable {
     private static final long serialVersionUID = 2L;

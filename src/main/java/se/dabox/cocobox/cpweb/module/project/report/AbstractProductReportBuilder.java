@@ -37,7 +37,7 @@ import se.dabox.util.ParamUtil;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  * @param <P>
  */
 public abstract class AbstractProductReportBuilder<P> {

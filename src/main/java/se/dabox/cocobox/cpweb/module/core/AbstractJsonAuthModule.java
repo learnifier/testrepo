@@ -32,7 +32,7 @@ import se.dabox.service.webutils.login.nlogin.JavascriptNewLoginChecker;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     private final WebLoginCheck loginChecker;

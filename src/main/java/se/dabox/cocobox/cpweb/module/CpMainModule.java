@@ -38,7 +38,7 @@ import se.dabox.service.orgdir.client.OrgUnitInfo;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/site")
 public class CpMainModule extends AbstractWebAuthModule {

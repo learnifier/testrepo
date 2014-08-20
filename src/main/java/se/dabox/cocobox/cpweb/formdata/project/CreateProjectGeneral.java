@@ -10,7 +10,7 @@ import net.unixdeveloper.druwa.formbean.annotation.FormField;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CreateProjectGeneral implements Serializable {
 

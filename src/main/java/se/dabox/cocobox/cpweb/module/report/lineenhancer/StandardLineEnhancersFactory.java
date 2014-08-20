@@ -8,7 +8,7 @@ import se.dabox.cocobox.cpweb.module.report.lineenhancer.impl.OrderInfoEnhancer;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class StandardLineEnhancersFactory {
 

@@ -39,7 +39,7 @@ import se.dabox.util.collections.Predicate;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/reporting.js")
 public class ReportJsonModule extends AbstractJsonAuthModule {

@@ -71,7 +71,7 @@ import se.dabox.util.collections.Transformer;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.create")
 public class NewProjectModule extends AbstractWebAuthModule {

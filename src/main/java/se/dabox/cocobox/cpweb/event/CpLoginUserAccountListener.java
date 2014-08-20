@@ -10,7 +10,7 @@ import se.dabox.service.login.client.UserAccount;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CpLoginUserAccountListener implements LoginUserAccountListener {
 

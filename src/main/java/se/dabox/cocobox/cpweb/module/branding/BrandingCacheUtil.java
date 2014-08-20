@@ -8,7 +8,7 @@ import se.dabox.util.MultiKey;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class BrandingCacheUtil {
     public static final Integer BRANDING_CACHE = CacheIdFactory.newId();

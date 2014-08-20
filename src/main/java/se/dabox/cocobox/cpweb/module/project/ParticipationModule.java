@@ -27,7 +27,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.part")
 public class ParticipationModule extends AbstractWebAuthModule {

@@ -15,7 +15,7 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 class LineDateEnhancer {
 

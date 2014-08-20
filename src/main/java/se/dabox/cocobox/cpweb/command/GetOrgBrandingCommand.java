@@ -15,7 +15,7 @@ import se.dabox.util.collections.Transformer;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class GetOrgBrandingCommand {
     private final RequestCycle cycle;

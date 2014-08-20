@@ -19,7 +19,7 @@ import se.dabox.service.proddir.data.Product;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.report")
 public class ProjectReportModule extends AbstractProjectWebModule {

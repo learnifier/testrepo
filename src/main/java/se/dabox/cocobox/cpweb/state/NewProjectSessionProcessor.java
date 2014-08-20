@@ -10,7 +10,7 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public interface NewProjectSessionProcessor extends Serializable {
 

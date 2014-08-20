@@ -11,7 +11,7 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 
 /**
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class ProjectData {
 

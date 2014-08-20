@@ -9,7 +9,7 @@ import se.dabox.util.ParamUtil;
 /**
  * Creates an error state. orgId (used for branding) and exception are mandatory.
  *
- * @author Jerker Klang <jerker.klang@dabox.se>
+ * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class ErrorState {
 
