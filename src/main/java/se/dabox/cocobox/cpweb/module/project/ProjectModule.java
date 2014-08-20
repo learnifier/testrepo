@@ -17,6 +17,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
+import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.coursebuilder.initdata.InitData;
@@ -433,6 +434,12 @@ public class ProjectModule extends AbstractProjectWebModule {
             ErrorState state = new ErrorState(project.getOrgId(), product, ex, prjId);
             return NavigationUtil.getIntegrationErrorPage(cycle, state);
         }
+    }
+
+    @WebAction
+    public RequestTarget onImpersonate(RequestCycle cycle, String strParticipationId) {
+        //TODO: Enforce project permission check
+        return new StringRequestTarget("OK "+strParticipationId);        
     }
 
     private TemplateLists getLists(RequestCycle cycle, long mailBucket) {

@@ -32,7 +32,7 @@
         <dependency>
             <groupId>se.dabox.cocosite</groupId>
             <artifactId>cocosite-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-cpreview-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>se.dabox.service.contentrepo</groupId>
