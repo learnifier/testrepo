@@ -76,7 +76,7 @@ ${cpweb_foot}
                                 return data;
                             } else if (oObj.aData.activated) {
                                 var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + oObj.aData.participationLink + '\'); return false"><img src="${cocoboxCdn}/cocobox/img/cp/project_participationLink.png" alt="Participation Link"/></a>';
-                                data += '<a href="" onclick="impersonate('+oObj.aData.id+'); return false"><img src="${cocoboxCdn}/cocobox/img/cp/project_participationLink.png" alt="Inpersonate"/></a>';
+                                data += '<a href="" onclick="impersonate('+oObj.aData.id+'); return false"><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
 
                                 return data;
                             }
