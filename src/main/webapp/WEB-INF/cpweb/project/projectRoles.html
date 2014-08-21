@@ -116,18 +116,12 @@ ${cpweb_foot}
     
     
     function deleteMember(role, deleteLink, userId) {
-        $.post({
-            url: deleteLink,
-            method: "POST",
-            data: {
-                role: role,
-                userId: userId
-            }, 
-            success: function(data) {
-                log(data);
-            }
-        })
-    }
+        $("#delUserId").val(userId);
+        $("#delRole").val(role);
+        var form = $("#deleteRoleForm");
+        form.attr("action", deleteLink);
+        form.submit();
+    };
     
     
 </script>
@@ -175,7 +169,12 @@ ${cpweb_foot}
     </table>
 </section>
     
-
+<div style="display: none">
+    <form id="deleteRoleForm" method="POST" action="">
+            <input type="hidden" id="delUserId" name="userId" />
+            <input type="hidden" id="delRole" name="role" />
+    </form>
+</div>
 
 [/@dws.skin]
 
