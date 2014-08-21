@@ -18,6 +18,7 @@ import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.OrgBranding;
+import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.login.LoginHandler;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.user.UserAccountTransformers;
@@ -54,7 +55,7 @@ public class OrgSelectorModule extends AbstractWebAuthModule {
         final int size = orgIds.size();
 
         if (size == 0) {
-            return new RedirectUrlRequestTarget(getConfValue(cycle, "upweb.baseurl"));
+            return new RedirectUrlRequestTarget(getConfValue(cycle, CocoSiteConfKey.UPWEB_BASEURL));
         } else if (size == 1) {
             return new WebModuleRedirectRequestTarget(CpMainModule.class, "home", Long.
                     toString(orgIds.get(0)));

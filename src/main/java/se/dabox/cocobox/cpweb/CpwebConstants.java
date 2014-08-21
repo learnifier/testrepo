@@ -27,12 +27,6 @@ public final class CpwebConstants {
 
     public static final long LINKACTION_LIFETIME = TimeUnit.MINUTES.toMillis(5);
 
-    /**
-     * Name of the conf value that contains the upweb linkaction endpoint
-     *
-     */
-    public static final String UPWEB_LINKACTION_ENDPOINT = "upweb-dev.linkaction.endpoint";
-
     private CpwebConstants() {
     }
 

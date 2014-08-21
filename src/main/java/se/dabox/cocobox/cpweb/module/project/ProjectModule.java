@@ -40,6 +40,8 @@ import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
+import se.dabox.cocosite.druwa.CocoSiteConfKey;
+import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.security.CocoboxPermissions;
@@ -450,17 +452,19 @@ public class ProjectModule extends AbstractProjectWebModule {
         OrgProject project = getProject(cycle, Long.toString(part.getProjectId()));
         checkPermission(cycle, project);
 
-        ImpersonateParticipationLinkAction action = new ImpersonateParticipationLinkAction(
-                part.getParticipationId());
-
         long caller = LoginUserAccountHelper.getCurrentCaller();
+
+        ImpersonateParticipationLinkAction action = new ImpersonateParticipationLinkAction(
+                caller,
+                part.getParticipationId());
 
         String randId = getRandomDataClient(cycle).addRandomData(caller, action,
                 CpwebConstants.LINKACTION_LIFETIME);
 
-        String endpoint = getConfValue(cycle, CpwebConstants.UPWEB_LINKACTION_ENDPOINT);
+        String endpoint = getConfValue(cycle, CocoSiteConfKey.UPWEB_BASEURL)
+                + CocoSiteConstants.UPWEB_LINKACTION_ENDPOINT;
 
-        UrlBuilder builder = new UrlBuilder(endpoint+'/'+randId);
+        UrlBuilder builder = new UrlBuilder(endpoint+randId);
         builder.addParameter("ts", Long.toString(System.currentTimeMillis()));
 
         return new RedirectUrlRequestTarget(builder.toString());
