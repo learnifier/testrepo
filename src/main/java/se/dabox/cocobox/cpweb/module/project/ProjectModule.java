@@ -17,13 +17,10 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
-import net.unixdeveloper.druwa.request.StringRequestTarget;
-import net.unixdeveloper.druwa.util.UrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.coursebuilder.initdata.InitData;
 import se.dabox.cocobox.coursebuilder.initdata.InitDataBuilder;
-import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.account.ChangePassword;
 import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
@@ -40,14 +37,13 @@ import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
-import se.dabox.cocosite.druwa.CocoSiteConfKey;
-import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
+import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
@@ -458,16 +454,9 @@ public class ProjectModule extends AbstractProjectWebModule {
                 caller,
                 part.getParticipationId());
 
-        String randId = getRandomDataClient(cycle).addRandomData(caller, action,
-                CpwebConstants.LINKACTION_LIFETIME);
-
-        String endpoint = getConfValue(cycle, CocoSiteConfKey.UPWEB_BASEURL)
-                + CocoSiteConstants.UPWEB_LINKACTION_ENDPOINT;
-
-        UrlBuilder builder = new UrlBuilder(endpoint+randId);
-        builder.addParameter("ts", Long.toString(System.currentTimeMillis()));
-
-        return new RedirectUrlRequestTarget(builder.toString());
+        String url = LinkActionUrlHelper.getUrl(cycle, action);
+        
+        return new RedirectUrlRequestTarget(url);
     }
 
     private TemplateLists getLists(RequestCycle cycle, long mailBucket) {

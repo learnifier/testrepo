@@ -25,8 +25,6 @@ public final class CpwebConstants {
      */
     public static final String SEND_PARTICIPATIONS_FLASH = "sendParticipationsFlash";
 
-    public static final long LINKACTION_LIFETIME = TimeUnit.MINUTES.toMillis(5);
-
     private CpwebConstants() {
     }
 
