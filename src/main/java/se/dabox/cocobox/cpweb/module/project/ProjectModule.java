@@ -44,6 +44,9 @@ import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
+import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
@@ -456,6 +459,26 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         String url = LinkActionUrlHelper.getUrl(cycle, action);
         
+        return new RedirectUrlRequestTarget(url);
+    }
+
+    @WebAction
+    public RequestTarget onPreviewDesign(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        RealProjectSource projSource = new RealProjectSource(project.getProjectId());
+        ProjectCddSource cddSource = new ProjectCddSource(project.getProjectId());
+
+        CoursePreviewLinkAction action = new CoursePreviewLinkAction();
+        action.setCddSource(cddSource);
+        action.setProjectSource(projSource);
+        
+        String url = LinkActionUrlHelper.getUrl(cycle, action);
+
         return new RedirectUrlRequestTarget(url);
     }
 
