@@ -45,6 +45,7 @@ import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
 import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
+import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
@@ -476,6 +477,11 @@ public class ProjectModule extends AbstractProjectWebModule {
         CoursePreviewLinkAction action = new CoursePreviewLinkAction();
         action.setCddSource(cddSource);
         action.setProjectSource(projSource);
+        action.setParticipationSource(new PreviewParticipationSource(projSource));
+
+        if (!action.isValid()) {
+            throw new IllegalStateException("Action is not setup correctly");
+        }
         
         String url = LinkActionUrlHelper.getUrl(cycle, action);
 
