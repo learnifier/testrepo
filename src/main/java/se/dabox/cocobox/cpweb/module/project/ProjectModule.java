@@ -477,7 +477,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         CoursePreviewLinkAction action = new CoursePreviewLinkAction();
         action.setCddSource(cddSource);
         action.setProjectSource(projSource);
-        action.setParticipationSource(new PreviewParticipationSource(projSource));
+        action.setParticipationSource(new PreviewParticipationSource());
 
         if (!action.isValid()) {
             throw new IllegalStateException("Action is not setup correctly");
