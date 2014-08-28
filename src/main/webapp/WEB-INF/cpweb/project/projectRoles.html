@@ -18,7 +18,7 @@ ${cpweb_foot}
     require(['select2.min'], function() {
         
        $("#userSelect").select2({
-            placeholder: "Search for a user",
+            placeholder: "Start typing name here",
             minimumInputLength: 2,
             ajax: { 
                 url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
@@ -40,7 +40,7 @@ ${cpweb_foot}
                 
                 $('#userSelect').attr('value', data.id);
                 
-                return '<p value="' + data.id + '"> selected user: ' + data.text + '</p>';
+                return '<p value="' + data.id + '">' + data.text + '</p>';
             }
         }); 
     });
@@ -84,16 +84,15 @@ ${cpweb_foot}
                 {
                     "aTargets": [ 1 ],
                     "mData": null,
-                    "sWidth": "10%",
+                    "sWidth": "30%",
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
-                        [#if security.hasPermission("BO_EDIT_USER")]
-                        
+                            var roleList='';
                             for(var i = 0; i < oObj.aData.roles.length; i++) {
-                                return '<button onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')">' + oObj.aData.roles[i].roleName + ' </button>';
+                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + oObj.aData.roles[i].roleName + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')">Remove role</a></p>';
                             }
-                            
-                            
+                            return roleList;                            
+                        [#if security.hasPermission("BO_EDIT_USER")]
                         [#else]
                           return '';
                         [/#if]
@@ -106,8 +105,8 @@ ${cpweb_foot}
             "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
              
             "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>This project has no users with roles assigned </span>",
-                "sLoadingRecords": "<p>Loading roles...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                "sEmptyTable": "<span class='emptytable'>There are no users on this team</span>",
+                "sLoadingRecords": "<p>Loading team members...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
        
@@ -117,18 +116,12 @@ ${cpweb_foot}
     
     
     function deleteMember(role, deleteLink, userId) {
-        $.ajax({
-            url: deleteLink,
-            method: "POST",
-            data: {
-                role: role,
-                userId: userId
-            }, 
-            success: function(data) {
-                log(data);
-            }
-        })
-    }
+        $("#delUserId").val(userId);
+        $("#delRole").val(role);
+        var form = $("#deleteRoleForm");
+        form.attr("action", deleteLink);
+        form.submit();
+    };
     
     
 </script>
@@ -141,24 +134,34 @@ ${cpweb_foot}
 <h2>[@dws.txt key="cpweb.project.roles.title" /]</h2>
 
 <form method="POST" action="${helper.urlFor('project.ProjectModificationModule','assignRole',[prj.projectId])}">
-    <input name="userId" type="number" id="userSelect" class="bigdrop">
 
-    
-    [#list projectRoles?keys as pr]
-    <label>${projectRoles[pr]}
-    <input type="radio" name="role" value="${pr}">
-    </label>
-    [/#list]
-    
-    <button type="submit">Assign</button>    
+    <section id="addtoteam">
+        <section class="field">
+        <div class="inputtext">
+        <label for="userSelect">Select user</label>
+        <input name="userId" type="number" id="userSelect" class="bigdrop">
+        </div>
+        <div class="inputtext">
+            <label for="roleSelect">Select role</label>
+            <select id="roleSelect" name="role">    
+            [#list projectRoles?keys as pr]
+            <option value="${pr}">${projectRoles[pr]}</option>
+            [/#list]
+            </select>
+        </div>
+        </section>
+        <section class="action">
+            <button type="submit">Assign</button>    
+        </section>
+    </section>
 </form>
 
 <section class="list">
     <table class="list" id="userroleslist">
         <thead>
             <tr>
+                <th>Name</th>
                 <th>Role</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -166,7 +169,12 @@ ${cpweb_foot}
     </table>
 </section>
     
-
+<div style="display: none">
+    <form id="deleteRoleForm" method="POST" action="">
+            <input type="hidden" id="delUserId" name="userId" />
+            <input type="hidden" id="delRole" name="role" />
+    </form>
+</div>
 
 [/@dws.skin]
 

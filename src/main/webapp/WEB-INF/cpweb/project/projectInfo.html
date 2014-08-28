@@ -106,6 +106,9 @@ cpweb.editable($('#project-status .editable-content'), $('#project-status .edita
         <ul>
             [#--    <li class="[#if selected == 'overview']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>--]
             <li class="[#if selected == 'participants']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
+            [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
+            <li class="[#if selected == 'projectadmin']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
+            [/@]
 
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             <li class="[#if selected == 'details']activeItem[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.details' /]</span></a></li>
@@ -134,9 +137,6 @@ cpweb.editable($('#project-status .editable-content'), $('#project-status .edita
             <li class="[#if selected == 'registration']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
             [/@]
             <li class="[#if selected == 'settings']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
-            [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
-            <li class="[#if selected == 'projectadmin']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
-            [/@]
         </ul>
     </nav>
 </section>
