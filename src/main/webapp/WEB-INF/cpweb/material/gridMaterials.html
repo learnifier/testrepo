@@ -131,27 +131,6 @@ ${cpweb_foot}
 
 
 <script>
-                    
-    
-    /*
-     
-     listMaterialsProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-     listMaterialsProducts.newOrgMatUrl = "${helper.urlFor('material.ProductMaterialJsonModule','newProdLink',[org.id])}";
-     listMaterialsProducts.deleteOrgMatLinkUrl = "${helper.urlFor('material.ProductMaterialJsonModule','deleteLink',[org.id])}";
-     listMaterialsProducts.contextPath = "${contextPath}";
-     listMaterialsProducts.sLang = "Search purchased materials";
-     
-     listMaterialsOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
-     listMaterialsOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-     listMaterialsOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
-     listMaterialsOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
-     listMaterialsOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
-     listMaterialsOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
-     listMaterialsOrgMats.contextPath = "${contextPath}";
-     listMaterialsOrgMats.sLang = "Search added materials";
-     
-     */
-    
     var listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
     var listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
     
@@ -175,8 +154,6 @@ ${cpweb_foot}
     };
     
     var processDeleteOrgMatAjaxResponse = function(data) {
-        log('Ajax response', data);
-
         if (data.status == "OK") {
             //Delete row with error
             deleteOrgMatRow(data);
