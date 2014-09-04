@@ -43,7 +43,7 @@ public class BrandingColorForm {
         this.secondarycolor = secondarycolor;
     }
     
-    @FormField(type="colorpicker")
+    @FormField(type="colorpicker", required = false)
     public String getTopbarcolor() {
         return topbarcolor;
     }

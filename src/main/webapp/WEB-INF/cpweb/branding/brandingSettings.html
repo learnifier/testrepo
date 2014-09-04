@@ -253,7 +253,9 @@ ${cpweb_foot}
                                     [@mbform.inputColor name="navcolor"/]
                                     [@mbform.inputColor name="primarycolor" /]
                                     [@mbform.inputColor name="secondarycolor" /]
-                                    [@mbform.inputColor name="topbarcolor" /]
+                                    [#if dwsrt.hasFeature("cdesign2")]
+                                        [@mbform.inputColor name="topbarcolor" /]
+                                    [/#if]
                                 </fieldset>
                             </div>
                         </section>
