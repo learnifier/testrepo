@@ -77,6 +77,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         map.put("cpPrimaryColor", formsess.getObject().getPrimarycolor());
         map.put("cpSecondaryColor", formsess.getObject().getSecondarycolor());
         map.put("cpNavColor", formsess.getObject().getNavcolor());
+        map.put("upTopbarBackgroundColor", formsess.getObject().getTopbarcolor());
 
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
                 LoginUserAccountHelper.getUserId(cycle), map);
@@ -101,6 +102,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         brandingMap.put("cpPrimaryColor", null);
         brandingMap.put("cpSecondaryColor", null);
         brandingMap.put("cpNavColor", null);
+        brandingMap.put("upTopbarBackgroundColor", null);
 
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
                 LoginUserAccountHelper.getUserId(cycle), brandingMap, true);
@@ -119,7 +121,8 @@ public class BrandingModule extends AbstractWebAuthModule {
         bcf.setNavcolor("#B36666");
         bcf.setPrimarycolor("#B36666");
         bcf.setSecondarycolor("#B36666");
-
+        bcf.setTopbarcolor("#B36666");
+        
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
 
         Configuration config = DwsRealmHelper.getRealmConfiguration(cycle);
@@ -133,6 +136,9 @@ public class BrandingModule extends AbstractWebAuthModule {
         bcf.setSecondarycolor(ObjectUtils.firstNonNull(
                 branding.getMetadata().get("cpSecondaryColor"),
                 config.getValue(CpBrandingConstants.DEFAULT_SECONDARY_COLOR)));
+        bcf.setTopbarcolor(ObjectUtils.firstNonNull(
+                branding.getMetadata().get("upTopbarBackgroundColor"),
+                config.getValue(CpBrandingConstants.DEFAULT_TOPBAR_COLOR)));
 
         return bcf;
     }

@@ -12,6 +12,7 @@ public class CpBrandingConstants {
     public static final String DEFAULT_NAV_COLOR = "cocobox.branding.cpnavcolor.default";
     public static final String DEFAULT_PRIMARY_COLOR = "cocobox.branding.cpprimarycolor.default";
     public static final String DEFAULT_SECONDARY_COLOR = "cocobox.branding.cpnavcolor.default";
+    public static final String DEFAULT_TOPBAR_COLOR = "cocobox.branding.uptopbarcolor.default";
 
     private CpBrandingConstants() {
     }
