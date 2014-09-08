@@ -14,6 +14,7 @@ public class BrandingColorForm {
     private String navcolor;
     private String primarycolor;
     private String secondarycolor;
+    private String topbarcolor;
 
     @FormField(type="colorpicker")
     public String getNavcolor() {
@@ -40,6 +41,15 @@ public class BrandingColorForm {
 
     public void setSecondarycolor(String secondarycolor) {
         this.secondarycolor = secondarycolor;
+    }
+    
+    @FormField(type="colorpicker", required = false)
+    public String getTopbarcolor() {
+        return topbarcolor;
+    }
+
+    public void setTopbarcolor(String topbarcolor) {
+        this.topbarcolor = topbarcolor;
     }
 
 
