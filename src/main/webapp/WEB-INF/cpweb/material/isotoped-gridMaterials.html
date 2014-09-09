@@ -164,7 +164,7 @@ ${cpweb_foot}
     
     });
     
-    require(['handlebars'], function() {
+    require(['handlebars'], function(Handlebars) {
         Handlebars.registerHelper('if_eq', function(a, b, opts) {
             if(a == b) 
                 return opts.fn(this);
