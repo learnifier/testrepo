@@ -75,12 +75,12 @@ ${cpweb_foot}
             <option value="">No Template</option>
             <optgroup label="Generic templates">
                 [#list templateLists.stickyList as template]
-                <option value="${template.id}">${template.name}</option>
+                <option value="${template.id?c}">${template.name}</option>
                 [/#list]
             </optgroup>
             <optgroup label="Custom templates">
                 [#list templateLists.unstickyList as template]
-                <option value="${template.id}">${template.name}</option>
+                <option value="${template.id?c}">${template.name}</option>
                 [/#list]
             </optgroup>
         </select>
