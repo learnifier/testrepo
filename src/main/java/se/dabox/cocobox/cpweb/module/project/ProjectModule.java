@@ -47,6 +47,7 @@ import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
 import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
 import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectDatabankSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -478,6 +479,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         action.setCddSource(cddSource);
         action.setProjectSource(projSource);
         action.setParticipationSource(new PreviewParticipationSource());
+        action.setDatabankSource(new ProjectDatabankSource(project.getProjectId()));
 
         if (!action.isValid()) {
             throw new IllegalStateException("Action is not setup correctly");
