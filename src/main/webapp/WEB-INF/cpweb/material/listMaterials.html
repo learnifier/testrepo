@@ -26,7 +26,6 @@ ${cpweb_head}
     }
     div.dataTables_paginate paginate_active {
     color: white;
-    background-color: #017fd6;
     border: none;
     }
     table.dataTable thead > tr > th {
@@ -187,28 +186,7 @@ ${cpweb_foot}
             cocobox.infoDialog("Unable to delete material", lines);
         };
 
-        
        
-        /*
-        listMaterialsProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-        listMaterialsProducts.newOrgMatUrl = "${helper.urlFor('material.ProductMaterialJsonModule','newProdLink',[org.id])}";
-        listMaterialsProducts.deleteOrgMatLinkUrl = "${helper.urlFor('material.ProductMaterialJsonModule','deleteLink',[org.id])}";
-        listMaterialsProducts.contextPath = "${contextPath}";
-        listMaterialsProducts.sLang = "Search purchased materials";
-
-        listMaterialsProducts.init();
-
-        listMaterialsOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
-        listMaterialsOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-        listMaterialsOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
-        listMaterialsOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
-        listMaterialsOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
-        listMaterialsOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
-        listMaterialsOrgMats.contextPath = "${contextPath}";
-        listMaterialsOrgMats.sLang = "Search added materials";
-
-        listMaterialsOrgMats.init();
-        */
     });
  
 </script>

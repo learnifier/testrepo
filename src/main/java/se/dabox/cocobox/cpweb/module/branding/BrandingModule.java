@@ -18,6 +18,8 @@ import se.dabox.cocobox.cpweb.CpBrandingConstants;
 import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocobox.cpweb.formdata.branding.BrandingColorForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocosite.branding.GetCachedBrandingCommand;
+import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.event.BrandingChangedListenerUtil;
 import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
@@ -77,6 +79,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         map.put("cpPrimaryColor", formsess.getObject().getPrimarycolor());
         map.put("cpSecondaryColor", formsess.getObject().getSecondarycolor());
         map.put("cpNavColor", formsess.getObject().getNavcolor());
+        map.put("upTopbarBackgroundColor", formsess.getObject().getTopbarcolor());
 
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
                 LoginUserAccountHelper.getUserId(cycle), map);
@@ -101,6 +104,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         brandingMap.put("cpPrimaryColor", null);
         brandingMap.put("cpSecondaryColor", null);
         brandingMap.put("cpNavColor", null);
+        brandingMap.put("upTopbarBackgroundColor", null);
 
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
                 LoginUserAccountHelper.getUserId(cycle), brandingMap, true);
@@ -119,20 +123,32 @@ public class BrandingModule extends AbstractWebAuthModule {
         bcf.setNavcolor("#B36666");
         bcf.setPrimarycolor("#B36666");
         bcf.setSecondarycolor("#B36666");
-
+        bcf.setTopbarcolor("#B36666");
+        
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
 
         Configuration config = DwsRealmHelper.getRealmConfiguration(cycle);
 
+        Branding realmBranding
+                = new GetCachedBrandingCommand(cycle).getBranding(new GetRealmBrandingId(cycle).
+                        getBrandingId());
+
         bcf.setNavcolor(ObjectUtils.firstNonNull(
                 branding.getMetadata().get("cpNavColor"),
+                realmBranding.getMetadata().get("cpNavColor"),
                 config.getValue(CpBrandingConstants.DEFAULT_NAV_COLOR)));
         bcf.setPrimarycolor(ObjectUtils.firstNonNull(
                 branding.getMetadata().get("cpPrimaryColor"),
+                realmBranding.getMetadata().get("cpPrimaryColor"),
                 config.getValue(CpBrandingConstants.DEFAULT_PRIMARY_COLOR)));
         bcf.setSecondarycolor(ObjectUtils.firstNonNull(
                 branding.getMetadata().get("cpSecondaryColor"),
+                realmBranding.getMetadata().get("cpSecondaryColor"),
                 config.getValue(CpBrandingConstants.DEFAULT_SECONDARY_COLOR)));
+        bcf.setTopbarcolor(ObjectUtils.firstNonNull(
+                branding.getMetadata().get("upTopbarBackgroundColor"),
+                realmBranding.getMetadata().get("upTopbarBackgroundColor"),
+                config.getValue(CpBrandingConstants.DEFAULT_TOPBAR_COLOR)));
 
         return bcf;
     }

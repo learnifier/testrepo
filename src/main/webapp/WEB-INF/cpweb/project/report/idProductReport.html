@@ -22,8 +22,9 @@ ${cpweb_foot}
 				},
 				success: function(data) {
 					var aaData = [];
-					
-					var activatedSum = 0;
+
+                                        var activatedSum = 0;
+					var notaccessedSum = 0;
 					var accessedSum = 0;
 					var completedSum = 0;
 					var totalParticipants = 0;
@@ -31,15 +32,22 @@ ${cpweb_foot}
 					for (var i = 0; i < data.aaData.length; i++) {
 						var obj = data.aaData[i];
 						var completionRate = ((obj.completed/obj.activated)*100).toFixed(2) + '%';
-						activatedSum = activatedSum + obj.activated;
-						accessedSum = accessedSum + obj.accessed;
-						completedSum = completedSum + obj.completed;
+
+                                                var completed = obj.completed;
+                                                var inprogress = obj.accessed - completed;
+                                                var notaccessed = obj.activated - inprogress - completed;
+                                                var activated = obj.activated;
+
+						notaccessedSum = notaccessedSum + notaccessed;
+						accessedSum = accessedSum + inprogress;
+						completedSum = completedSum + completed;
+                                                activatedSum = activatedSum + obj.activated;
 						
 						var nameWithLink = "<a href='" + obj.link + " '>" + obj.name + "</a>"; 
 						
 						
 						totalParticipants++;
-						aaData.push([nameWithLink, obj.activated, obj.accessed, obj.completed, completionRate]);
+						aaData.push([nameWithLink, activated, notaccessed, inprogress, completed, completionRate]);
 					}
 
 					$('#r_idproduct').dataTable({
@@ -52,6 +60,7 @@ ${cpweb_foot}
 						"sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
 						"aoColumns": [
 							{"sTitle": "User", "sWidth": "400px"},
+							{"sTitle": "Invited"},
 							{"sTitle": "Not Accessed"},
 							{"sTitle": "In Progress"},
 							{"sTitle": "Completed"},
@@ -65,6 +74,7 @@ ${cpweb_foot}
 					
 					if(totalParticipants > 0 ) {
 						var activatedAvg = Math.floor(activatedSum/totalParticipants);
+						var notaccessedAvg = Math.floor(notaccessedSum/totalParticipants);
 						var accessedAvg = Math.floor(accessedSum/totalParticipants);
 						var completedAvg = Math.floor(completedSum/totalParticipants);
 					
@@ -75,6 +85,7 @@ ${cpweb_foot}
 						var tfootAvgRow = $('<tr class="average">');
 						tfootAvgRow.append($('<th>').html('Average'));
 						tfootAvgRow.append($('<td>').text(activatedAvg));
+						tfootAvgRow.append($('<td>').text(notaccessedAvg));
 						tfootAvgRow.append($('<td>').html(accessedAvg));
 						tfootAvgRow.append($('<td>').text(completedAvg));
 						tfoot.html(tfootAvgRow);
@@ -82,6 +93,7 @@ ${cpweb_foot}
 						var tfootSumRow = $('<tr class="total">');
 						tfootSumRow.append($('<th>').html('Total'));
 						tfootSumRow.append($('<td>').text(activatedSum));
+						tfootSumRow.append($('<td>').text(notaccessedSum));
 						tfootSumRow.append($('<td>').html(accessedSum));
 						tfootSumRow.append($('<td>').text(completedSum));
 						tfoot.append(tfootSumRow);

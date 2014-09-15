@@ -21,7 +21,6 @@ import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.proddir.data.Product;
-import se.dabox.service.proddir.data.ProductTypeId;
 import se.dabox.util.ParamUtil;
 
 /**

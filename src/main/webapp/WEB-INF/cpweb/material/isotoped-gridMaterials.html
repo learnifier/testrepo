@@ -40,7 +40,6 @@ ${cpweb_foot}
 <script id="grid-entry-template" type="text/x-handlebars-template">
     
     <div id="grid-entries">
-        {{#each aaData}}
         <div class="grid-entry" data-index="{{@index}}" data-type="{{type}}" data-materialtype="{{materialType}}">
             <div class="body" style="background-image: url('{{thumbnailx256}}')">
                 <div class="info">
@@ -124,7 +123,6 @@ ${cpweb_foot}
         
             </div>
         </div>
-        {{/each}}
     </div>
 </script>
      
@@ -136,58 +134,52 @@ ${cpweb_foot}
     
     var deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}";
     var editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+</script>
+
+<script>
     
-    var deleteOrgMat = function(orgMatId) {
-        var ajaxData = {"orgmatid": orgMatId};
-        var ajaxSettings = {};
-        ajaxSettings.data = ajaxData;
-        ajaxSettings.success = processDeleteOrgMatAjaxResponse;
-        require(['dabox-common'], function() {
-            cocobox.confirmationDialog("Delete material",
-                    "Do you want to permanently delete this material?",
-                    function() {
-                        cocobox.ajaxPost(deleteOrgMatUrl, ajaxSettings);
-                    }
-            );
+    require(['isotoped-list'], function(il) {
+        $.ajax({
+            url: listPurchasedMatsUrl,
+            success: function(data) {
+                var $iso = il.isotopedFilteredList(data.aaData, {'templateSelector': '#grid-entry-template'}, {
+                    filters: [
+                        {
+                            'name': 'All', 
+                            'additionalCss': ' active',
+                            'filter': function() { 
+                                return true; 
+                            } 
+                        },
+                        {
+                            'name': 'File', 
+                            'filter': function() { 
+                                return false; 
+                            } 
+                        }
+                    ]
+                });
+            }
+        });
+    
+    });
+    
+    require(['handlebars'], function(Handlebars) {
+        Handlebars.registerHelper('if_eq', function(a, b, opts) {
+            if(a == b) 
+                return opts.fn(this);
+            else
+                return opts.inverse(this);
         });
 
-    };
-    
-    var processDeleteOrgMatAjaxResponse = function(data) {
-        if (data.status == "OK") {
-            //Delete row with error
-            deleteOrgMatRow(data);
-        } else {
-            displayDeleteOrgMatError(data);
-        }
-    };
-   
-    var displayDeleteOrgMatError = function(data) {
-        var lines = [];
-        lines.push("This material cannot be deleted due to the foilowing reason.");
-        lines.push("");
-        if (data.activeLinkCount > 0) {
-            lines.push("This material has an active access link");
-            lines.push();
-        }
-
-        var pns = data.linkedProjectNames;
-        if (pns && pns.length > 0) {
-            lines.push("This material is used in the following projects:");
-            lines.push();
-            for(var i = 0; i<pns.length; i++) {
-                var pn = pns[i];
-                lines.push(pn);
-            }
-        }
-
-        cocobox.infoDialog("Unable to delete material", lines);
-    };
-    
+        Handlebars.registerPartial('video', $('#video-partial').html());
+        Handlebars.registerPartial('audio', $('#audio-partial').html());
+        Handlebars.registerPartial('file', $('#file-partial').html());
+        Handlebars.registerPartial('general', $('#general-partial').html());
+    });
     
 </script>
 
-<script src="${contextPath}/js/material/gridMaterials.js"></script>
 
 [/#assign]
 
@@ -202,22 +194,12 @@ ${cpweb_foot}
 
 <div class='grid-header'>
     <div class='list-toggle'>[#include 'listToggle.html' /]</div>
-    <div class='filter'>
-        <ul class="grid-filter" id="materials-grid-filter">
-            <li><a class="filter" data-filter="all">All</a></li>
-            <li><a class="filter" data-filter="added">Added</a></li>
-            <li><a class="filter" data-filter="purchased">Purchased</a></li>
-            <li><a class="filter" data-filter="audio">Audio</a></li>
-            <li><a class="filter" data-filter="video">Video</a></li>
-            <li><a class="filter" data-filter="docs">Documents</a></li>
-        </ul>
-    </div>
 </div>
 
-<div id="materials-grid" class="grid-list">
+<div class="ccb-list ccb-filtered-list">
+    <div id="isotopeFilter" class="ccb-filtered-list__filter grid-filter"></div>
+    <div id="isotopeList" class="ccb-filtered-list__list"></div>
 </div>
-
-
 
 
 

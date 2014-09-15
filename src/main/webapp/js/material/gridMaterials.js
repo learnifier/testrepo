@@ -5,7 +5,7 @@ require(['jquery'], function() {
     var orgMats;
     var purchMats;
 
-    require(['handlebars'], function() {
+    require(['handlebars'], function(Handlebars) {
 
         Handlebars.registerHelper('if_eq', function(a, b, opts) {
             if(a == b) 

@@ -68,6 +68,7 @@ import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
+import se.dabox.util.collections.NotPredicate;
 import se.dabox.util.collections.Predicate;
 import se.dabox.util.collections.Transformer;
 import se.dabox.util.converter.ConversionContext;
@@ -812,7 +813,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         List<Product> products = getGrantedProducts(cycle, ccbc.listOrgProducts(orgId));
         ProductTypeUtil.setTypes(getProductDirectoryClient(cycle), products);
 
-        if (project != null) {
+        if (project == null) {
+            //Remove project products
+            products = CollectionsUtil.sublist(products, new NotPredicate<>(ProductPredicates.
+                    getProjectOwnedProductPredicate()));
+        } else {
             products = new GetProjectCompatibleProducts().getValid(project, products);
         }
 

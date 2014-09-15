@@ -91,9 +91,9 @@ ${cpweb_head}
     <h2>Email template preview</h2>
     <section id="emailcontent">
         <p class="label">Subject:</p>
-        <p class="subject">${template.subject!''?xhtml}<p/>
+        <p class="subject">${(template.subject!'')?xhtml}<p/>
         <p class="label">Body:</p>
-        <textarea id="body" disabled="disabled">${template.mainContent!''?xhtml}</textarea>
+        <textarea id="body" disabled="disabled">${(template.mainContent!'')?xhtml}</textarea>
     </section>
 
 </section>
