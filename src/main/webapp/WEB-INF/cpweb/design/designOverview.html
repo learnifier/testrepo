@@ -62,6 +62,11 @@ ${cpweb_head}
             <form action="${helper.urlFor('coursedesign.DesignModule','view',[org.id, designId])}" method="post">
                 <button>View</button>
             </form>
+            
+             <form action="${helper.urlFor('coursedesign.DesignModule','preview',[org.id, designId])}" method="post">
+                <button>Preview</button>
+            </form>
+            
         </div>
         <div class="itemicon">
             <p>Course Design<p><h1>${design.name?xhtml}</h1>
