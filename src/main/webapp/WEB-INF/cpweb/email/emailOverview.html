@@ -1,12 +1,12 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
+[#import "/material/materialsMenu.html" as mMenu /]
 
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
 </script>
 
 
@@ -39,7 +39,7 @@ ${cpweb_foot}
 [/#assign]
 
 [#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="emails"][/@sMenu.settingsMenu]
+[@mMenu.materialsMenu selected="emails"][/@mMenu.materialsMenu]
 [/#assign]
 
 [#assign head]

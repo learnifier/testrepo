@@ -1,6 +1,6 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
+[#import "/material/materialsMenu.html" as mMenu /]
 
 [#assign foot]
 ${cpweb_foot}
@@ -10,7 +10,7 @@ ${cpweb_foot}
 [/#assign]
 
 [#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="designs"][/@sMenu.settingsMenu]
+    [@mMenu.materialsMenu selected="designs"][/@mMenu.materialsMenu]
 [/#assign]
 
 

@@ -1,12 +1,12 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
+[#import "/material/materialsMenu.html" as mMenu /]
 
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
     
     function deleteCourseDesign () {
         cocobox.confirmationDialog("Delete course design", "Do you want to delete this course design?", 
@@ -22,7 +22,7 @@ ${cpweb_foot}
 [/#assign]
 
 [#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="designs"][/@sMenu.settingsMenu]
+    [@mMenu.materialsMenu selected="designs"][/@mMenu.materialsMenu]
 [/#assign]
 
 [#assign head]
