@@ -133,6 +133,11 @@ public class NewProjectJsonModule extends AbstractJsonAuthModule {
                 g.writeStringField("name",item.getName());
                 g.writeStringField("description",item.getDescription());
                 g.writeStringField("thumbnail",item.getThumbnailUrl());
+                g.writeStringField("type",item.getType());
+                if (item instanceof CourseDesignNewProjectType) {
+                    CourseDesignNewProjectType cdItem = (CourseDesignNewProjectType) item;
+                    g.writeNumberField("designId", cdItem.design.getDesignId());
+                }
             }
         }.encodeToStream(types);
     }
@@ -143,6 +148,7 @@ public class NewProjectJsonModule extends AbstractJsonAuthModule {
         public String getName();
         public String getDescription();
         public String getThumbnailUrl();
+        public String getType();
     }
 
     private static class CourseDesignNewProjectType implements NewProjectType {
@@ -172,6 +178,11 @@ public class NewProjectJsonModule extends AbstractJsonAuthModule {
         public String getThumbnailUrl() {
             return new CourseDesignThumbnail(DruwaApplication.getCurrentRequestCycle(), design.
                     getDesignId()).get();
+        }
+
+        @Override
+        public String getType() {
+            return "design";
         }
     }
 
@@ -207,6 +218,11 @@ public class NewProjectJsonModule extends AbstractJsonAuthModule {
         @Override
         public String getThumbnailUrl() {
             return material.getThumbnail(256);
+        }
+
+        @Override
+        public String getType() {
+            return "material";
         }
 
     }
