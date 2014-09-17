@@ -482,7 +482,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         action.setDatabankSource(new ProjectDatabankSource(project.getProjectId()));
 
         if (!action.isValid()) {
-            throw new IllegalStateException("Action is not setup correctly");
+            throw new IllegalStateException("CoursePreviewLinkAction is not setup correctly");
         }
         
         String url = LinkActionUrlHelper.getUrl(cycle, action);
