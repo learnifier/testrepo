@@ -45,6 +45,11 @@ ${cpweb_foot}
                     }, "json");
                 });
 
+                $('#crprj_designslist ul').on('click', 'a.preview', function(e) {
+                    //prevent the scrolling and such..
+                    e.stopPropagation();
+                });
+
                 $('#crprj_designslist ul').on('click', 'li', function() {
                     log(this);
                     $('#next_btn').removeAttr('disabled', 'disabled');

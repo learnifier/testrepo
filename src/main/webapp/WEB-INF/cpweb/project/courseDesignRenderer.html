@@ -7,5 +7,10 @@
         <p>{{>description}}</p>
         <span class="btn secondarybackgroundcolor select">Select</span>
         <span class="btn primarybackgroundcolor selected">Selected</span>
+        {{if type == 'design'}}
+            <a href="${helper.urlFor('coursedesign.DesignModule','preview',[org.id])}/{{:designId}}" target="_blank" class="btn secondarybackgroundcolor preview" >
+                Preview
+            </a>
+        {{/if}}
     </li>
 </script>

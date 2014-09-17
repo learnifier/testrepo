@@ -25,6 +25,12 @@ import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
+import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
+import se.dabox.cocosite.upweb.linkaction.cpreview.DirectCddSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewDatabankSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewProjectSource;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.coursedesign.BucketCourseDesignInfo;
@@ -206,6 +212,28 @@ public class DesignModule extends AbstractWebAuthModule {
                 backUrl).setReadOnly(true).createInitData();
 
         return new RedirectUrlRequestTarget(GotoDesignBuilder.process(cycle, id));
+    }
+
+     @WebAction
+    public RequestTarget onPreview(RequestCycle cycle, String strOrgId, String strDesignId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
+
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+
+        if (bcd == null) {
+            return toListPage(cycle, strOrgId);
+        }
+
+        CoursePreviewLinkAction preview = new CoursePreviewLinkAction();
+        preview.setCddSource(new DirectCddSource(bcd.getDesign().getDesignId()));
+        preview.setParticipationSource(new PreviewParticipationSource());
+        preview.setProjectSource(new PreviewProjectSource(org.getId()));
+        preview.setDatabankSource(new PreviewDatabankSource());
+
+        String url = LinkActionUrlHelper.getUrl(cycle, preview);
+
+        return new RedirectUrlRequestTarget(url);
     }
 
     private BucketCourseDesign getOrgCourseDesign(final RequestCycle cycle, final long orgId,

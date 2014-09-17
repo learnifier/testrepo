@@ -21,6 +21,7 @@ import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.date.DateFormatters;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ImpersonateUtil;
 import se.dabox.cocosite.util.PercentageCalculator;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -69,10 +70,11 @@ class ProjectRosterJsonGenerator {
 
     ByteArrayOutputStream toJson(
             final RequestCycle cycle, List<ProjectParticipation> participations,
-            List<UserAccount> users, final String strOrgId, final OrgProject prj) {
+            List<UserAccount> users, final String strOrgId, final OrgProject prj,
+            final boolean impersonateAllowed) {
         this.cycle = cycle;
         this.project = prj;
-        this.participations = participations;
+        this.participations = participations;        
 
         prepare();
 
@@ -138,10 +140,10 @@ class ProjectRosterJsonGenerator {
 
                 g.writeBooleanField("inError", item.isInError());
                 g.writeBooleanField("activated", item.isActivated());
+                final String strParticipationId = Long.toString(item.getParticipationId());
 
                 String detailsUrl = cycle.urlFor(ParticipationJsonModule.class,
-                        "participationDetails",
-                        Long.toString(item.getParticipationId()));
+                        "participationDetails", strParticipationId);
 
                 g.writeStringField("detailsUrl", detailsUrl);
 
@@ -151,6 +153,15 @@ class ProjectRosterJsonGenerator {
                 g.writeStringField("errorMsg", toErrorMessageHtml(item.getErrorMessage()));
 
                 g.writeBooleanField("overdue", isOverdue(item));
+
+                if (impersonateAllowed && ImpersonateUtil.canImpersonate(item)) {
+                    String url = cycle.urlFor(ProjectModule.class, "impersonate", strParticipationId);
+
+                    g.writeStringField("impersonateUrl", url);
+                } else {
+                    g.writeNullField("impersonateUrl");
+                }
+
             }
         }.encodeToStream(participations);
     }

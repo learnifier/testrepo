@@ -42,12 +42,20 @@ import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
+import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
+import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
+import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
+import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectDatabankSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
@@ -433,6 +441,53 @@ public class ProjectModule extends AbstractProjectWebModule {
             ErrorState state = new ErrorState(project.getOrgId(), product, ex, prjId);
             return NavigationUtil.getIntegrationErrorPage(cycle, state);
         }
+    }
+
+    @WebAction
+    public RequestTarget onImpersonate(RequestCycle cycle, String strParticipationId) {
+        //TODO: Enforce project permission check
+
+        ProjectParticipation part
+                = getCocoboxCordinatorClient(cycle).getProjectParticipation(Long.valueOf(
+                                strParticipationId));
+        OrgProject project = getProject(cycle, Long.toString(part.getProjectId()));
+        checkPermission(cycle, project);
+
+        long caller = LoginUserAccountHelper.getCurrentCaller();
+
+        ImpersonateParticipationLinkAction action = new ImpersonateParticipationLinkAction(
+                caller,
+                part.getParticipationId());
+
+        String url = LinkActionUrlHelper.getUrl(cycle, action);
+        
+        return new RedirectUrlRequestTarget(url);
+    }
+
+    @WebAction
+    public RequestTarget onPreviewDesign(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        RealProjectSource projSource = new RealProjectSource(project.getProjectId());
+        ProjectCddSource cddSource = new ProjectCddSource(project.getProjectId());
+
+        CoursePreviewLinkAction action = new CoursePreviewLinkAction();
+        action.setCddSource(cddSource);
+        action.setProjectSource(projSource);
+        action.setParticipationSource(new PreviewParticipationSource());
+        action.setDatabankSource(new ProjectDatabankSource(project.getProjectId()));
+
+        if (!action.isValid()) {
+            throw new IllegalStateException("CoursePreviewLinkAction is not setup correctly");
+        }
+        
+        String url = LinkActionUrlHelper.getUrl(cycle, action);
+
+        return new RedirectUrlRequestTarget(url);
     }
 
     private TemplateLists getLists(RequestCycle cycle, long mailBucket) {
