@@ -76,8 +76,7 @@ ${cpweb_foot}
                                 return data;
                             } else if (oObj.aData.activated) {
                                 var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + oObj.aData.participationLink + '\'); return false"><img src="${cocoboxCdn}/cocobox/img/cp/project_participationLink.png" alt="Participation Link"/></a>';
-                                data += '<a href="" onclick="impersonate('+oObj.aData.id+'); return false"><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
-
+                                
                                 return data;
                             }
 
@@ -90,7 +89,9 @@ ${cpweb_foot}
                         "sWidth": 250,
                         "useRendered": false,
                         "fnRender": function(oObj) {
-                            return  '<a href="' + oObj.aData.link + '" style="display:block;" title="' + oObj.aData.email + '">' + oObj.aData.displayName + '</a> ';
+                            var data = '<a class="name" href="' + oObj.aData.link + '" title="' + oObj.aData.email + '">' + oObj.aData.displayName + '</a> ';
+                            data += '<a class="impersonate-link" target="_blank" title="Visit Learner Portal as ' + oObj.aData.displayName +'" href="" onclick="impersonate('+oObj.aData.id+'); return false"><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
+                            return data;
                         }
                     },
                     {
