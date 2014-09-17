@@ -33,6 +33,8 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.security.project.ProjectPermissionCheck;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.Clients;
@@ -125,8 +127,11 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         String strOrgId = Long.toString(prj.getOrgId());
 
+        boolean impersonateAllowed = ProjectPermissionCheck.fromCycle(cycle).checkPermission(prj,
+                CocoboxPermissions.PRJ_IMPERSONATE_PARTICIPANT);
+
         return jsonTarget(new ProjectRosterJsonGenerator().toJson(cycle, participations, users,
-                strOrgId, prj));
+                strOrgId, prj, impersonateAllowed));
     }
 
     @WebAction
