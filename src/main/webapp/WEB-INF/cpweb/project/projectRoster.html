@@ -90,7 +90,11 @@ ${cpweb_foot}
                         "useRendered": false,
                         "fnRender": function(oObj) {
                             var data = '<a class="name" href="' + oObj.aData.link + '" title="' + oObj.aData.email + '">' + oObj.aData.displayName + '</a> ';
-                            data += '<a class="impersonate-link" target="_blank" title="Visit Learner Portal as ' + oObj.aData.displayName +'" href="" onclick="impersonate('+oObj.aData.id+'); return false"><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
+                            data += '<a class="impersonate-link" target="_blank" title="Visit Learner Portal as '
+                                    + oObj.aData.displayName
+                                    + '" href="${helper.urlFor('ProjectModule','impersonate')}/' 
+                                    + oObj.aData.id
+                                    + ' "><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
                             return data;
                         }
                     },
