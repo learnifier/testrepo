@@ -445,13 +445,11 @@ public class ProjectModule extends AbstractProjectWebModule {
 
     @WebAction
     public RequestTarget onImpersonate(RequestCycle cycle, String strParticipationId) {
-        //TODO: Enforce project permission check
-
         ProjectParticipation part
                 = getCocoboxCordinatorClient(cycle).getProjectParticipation(Long.valueOf(
                                 strParticipationId));
         OrgProject project = getProject(cycle, Long.toString(part.getProjectId()));
-        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.PRJ_IMPERSONATE_PARTICIPANT);
 
         long caller = LoginUserAccountHelper.getCurrentCaller();
 
