@@ -23,11 +23,15 @@ ${cpweb_foot}
                         if ( oObj.aData.targetFilter == 'all' ) {
                             return '[@dws.txt key="cpweb.project.schedule.target.all" /]'
                         } else if ( oObj.aData.targetFilter == 'invited' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.invited" /]'                                
+                            return '[@dws.txt key="cpweb.project.schedule.target.invited" /]'
                         } else if ( oObj.aData.targetFilter == 'notinvited' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.notinvited" /]'                                
+                            return '[@dws.txt key="cpweb.project.schedule.target.notinvited" /]'
+                        } else if ( oObj.aData.targetFilter == 'completed' ) {
+                            return '[@dws.txt key="cpweb.project.schedule.target.completed" /]'
+                        } else if ( oObj.aData.targetFilter == 'uncompleted' ) {
+                            return '[@dws.txt key="cpweb.project.schedule.target.uncompleted" /]'
                         } else {
-                            return  null;                        
+                            return oObj.aData.targetFilter;
                         }
                     }
                 },
@@ -43,43 +47,43 @@ ${cpweb_foot}
                         if ( oObj.aData.status == 'N' ) {
                             return '<span>[@dws.txt key="cpweb.project.schedule.status.new" /]</span>'
                         } else if ( oObj.aData.status == 'E' ) {
-                            return '<span class="ok">[@dws.txt key="cpweb.project.schedule.status.executed" /]</span>'                       
+                            return '<span class="ok">[@dws.txt key="cpweb.project.schedule.status.executed" /]</span>'
                         } else if ( oObj.aData.status == 'C' ) {
-                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.cancelled" /]</span>'                           
+                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.cancelled" /]</span>'
                         } else if ( oObj.aData.status == 'A' ) {
-                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.allocfailure" /]</span>'                             
+                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.allocfailure" /]</span>'
                         } else if ( oObj.aData.status == 'M' ) {
-                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.missing" /]</span>'                     
+                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.missing" /]</span>'
                         } else {
-                            return  null;                        
+                            return  null;
                         }
                     }
                 },
                 {
                     "aTargets": [ 4 ],
                     "mData": null,
-                    
+
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
                         log(oObj.aData.status);
                         if ( oObj.aData.status == 'N' ) {
                            return '<button onclick="deleteTask(\'' +  oObj.aData.taskId + '\',this)">Delete</button>';
                         } else {
-                            return  null;                        
+                            return  null;
                         }
                     }
                 },
 				{
                     "aTargets": [ 5 ],
                     "mData": null,
-                    
+
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
                         log(oObj.aData.status);
                         if ( oObj.aData.status == 'N' ) {
                            return '<a type="button" href="' + oObj.aData.editLink + '">Edit</a>';
                         } else {
-                            return  null;                        
+                            return  null;
                         }
                     }
                 }
@@ -131,7 +135,7 @@ ${cpweb_foot}
 <section id="addtask">
     [#global formPrefix="cpweb" /]
     <form action="${formlink}" name="addTaskForm" id="addTaskForm" class="fullpage" method="post">
-        <section class="field">           
+        <section class="field">
             [@mbform.select name="tasktarget" class="input_full" tabindex="2"]
             [@mbform.option value="all"]All participants[/@mbform.option]
             [@mbform.option value="invited"]Invited participants[/@mbform.option]
