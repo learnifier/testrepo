@@ -75,6 +75,7 @@ public class CourseDesignJsonModule extends AbstractJsonAuthModule {
                         strOrgId, item.getDesignId()));
                 g.writeStringField("thumbnail",
                         new CourseDesignThumbnail(cycle, item.getDesignId()).get());
+                writeDateField("created", item.getCreated());
             }
         }.encodeToStream(designs);
     }
