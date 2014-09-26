@@ -9,6 +9,7 @@ import se.dabox.cocosite.druwa.security.ClientPortalSecurityNamespaceFactory;
 import se.dabox.cocosite.druwa.security.ProjectSecurityNamespaceFactory;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.portalswitch.PortalSwitchInfoImpl;
 import se.dabox.cocosite.security.project.ProjectPermissionCheck;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
@@ -28,6 +29,9 @@ public class CpwebModifyViewHandler implements ModifyViewDataHandler {
                 InfoCacheHelper.getInstance(event.getCycle());
 
         event.getMap().put(FREEMARKER_ATTRIBUTE_NAME_INFOHELPER, infoHelper);
+
+        event.getMap().put(PortalSwitchInfoImpl.ATTRIBUTE_NAME,
+                new PortalSwitchInfoImpl(event.getCycle()));
 
         activateClientPortalSecurityNamespace(event);
         activateProjectSecurityNamespace(event);
