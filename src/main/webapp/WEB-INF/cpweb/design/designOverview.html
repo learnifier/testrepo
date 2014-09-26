@@ -43,7 +43,7 @@ ${cpweb_head}
 
             [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','editDesign',[org.id, designId])}" method="post">
-                <button>Edit Course Design</button>
+                <button>Edit Course Template</button>
             </form>
             [/#if]
 
@@ -69,7 +69,7 @@ ${cpweb_head}
             
         </div>
         <div class="itemicon">
-            <p>Course Design<p><h1>${design.name?xhtml}</h1>
+            <p>Course Template<p><h1>${design.name?xhtml}</h1>
         </div>
         <div class="itemdetails">
             <ul>

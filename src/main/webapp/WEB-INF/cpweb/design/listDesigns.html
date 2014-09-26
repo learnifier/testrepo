@@ -89,13 +89,13 @@ ${cpweb_foot}
             "sAjaxSource": "${helper.urlFor('coursedesign.CourseDesignJsonModule', 'list', [org.id])?js_string}",
             "oLanguage": {
                 "sSearch": "",
-                "sZeroRecords": "No course designs matches your query",
-                "sEmptyTable": "<span class='emptytable'>You have no course designs on your account.</span>",
+                "sZeroRecords": "No course templates matches your query",
+                "sEmptyTable": "<span class='emptytable'>You have no course templates on your account.</span>",
                 "sLoadingRecords": "<p>Loading course designs...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
         });
-        $('#listdesigns_filter input').attr('placeholder', 'Search course designs');
+        $('#listdesigns_filter input').attr('placeholder', 'Search course templates');
 
     } );
 
@@ -110,7 +110,7 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
 
-<h1>Course Designs</h1>
+<h1>Course Templates</h1>
 <section class="list">
     <table class="list" id="listdesigns">
         <thead>
