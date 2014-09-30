@@ -35,6 +35,7 @@ import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.material.FetchMode;
 import se.dabox.service.common.ccbc.project.material.GetParticipationCrispProductReportsRequest;
 import se.dabox.service.common.ccbc.project.material.GetParticipationCrispProductStatusRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
@@ -417,6 +418,7 @@ public class ParticipationDetailsCommand {
     private void doRefreshCrispInformation() {
         GetParticipationCrispProductStatusRequest req =
                 new GetParticipationCrispProductStatusRequest(participation.getParticipationId());
+        req.setFetchMode(FetchMode.DIRECT);
 
         getProjectMaterialCoordinatorClient().getParticipationCrispProductStatus(req);
     }
