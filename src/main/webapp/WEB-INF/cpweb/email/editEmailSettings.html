@@ -34,7 +34,9 @@ ${cpweb_foot}
 
                     [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
                     [@mbform.select name="lang" class="input_full" tabindex="3"]
-                    [@mbform.option value="en" defaultValue=defaultValue]English[/@mbform.option]
+                    [#list emailLocales as emailLocale]
+                            [@mbform.option value=emailLocale.id defaultValue=defaultValue]${emailLocale.name?xhtml}[/@mbform.option]
+                    [/#list]
                     [/@mbform.select]
 
                                         

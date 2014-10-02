@@ -5,6 +5,7 @@
 package se.dabox.cocobox.cpweb.module.mail;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -24,6 +25,8 @@ import se.dabox.cocobox.cpweb.formdata.mail.EmailSettingForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.maileditor.initdata.MeInitData;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
+import se.dabox.cocosite.email.EmailLocaleListFactory;
+import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
@@ -91,6 +94,9 @@ public class MailModule extends AbstractWebAuthModule {
         map.put("org", org);
         map.put("template", template);
         map.put("copyMode", copyMode);
+
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        map.put("emailLocales", new EmailLocaleListFactory().getLocales(cycle, userLocale));
 
         String formLink;
 
