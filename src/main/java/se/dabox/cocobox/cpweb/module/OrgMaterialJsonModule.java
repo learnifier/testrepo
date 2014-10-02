@@ -22,6 +22,8 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.codehaus.jackson.JsonGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
@@ -38,6 +40,7 @@ import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.ccbc.material.OrgMaterialLink;
@@ -79,6 +82,9 @@ import se.dabox.util.converter.ConversionContext;
  */
 @WebModuleMountpoint("/orgmats.json")
 public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(OrgMaterialJsonModule.class);
+
     private static final AccountBalance FAKE_BALANCE = new AccountBalance(-1, 0, 0, 0);
 
     /**
@@ -234,24 +240,38 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
-        OrgMaterial orgMat = ccbc.getOrgMaterial(orgmatid);
+        OrgMaterial orgMat = null;
+        try {
+            orgMat = ccbc.getOrgMaterial(orgmatid);
+        } catch (NotFoundException nfe){
+            LOGGER.info("Tried to delete an orgmat that doesn't exist: {}", orgmatid);
+
+            return createDeleteMaterialResponse(orgmatid, 0, Collections.<String>emptyList(), true);
+        }
         checkOrgPermission(cycle, orgMat.getOrgId());
 
         int activeLinks = getActiveLinks(ccbc, orgMat);
         List<String> projectNames = getLinkedProjectNames(ccbc, orgMat);
 
+        boolean canDelete = activeLinks == 0 && projectNames.isEmpty();
+
+
+        if (canDelete) {
+            ccbc.deleteOrgMaterial(orgmatid, LoginUserAccountHelper.getUserId(cycle));
+        }
+
+        return createDeleteMaterialResponse(orgmatid, activeLinks, projectNames, canDelete);
+    }
+
+    private RequestTarget createDeleteMaterialResponse(long orgmatid, int activeLinks,
+            List<String> projectNames, boolean canDelete) {
         Map<String, Object> map = createMap();
 
         map.put("orgmatid", orgmatid);
         map.put("activeLinkCount", activeLinks);
         map.put("linkedProjectNames", projectNames);
 
-        boolean canDelete = activeLinks == 0 && projectNames.isEmpty();
         map.put("status", canDelete ? "OK" : "DENIED");
-
-        if (canDelete) {
-            ccbc.deleteOrgMaterial(orgmatid, LoginUserAccountHelper.getUserId(cycle));
-        }
 
         return jsonTarget(map);
     }
