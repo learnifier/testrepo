@@ -75,7 +75,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         }
 
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(org.getId());
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("cpPrimaryColor", formsess.getObject().getPrimarycolor());
         map.put("cpSecondaryColor", formsess.getObject().getSecondarycolor());
         map.put("cpNavColor", formsess.getObject().getNavcolor());
