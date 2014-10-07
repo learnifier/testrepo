@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.mail;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -69,7 +70,8 @@ public class SendMailModule extends AbstractWebAuthModule {
             map.put("templateLists", lists);
         } else {
             MailTemplate stickyTemplate = getStickyTemplate(cycle, mailBucket,
-                    sms.getStickyTemplateHint());
+                    sms.getStickyTemplateHint(),
+                    sms.getStickyTemplateLocale());
 
             if (stickyTemplate == null) {
                 String msg = String.format("Sticky template %s missing in bucket %d", sms.
@@ -177,7 +179,7 @@ public class SendMailModule extends AbstractWebAuthModule {
     }
 
     private MailTemplate getStickyTemplate(RequestCycle cycle, long mailBucket,
-            String stickyTemplateHint) {
+            String stickyTemplateHint, Locale locale) {
         ParamUtil.required(stickyTemplateHint, "stickyTemplateHint");
 
         MailTemplateServiceClient mtClient = getMailTemplateClient(cycle);
@@ -186,7 +188,7 @@ public class SendMailModule extends AbstractWebAuthModule {
         return GetHintedMailTemplateCommand.getHintedTemplate(mtClient, stickyTemplateHint,
                 mailBucket,
                 parentBucket,
-                null);
+                locale);
     }
 
     private List<UserAccount> getReceivers(RequestCycle cycle, SendMailSession sms) {

@@ -11,6 +11,7 @@ import net.unixdeveloper.druwa.formbean.annotation.FormField;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AddMemberForm implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String memberfirstname;
     private String memberlastname;

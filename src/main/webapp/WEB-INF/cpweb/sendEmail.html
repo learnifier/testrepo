@@ -26,7 +26,7 @@ ${cpweb_foot}
 
     [#if stickyTemplateId??]
     $(function() {
-        fetchTemplate(${stickyTemplateId});
+        fetchTemplate(${stickyTemplateId?c});
     });
     [/#if]
 
