@@ -65,11 +65,11 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
         var data = [
             {
                 value: onTrack,
-                color: "green"
+                color: "#00CC00"
             },
             {
                 value: overDue,
-                color: "red"
+                color: "#FF0000"
             }
         ];
 
@@ -93,15 +93,15 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
         var data = [
             {
                 value: invited,
-                color: "red"
+                color: "#FF0000"
             },
             {
                 value: inProgress,
-                color: "orange"
+                color: "#FFA300"
             },
             {
                 value: completed,
-                color: "green"
+                color: "#00CC00"
             }
         ];
         new Chart(ctx).Doughnut(data, {animation: animationState});
