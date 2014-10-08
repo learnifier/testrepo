@@ -46,13 +46,9 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
 
         List<UserAccount> matching;
         
-        if (query == null) {
-            matching = CacheClients.getClient(cycle, UserAccountService.class).getUserAccounts();
-        } else {
-            SearchContext ctx = new SearchContext(cycle, query, miniOrg);
+        SearchContext ctx = new SearchContext(cycle, query, miniOrg);
             matching = getJsonUsers(ctx);
-        }
-
+        
         return toJson(matching);
     }
 
@@ -75,8 +71,11 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
         final long userId = LoginUserAccountHelper.getUserId(ctx.cycle);
         final String orgRole = OrgRoleName.forOrg(ctx.org.getId()).toString();
 
-        List<UserAccount> uas = getUserAccountService(ctx).searchUserAccounts(userId, ctx.term,
-                CocoSiteConstants.UA_PROFILE, orgRole, CocoboxSecurityConstants.USER_ROLE, 0, MAX_RESULT);
+        List<UserAccount> uas = getUserAccountService(ctx).searchUserAccounts(userId,
+                ctx.term,
+                CocoSiteConstants.UA_PROFILE, 
+                orgRole,
+                CocoboxSecurityConstants.USER_ROLE, 0, MAX_RESULT);
 
         return uas;
     }
