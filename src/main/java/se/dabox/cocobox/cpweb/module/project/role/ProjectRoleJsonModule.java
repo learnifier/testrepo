@@ -16,6 +16,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
@@ -41,12 +42,12 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onSearchUser(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo miniOrg = secureGetMiniOrg(cycle, strOrgId);
 
-        String query = cycle.getRequest().getParameter("term");
+        String query = StringUtils.trimToNull(cycle.getRequest().getParameter("term"));
 
         List<UserAccount> matching;
         
-        if (query.length() < 2) {
-            matching = Collections.emptyList();
+        if (query == null) {
+            matching = CacheClients.getClient(cycle, UserAccountService.class).getUserAccounts();
         } else {
             SearchContext ctx = new SearchContext(cycle, query, miniOrg);
             matching = getJsonUsers(ctx);
