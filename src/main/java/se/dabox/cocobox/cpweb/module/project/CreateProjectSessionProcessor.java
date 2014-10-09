@@ -142,7 +142,8 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                     npr = npr.withName(String.format("%s (%d)", projectName, i));
                 }
 
-                project = ccbc.newProject(npr);
+                long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+                project = ccbc.newProject(caller, npr);
                 break;
             } catch (AlreadyExistsException ex) {
                 aex = ex;
