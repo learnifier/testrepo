@@ -562,7 +562,8 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
                 }
 
-                ccbcClient.newProjectParticipant(prj.getProjectId(), ua.getUserId());
+                long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+                ccbcClient.newProjectParticipant(caller, prj.getProjectId(), ua.getUserId());
 
                 return null;
             }
