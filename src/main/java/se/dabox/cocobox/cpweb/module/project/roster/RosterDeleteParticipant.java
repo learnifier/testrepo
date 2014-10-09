@@ -28,6 +28,7 @@ import se.dabox.util.collections.Transformer;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class RosterDeleteParticipant extends AbstractRosterListCommand {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public RequestTarget execute(ListformContext context,
@@ -68,7 +69,7 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
         CocoboxCordinatorClient ccbcClient =
                 getCocoboxCordinatorClient(context);
 
-        long userId = LoginUserAccountHelper.getUserId(context.getCycle());
+        long userId = LoginUserAccountHelper.getCurrentCaller(context.getCycle());
         try {
             ccbcClient.deleteProjectParticipant(userId, getProjectId(context), value);
         } catch (DwsServiceErrorCodeException secx) {
