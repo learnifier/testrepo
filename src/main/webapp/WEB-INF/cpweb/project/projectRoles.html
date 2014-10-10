@@ -19,13 +19,14 @@ ${cpweb_foot}
         
        $("#userSelect").select2({
             placeholder: "Start typing name here",
-            minimumInputLength: 2,
             ajax: { 
                 url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
+                minimumInputLength: -1,
                 dataType: 'json',
+                quietMillis: 300,
                 data: function (term, page) {
                     return {
-                        term: term, // search term
+                        term: term,
                         page_limit: 10
                     };
                 },
