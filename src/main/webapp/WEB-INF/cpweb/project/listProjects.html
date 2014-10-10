@@ -11,7 +11,7 @@ ${cpweb_foot}
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
     var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
     var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
-    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?type=${projectStatus}";
+    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
 
     require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
        //No initialization needed
@@ -31,9 +31,8 @@ ${cpweb_foot}
 <section class="list">
     <nav id="itemnav" style="margin-bottom: 10px;">
         <ul>
-            <li class="${(projectStatus == 'NEW')?string('activeItem','')}"><a  href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=NEW"><span>${ctext("project.status.NEW")?xml}</span></a></li>
-            <li class="${(projectStatus == 'ACTIVE')?string('activeItem','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=ACTIVE"><span>${ctext("project.status.ACTIVE")?xml}</span></a></li>
-            <li class="${(projectStatus == 'DISABLED')?string('activeItem','')}" ><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?type=DISABLED"><span>${ctext("project.status.DISABLED")?xml}</span></a></li>
+            <li class="${(projectFilter == '')?string('activeItem','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}"><span>${ctext("listprojects.activeandnew")?xml}</span></a></li>
+            <li class="${(projectFilter == 'archived')?string('activeItem','')}" ><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?f=archived"><span>${ctext("listprojects.disabled")?xml}</span></a></li>
         </ul>
     </nav>
     

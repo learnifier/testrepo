@@ -208,7 +208,13 @@ public class CpMainModule extends AbstractWebAuthModule {
         Map<String, Object> map = createMap();
 
         map.put("org", org);
-        map.put("projectStatus", getProjectStatus(cycle.getRequest()));
+
+        String projectFilter = "";
+        if ("archived".equals(cycle.getRequest().getParameter("f"))) {
+            projectFilter = "archived";
+        }
+
+        map.put("projectFilter", projectFilter);
 
         return new FreemarkerRequestTarget("/project/listProjects.html", map);
     }

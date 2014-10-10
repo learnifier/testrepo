@@ -86,7 +86,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                 ccbc.listOrgProjects(orgId);
         projects = CollectionsUtil.sublist(projects, OrgProjectPredicates.
                 getSubtypePredicate(ProjectSubtypeConstants.MAIN));
-        projects = filterProjects(cycle.getRequest().getParameter("type"), projects);
+        projects = filterProjects(cycle.getRequest().getParameter("f"), projects);
 
         ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects, favoriteIds);
 
@@ -452,32 +452,28 @@ public class CpJsonModule extends AbstractJsonAuthModule {
     }
 
     private List<OrgProject> filterProjects(String parameter, List<OrgProject> projects) {
-        final ProjectStatus status = decodeStatus(parameter);
-
-        if (status == null) {
-            return projects;
-        }
+        final boolean ongoing = decodeStatus(parameter);
 
         return CollectionsUtil.sublist(projects, new Predicate<OrgProject>() {
 
             @Override
             public boolean evalute(OrgProject item) {
-                return item.getStatus() == status;
+                if (ongoing) {
+                    return item.getStatus() != ProjectStatus.DISABLED;
+                } else {
+                    return item.getStatus() == ProjectStatus.DISABLED;
+                }
             }
         });
 
     }
 
-    private ProjectStatus decodeStatus(String parameter) {
+    private boolean decodeStatus(String parameter) {
         if (parameter == null) {
-            return null;
+            return true;
         }
 
-        try {
-            return ProjectStatus.valueOf(parameter);
-        } catch(IllegalArgumentException ex) {
-            return null;
-        }
+        return !"archived".equals(parameter);
     }
 
     private static class ComboProjectAlert implements Comparable<ComboProjectAlert> {
