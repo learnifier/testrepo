@@ -56,6 +56,7 @@ import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -70,6 +71,7 @@ import se.dabox.service.common.tx.OperationFailureException;
 import se.dabox.service.common.tx.UTComplexTxOperation;
 import se.dabox.service.common.tx.ValidationFailureException;
 import se.dabox.service.common.tx.VerificationStatus;
+import se.dabox.service.login.client.AlreadyExistsException;
 import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.CreateBasicUserAccountRequest;
 import se.dabox.service.login.client.UserAccount;
@@ -531,11 +533,22 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
             @Override
             protected void preVerification() {
                 participants = ccbcClient.listProjectParticipations(prj.getProjectId());
+                ua = findUserWithEmail(email);
+            }
+
+            /**
+             * Returns the user with the specified email or null.
+             *
+             * @param userEmailAddress
+             * @return
+             * @throws ClientFactoryException
+             */
+            private UserAccount findUserWithEmail(String userEmailAddress) throws ClientFactoryException {
                 List<UserAccount> uas = Clients.getClient(cycle, UserAccountService.class).
                         getUserAccountsByProfileSetting("email", "email",
-                                email);
+                                userEmailAddress);
 
-                ua = CollectionsUtil.singleItemOrNull(uas);
+                return CollectionsUtil.singleItemOrNull(uas);
             }
 
             @Override
@@ -553,7 +566,20 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                                     email);
                     final UserAccountService uaClient
                             = Clients.getClient(cycle, UserAccountService.class);
-                    ua = uaClient.createBasicUserAccount(create);
+
+                    try {
+                        ua = uaClient.createBasicUserAccount(create);
+                    } catch (AlreadyExistsException ex) {
+                        LOGGER.debug("Account already exists for email {}. Trying to fetch it instead.", email);
+                        ua = findUserWithEmail(email);
+                        if (ua == null) {
+                            String msg = String.format(
+                                    "Inconsistency situation. We can't create an account with email %s but we can't find it either",
+                                    email);
+                            throw new IllegalStateException(msg);
+                        }
+                    }
+
                     
                     uaClient.updateUserProfileValue(ua.getUserId(),
                             CocoboxUserAccount.PROFILE_COCOBOX, 
