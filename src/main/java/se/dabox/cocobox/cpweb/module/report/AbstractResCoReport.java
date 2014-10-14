@@ -19,7 +19,7 @@ public abstract class AbstractResCoReport extends AbstractReport {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(AvailableReport.class);
-    private Map<String, TokenAmount> amountMap = new HashMap<String, TokenAmount>();
+    private final Map<String, TokenAmount> amountMap = new HashMap<>();
 
     public AbstractResCoReport(RequestCycle cycle) {
         super(cycle);
@@ -71,13 +71,17 @@ public abstract class AbstractResCoReport extends AbstractReport {
 
         String[] split = name.split(":");
 
-        if (split[1].equals("p")) {
-            processProjectReservation(tokenAmount, split);
-        } else if (split[1].equals("l")) {
-            processDeeplinkReservation(tokenAmount, split);
-        } else {
-            LOGGER.warn("Unknown reservation source: {}", name);
-            processUnknownReservation(tokenAmount, split);
+        switch (split[1]) {
+            case "p":
+                processProjectReservation(tokenAmount, split);
+                break;
+            case "l":
+                processDeeplinkReservation(tokenAmount, split);
+                break;
+            default:
+                LOGGER.warn("Unknown reservation source: {}", name);
+                processUnknownReservation(tokenAmount, split);
+                break;
         }
     }
 
