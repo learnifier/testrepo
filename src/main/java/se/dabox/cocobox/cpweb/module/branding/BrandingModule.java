@@ -101,13 +101,14 @@ public class BrandingModule extends AbstractWebAuthModule {
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(org.getId());
 
         Map<String, String> brandingMap = branding.getMetadata();
-        brandingMap.put("cpPrimaryColor", null);
-        brandingMap.put("cpSecondaryColor", null);
-        brandingMap.put("cpNavColor", null);
-        brandingMap.put("upTopbarBackgroundColor", null);
+        HashMap<String, String> modificationMap = new HashMap<>(brandingMap);
+        modificationMap.put("cpPrimaryColor", null);
+        modificationMap.put("cpSecondaryColor", null);
+        modificationMap.put("cpNavColor", null);
+        modificationMap.put("upTopbarBackgroundColor", null);
 
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
-                LoginUserAccountHelper.getUserId(cycle), brandingMap, true);
+                LoginUserAccountHelper.getUserId(cycle), modificationMap, true);
         BrandingChangedListenerUtil.triggerEvent(cycle, branding.getBrandingId());
 
         GlobalCacheManager.getCache(cycle).removeEntry(BrandingCacheUtil.getBrandingCacheKey(org.
