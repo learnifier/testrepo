@@ -32,6 +32,7 @@ import se.dabox.cocobox.cpweb.excel.Contact;
 import se.dabox.cocobox.cpweb.excel.RosterError;
 import se.dabox.cocobox.cpweb.excel.RosterException;
 import se.dabox.cocobox.cpweb.excel.RosterReader;
+import se.dabox.cocobox.cpweb.excel.SimpleEmailValidator;
 import se.dabox.cocobox.cpweb.formdata.project.AddMemberForm;
 import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
 import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
@@ -133,14 +134,26 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         DruwaFormValidationSession<AddMemberForm> sess = getValidationSession(AddMemberForm.class,
                 cycle);
+
         sess.setTransferToViewSession(true);
 
         if (!sess.process()) {
             return toRoster(projectId);
         }
 
+        AddMemberForm form = sess.getObject();
+
+        if (!SimpleEmailValidator.getInstance().isValidEmail(form.getMemberemail())) {
+            sess.addError(new ValidationError(ValidationConstraint.EMAIL_FORMAT, "memberemail", "email.invalid.input"));
+        }
+
+        if (!sess.process()) {
+            LOGGER.info("Invalid email: {}", form.getMemberemail());
+            return toRoster(projectId);
+        }
+
         try {
-            AddMemberForm form = sess.getObject();
+            
             addMember(cycle, prj, form.getMemberfirstname(), form.getMemberlastname(), form.
                     getMemberemail());
         } catch (ValidationFailureException vfe) {

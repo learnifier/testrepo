@@ -37,7 +37,7 @@ public class RosterReader {
     private int surnameCol = 1;
     private int emailCol = 2;
     private final List<RosterError> errors = new ArrayList<>();
-    private List<Contact> contacts = new ArrayList<>();
+    private final List<Contact> contacts = new ArrayList<>();
     private EmailValidator emailValidator = SimpleEmailValidator.getInstance();
 
     public List<Contact> readContacts(InputStream inputStream) {
@@ -200,8 +200,6 @@ public class RosterReader {
         if (cell.getCellType() != Cell.CELL_TYPE_STRING) {
             //Return invalid value?
         }
-
-
 
         return StringUtils.trim(cell.getStringCellValue());
     }

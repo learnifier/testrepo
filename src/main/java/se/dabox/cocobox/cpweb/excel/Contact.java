@@ -3,6 +3,8 @@
  */
 package se.dabox.cocobox.cpweb.excel;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
@@ -15,7 +17,7 @@ public class Contact {
     public Contact(String givenName, String surname, String email) {
         this.givenName = givenName;
         this.surname = surname;
-        this.email = email;
+        this.email = StringUtils.trim(email);
     }
 
     public String getGivenName() {
