@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -102,6 +103,8 @@ public class RosterReader {
         try {
             LOGGER.debug("Trying to open workbook from stream: {}", is);
             workbook = WorkbookFactory.create(is);
+        } catch(EncryptedDocumentException ex) {
+            throw new RosterFormatException("Can't open an encrypted workbook.", ex);
         } catch (IOException | InvalidFormatException | POIXMLException | IllegalArgumentException ex) {
             throw new RosterFormatException("Failed to read workbook.", ex);
         }
