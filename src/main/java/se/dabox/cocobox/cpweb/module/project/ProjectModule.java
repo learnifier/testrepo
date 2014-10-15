@@ -53,6 +53,7 @@ import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
@@ -141,9 +142,14 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.FLIRT)) {
             if (project.getFlirtId() == null || project.getNewsFlirtId() == null) {
-                LOGGER.debug("Flirt ids are missing from project. Resyncing project");
-                cocoboxCordinatorClient.syncProjectState(project.getProjectId());
-                project = cocoboxCordinatorClient.getProject(project.getProjectId());
+                LOGGER.debug("Flirt ids are missing from project {}. Resyncing project", projectId);
+                try {
+                    cocoboxCordinatorClient.syncProjectState(project.getProjectId());
+                    project = cocoboxCordinatorClient.getProject(project.getProjectId());
+                } catch (NotFoundException nfe) {
+                    LOGGER.info("Project {} missing (stage 2). Redirecting to cpweb main page", projectId);
+                    throw new RetargetException(NavigationUtil.toMain(cycle));
+                }
             }
         }
 
