@@ -127,10 +127,37 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
+[#macro userNameAndEmail userId]
+
+
+[#if infoHelper.getMiniUserInfo(userId)??]
+[#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
+${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;
+[/#if]
+
+[/#macro]
 
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
 
 [@pInfo.projectInfo selected="settings"][/@pInfo.projectInfo]
+
+<h2>Information</h2>
+<div class="itemdetails">    
+    <ul>
+        <li>
+            <span class="label">Created by:</span><span class="setting">[@userNameAndEmail prj.updatedBy /]</span>
+        </li>
+        <li>
+            <span class="label">Created:</span><span class="setting">${(prj.created?datetime?string.full)!''}</span>
+        </li>
+        <li>
+            <span class="label">Last updated by:</span><span class="setting">[@userNameAndEmail prj.updatedBy /]</span>
+        </li>
+        <li>
+            <span class="label">Last updated:</span><span class="setting">${(prj.updated?datetime?string.full)!''}</span>
+        </li>        
+    </ul>
+</div>
 
 <div id="settingsList">
     <h2>[@dws.txt key="cpweb.project.settings.title" /]</h2>
