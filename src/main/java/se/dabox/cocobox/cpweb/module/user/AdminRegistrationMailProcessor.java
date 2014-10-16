@@ -82,7 +82,7 @@ public class AdminRegistrationMailProcessor implements SendMailProcessor {
     }
 
     private String createToken(RequestCycle cycle, UserAccount account, OrgUnitInfo org) {
-        String json = ActivateCpAdminTokenGenerator.
+        String json = new ActivateCpAdminTokenGenerator().
                 createTokenData(org.getId(), account.getUserId());
 
         RandomDataClient rdc = AbstractAuthModule.getRandomDataClient(cycle);
