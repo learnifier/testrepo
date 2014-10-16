@@ -152,8 +152,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
         ValidateDesignDataResponse resp = getPureValidationResponse(design, cycle);
 
         Map<String, Set<ExtendedComponentFieldName>> fieldMapSet
-                = new FieldSetCreator(cdd, project).
-                createFieldMapSet(resp);
+                = new FieldSetCreator(cdd).createFieldMapSet(resp);
 
         WebRequest req = cycle.getRequest();
 
@@ -292,8 +291,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
         map.put("formsess", getValidationSession(Blank.class, cycle));
 
         Map<String, Set<ExtendedComponentFieldName>> fieldMapSet
-                = new FieldSetCreator(cdd, project).
-                createFieldMapSet(resp);
+                = new FieldSetCreator(cdd).createFieldMapSet(resp);
 
         List<Component> components = cdd.getComponents();
         List<Component> primaryComponents = getPrimaryComponentsView(components, fieldMapSet);

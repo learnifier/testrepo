@@ -3,14 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.project.details;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.coursedesign.ComponentConstants;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
 import se.dabox.service.common.coursedesign.ValidateDesignDataResponse;
@@ -29,15 +27,10 @@ import se.dabox.util.collections.Transformer;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class FieldSetCreator {
-    private static final Set<String> EPOCH_MANDATORY_FIELDS = new HashSet<>(
-            Arrays.asList("starts", "ends"));
-
     private final CourseDesignDefinition cdd;
-    private final OrgProject project;
-
-    public FieldSetCreator(CourseDesignDefinition cdd, OrgProject project) {
+    
+    public FieldSetCreator(CourseDesignDefinition cdd) {
         this.cdd = cdd;
-        this.project = project;
     }
 
     public Map<String, Set<ExtendedComponentFieldName>> createFieldMapSet(ValidateDesignDataResponse resp) {
