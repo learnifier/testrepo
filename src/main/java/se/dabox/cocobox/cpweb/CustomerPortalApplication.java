@@ -20,7 +20,6 @@ import se.dabox.cocosite.druwa.DefaultCocositeInitialization;
 import se.dabox.cocosite.login.LoginHandler;
 import se.dabox.cocosite.module.account.picture.PictureModule;
 import se.dabox.cocosite.portalswitch.PortalSwitchAjaxModule;
-import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.common.ccbc.mailfilter.MailFilterTarget;
 import se.dabox.service.webutils.druwa.DwsWebsiteConstants;
 import se.dabox.service.webutils.druwa.DwsWebsiteHelper;

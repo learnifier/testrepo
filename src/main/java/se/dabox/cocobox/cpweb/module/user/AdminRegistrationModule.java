@@ -14,7 +14,9 @@ import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import se.dabox.cocobox.cpweb.module.core.AbstractModule;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.service.login.client.LoginService;
 
 /**
  *
@@ -43,7 +45,7 @@ public class AdminRegistrationModule extends AbstractModule {
 
         long brandingId = new GetRealmBrandingId(cycle).getBrandingId();
 
-        String loginUrl = getServiceClientFactory(cycle).getLoginService().autoLogin(userId, url,
+        String loginUrl = CacheClients.getClient(cycle, LoginService.class).autoLogin(userId, url,
                 true, CocoSiteConstants.DEFAULT_LOGIN_SKIN, brandingId);
         
         return new RedirectUrlRequestTarget(loginUrl);

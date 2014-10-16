@@ -8,14 +8,15 @@ import java.util.Locale;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import org.apache.commons.lang3.StringUtils;
+import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
-import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectDetails;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleSearch;
+import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.util.ParamUtil;
@@ -26,6 +27,9 @@ import se.dabox.util.collections.CollectionsUtil;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AssignRoleCommand {
+    private static final String MAILHINT_EXISTING_USER = "cpweb.project.roleassigned";
+    //TODO: Change to own hint
+    private static final String MAILHINT_NEW_USER = CpwebConstants.ADMIN_WELCOME_MAIL_HINT;
 
     private final RequestCycle cycle;
     private final String email;
@@ -85,7 +89,22 @@ public class AssignRoleCommand {
     }
 
     private RequestTarget createAssignNewUserTarget() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        ProjectRolesRedirectTargetGenerator rolesPageTarget
+                = new ProjectRolesRedirectTargetGenerator(project.getProjectId());
+
+        AssignNewUserRoleProcessor processor = new AssignNewUserRoleProcessor(
+                project.getProjectId(),
+                email,
+                role);
+
+        SendMailSession sms = new SendMailSession(processor, rolesPageTarget, rolesPageTarget);
+        sms.setStickyTemplateHint(MAILHINT_NEW_USER);
+        Locale mailLocale = getMailLocale();
+        sms.setStickyTemplateLocale(mailLocale);
+
+        sms.storeInSession(cycle);
+
+        return sms.getPreSendTarget(project.getOrgId());
     }
 
     private RequestTarget createAssignExistingAdmin() {
@@ -99,7 +118,7 @@ public class AssignRoleCommand {
                 role);
 
         SendMailSession sms = new SendMailSession(processor, rolesPageTarget, rolesPageTarget);
-        sms.setStickyTemplateHint("cpweb.project.roleassigned");
+        sms.setStickyTemplateHint(MAILHINT_EXISTING_USER);
         Locale mailLocale = getMailLocale();
         sms.setStickyTemplateLocale(mailLocale);
 
@@ -144,9 +163,15 @@ public class AssignRoleCommand {
 
     private Locale getMailLocale() {
         UserAccount account = getMatchingUserAccount();
+        if (account == null) {
+            return determineRealmDefaultUserLocale();
+        }
         return CocositeUserHelper.getUserAccountUserLocale(account);
     }
 
+    private Locale determineRealmDefaultUserLocale() {
+        return new GetUserDefaultLocaleCommand().getLocale(cycle);
+    }
 
     private static enum UserType {
         NEW_USER,

@@ -426,18 +426,28 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         UserAccount userAccount = uaService.getUserAccount(userId);
         
         return new AssignRoleCommand(cycle, prj, userAccount.getPrimaryEmail(), roleId).assign();
+    }
 
-//        long caller = LoginUserAccountHelper.getCurrentCaller();
-//
-//        ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
-//                roleId);
-//
-//        boolean response = ccbc.grantProjectUserRole(mod);
-//
-//        LOGGER.info("Adding role {} in project {} for {} (caller {}): {}",
-//                roleId, strProjectId, userId, caller, response);
-//
-//        return toProjectRolePage(cycle, strProjectId);
+    @WebAction()
+    public RequestTarget onAssignRoleEmail(RequestCycle cycle, String strProjectId) {
+        String email = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "email");
+        String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
+
+        //TODO: Verify email structure
+
+        if (!new CocoboxRoleUtil().getProjectRoles(cycle).containsKey(roleId)) {
+            String msg = String.format("Invalid project role id: %s", roleId);
+            return new ErrorCodeRequestTarget(400, msg);
+        }
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
+
+       return new AssignRoleCommand(cycle, prj, email, roleId).assign();
     }
 
     @WebAction(methods = HttpMethod.POST)
