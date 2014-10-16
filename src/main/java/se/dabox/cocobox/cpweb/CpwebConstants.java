@@ -3,8 +3,6 @@
  */
 package se.dabox.cocobox.cpweb;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
@@ -13,6 +11,8 @@ public final class CpwebConstants {
 
     public static final String ADMIN_WELCOME_MAIL_HINT = "mail.admin.welcome";
     public static final String ADMIN_REGISTRATION_MAIL_HINT = "mail.admin.registration";
+
+    public static final String PRJADMIN_REGISTRATION_MAIL_HINT = "mail.admin.registration";
 
     public static final String MAILEDITOR_SKIN = "CPAuthMenu2";
 

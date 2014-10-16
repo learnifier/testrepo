@@ -12,13 +12,20 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import se.dabox.cocobox.cpweb.module.core.AbstractModule;
+import se.dabox.cocobox.cpweb.module.project.role.ActivateNewProjectAdmin;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
+import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.LoginService;
+import se.dabox.service.orgadmin.client.ActivateCpAdminTokenGenerator;
 
 /**
+ * Handles registration of activation of admins and project admins.
+ *
+ * <p>This module are not having a login checker because the user is not logged in yet</p>
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
@@ -39,14 +46,16 @@ public class AdminRegistrationModule extends AbstractModule {
             return new FreemarkerRequestTarget("/registration/registrationAlreadyDone.html", null);
         }
 
+        String type = (String) map.get("type");
+
+        final String url = processRegistration(cycle, id, type, map);
+
         long userId = ((Number) map.get("userId")).longValue();
-        String url = cycle.urlFor(AdminRegistrationCompletionModule.class,
-                AdminRegistrationCompletionModule.ACTION, id);
 
         long brandingId = new GetRealmBrandingId(cycle).getBrandingId();
 
-        String loginUrl = CacheClients.getClient(cycle, LoginService.class).autoLogin(userId, url,
-                true, CocoSiteConstants.DEFAULT_LOGIN_SKIN, brandingId);
+        String loginUrl = CacheClients.getClient(cycle, LoginService.class).
+                autoLogin(userId, url, true, CocoSiteConstants.DEFAULT_LOGIN_SKIN, brandingId);
         
         return new RedirectUrlRequestTarget(loginUrl);
     }
@@ -63,6 +72,24 @@ public class AdminRegistrationModule extends AbstractModule {
         }
 
         return JsonUtils.decode(json);
+    }
+
+    private String processRegistration(RequestCycle cycle, String id, String type,
+            Map<String, ?> map) {
+        switch(type) {
+            case ActivateCpAdminTokenGenerator.TYPE:
+                return cycle.urlFor(AdminRegistrationCompletionModule.class,
+                        AdminRegistrationCompletionModule.ACTION, id);
+            case ProjectRoleAdminTokenGenerator.TYPE:
+                return activateProjectAdmin(cycle, id, map);
+            default:
+                throw new IllegalStateException("Unknown registration type for session "+id+": "+type);
+        }
+    }
+
+    private String activateProjectAdmin(RequestCycle cycle, String id,
+            Map<String, ?> map) {
+        return new ActivateNewProjectAdmin(cycle, id, map).getTargetUrl();
     }
 
 }

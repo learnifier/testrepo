@@ -54,8 +54,7 @@ public class AdminRegistrationMailProcessor implements SendMailProcessor {
         Map<String, String> vars =
                 new AdminRegistrationMailVariables().produceFor(config, account, org);
 
-        SendMailRequest req =
-                getRequest(cycle);
+        SendMailRequest req = getNewSendMailRequest(cycle);
         smt.toSendMailRequest(req);
 
         SendMailRecipient recipient = new SendMailRecipient(account.getDisplayName(), account.
@@ -92,17 +91,18 @@ public class AdminRegistrationMailProcessor implements SendMailProcessor {
         return token;
     }
 
-    private SendMailRequest getRequest(RequestCycle cycle) {
+    @Override
+    public MailSender getMailSender(RequestCycle cycle) {
+        SendMailRequest req = getNewSendMailRequest(cycle);
+
+        return new MailSender(req.getFromName(), req.getFromEmail());
+    }
+
+
+    protected SendMailRequest getNewSendMailRequest(RequestCycle cycle) {
         SendMailRequest req =
                 SendMailRequestFactory.newRequest(LoginUserAccountHelper.getUserId(cycle));
         return req;
-    }
-
-    @Override
-    public MailSender getMailSender(RequestCycle cycle) {
-        SendMailRequest req = getRequest(cycle);
-
-        return new MailSender(req.getFromName(), req.getFromEmail());
     }
 
 }

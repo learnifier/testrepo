@@ -21,6 +21,8 @@ import se.dabox.service.common.mailsender.SendMailRequest;
 import se.dabox.service.orgadmin.client.AdminMailRequest;
 import se.dabox.service.orgadmin.client.MailInfo;
 import se.dabox.service.orgadmin.client.OrgAdminClient;
+import se.dabox.service.orgdir.client.OrgUnitInfo;
+import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
@@ -53,12 +55,21 @@ abstract class AbstractRoleProcessor implements SendMailProcessor {
         return new MailSender(req.getFromName(), req.getFromEmail());
     }
 
-    protected void sendMail(RequestCycle cycle,
+    public void sendMail(RequestCycle cycle,
             SendMailSession sms,
             SendMailTemplate smt,
             long receiverUserId) {
-
         long caller = LoginUserAccountHelper.getCurrentCaller();
+
+        sendMail(cycle, caller, sms, smt, receiverUserId);
+
+    }
+
+    public void sendMail(RequestCycle cycle,
+            long caller,
+            SendMailSession sms,
+            SendMailTemplate smt,
+            long receiverUserId) {
 
         String roleName = new CocoboxRoleUtil().getProjectRoles(cycle).get(roleId);
 
@@ -75,6 +86,11 @@ abstract class AbstractRoleProcessor implements SendMailProcessor {
         oaClient.sendAdminMail(caller, mailReq);
     }
 
+    protected SendMailRequest getNewSendMailRequest(RequestCycle cycle) {
+        SendMailRequest req =
+                SendMailRequestFactory.newRequest(LoginUserAccountHelper.getUserId(cycle));
+        return req;
+    }
 
     protected ProjectDetails getProject() {
         final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
@@ -82,6 +98,19 @@ abstract class AbstractRoleProcessor implements SendMailProcessor {
         CocoboxCordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
 
         return ccbc.getProject(projectId);
+    }
+
+    protected OrgUnitInfo getOrgUnit() {
+
+        ProjectDetails prj = getProject();
+        final long ouId= prj.getOrgId();
+
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+
+        OrganizationDirectoryClient odClient
+                = CacheClients.getClient(cycle, OrganizationDirectoryClient.class);
+
+        return odClient.getOrgUnitInfo(ouId);
     }
 
 }
