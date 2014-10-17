@@ -79,7 +79,11 @@ ${cpweb_foot}
                     "aTargets": [ 0 ],
                     "mData": "displayName",
                     "fnRender": function ( oObj ) {
-                        return  '<span title="' +oObj.aData.displayName + '">' + cocobox.trunc(oObj.aData.displayName, 20) + '</span>';
+                        var dName = oObj.aData.displayName;
+                        if (dName.length < 2) {
+                            return oObj.aData.email;
+                        }
+                        return  '<span title="' +dName + '">' + cocobox.trunc(dName, 20) + '</span>';
                     }
                 },
                 {
