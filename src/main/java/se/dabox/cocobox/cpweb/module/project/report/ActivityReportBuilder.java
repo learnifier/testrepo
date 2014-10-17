@@ -11,6 +11,7 @@ import java.util.Map;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
@@ -20,6 +21,7 @@ import se.dabox.service.common.DwsConstants;
 import se.dabox.service.common.ajaxlongrun.Status;
 import se.dabox.service.common.ajaxlongrun.StatusSource;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductStatus;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -237,9 +239,15 @@ class ActivityReportBuilder implements StatusSource {
                 = new GetParticipationCrispProductStatusRequest(participant.getParticipationId(),
                         productId.getId());
         req.setFetchMode(FetchMode.CACHED);
-        ParticipationCrispProductStatus status
-                = CollectionsUtil.
-                singleItemOrNull(pmcClient.getParticipationCrispProductStatus(req));
+
+        ParticipationCrispProductStatus status = null;
+        try {
+            List<ParticipationCrispProductStatus> statuses
+                    = pmcClient.getParticipationCrispProductStatus(req);
+            status = CollectionsUtil.singleItemOrNull(statuses);
+        } catch (NotFoundException nfe) {
+            //Participation not available
+        }
 
         if (status == null) {
             return null;

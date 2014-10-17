@@ -35,7 +35,7 @@ public abstract class AbstractWebAuthModule extends AbstractAuthModule {
     public AbstractWebAuthModule() {
         this.loginChecker = new CocositeLoginChecker();
         this.loginChecker.
-                addAfterLoginListener(new UserRoleCheckAfterLoginListener(
+                addRequestSecurityCheck(new UserRoleCheckAfterLoginListener(
                 CocoboxSecurityConstants.USER_ROLE));
 
 

@@ -43,7 +43,7 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
 
         this.loginChecker = new JavascriptNewLoginChecker();
         this.loginChecker.
-                addAfterLoginListener(new UserRoleCheckAfterLoginListener(
+                addRequestSecurityCheck(new UserRoleCheckAfterLoginListener(
                 CocoboxSecurityConstants.USER_ROLE));
     }
 
