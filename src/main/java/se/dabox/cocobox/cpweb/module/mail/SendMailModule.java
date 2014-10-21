@@ -65,10 +65,12 @@ public class SendMailModule extends AbstractWebAuthModule {
 
         Map<String, Object> map = createMap();
 
-        if (sms.getStickyTemplateHint() == null) {
+        if (sms.isDropdownEnabled()) {
             TemplateLists lists = getLists(cycle, mailBucket);
             map.put("templateLists", lists);
-        } else {
+        }
+
+        if (sms.getStickyTemplateHint() != null) {
             MailTemplate stickyTemplate = getStickyTemplate(cycle, mailBucket,
                     sms.getStickyTemplateHint(),
                     sms.getStickyTemplateLocale());
@@ -99,6 +101,7 @@ public class SendMailModule extends AbstractWebAuthModule {
         map.put("sms", sms);
         map.put("showCancel", sms.getCancelTargetGenerator() != null);
         map.put("receivers", getReceivers(cycle, sms));
+        map.put("displayReceivers", sms.getDisplayReceivers());
         map.put("sender", sms.getProcessor().getMailSender(cycle));
         
         addOldValueIfMissing(formsess, "body", body);

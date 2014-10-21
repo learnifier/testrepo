@@ -67,7 +67,7 @@ ${cpweb_foot}
 
     <h1>Send Email</h1>
     [#-- Only display if we don't have a sticky id --]
-    [#if !stickyTemplateId??]
+    [#if sms.dropdownEnabled]
     <div id="selecttemplate">   
         <h2>${counter} Select Email Template</h2>
         <label for="templates">Email Templates</label>
@@ -104,6 +104,9 @@ ${cpweb_foot}
                             <ul id="to">
                                 [#list receivers as receiver]
                                     <li>${receiver.displayName?xhtml} &lt;${receiver.primaryEmail?xhtml}&gt;</li>
+                                [/#list]
+                                [#list displayReceivers as receiver]
+                                    <li>${receiver.name?xhtml!''} &lt;${receiver.email?xhtml}&gt;</li>
                                 [/#list]
                             </ul>
                             [#if sender??]

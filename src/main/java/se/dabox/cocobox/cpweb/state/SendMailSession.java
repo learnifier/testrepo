@@ -32,6 +32,7 @@ public class SendMailSession implements Serializable {
     private final UUID uuid;
     private final Date created = new Date();
     private final ArrayList<Long> receivers = new ArrayList<>();
+    private final ArrayList<Receiver> displayReceivers = new ArrayList<>();
     private final ArrayList<Object> extraDatas = new ArrayList<>();
     private SendMailProcessor processor;
     private Map<String,? super Object> metaData;
@@ -39,6 +40,7 @@ public class SendMailSession implements Serializable {
     private final RequestTargetGenerator cancelTargetGenerator;
     private String stickyTemplateHint;
     private Locale stickyTemplateLocale;
+    private boolean stickyHidesDropdown = true;
     private PortableMailTemplate portableMailTemplate;
 
     public SendMailSession(SendMailProcessor processor,
@@ -120,6 +122,28 @@ public class SendMailSession implements Serializable {
     public void addReceiver(long receiver, Object extraData) {
         receivers.add(receiver);
         extraDatas.add(extraData);
+    }
+
+    /**
+     * Adds a receiver that is only used for display.
+     *
+     * @param receiver The receiver to add
+     *
+     * @throws IllegalArgumentException Thrown if receiver is null
+     */
+    public void addDisplayReceiver(Receiver receiver) {
+        ParamUtil.required(receiver, "receiver");
+
+        displayReceivers.add(receiver);
+    }
+
+    /**
+     * Returns a list with display receivers.
+     *
+     * @return A list with the display receivers.
+     */
+    public List<Receiver> getDisplayReceivers() {
+        return displayReceivers;
     }
 
     public SendMailProcessor getProcessor() {
@@ -205,14 +229,38 @@ public class SendMailSession implements Serializable {
         this.stickyTemplateLocale = stickyTemplateLocale;
     }
 
+    /**
+     * Determines if a sticky template should hide the dropdown of mail templates
+     * (true is default).
+     *
+     * @return True if a sticky template should hide the drop down
+     */
+    public boolean isStickyHidesDropdown() {
+        return stickyHidesDropdown;
+    }
+
+    public void setStickyHidesDropdown(boolean stickyHidesDropdown) {
+        this.stickyHidesDropdown = stickyHidesDropdown;
+    }
+
+    /**
+     * Determines if the dropdown of mail templates is enabled.
+     *
+     * @return True if the dropdown with mail templates should be visible.
+     */
+    public boolean isDropdownEnabled() {
+        return stickyTemplateHint == null || !stickyHidesDropdown;
+    }
+
     @Override
     public String toString() {
-        return "SendMailSession{" + "uuid=" + uuid + ", created=" + created +
-                ", receivers=" + receivers + ", extraDatas=" + extraDatas +
-                ", processor=" + processor + ", metaData=" + metaData +
-                ", stickyTemplateHint=" + stickyTemplateHint +
-                ", completedTargetGenerator=" + completedTargetGenerator +
-                ", portableMailTemplate=" + portableMailTemplate + '}';
+        return "SendMailSession{" + "uuid=" + uuid + ", created=" + created + ", receivers=" +
+                receivers + ", extraDatas=" + extraDatas + ", processor=" + processor + ", metaData=" +
+                metaData + ", completedTargetGenerator=" + completedTargetGenerator +
+                ", cancelTargetGenerator=" + cancelTargetGenerator + ", stickyTemplateHint=" +
+                stickyTemplateHint + ", stickyTemplateLocale=" + stickyTemplateLocale +
+                ", stickyHidesDropdown=" + stickyHidesDropdown + ", portableMailTemplate=" +
+                portableMailTemplate + '}';
     }
 
     public RequestTarget getCompletedRequestTarget(RequestCycle cycle) {

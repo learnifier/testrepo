@@ -9,6 +9,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocobox.cpweb.CpwebConstants;
+import se.dabox.cocobox.cpweb.state.Receiver;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
@@ -28,6 +29,7 @@ import se.dabox.util.collections.CollectionsUtil;
  */
 public class AssignRoleCommand {
     private static final String MAILHINT_EXISTING_USER = "cpweb.project.roleassigned";
+    private static final String MAILHINT_EXISTING_ADMIN = "cpweb.project.roleassigned";
     //TODO: Change to own hint
     private static final String MAILHINT_NEW_USER = CpwebConstants.ADMIN_WELCOME_MAIL_HINT;
 
@@ -101,6 +103,8 @@ public class AssignRoleCommand {
         sms.setStickyTemplateHint(MAILHINT_NEW_USER);
         Locale mailLocale = getMailLocale();
         sms.setStickyTemplateLocale(mailLocale);
+        sms.setStickyHidesDropdown(false);
+        sms.addDisplayReceiver(new Receiver("", email));
 
         sms.storeInSession(cycle);
 
@@ -108,7 +112,14 @@ public class AssignRoleCommand {
     }
 
     private RequestTarget createAssignExistingAdmin() {
+        return createAssignExistingWithTemplate(MAILHINT_EXISTING_ADMIN);
+    }
 
+    private RequestTarget createAssignExistingUser() {
+        return createAssignExistingWithTemplate(MAILHINT_EXISTING_USER);
+    }
+
+    private RequestTarget createAssignExistingWithTemplate(String templateHint) {
         ProjectRolesRedirectTargetGenerator rolesPageTarget
                 = new ProjectRolesRedirectTargetGenerator(project.getProjectId());
 
@@ -118,17 +129,18 @@ public class AssignRoleCommand {
                 role);
 
         SendMailSession sms = new SendMailSession(processor, rolesPageTarget, rolesPageTarget);
-        sms.setStickyTemplateHint(MAILHINT_EXISTING_USER);
+        sms.setStickyTemplateHint(templateHint);
         Locale mailLocale = getMailLocale();
         sms.setStickyTemplateLocale(mailLocale);
+        sms.setStickyHidesDropdown(false);
+        
+        UserAccount matching = getMatchingUserAccount();
+        
+        sms.addReceiver(matching.getUserId());
 
         sms.storeInSession(cycle);
 
         return sms.getPreSendTarget(project.getOrgId());
-    }
-
-    private RequestTarget createAssignExistingUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private UserAccount getMatchingUserAccount() {
