@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.branding;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.unixdeveloper.druwa.FileUpload;
@@ -154,14 +155,15 @@ public class LogoModule extends AbstractJsonAuthModule {
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(org.getId());
 
         Map<String, String> brandingMap = branding.getMetadata();
-        String oldImage = brandingMap.put("cpLogo", null);
-        brandingMap.put("cpLogo.x", null);
-        brandingMap.put("cpLogo.y", null);
-        brandingMap.put("cpLogo.w", null);
-        brandingMap.put("cpLogo.h", null);
+        Map<String, String> newBrandingMap = new HashMap<>(brandingMap);
+        String oldImage = newBrandingMap.put("cpLogo", null);
+        newBrandingMap.put("cpLogo.x", null);
+        newBrandingMap.put("cpLogo.y", null);
+        newBrandingMap.put("cpLogo.w", null);
+        newBrandingMap.put("cpLogo.h", null);
 
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
-                LoginUserAccountHelper.getUserId(cycle), brandingMap, true);
+                LoginUserAccountHelper.getUserId(cycle), newBrandingMap, true);
         BrandingChangedListenerUtil.triggerEvent(cycle, branding.getBrandingId());
 
         if (oldImage != null) {
