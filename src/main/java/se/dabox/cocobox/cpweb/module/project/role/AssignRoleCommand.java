@@ -28,10 +28,9 @@ import se.dabox.util.collections.CollectionsUtil;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AssignRoleCommand {
-    private static final String MAILHINT_EXISTING_USER = "cpweb.project.roleassigned";
-    private static final String MAILHINT_EXISTING_ADMIN = "cpweb.project.roleassigned";
-    //TODO: Change to own hint
-    private static final String MAILHINT_NEW_USER = CpwebConstants.ADMIN_WELCOME_MAIL_HINT;
+    private static final String MAILHINT_EXISTING_USER = CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT;
+    private static final String MAILHINT_EXISTING_ADMIN = CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT;
+    private static final String MAILHINT_NEW_USER = CpwebConstants.PRJADMIN_REGISTRATION_MAIL_HINT;
 
     private final RequestCycle cycle;
     private final String email;

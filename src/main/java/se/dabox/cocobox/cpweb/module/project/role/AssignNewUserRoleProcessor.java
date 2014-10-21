@@ -10,14 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.module.core.AbstractAuthModule;
-import se.dabox.cocobox.cpweb.module.user.AdminRegistrationMailVariables;
+import se.dabox.service.common.ccbc.mail.AdminRegistrationMailVariables;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetGenericMailBucketCommand;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.mail.GetOrgProjectMailVariables;
+import se.dabox.service.common.ccbc.project.ProjectDetails;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleModification;
 import se.dabox.service.common.context.Configuration;
@@ -78,7 +81,9 @@ public class AssignNewUserRoleProcessor extends AbstractRoleProcessor {
         OrgUnitInfo org = getOrgUnit();
 
         Map<String, String> vars =
-                new AdminRegistrationMailVariables().produceFor(config, account, org);
+                new AdminRegistrationMailVariables().produceFor(config, account, org, token);
+
+        ProjectDetails prj = getProject();
 
         SendMailTemplate activationTemplate = getActivationTemplate(cycle, account);
 
@@ -89,9 +94,10 @@ public class AssignNewUserRoleProcessor extends AbstractRoleProcessor {
                 account.getPrimaryEmail());
 
         recipient.addVariables(vars);
-        recipient.addVariable("registrationid", token);
+        recipient.addVariables(new GetOrgProjectMailVariables().getMap(prj, config));
 
-        recipient.addVariable("link", vars.get("registrationlink") + token);
+        String roleName = new CocoboxRoleUtil().getProjectRoles(cycle).get(getRoleId());
+        recipient.addVariable("role", roleName);
 
         mailReq.addRecipient(recipient);
 

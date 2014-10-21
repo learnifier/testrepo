@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
+import se.dabox.service.common.ccbc.mail.AdminRegistrationMailVariables;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.cpweb.module.core.AbstractAuthModule;
@@ -52,7 +53,7 @@ public class AdminRegistrationMailProcessor implements SendMailProcessor {
         Configuration config = DwsRealmHelper.getRealmConfiguration(cycle);
 
         Map<String, String> vars =
-                new AdminRegistrationMailVariables().produceFor(config, account, org);
+                new AdminRegistrationMailVariables().produceFor(config, account, org, token);
 
         SendMailRequest req = getNewSendMailRequest(cycle);
         smt.toSendMailRequest(req);

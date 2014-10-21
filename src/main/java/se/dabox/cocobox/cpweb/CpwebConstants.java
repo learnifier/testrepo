@@ -12,7 +12,8 @@ public final class CpwebConstants {
     public static final String ADMIN_WELCOME_MAIL_HINT = "mail.admin.welcome";
     public static final String ADMIN_REGISTRATION_MAIL_HINT = "mail.admin.registration";
 
-    public static final String PRJADMIN_REGISTRATION_MAIL_HINT = "mail.admin.registration";
+    public static final String PRJADMIN_WELCOME_MAIL_HINT = "mail.projectadmin.welcome";
+    public static final String PRJADMIN_REGISTRATION_MAIL_HINT = "mail.projectadmin.registration";
 
     public static final String MAILEDITOR_SKIN = "CPAuthMenu2";
 
