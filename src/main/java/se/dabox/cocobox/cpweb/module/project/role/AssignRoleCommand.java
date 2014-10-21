@@ -28,10 +28,6 @@ import se.dabox.util.collections.CollectionsUtil;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class AssignRoleCommand {
-    private static final String MAILHINT_EXISTING_USER = CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT;
-    private static final String MAILHINT_EXISTING_ADMIN = CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT;
-    private static final String MAILHINT_NEW_USER = CpwebConstants.PRJADMIN_REGISTRATION_MAIL_HINT;
-
     private final RequestCycle cycle;
     private final String email;
     private final ProjectDetails project;
@@ -99,7 +95,7 @@ public class AssignRoleCommand {
                 role);
 
         SendMailSession sms = new SendMailSession(processor, rolesPageTarget, rolesPageTarget);
-        sms.setStickyTemplateHint(MAILHINT_NEW_USER);
+        sms.setStickyTemplateHint(CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT);
         Locale mailLocale = getMailLocale();
         sms.setStickyTemplateLocale(mailLocale);
         sms.setStickyHidesDropdown(false);
@@ -111,11 +107,11 @@ public class AssignRoleCommand {
     }
 
     private RequestTarget createAssignExistingAdmin() {
-        return createAssignExistingWithTemplate(MAILHINT_EXISTING_ADMIN);
+        return createAssignExistingWithTemplate(CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT);
     }
 
     private RequestTarget createAssignExistingUser() {
-        return createAssignExistingWithTemplate(MAILHINT_EXISTING_USER);
+        return createAssignExistingWithTemplate(CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT);
     }
 
     private RequestTarget createAssignExistingWithTemplate(String templateHint) {
