@@ -31,6 +31,7 @@ ${cpweb_foot}
                     };
                 },
                 results: function (data, page) { 
+                    //log('result' , data);
                     return {results: data.results};
                 }
             },
@@ -39,44 +40,24 @@ ${cpweb_foot}
             },
             formatSelection: function(data) {
                 
-                $('#userSelect').attr('value', data.id);
+                //log('formatSelection' , data);
                 
-                return '<p value="' + data.id + '">' + data.text + '</p>';
+                $('#userSelect').attr('value', data.email);
+                
+                return '<p value="' + data.email + '">' + data.text + '</p>';
             },
             createSearchChoice: function(term, data) { 
                 if ($(data).filter(function() { 
                     return this.text.localeCompare(term)===0; 
                 }).length===0) {
+                    
+                     $('#userSelect').attr('value', data.email);
+                    
                     return {id:term, text: term, email: 'Add email to assign new team member'};
                 } 
             }
         }); 
-    });
-    
-    function addMemberToTeam(member) {
-        log('in add member to team, adding' , member);
-    }
-    
-    function assign() {
-        var id = $('#userSelect').val();
-        log(id);
-        
-        var role = $('#userRole').val();
-        log(role);
-        
-        $.ajax({
-            url: "${helper.urlFor('project.ProjectModificationModule','assignRole',[prj.projectId])}",
-            method: "POST",
-            data: {
-                userId: id,
-                role: role
-            },
-            success: function(data) {
-                log(data);
-            }
-        });
-        
-    }
+    }); 
     
     require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
        
@@ -148,13 +129,12 @@ ${cpweb_foot}
 
 <h2>[@dws.txt key="cpweb.project.roles.title" /]</h2>
 
-<form method="POST" action="${helper.urlFor('project.ProjectModificationModule','assignRole',[prj.projectId])}">
-
+<form method="POST" action="${helper.urlFor('project.ProjectModificationModule','assignRoleEmail',[prj.projectId])}" >
     <section id="addtoteam">
         <section class="field">
         <div class="inputtext">
         <label for="userSelect">Select a user or add with a new email</label>
-        <input name="userId" type="number" id="userSelect" class="bigdrop">
+        <input name="email" type="email" id="userSelect" class="bigdrop">
         </div>
         <div class="inputtext">
             <label for="roleSelect">Select role</label>
