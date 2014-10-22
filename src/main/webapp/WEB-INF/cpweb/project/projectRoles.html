@@ -18,7 +18,7 @@ ${cpweb_foot}
     require(['select2.min'], function() {
         
        $("#userSelect").select2({
-            placeholder: "Start typing name here",
+            multiple: true,
             ajax: { 
                 url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
                 minimumInputLength: -1,
@@ -42,10 +42,20 @@ ${cpweb_foot}
                 $('#userSelect').attr('value', data.id);
                 
                 return '<p value="' + data.id + '">' + data.text + '</p>';
+            },
+            createSearchChoice: function(term, data) { 
+                if ($(data).filter(function() { 
+                    return this.text.localeCompare(term)===0; 
+                }).length===0) {
+                    return {id:term, text: term, email: 'Add email to assign new team member'};
+                } 
             }
         }); 
     });
     
+    function addMemberToTeam(member) {
+        log('in add member to team, adding' , member);
+    }
     
     function assign() {
         var id = $('#userSelect').val();
@@ -143,7 +153,7 @@ ${cpweb_foot}
     <section id="addtoteam">
         <section class="field">
         <div class="inputtext">
-        <label for="userSelect">Select user</label>
+        <label for="userSelect">Select a user or add with a new email</label>
         <input name="userId" type="number" id="userSelect" class="bigdrop">
         </div>
         <div class="inputtext">
