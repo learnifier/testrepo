@@ -92,7 +92,7 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
 
                     @Override
                     protected void encodeItem(UserAccount item) throws IOException {
-                        generator.writeNumberField("id", item.getUserId());
+                        generator.writeStringField("id", item.getPrimaryEmail());
                         generator.writeStringField("text", item.getDisplayName());
                         generator.writeStringField("email", item.getPrimaryEmail());
                         generator.writeStringField("type", "clientadmin");
