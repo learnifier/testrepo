@@ -428,7 +428,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         return new AssignRoleCommand(cycle, prj, userAccount.getPrimaryEmail(), roleId).assign();
     }
 
-    @WebAction()
+    @WebAction(methods = HttpMethod.POST)
     public RequestTarget onAssignRoleEmail(RequestCycle cycle, String strProjectId) {
         String email = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "email");
         String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
