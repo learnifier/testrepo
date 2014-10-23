@@ -33,6 +33,7 @@ import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
+import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
@@ -130,24 +131,30 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
 
-    private OrgProject getProject(RequestCycle cycle, String projectId) throws NumberFormatException {
+    private OrgProject getProject(RequestCycle cycle, String strProjectId) throws NumberFormatException {
         final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
-        OrgProject project =
-                cocoboxCordinatorClient.getProject(Long.valueOf(projectId));
+
+        Long projectId = CpwebParameterUtil.stringToLong(strProjectId);
+
+        OrgProject project = null;
+
+        if (projectId != null) {
+                cocoboxCordinatorClient.getProject(projectId);
+        }
         
         if (project == null) {
-            LOGGER.info("Project {} missing. Redirecting to cpweb main page", projectId);
+            LOGGER.info("Project {} missing. Redirecting to cpweb main page", strProjectId);
             throw new RetargetException(NavigationUtil.toMain(cycle));
         }
 
         if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.FLIRT)) {
             if (project.getFlirtId() == null || project.getNewsFlirtId() == null) {
-                LOGGER.debug("Flirt ids are missing from project {}. Resyncing project", projectId);
+                LOGGER.debug("Flirt ids are missing from project {}. Resyncing project", strProjectId);
                 try {
                     cocoboxCordinatorClient.syncProjectState(project.getProjectId());
                     project = cocoboxCordinatorClient.getProject(project.getProjectId());
                 } catch (NotFoundException nfe) {
-                    LOGGER.info("Project {} missing (stage 2). Redirecting to cpweb main page", projectId);
+                    LOGGER.info("Project {} missing (stage 2). Redirecting to cpweb main page", strProjectId);
                     throw new RetargetException(NavigationUtil.toMain(cycle));
                 }
             }
