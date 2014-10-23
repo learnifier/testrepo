@@ -107,7 +107,7 @@ public class AssignRoleCommand {
     }
 
     private RequestTarget createAssignExistingAdmin() {
-        return createAssignExistingWithTemplate(CpwebConstants.PRJADMIN_WELCOME_MAIL_HINT);
+        return createAssignExistingWithTemplate(CpwebConstants.PRJADMIN_ROLE_ASSIGNED_HINT);
     }
 
     private RequestTarget createAssignExistingUser() {
