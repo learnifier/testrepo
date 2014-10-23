@@ -139,7 +139,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         OrgProject project = null;
 
         if (projectId != null) {
-                cocoboxCordinatorClient.getProject(projectId);
+            project = cocoboxCordinatorClient.getProject(projectId);
         }
         
         if (project == null) {
