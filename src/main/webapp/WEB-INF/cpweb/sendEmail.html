@@ -2,6 +2,13 @@
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
+
+
+[#import "/se/dabox/services/dwsfu/ckeditor4.ftl" as ck /]
+
+[@ck.ckeditorScriptTags /]
+[@ck.initCkeditor target="#body" /]
+
 <script>
 
     function fetchTemplate(id) {
@@ -34,11 +41,6 @@ ${cpweb_foot}
     [/#if]
 
 </script>
-
-[#import "/se/dabox/services/dwsfu/ckeditor4.ftl" as ck /]
-
-[@ck.ckeditorScriptTags /]
-[@ck.initCkeditor target="#body" /]
 
 <script type="text/javascript">
     $(function() {
