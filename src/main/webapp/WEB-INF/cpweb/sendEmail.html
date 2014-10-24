@@ -7,17 +7,20 @@ ${cpweb_foot}
     function fetchTemplate(id) {
         $.post("${helper.urlFor('MailJsonModule','getTemplate')}", {"templateId": id}, function(response) {
             $("#subject").val(response.subject);
-            $("#body").val(response.body);
             $("#mtype").val(response.mtype);
-
+            var body = $('#body');
+            body.ckeditorGet().setData(response.body);
         });
     }
 
     $('#templates').on('change', function() {
         if (this.value == '') {
             $("#subject").val("");
-            $("#body").val("");
             $("#mtype").val("");
+
+            var body = $('#body');
+            body.ckeditorGet().setData(response.body);
+
             return;
         }
 
