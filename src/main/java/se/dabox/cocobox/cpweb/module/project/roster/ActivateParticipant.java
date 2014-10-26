@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractRosterListCommand;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.participation.activation.ActivationException;
 import se.dabox.service.webutils.listform.ListformContext;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -23,8 +23,8 @@ public class ActivateParticipant extends AbstractRosterListCommand {
 
     @Override
     protected void executeSingle(ListformContext context, Long participationId) {
-        CocoboxCordinatorClient ccbc =
-                CacheClients.getClient(context.getCycle(), CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc =
+                CacheClients.getClient(context.getCycle(), CocoboxCoordinatorClient.class);
         try {
             final long userId = LoginUserAccountHelper.getUserId(context.getCycle());
             ccbc.activateParticipation(userId, participationId);

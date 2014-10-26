@@ -40,7 +40,7 @@ import se.dabox.cocobox.cpweb.module.project.details.RelativeEnableDatabankUpdat
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -100,7 +100,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
 
     private RequestTarget innerVerifyNewDesign(final RequestCycle cycle, String strProjectId,
             final boolean primary) {
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         final OrgProject project = ccbc.getProject(Long.valueOf(strProjectId));
 
@@ -135,7 +135,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
 
     private RequestTarget innerUpdateNewDesign(RequestCycle cycle, String strProjectId,
             boolean autoCall) {
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         OrgProject project = ccbc.getProject(Long.valueOf(strProjectId));
 
@@ -402,7 +402,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
         getCocoboxCordinatorClient(cycle).syncProjectState(project.getProjectId());
     }
 
-    private void saveDatabank(RequestCycle cycle, CocoboxCordinatorClient ccbc, OrgProject project,
+    private void saveDatabank(RequestCycle cycle, CocoboxCoordinatorClient ccbc, OrgProject project,
             Set<DatabankEntry> databank) {
 
         List<DatabankEntry> oldDatabank = getOldDatabank(project, ccbc);
@@ -547,7 +547,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
             return;
         }
 
-        CocoboxCordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
 
         List<ProjectParticipation> participations = ccbcClient.listProjectParticipations(project.
                 getProjectId());
@@ -625,14 +625,14 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
         return null;
     }
 
-    private List<DatabankEntry> getOldDatabank(OrgProject project, CocoboxCordinatorClient ccbc) {
+    private List<DatabankEntry> getOldDatabank(OrgProject project, CocoboxCoordinatorClient ccbc) {
         long oldDatabankId = ValueUtils.coalesce(project.getStageDatabank(), project.
                 getMasterDatabank());
         List<DatabankEntry> oldDatabank = ccbc.getDatabank(oldDatabankId);
         return oldDatabank;
     }
 
-    private DatabankFacade getOldDatabankFacade(OrgProject project, CocoboxCordinatorClient ccbc) {
+    private DatabankFacade getOldDatabankFacade(OrgProject project, CocoboxCoordinatorClient ccbc) {
         List<DatabankEntry> oldDatabank = getOldDatabank(project, ccbc);
 
         return new DatabankFacade(oldDatabank, project);
@@ -641,7 +641,7 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
     private void populateExtraValues(RequestCycle cycle,
             Map<String, Set<ExtendedComponentFieldName>> fieldMapSet, CourseDesignDefinition cdd,
             OrgProject project) {
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         DatabankFacade dbFacade = getOldDatabankFacade(project, ccbc);
 

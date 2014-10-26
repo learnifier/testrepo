@@ -14,7 +14,7 @@ import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.mail.SendMailRequestFactory;
 import se.dabox.service.common.ccbc.project.ProjectDetails;
 import se.dabox.service.common.mailsender.SendMailRequest;
@@ -95,7 +95,7 @@ abstract class AbstractRoleProcessor implements SendMailProcessor {
     protected ProjectDetails getProject() {
         final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
 
-        CocoboxCordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         return ccbc.getProject(projectId);
     }

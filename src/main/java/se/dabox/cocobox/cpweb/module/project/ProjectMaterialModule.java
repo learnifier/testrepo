@@ -23,7 +23,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
 import se.dabox.cocobox.crisp.runtime.CrispException;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
@@ -48,7 +48,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
     public RequestTarget onAddMaterial(final RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -83,7 +83,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
     public RequestTarget onRemoveMaterial(final RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 

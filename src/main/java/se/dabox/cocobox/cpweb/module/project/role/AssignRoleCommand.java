@@ -14,7 +14,7 @@ import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectDetails;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleSearch;
 import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
@@ -163,7 +163,7 @@ public class AssignRoleCommand {
     private boolean isTrainer(UserAccount account) {
         ProjectUserRoleSearch search = ProjectUserRoleSearch.forUserId(account.getUserId());
 
-        CocoboxCordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         return !ccbc.searchProjectUserRoles(search).isEmpty();
     }

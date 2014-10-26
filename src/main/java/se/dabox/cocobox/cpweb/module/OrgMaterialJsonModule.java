@@ -39,7 +39,7 @@ import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
@@ -207,7 +207,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         //TODO: Security check here
         long materialId = Long.valueOf(cycle.getRequest().getParameter("orgmatid"));
 
-        final CocoboxCordinatorClient client = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient client = getCocoboxCordinatorClient(cycle);
 
         long userId = getCurrentUser(cycle);
 
@@ -224,7 +224,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         //TODO: Security check here
         long orgmatlinkid = Long.valueOf(cycle.getRequest().getParameter("orgmatlinkid"));
 
-        final CocoboxCordinatorClient client = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient client = getCocoboxCordinatorClient(cycle);
 
         client.deleteOrgMaterialLink(LoginUserAccountHelper.getUserId(cycle), orgmatlinkid);
 
@@ -238,7 +238,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onDeleteOrgMat(RequestCycle cycle) {
         long orgmatid = Long.valueOf(cycle.getRequest().getParameter("orgmatid"));
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         OrgMaterial orgMat = null;
         try {
@@ -644,7 +644,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     private List<OrgMaterialLink> getOrgLinksOrCreateLink(RequestCycle cycle, long materialId) {
-        final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
         List<OrgMaterialLink> links =
                 cocoboxCordinatorClient.listOrgMaterialLinks(
                 materialId);
@@ -658,7 +658,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return cocoboxCordinatorClient.listOrgMaterialLinks(materialId);
     }
 
-    private OrgMaterialLink getLink(CocoboxCordinatorClient client, long materialId, long linkId) {
+    private OrgMaterialLink getLink(CocoboxCoordinatorClient client, long materialId, long linkId) {
         List<OrgMaterialLink> links = client.listOrgMaterialLinks(materialId);
 
         for (OrgMaterialLink link : links) {
@@ -689,11 +689,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return pdClient.getProducts(true, productIds);
     }
 
-    private int getActiveLinks(CocoboxCordinatorClient ccbc, OrgMaterial orgMat) {
+    private int getActiveLinks(CocoboxCoordinatorClient ccbc, OrgMaterial orgMat) {
         return orgMat.getActiveLinks();
     }
 
-    private List<String> getLinkedProjectNames(CocoboxCordinatorClient ccbc, OrgMaterial orgMat) {
+    private List<String> getLinkedProjectNames(CocoboxCoordinatorClient ccbc, OrgMaterial orgMat) {
         List<OrgProject> projects = ccbc.listOrgProjectsUsingOrgMat(orgMat.getOrgMaterialId());
 
         return CollectionsUtil.transformList(projects, new Transformer<OrgProject, String>() {
@@ -813,7 +813,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         List<Product> products = getOrgProducts(cycle, orgId, project, projectType);
 
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         List<OrgMaterial> orgMats =
                 ccbc.listOrgMaterial(orgId);
@@ -828,7 +828,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
     public static List<Product> getOrgProducts(final RequestCycle cycle, final long orgId,
             OrgProject project, ProjectType projectType) {
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         List<Product> products = getGrantedProducts(cycle, ccbc.listOrgProducts(orgId));
         ProductTypeUtil.setTypes(getProductDirectoryClient(cycle), products);

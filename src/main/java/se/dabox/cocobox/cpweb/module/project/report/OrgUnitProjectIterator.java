@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.OrgProjectPredicates;
 import se.dabox.service.common.ccbc.project.OrgProjectTransformers;
@@ -26,11 +26,11 @@ class OrgUnitProjectIterator implements Iterator<ProjectParticipation> {
     private final Iterator<Long> projectIdIterator;
 
     private Iterator<ProjectParticipation> ppartIterator;
-    private final CocoboxCordinatorClient ccbcClient;
+    private final CocoboxCoordinatorClient ccbcClient;
 
     OrgUnitProjectIterator(ServiceRequestCycle cycle, long ouId) {
         ccbcClient
-                = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+                = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         List<OrgProject> projects = ccbcClient.listOrgProjects(ouId);
         projects = CollectionsUtil.sublist(projects, OrgProjectPredicates.

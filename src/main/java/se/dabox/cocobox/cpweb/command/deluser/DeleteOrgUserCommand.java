@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpAdminRoles;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.login.client.UserAccount;
@@ -26,7 +26,7 @@ public class DeleteOrgUserCommand {
 
     private final RequestCycle cycle;
     private final long caller;
-    private final CocoboxCordinatorClient ccbc;
+    private final CocoboxCoordinatorClient ccbc;
     private final UserAccountService uaService;
     private final long orgId;
 
@@ -34,7 +34,7 @@ public class DeleteOrgUserCommand {
         this.cycle = cycle;
         this.caller = caller;
         this.orgId = orgId;
-        this.ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        this.ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         this.uaService = CacheClients.getClient(cycle, UserAccountService.class);
     }
 

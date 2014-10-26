@@ -12,7 +12,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -26,13 +26,13 @@ import se.dabox.service.proddir.data.Product;
 class UsedReportLineEnhancer {
 
     private final RequestCycle cycle;
-    private final CocoboxCordinatorClient ccbc;
+    private final CocoboxCoordinatorClient ccbc;
     private final ProductDirectoryClient pdClient;
 
     UsedReportLineEnhancer(RequestCycle cycle) {
         this.cycle = cycle;
 
-        ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         pdClient = CacheClients.getClient(cycle, ProductDirectoryClient.class);
     }
 

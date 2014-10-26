@@ -59,7 +59,7 @@ import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.client.Clients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.OverlimitException;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -125,7 +125,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onAddMember(final RequestCycle cycle, String projectId) {
-        final CocoboxCordinatorClient ccbcClient = getCocoboxCordinatorClient(
+        final CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(
                 cycle);
 
         final OrgProject prj = ccbcClient.getProject(Long.valueOf(
@@ -214,7 +214,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
     public RequestTarget onDeleteProject(RequestCycle cycle, String strOrgId, String strProjectId) {
         checkOrgPermission(cycle, strOrgId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         List<ProjectParticipation> participants;
         try {
             participants = ccbc.listProjectParticipations(Long.valueOf(
@@ -417,7 +417,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         long prjId = Long.valueOf(strProjectId);
         
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
         checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
@@ -442,7 +442,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
         checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
@@ -458,7 +458,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
         checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
@@ -524,7 +524,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
     private void addMember(final RequestCycle cycle, final OrgProject prj, final String givenName,
             final String surname,
             final String email) {
-        final CocoboxCordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
         UTComplexTxOperation<Void, Void> op = new UTComplexTxOperation<Void, Void>() {
             private UserAccount ua;
             private List<ProjectParticipation> participants;

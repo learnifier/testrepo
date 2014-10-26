@@ -26,7 +26,7 @@ import se.dabox.cocosite.util.PercentageCalculator;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.ClientFactoryException;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductStatus;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -238,7 +238,7 @@ class ProjectRosterJsonGenerator {
             return null;
         }
 
-        CocoboxCordinatorClient ccbcClient =
+        CocoboxCoordinatorClient ccbcClient =
                 getCocobocCordinatorClient(cycle);
 
         ProjectParticipation part = ccbcClient.getProjectParticipation(prj.getParticipationOwner());
@@ -250,9 +250,9 @@ class ProjectRosterJsonGenerator {
         return part.getUserId();
     }
 
-    private CocoboxCordinatorClient getCocobocCordinatorClient(RequestCycle cycle) throws ClientFactoryException {
-        CocoboxCordinatorClient ccbcClient =
-                CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+    private CocoboxCoordinatorClient getCocobocCordinatorClient(RequestCycle cycle) throws ClientFactoryException {
+        CocoboxCoordinatorClient ccbcClient =
+                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         return ccbcClient;
     }
 

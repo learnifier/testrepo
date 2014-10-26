@@ -18,7 +18,7 @@ import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.security.role.RoleUuidNamePair;
 import se.dabox.cocosite.user.MiniUserInfo;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRole;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleSearch;
@@ -33,7 +33,7 @@ import se.dabox.util.collections.Transformer;
 public class ListProjectAdminJson {
 
     private final RequestCycle cycle;
-    private final CocoboxCordinatorClient ccbc;
+    private final CocoboxCoordinatorClient ccbc;
     private Map<Long, Set<String>> userRolesMap;
     private OrgProject prj;
     private List<MiniUserInfo> users;
@@ -42,7 +42,7 @@ public class ListProjectAdminJson {
     private Map<String, String> projectRolesMap;
 
 
-    ListProjectAdminJson(RequestCycle cycle, CocoboxCordinatorClient ccbc) {
+    ListProjectAdminJson(RequestCycle cycle, CocoboxCoordinatorClient ccbc) {
         this.cycle = cycle;
         this.ccbc = ccbc;
     }

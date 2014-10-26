@@ -16,7 +16,7 @@ import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.ErrorState;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductReport;
 import se.dabox.service.common.ccbc.participation.crisppart.ReportScopes;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -39,7 +39,7 @@ public class ParticipationModule extends AbstractWebAuthModule {
 
         long partId = Long.valueOf(strParticipationId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         ProjectParticipation participation =
                 ccbc.getProjectParticipation(partId);

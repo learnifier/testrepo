@@ -13,7 +13,7 @@ import se.dabox.cocobox.cpweb.module.project.DeleteFailure;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.product.IdProjectProductUtil;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -37,12 +37,12 @@ public class ParticipationIdProjectProductDeleteCheck {
     private static final Logger LOGGER = LoggerFactory.getLogger(
             ParticipationIdProjectProductDeleteCheck.class);
 
-    private final CocoboxCordinatorClient cocoboxCordinatorClient;
+    private final CocoboxCoordinatorClient cocoboxCordinatorClient;
     private final long projectId;
     private Set<ProductId> idProductIds;
     private UserIdentifierHelper helper;
 
-    ParticipationIdProjectProductDeleteCheck(CocoboxCordinatorClient cocoboxCordinatorClient,
+    ParticipationIdProjectProductDeleteCheck(CocoboxCoordinatorClient cocoboxCordinatorClient,
             long projectId) {
         this.cocoboxCordinatorClient = cocoboxCordinatorClient;
         this.projectId = projectId;

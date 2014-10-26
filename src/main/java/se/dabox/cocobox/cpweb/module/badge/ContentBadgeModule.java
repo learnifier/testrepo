@@ -29,7 +29,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractModule;
 import se.dabox.cocosite.converter.cds.CdsUtil;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.common.DwsConstants;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialLink;
 import se.dabox.service.common.cds.ContentDeliveryServiceClient;
@@ -144,7 +144,7 @@ public class ContentBadgeModule extends AbstractModule {
             String realmId = DwsRealmHelper.determineRequestRealm(cycle);
             //We have the link, let's build the badge
 
-            CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+            CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
             OrgMaterialLink link = ccbc.getOrgMatLinkByLinkid(linkId);
             OrgMaterial orgmat = ccbc.getOrgMaterial(link.getOrgMaterialId());
 

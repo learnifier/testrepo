@@ -38,7 +38,7 @@ import se.dabox.cocosite.security.project.ProjectPermissionCheck;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.Clients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ListProjectParticipationsRequest;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
@@ -109,7 +109,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
             throws Exception {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
         List<UserAccount> users =
@@ -139,7 +139,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
             throws Exception {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
         List<UserAccount> users =
@@ -155,7 +155,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onParticipationBounceInfo(final RequestCycle cycle, String strPartId) {
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         List<MailBounce> bounces = ccbc.getParticipationMailBounce(Long.valueOf(strPartId));
         List<MailBounce> filteredBounces =
                 MailBounceUtil.active(bounces);
@@ -186,7 +186,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                         generator.writeNumberField("partId", data.getParticipationId());
                         generator.writeNumberField("orgId", data.getOrgId());
 
-                        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
                         OrgProject prj = ccbc.getProject(data.getProjectId());
                         generator.writeStringField("projectName", prj.getName());
 
@@ -211,7 +211,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
             throws Exception {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -226,7 +226,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onProjectMaterials(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -240,7 +240,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onListProjectRoleUsers(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -253,7 +253,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onSetInvitationCreditLimit(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
 
@@ -305,7 +305,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onSetInvitationPassword(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
 
@@ -359,7 +359,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         boolean enabled = Boolean.valueOf(cycle.getRequest().getParameter("status"));
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
 
@@ -386,7 +386,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onSetAutoIcalStatus(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
 
@@ -449,7 +449,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onSetSocialSetting(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
 
@@ -489,7 +489,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onListCountries(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -515,7 +515,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onListLanguages(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -541,7 +541,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onListTimeZones(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
@@ -681,7 +681,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     private void reactivateProjectParticipants(RequestCycle cycle, OrgProject project) {
-        CocoboxCordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
         List<ProjectParticipation> participations =
                 ccbcClient.listProjectParticipations(project.getProjectId());
 
@@ -694,7 +694,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     private void cancelInvitations(RequestCycle cycle, OrgProject project, boolean sendUpdates) {
-        CocoboxCordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
         List<ProjectParticipation> participations =
                 ccbcClient.listProjectParticipations(project.getProjectId());
 

@@ -10,7 +10,7 @@ import se.dabox.cocobox.cpweb.module.mail.MailSender;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NewProjectTaskRequest;
 import se.dabox.service.common.ccbc.mailfilter.MailFilterTarget;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
@@ -54,8 +54,8 @@ public class CreateMailTaskSendMailProcessor extends AbstractMailSendMailProcess
         return null;
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient(RequestCycle cycle) {
-        return CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient(RequestCycle cycle) {
+        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
 }

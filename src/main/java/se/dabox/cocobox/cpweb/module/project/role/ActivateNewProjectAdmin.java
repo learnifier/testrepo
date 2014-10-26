@@ -11,7 +11,7 @@ import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.JacksonHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.context.DwsRealmHelper;
@@ -62,7 +62,7 @@ public class ActivateNewProjectAdmin {
      *
      */
     private void sendWelcomeMail() {
-        CocoboxCordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         String roleId = (String) map.get(ProjectRoleAdminTokenGenerator.FIELD_ROLE_ID);
 

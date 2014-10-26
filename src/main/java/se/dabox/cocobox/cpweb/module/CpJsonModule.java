@@ -34,7 +34,7 @@ import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.OrgUser;
 import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.alert.ProjectAlertInfo;
@@ -77,7 +77,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
 
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         List<Long> favoriteIds = ccbc.getFavorites(userId, orgId);
@@ -100,7 +100,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
 
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         List<Long> favoriteIds = ccbc.getFavorites(userId, orgId);
@@ -122,7 +122,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         List<MailBounceInfo> bounces = ccbc.getOrgBounceInfo(orgId);
         List<ProjectAlertInfo> alerts =
@@ -176,7 +176,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         List<Long> favoriteIds = ccbc.getFavorites(userId, orgId);
@@ -423,7 +423,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
                     @Override
                     public String callIdProjectProject() {
-                        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
                         ProjectParticipation part =
                                 ccbc.getProjectParticipation(project.getParticipationOwner());
 

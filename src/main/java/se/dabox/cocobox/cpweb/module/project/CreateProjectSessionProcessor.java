@@ -25,7 +25,7 @@ import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -132,7 +132,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         OrgProject project = null;
         String projectName = npr.getName();
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         AlreadyExistsException aex = null;
         for (int i = 0; i < 20; i++) {
@@ -190,8 +190,8 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         return toProjectPage(project.getProjectId());
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient(RequestCycle cycle) {
-        return Clients.getClient(cycle, CocoboxCordinatorClient.class);
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient(RequestCycle cycle) {
+        return Clients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
     private RequestTarget toProjectPage(long projectId) {

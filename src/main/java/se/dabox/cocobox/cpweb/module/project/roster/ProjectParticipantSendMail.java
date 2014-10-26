@@ -24,7 +24,7 @@ import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.Permission;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
@@ -91,7 +91,7 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
 
     private Map<Long, ProjectParticipation> getParticipationMap(ListformContext context) {
         OrgProject prj = context.getAttribute("project", OrgProject.class);
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(context);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(context);
         List<ProjectParticipation> parts = ccbc.listProjectParticipations(prj.getProjectId());
         Map<Long, ProjectParticipation> map = CollectionsUtil.createMap(parts,
                 new Transformer<ProjectParticipation, Long>() {
@@ -129,9 +129,9 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
         return sms;
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient(ListformContext context) {
-        CocoboxCordinatorClient ccbc = context.getAttribute("ccbcClient",
-                CocoboxCordinatorClient.class);
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient(ListformContext context) {
+        CocoboxCoordinatorClient ccbc = context.getAttribute("ccbcClient",
+                CocoboxCoordinatorClient.class);
         return ccbc;
     }
 
@@ -145,7 +145,7 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
             final long projectId,
             final List<Long> values) {
 
-        final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(context);
+        final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(context);
 
         OrgProject project = cocoboxCordinatorClient.getProject(projectId);
 

@@ -15,7 +15,7 @@ import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.cocobox.cpweb.state.SendMailVerifier;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ProjectParticipantMailRequest;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
@@ -40,7 +40,7 @@ public class ProjectSendMailProcessor implements SendMailProcessor, SendMailVeri
     @Override
     public void processSendMail(RequestCycle cycle, SendMailSession session,
             SendMailTemplate template) {
-        CocoboxCordinatorClient ccbc =
+        CocoboxCoordinatorClient ccbc =
                 AbstractModule.getCocoboxCordinatorClient(cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);

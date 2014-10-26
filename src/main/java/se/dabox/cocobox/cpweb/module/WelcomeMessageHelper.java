@@ -15,7 +15,7 @@ import se.dabox.service.common.DwsDevelopmentMode;
 import se.dabox.service.common.cache.CacheIdFactory;
 import se.dabox.service.common.cache.GlobalCache;
 import se.dabox.service.common.cache.GlobalCacheManager;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.WelcomeMessage;
 import se.dabox.service.orgadmin.client.AdminGroupUser;
 import se.dabox.service.orgadmin.client.OrgAdminClient;
@@ -87,8 +87,8 @@ public class WelcomeMessageHelper {
                     }
                 });
 
-        CocoboxCordinatorClient ccbc =
-                CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc =
+                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         List<WelcomeMessage> messages = ccbc.getWelcomeMessages(userIds);
 

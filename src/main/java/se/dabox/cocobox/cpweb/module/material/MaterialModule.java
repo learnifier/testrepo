@@ -18,7 +18,7 @@ import se.dabox.cocobox.cpweb.formdata.material.EditMaterialForm;
 import se.dabox.cocobox.cpweb.module.CpMainModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.material.MutableOrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
@@ -105,7 +105,7 @@ public class MaterialModule extends AbstractWebAuthModule {
     }
 
     private OrgMaterial getOrgMaterial(RequestCycle cycle, long orgmatId) throws IllegalArgumentException {
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgMaterial orgmat = ccbc.getOrgMaterial(orgmatId);
         if (orgmat == null) {
             throw new IllegalArgumentException("OrgMat missing "+orgmatId);

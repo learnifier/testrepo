@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleModification;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
@@ -40,7 +40,7 @@ public class AssignExistingUserRoleProcessor extends AbstractRoleProcessor {
         ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, projectId, userId,
                 roleId);
 
-        CocoboxCordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         boolean response = ccbc.grantProjectUserRole(mod);
 
         LOGGER.info("Adding role {} in project {} for {} (caller {}): {}",

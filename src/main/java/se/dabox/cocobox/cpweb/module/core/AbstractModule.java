@@ -16,7 +16,7 @@ import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.branding.client.BrandingClient;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
@@ -78,9 +78,9 @@ public abstract class AbstractModule {
         return new DwsContentRepoClient();
     }
 
-    public static CocoboxCordinatorClient getCocoboxCordinatorClient(
+    public static CocoboxCoordinatorClient getCocoboxCordinatorClient(
             RequestCycle cycle) {
-        return CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
     public static ProjectMaterialCoordinatorClient getProjectMaterialCoordinatorClient(

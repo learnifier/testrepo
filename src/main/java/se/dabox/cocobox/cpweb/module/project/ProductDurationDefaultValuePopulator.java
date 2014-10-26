@@ -11,7 +11,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocobox.cpweb.module.project.details.ExtendedComponentFieldName;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
@@ -104,8 +104,8 @@ public class ProductDurationDefaultValuePopulator {
         return durationMap;
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient() {
-        return CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient() {
+        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
     private ProjectMaterialCoordinatorClient getProjectMaterialCoordinatorClient() {

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -254,8 +254,8 @@ class ProgressComponentResolver {
                 new ProjectSubtypeCallable<List<DatabankEntry>>() {
                     @Override
                     public List<DatabankEntry> callMainProject() {
-                        CocoboxCordinatorClient ccbc =
-                                CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+                        CocoboxCoordinatorClient ccbc =
+                                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
                         return ccbc.getDatabank(project.getMasterDatabank());                        
                     }
@@ -268,8 +268,8 @@ class ProgressComponentResolver {
     }
 
     private Map<UUID, ParticipationProgress> getProgressMap() {
-        CocoboxCordinatorClient ccbc =
-                CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc =
+                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         List<ParticipationProgress> progressList =
                 ccbc.getParticipationProgress(participation.getParticipationId());
@@ -288,8 +288,8 @@ class ProgressComponentResolver {
 
         String orgMatId = subtype.split(Pattern.quote("|"), 2)[1];
 
-        CocoboxCordinatorClient ccbc =
-                CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc =
+                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         return ccbc.getOrgMaterial(Long.valueOf(orgMatId));
     }

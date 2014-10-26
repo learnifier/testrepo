@@ -12,7 +12,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.partdetails.ParticipationDetailsCommand;
 import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.date.DateFormatters;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.proddir.ProductFetchUtil;
@@ -32,7 +32,7 @@ public class ParticipationJsonModule extends AbstractJsonAuthModule {
         
         long partId = Long.valueOf(strParticipationId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         ProjectParticipation participation =
                 ccbc.getProjectParticipation(partId);

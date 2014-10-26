@@ -10,7 +10,7 @@ import se.dabox.cocobox.cpweb.module.mail.SendMailProcessor;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.UpdateProjectTaskRequest;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
@@ -41,8 +41,8 @@ public class EditMailTaskSendMailProcessor extends AbstractMailSendMailProcessor
         UpdateProjectTaskRequest update = UpdateProjectTaskRequest.
                 updatePortableMailTemplate(caller, taskId, pmtString);
 
-        CocoboxCordinatorClient ccbcClient
-                = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbcClient
+                = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         ccbcClient.updateScheduledProjectTask(update);
     }

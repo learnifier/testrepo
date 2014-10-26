@@ -9,7 +9,7 @@ import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.credit.CreditCheckResult;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
@@ -25,7 +25,7 @@ import se.dabox.util.collections.ValueUtils;
 public class CpCreditCheck {
 
     private final RequestCycle cycle;
-    private CocoboxCordinatorClient cachedCcbc;
+    private CocoboxCoordinatorClient cachedCcbc;
     private final long projectId;
 
     public CpCreditCheck(RequestCycle cycle, OrgUnitInfo org, long projectId) {
@@ -34,7 +34,7 @@ public class CpCreditCheck {
     }
 
     public List<CreditAllocationFailure> getCreditFailures(List<Long> participationIds) {
-        CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient();
+        CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient();
         final CreditCheckResult ccc
                 = cocoboxCordinatorClient.
                 participationCreditCheck(projectId, participationIds);
@@ -79,10 +79,10 @@ public class CpCreditCheck {
                 });
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient() {
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient() {
 
         if (cachedCcbc == null) {
-            cachedCcbc = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+            cachedCcbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         }
 
         return cachedCcbc;

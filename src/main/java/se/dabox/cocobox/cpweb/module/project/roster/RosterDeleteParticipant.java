@@ -14,7 +14,7 @@ import se.dabox.cocobox.cpweb.module.project.AbstractRosterListCommand;
 import se.dabox.cocobox.cpweb.module.project.DeleteFailure;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ParticipationToken;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.tokenmanager.client.TokenStatus;
@@ -40,7 +40,7 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
             return validationTarget;
         }
         
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(context);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(context);
 
         List<DeleteFailure> idFailures =
                 new ParticipationIdProjectProductDeleteCheck(
@@ -66,7 +66,7 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
 
     @Override
     protected void executeSingle(ListformContext context, Long value) {
-        CocoboxCordinatorClient ccbcClient =
+        CocoboxCoordinatorClient ccbcClient =
                 getCocoboxCordinatorClient(context);
 
         long userId = LoginUserAccountHelper.getCurrentCaller(context.getCycle());
@@ -94,7 +94,7 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
     private RequestTarget validateDelete(ListformContext context,
             List<Long> participationIds) {
 
-        CocoboxCordinatorClient ccbcClient = getCocoboxCordinatorClient(context);
+        CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(context);
 
         Set<ProjectParticipation> undeletable = new HashSet<>();
 
@@ -125,14 +125,14 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
 
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient(ListformContext context) {
-        CocoboxCordinatorClient ccbcClient =
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient(ListformContext context) {
+        CocoboxCoordinatorClient ccbcClient =
                 context.getAttribute("ccbcClient",
-                CocoboxCordinatorClient.class);
+                CocoboxCoordinatorClient.class);
         return ccbcClient;
     }
 
-    private boolean isDeletePossible(CocoboxCordinatorClient ccbcClient, Long participationId) {
+    private boolean isDeletePossible(CocoboxCoordinatorClient ccbcClient, Long participationId) {
 
         List<ParticipationToken> tokens = ccbcClient.getParticipationTokens(participationId);
         if (tokens == null || tokens.isEmpty()) {

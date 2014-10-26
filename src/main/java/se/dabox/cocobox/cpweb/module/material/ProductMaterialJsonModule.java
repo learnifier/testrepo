@@ -28,7 +28,7 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.AllocationFailureException;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.AddOrgProductLinkRequest;
 import se.dabox.service.common.ccbc.org.AddOrgProductLinkTokenRequest;
 import se.dabox.service.common.ccbc.org.AddOrgProductLinkTokenResponse;
@@ -59,7 +59,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, strOrgId);
         
         long opid = Long.valueOf(cycle.getRequest().getParameter("opid"));
-        final CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         List<OrgProductLink> links = ccbc.getOrgProductLinks(opid);
 
@@ -153,7 +153,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
                     getRequestTarget(formsess);
         }
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         long linkId = formsess.getObject().getOplid();
@@ -234,7 +234,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
 
         checkOrgPermission(cycle, strOrgId);
 
-        final CocoboxCordinatorClient client = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient client = getCocoboxCordinatorClient(cycle);
 
         long userId = getCurrentUser(cycle);
 
@@ -254,7 +254,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
 
         checkOrgPermission(cycle, strOrgId);
 
-        final CocoboxCordinatorClient client = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient client = getCocoboxCordinatorClient(cycle);
 
         long userId = getCurrentUser(cycle);
 
@@ -324,7 +324,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
 
         long orgprodId = Long.valueOf(strOrgProdId);
 
-        final CocoboxCordinatorClient client = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient client = getCocoboxCordinatorClient(cycle);
 
         List<OrgProduct> orgProds = client.listOrgProducts(orgId);
 

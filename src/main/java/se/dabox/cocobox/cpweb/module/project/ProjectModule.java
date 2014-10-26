@@ -53,7 +53,7 @@ import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -132,7 +132,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     private OrgProject getProject(RequestCycle cycle, String strProjectId) throws NumberFormatException {
-        final CocoboxCordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
+        final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
 
         Long projectId = CpwebParameterUtil.stringToLong(strProjectId);
 
@@ -224,7 +224,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         addCommonMapValues(map, project, cycle);
 
         List<ParticipationProgress> progress
-                = CacheClients.getClient(cycle, CocoboxCordinatorClient.class).
+                = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class).
                 getParticipationProgress(participationId);
         DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
         CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
@@ -438,7 +438,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     public RequestTarget onCrispAdmin(RequestCycle cycle, String strProjectId, String productId) {
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
@@ -520,8 +520,8 @@ public class ProjectModule extends AbstractProjectWebModule {
         long userId = LoginUserAccountHelper.getUserId(cycle);
         long stageId = cdClient.copyDesign(project.getDesignId(), userId, techInfo);
 
-        CocoboxCordinatorClient ccbc =
-                Clients.getClient(cycle, CocoboxCordinatorClient.class);
+        CocoboxCoordinatorClient ccbc =
+                Clients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         project.setStageDesignId(stageId);
 

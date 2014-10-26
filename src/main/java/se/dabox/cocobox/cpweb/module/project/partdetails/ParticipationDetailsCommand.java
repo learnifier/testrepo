@@ -24,7 +24,7 @@ import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
 import se.dabox.cocosite.date.DateFormatters;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductReport;
@@ -362,8 +362,8 @@ public class ParticipationDetailsCommand {
         return CacheClients.getClient(cycle, ProductDirectoryClient.class);
     }
 
-    private CocoboxCordinatorClient getCocoboxCordinatorClient() {
-        return CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient() {
+        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
     private long getParticipationId() {

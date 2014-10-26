@@ -32,7 +32,7 @@ import se.dabox.cocobox.cpweb.module.project.details.ProjectTypeValueValidator;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.cddb.DatabankDateConverter;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
@@ -78,7 +78,7 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
 
         long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project);
 
@@ -187,14 +187,14 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
         return null;
     }
 
-    private void addOldDatabank(CocoboxCordinatorClient ccbc,
+    private void addOldDatabank(CocoboxCoordinatorClient ccbc,
             Set<DatabankEntry> newDatabank, long databankId) {
         List<DatabankEntry> databank = ccbc.getDatabank(databankId);
         newDatabank.addAll(databank);
     }
 
     private String calculateNewDefaultValue(RequestCycle cycle,
-            CocoboxCordinatorClient ccbc,
+            CocoboxCoordinatorClient ccbc,
             Set<DatabankEntry> newDatabank,
             CourseDesignDefinition cdd,
             OrgProject project, Component comp, DataField field, RelativeDateCalculator rdc) {
@@ -207,7 +207,7 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
     }
 
     private String calculateNewRelativeEnableDefaultValue(RequestCycle cycle,
-            CocoboxCordinatorClient ccbc,
+            CocoboxCoordinatorClient ccbc,
             Set<DatabankEntry> newDatabank,
             OrgProject project, Component comp, DataField field) {
 
@@ -271,7 +271,7 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
     }
 
     private String calculateNewRelativeDefaultValue(RequestCycle cycle,
-            CocoboxCordinatorClient ccbc,
+            CocoboxCoordinatorClient ccbc,
             Set<DatabankEntry> newDatabank,
             CourseDesignDefinition cdd,
             OrgProject project, Component comp, DataField field, RelativeDateCalculator rdc) {

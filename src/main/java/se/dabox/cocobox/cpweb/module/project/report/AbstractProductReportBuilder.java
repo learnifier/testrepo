@@ -23,7 +23,7 @@ import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.DwsConstants;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
@@ -48,7 +48,7 @@ public abstract class AbstractProductReportBuilder<P> {
 
     protected final ServiceRequestCycle cycle;
     
-    protected final CocoboxCordinatorClient ccbcClient;
+    protected final CocoboxCoordinatorClient ccbcClient;
     protected final InfoCacheHelper icHelper;
     protected final LoadingCache<Long, List<ParticipationProgress>> progressCache;
 
@@ -58,7 +58,7 @@ public abstract class AbstractProductReportBuilder<P> {
         ParamUtil.required(cycle, "cycle");
         this.cycle = cycle;
 
-        ccbcClient = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        ccbcClient = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         icHelper = InfoCacheHelper.getInstance(cycle);
 
         progressCache = CacheBuilder.newBuilder().maximumSize(20).build(

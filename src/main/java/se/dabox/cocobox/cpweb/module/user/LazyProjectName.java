@@ -3,7 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.util.cache.LazyCache;
 import se.dabox.util.collections.Transformer;
@@ -15,7 +15,7 @@ import se.dabox.util.collections.Transformer;
 public class LazyProjectName {
     private final LazyCache<Long,String> cache;
 
-    public LazyProjectName(final CocoboxCordinatorClient ccbc) {
+    public LazyProjectName(final CocoboxCoordinatorClient ccbc) {
         this.cache = new LazyCache<Long, String>(new Transformer<Long, String>() {
 
             @Override

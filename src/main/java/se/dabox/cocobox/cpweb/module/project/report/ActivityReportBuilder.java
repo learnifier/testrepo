@@ -20,7 +20,7 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.DwsConstants;
 import se.dabox.service.common.ajaxlongrun.Status;
 import se.dabox.service.common.ajaxlongrun.StatusSource;
-import se.dabox.service.common.ccbc.CocoboxCordinatorClient;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductStatus;
@@ -54,7 +54,7 @@ class ActivityReportBuilder implements StatusSource {
     private final OrgProject project;
     private final CourseDesignDefinition cdd;
     private final InfoCacheHelper icHelper;
-    private final CocoboxCordinatorClient ccbcClient;
+    private final CocoboxCoordinatorClient ccbcClient;
     private final ProjectMaterialCoordinatorClient pmcClient;
     private final DatabankFacade databankFacade;
     
@@ -74,7 +74,7 @@ class ActivityReportBuilder implements StatusSource {
 
         icHelper = InfoCacheHelper.getInstance(cycle);
 
-        ccbcClient = CacheClients.getClient(cycle, CocoboxCordinatorClient.class);
+        ccbcClient = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         pmcClient = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
 
         databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
