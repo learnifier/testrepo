@@ -43,6 +43,9 @@ public class AssignExistingUserRoleProcessor extends AbstractRoleProcessor {
         CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         boolean response = ccbc.grantProjectUserRole(mod);
 
+        long orgId = getOrgUnit().getId();
+        new AddMissingClientAccessRole(cycle).addOrgUnitAccess(userId, orgId);
+
         LOGGER.info("Adding role {} in project {} for {} (caller {}): {}",
                 roleId, projectId, userId, caller, response);
 

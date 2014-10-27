@@ -5,21 +5,28 @@ package se.dabox.cocobox.cpweb.module.project.role;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.CpAdminRoles;
 import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.module.core.AbstractAuthModule;
 import se.dabox.service.common.ccbc.mail.AdminRegistrationMailVariables;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
+import se.dabox.cocosite.druwa.CocoServiceConfKey;
+import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetGenericMailBucketCommand;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.mail.GetOrgProjectMailVariables;
+import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.ccbc.project.ProjectDetails;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleModification;
@@ -73,6 +80,7 @@ public class AssignNewUserRoleProcessor extends AbstractRoleProcessor {
         }
 
         addProjectRole(cycle, account);
+        addClientRole(cycle, account);
 
         String token = createToken(cycle, account, smt);
 
@@ -152,6 +160,12 @@ public class AssignNewUserRoleProcessor extends AbstractRoleProcessor {
 
         LOGGER.info("Adding role {} in project {} for {} (caller {}): {}",
                 roleId, projectId, userId, caller, response);
+    }
+
+    private void addClientRole(RequestCycle cycle, UserAccount account) {
+        final long orgId = getOrgUnit().getId();
+
+        new AddMissingClientAccessRole(cycle).addOrgUnitAccess(account, orgId);
     }
 
 }

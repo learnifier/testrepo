@@ -42,6 +42,7 @@ public class ActivateNewProjectAdmin {
 
     public String getTargetUrl() {
         activateUserRoles();
+        activateOrgRole();
         sendWelcomeMail();
         markMapCompleted();
 
@@ -111,6 +112,20 @@ public class ActivateNewProjectAdmin {
      */
     private String getFirstAccessUrl() {
         return DwsRealmHelper.getRealmConfiguration(cycle).getValue("boweb.baseurl");
+    }
+
+    /**
+     * Activate an organization role so the user appear in under the client
+     * 
+     */
+    private void activateOrgRole() {
+        long projectId = JacksonHelper.getLong(map, ProjectRoleAdminTokenGenerator.FIELD_PROJECT_ID);
+        
+        CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
+
+        OrgProject prj = ccbc.getProject(projectId);
+        
+        new AddMissingClientAccessRole(cycle).addOrgUnitAccess(userId, prj.getOrgId());
     }
 
 }
