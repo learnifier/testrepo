@@ -3,7 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocobox.cpweb.module.project.role.AssignRoleCommand;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +31,6 @@ import se.dabox.cocobox.cpweb.excel.Contact;
 import se.dabox.cocobox.cpweb.excel.RosterError;
 import se.dabox.cocobox.cpweb.excel.RosterException;
 import se.dabox.cocobox.cpweb.excel.RosterReader;
-import se.dabox.cocobox.cpweb.excel.SimpleEmailValidator;
 import se.dabox.cocobox.cpweb.formdata.project.AddMemberForm;
 import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
 import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
@@ -42,6 +40,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.UrlRequestTargetGenerator;
+import se.dabox.cocobox.cpweb.module.project.role.AssignRoleCommand;
 import se.dabox.cocobox.cpweb.module.project.roster.ActivateParticipant;
 import se.dabox.cocobox.cpweb.module.project.roster.PermissionListformCommand;
 import se.dabox.cocobox.cpweb.module.project.roster.ProjectParticipantSendMail;
@@ -84,6 +83,7 @@ import se.dabox.service.webutils.listform.ListformContext;
 import se.dabox.service.webutils.listform.LongListformProcessor;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
+import se.dabox.util.email.SimpleEmailValidator;
 
 /**
  *
@@ -105,8 +105,8 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
             protected void beforeProcess(ListformContext context, ListformCommand<Long> cmd) {
                 super.beforeProcess(context, cmd);
 
-                if (cmd instanceof PermissionListformCommand) {
-                    PermissionListformCommand plc = (PermissionListformCommand) cmd;
+                if (cmd instanceof PermissionListformCommand<?>) {
+                    PermissionListformCommand<?> plc = (PermissionListformCommand<?>) cmd;
                     List<Permission> perms = plc.getPermissionsRequired();
                     RequestCycle cycle = context.getCycle();
                     OrgProject project = context.getAttribute("project", OrgProject.class);
