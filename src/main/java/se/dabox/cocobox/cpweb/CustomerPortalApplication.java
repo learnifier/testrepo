@@ -11,6 +11,7 @@ import net.unixdeveloper.druwa.mountpoint.RootRequestMountpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.converter.ColorPickerConverter;
+import se.dabox.cocobox.cpweb.converter.SimpleEmailConverter;
 import se.dabox.cocobox.cpweb.freemarker.CpwebModifyViewHandler;
 import se.dabox.cocobox.cpweb.freemarker.LearnifierBootstrap;
 import se.dabox.cocobox.cpweb.module.OrgSelectorModule;
@@ -81,7 +82,10 @@ public class CustomerPortalApplication extends DruwaApplication {
                 DateConverter.getIso8601Converter());
 
         formBeanContext.getConverterSession().addNamedConverter("colorpicker",
-                new ColorPickerConverter());        
+                new ColorPickerConverter());
+
+        formBeanContext.getConverterSession().addNamedConverter("simpleEmail",
+                new SimpleEmailConverter());
     }
 
 }

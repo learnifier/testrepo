@@ -404,37 +404,11 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         return jsResponse.getSuccessfulRedirect(url);
     }
 
-
-    @WebAction(methods = HttpMethod.POST)
-    public RequestTarget onAssignRole(RequestCycle cycle, String strProjectId) {
-        long userId = DruwaParamHelper.getMandatoryLongParam(LOGGER, cycle.getRequest(), "userId");
-        String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
-
-        if (!new CocoboxRoleUtil().getProjectRoles(cycle).containsKey(roleId)) {
-            String msg = String.format("Invalid project role id: %s", roleId);
-            return new ErrorCodeRequestTarget(400, msg);
-        }
-
-        long prjId = Long.valueOf(strProjectId);
-        
-        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
-        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
-
-        UserAccountService uaService = CacheClients.getClient(cycle, UserAccountService.class);
-        UserAccount userAccount = uaService.getUserAccount(userId);
-        
-        return new AssignRoleCommand(cycle, prj, userAccount.getPrimaryEmail(), roleId).assign();
-    }
-
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onAssignRoleEmail(RequestCycle cycle, String strProjectId) {
         String email = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "email");
         String roleId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "role");
 
-        //TODO: Verify email structure
-
         if (!new CocoboxRoleUtil().getProjectRoles(cycle).containsKey(roleId)) {
             String msg = String.format("Invalid project role id: %s", roleId);
             return new ErrorCodeRequestTarget(400, msg);
@@ -446,6 +420,12 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
         checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
+
+        if (!SimpleEmailValidator.getInstance().isValidEmail(email)) {
+            LOGGER.info("Email is invalid. Not assigning any roles. ({})", email);
+
+            return NavigationUtil.toProjectRoles(cycle, prjId);
+        }
 
        return new AssignRoleCommand(cycle, prj, email, roleId).assign();
     }

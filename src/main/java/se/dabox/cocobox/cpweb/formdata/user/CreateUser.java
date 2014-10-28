@@ -19,7 +19,7 @@ public class CreateUser implements Serializable {
     private Locale lang;
     private String role;
 
-    @FormField
+    @FormField(type = "simpleEmail")
     public String getEmail() {
         return email;
     }

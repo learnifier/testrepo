@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.project.role;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 
@@ -24,9 +25,7 @@ class ProjectRolesRedirectTargetGenerator implements RequestTargetGenerator {
 
     @Override
     public RequestTarget generateTarget(RequestCycle cycle) {
-        String strProjectId = Long.toString(projectId);
-
-        return new WebModuleRedirectRequestTarget(ProjectModule.class, "roles", strProjectId);
+        return NavigationUtil.toProjectRoles(cycle, projectId);
     }
 
     

@@ -93,6 +93,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     public static final String ROSTER_ACTION = "roster";
     public static final String TASK_ACTION = "task";
     public static final String MATERIAL_ACTION = "materials";
+    public static final String ROLES_ACTION = "roles";
 
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String projectId) {

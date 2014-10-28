@@ -178,6 +178,19 @@ public final class NavigationUtil {
                 Long.toString(project.getProjectId()));
     }
 
+    /**
+     * Target to the Project Roles (Project Admin/Team member) page.
+     *
+     * @param cycle
+     * @param projectId
+     * @return
+     */
+    public static WebModuleRedirectRequestTarget toProjectRoles(RequestCycle cycle, long projectId) {
+        return new WebModuleRedirectRequestTarget(ProjectModule.class,
+                ProjectModule.ROLES_ACTION,
+                Long.toString(projectId));
+    }
+
     public static RequestTarget toOrgSelector() {
         return new WebModuleRedirectRequestTarget(OrgSelectorModule.class);
     }
