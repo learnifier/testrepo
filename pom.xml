@@ -13,7 +13,7 @@
     <groupId>se.dabox.cocobox</groupId>
     <artifactId>cpweb</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-coursexp-SNAPSHOT</version>
     <name>Customer Portal web</name>
     <url>http://dabox.se</url>
 
