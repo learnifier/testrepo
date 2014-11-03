@@ -10,13 +10,12 @@ ${cpweb_foot}
 [@ck.initCkeditor target="#body" /]
 
 <script>
-
+    
     function fetchTemplate(id) {
         $.post("${helper.urlFor('MailJsonModule','getTemplate')}", {"templateId": id}, function(response) {
             $("#subject").val(response.subject);
             $("#mtype").val(response.mtype);
-            var body = $('#body');
-            body.ckeditorGet().setData(response.body);
+            $("#body").val(response.body);
         });
     }
 
@@ -25,8 +24,7 @@ ${cpweb_foot}
             $("#subject").val("");
             $("#mtype").val("");
 
-            var body = $('#body');
-            body.ckeditorGet().setData(response.body);
+            $("#body").val(response.body)
 
             return;
         }
@@ -44,12 +42,17 @@ ${cpweb_foot}
 
 <script type="text/javascript">
     $(function() {
-        $("#emailform").submit(function(event) {
+       $("#emailform").submit(function(event) {
             var body = $('#body');
-            body.ckeditorGet().updateElement();
+
+            if (CKEDITOR.env.isCompatible) {                
+                body.ckeditorGet().updateElement();
+            }
 
             if (body.val().length == 0) {
-                cocobox.errorDialog('No email content','You must enter a e-mail body');
+                require(['dabox-common'], function() {
+                    cocobox.errorDialog('No email content','You must enter a e-mail body');
+                });
                 event.stopPropagation();
                 return false;
             }
