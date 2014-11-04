@@ -33,8 +33,9 @@ import se.dabox.service.common.ccbc.project.ProjectProductException;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
-import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
@@ -220,12 +221,18 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         String userTitle = cdd.getInfo().getUserTitle();
         String userDesc = cdd.getInfo().getUserDescription();
 
-        UpdateProjectRequest upr =
-                new UpdateProjectRequest(project.getProjectId(), project.getName(), project.
-                getLocale(), userId, project.getCountry(), project.getTimezone(), null, newDesignId,
-                null, newDatabank, project.getNote(), project.getInvitePassword(), project.
-                getInviteLimit(), project.isSelfRegistrationEnabled(), userTitle, userDesc, project.
-                isAutoIcal(), project.isSocial());
+        UpdateProjectRequestBuilder updateBuilder
+                = new UpdateProjectRequestBuilder(userId, project.getProjectId());
+
+        updateBuilder.
+                setStageDesignId(newDesignId).
+                setStageDatabank(newDatabank).
+                setUserTitle(userTitle).
+                setUserDescription(userDesc).
+                setDefaultExpiration(getDefaultExpiration(cycle, newDesignId));
+
+
+        UpdateProjectRequest upr = updateBuilder.createUpdateProjectRequest();
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
     }
@@ -265,5 +272,22 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     private void updateRecentTimezone(RequestCycle cycle, NewProjectRequest npr) {
         new RecentTimezoneUpdateCommand(cycle).
                 updateRecentTimezone(npr.getOrgId(), npr.getTimezone());
+    }
+
+    private Long getDefaultExpiration(RequestCycle cycle, long newDesignId) {
+        CourseDesignClient cdClient =
+                Clients.getClient(cycle, CourseDesignClient.class);
+
+        CourseDesign design = cdClient.getDesign(newDesignId);
+        if (design == null) {
+            return null;
+        }
+
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+        if (cdd.getInfo() == null || cdd.getInfo().getDefaultParticipationExpiration() == null) {
+            return null;
+        }
+
+        return cdd.getInfo().getDefaultParticipationExpiration().getOffset();
     }
 }
