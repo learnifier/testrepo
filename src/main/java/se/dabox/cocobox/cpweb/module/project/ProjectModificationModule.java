@@ -55,7 +55,6 @@ import se.dabox.cocosite.security.Permission;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.dws.client.langservice.LangBundle;
-import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -121,6 +120,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         rosterProcessor.addCommand("delete", new RosterDeleteParticipant());
         rosterProcessor.addCommand("send", new ProjectParticipantSendMail());
         rosterProcessor.addCommand("activate", new ActivateParticipant());
+        rosterProcessor.addCommand("setExpiration", new SetParticipantExpiration());
     }
 
     @WebAction(methods = HttpMethod.POST)
