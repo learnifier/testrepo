@@ -40,6 +40,48 @@ cpweb.runListCommand = function (button, listform, cmd) {
     });
 }
 
+cpweb.setExpiration = function(button, listform, cmd) {
+    log('show some lightbox');
+    
+    //open modal
+    require(['dabox-jquery'], function() {
+        $('#expirationdialog').dialog({
+            width: 400,
+            height: 400,
+            modal: true,
+            buttons: {
+                "OK" : function() {
+                    //set value to the #expirationdate
+                    $('#expirationdate').val($('#expirationDateSetter').val());
+                    
+                    cpweb.runListCommand(button, listform, cmd);
+                    
+                    $( this ).dialog( "destroy" );
+                }
+            }
+        });
+    });
+    
+    
+    
+    
+    
+}
+
+cpweb.adjustExpiration = function(button, listform, cmd) {
+    log('show some dialog to adjust the expirationoffset');
+    
+    //open modal
+    
+    //render offset-setter
+    
+    //set value to the #expirationadjustment
+    
+    cpweb.runListCommand(button, listform, cmd);
+}
+
+
+
 cpweb.rowcbChange = function(checkbox) {
     var pForm = $(checkbox).parents('form').first();
 

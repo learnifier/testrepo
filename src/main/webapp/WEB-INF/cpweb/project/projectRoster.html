@@ -14,12 +14,16 @@ ${cpweb_foot}
 [#include "jsr_reportinfoTemplate.inc"]
 [#include "jsr_detailsTable.inc"]
 [#include "jsr_invitesTemplate.inc"]
+[#include "jsr_invitesTemplate.inc"]
+[#include "jsr_invitesTemplate.inc"]
 
 
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
 </script>
+
+
 <script>
     $(document).ready(function() {
         require(['dabox-datatables', 'jquery.timeago'], function() {
@@ -449,6 +453,9 @@ ${cpweb_head}
 <form method="post" id="projectrosterform" action="${helper.urlFor('ProjectModificationModule','listCommand')}">
     [@mbform.listformFields /]
     <input type="hidden" name="projectId" value="${prj.projectId?c}" />
+    <input id="expirationdate" type="hidden" name="expirationdate" value="" />
+    <input id="expirationadjustment" type="hidden" name="expirationadjustment" value="5" />
+    
     <section class="listactions">
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
         <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
@@ -462,6 +469,15 @@ ${cpweb_head}
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
         [/@security.boAdminBlock]
+        [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
+        <button onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
+        [/@]
+        [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
+        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'adjustExpiration');        
+                return false">Adjust Expiration</button>
+        [/@]
+        
+        
         [@dwsrt.feature feature="autoical"][#if prj.autoIcal]Calendar invitations are ON. <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>[/#if][/@dwsrt.feature]
     </section>
 
@@ -489,6 +505,8 @@ ${cpweb_head}
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
   [#include "rosterUpload.html" /]
 [/@]
+
+[#include "expirationSetterDialog.html" /]
 
 [#include "bounceInfo.html" /]
 
