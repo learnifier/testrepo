@@ -6,8 +6,10 @@ package se.dabox.cocobox.cpweb.module.coursedesign;
 
 import java.util.List;
 import java.util.Map;
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
@@ -277,6 +279,9 @@ public class DesignModule extends AbstractWebAuthModule {
         esf.setDescription(bcd.getInfo().getDescription());
         esf.setName(bcd.getInfo().getName());
 
+        Integer expirationDays = getExpirationDays(bcd);
+        esf.setExpiration(expirationDays);
+
         return esf;
     }
 
@@ -378,5 +383,19 @@ public class DesignModule extends AbstractWebAuthModule {
                 = form.getExpiration() == null ? null : DurationString.valueOf(form.getExpiration()
                         + "D");
         return newExpiration;
+    }
+
+    private Integer getExpirationDays(BucketCourseDesign bcd) {
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, bcd.getDesign().getDesign());
+
+        final DurationString exp = cdd.getInfo().getDefaultParticipationExpiration();
+
+        if (exp == null) {
+            return null;
+        }
+
+        return exp.getDays();
     }
 }
