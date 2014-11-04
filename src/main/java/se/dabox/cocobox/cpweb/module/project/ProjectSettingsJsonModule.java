@@ -9,8 +9,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.apache.commons.collections.map.Flat3Map;
@@ -25,6 +27,7 @@ import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.HybridLocaleUtils;
 
@@ -85,6 +88,9 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
 
         ProjectStatus status = prj.getStatus();
 
+        boolean expirationUpdate = false;
+        Long defaultParticipationExpiration = null;
+
         boolean match = true;
         switch (fieldName) {
             case "name":
@@ -127,6 +133,20 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
                     return returnSettingError(cycle, "Invalid status");
                 }
                 break;
+            case "participationexpiration":
+                try {
+                    if ("X".equals(fieldValue) || fieldValue.isEmpty()) {
+                        stringValue = "";
+                    } else {
+                        int val = Integer.parseInt(fieldValue);
+                        defaultParticipationExpiration = val * 86400000L;
+                    }
+
+                    expirationUpdate = true;
+                } catch(NumberFormatException nfe) {
+                    return returnSettingError(cycle, "Invalid day number value");
+                }
+                break;
             default:
                 match = false;
         }
@@ -141,6 +161,10 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
                 autoIcal, prj.isSocial());
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
+
+        if (expirationUpdate) {
+            updateExpiration(prj, defaultParticipationExpiration);
+        }
 
         new RecentTimezoneUpdateCommand(cycle).updateRecentTimezone(prj.getOrgId(), timezone);
 
@@ -218,6 +242,17 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
         return new ObjectStringContainer<>(locale, locale.getDisplayCountry(userLocale));
+    }
+
+    private void updateExpiration(OrgProject prj, Long expiration) {
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+        final long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+        UpdateProjectRequestBuilder builder =
+                new UpdateProjectRequestBuilder(caller, prj.getProjectId());
+
+        builder.setDefaultExpiration(expiration);
+
+        getCocoboxCordinatorClient(cycle).updateOrgProject(builder.createUpdateProjectRequest());
     }
 
     private final class ValidationException extends RuntimeException {

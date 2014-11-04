@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.formbean.FormBeanContext;
 import net.unixdeveloper.druwa.formbean.FormValidationSession;
@@ -62,11 +63,11 @@ public abstract class AbstractModule {
         return map;
     }
 
-    public String getConfValue(RequestCycle cycle, String name, String defaultValue) {
+    public String getConfValue(ServiceRequestCycle cycle, String name, String defaultValue) {
         return DwsRealmHelper.getRealmConfiguration(cycle).getValue(name, defaultValue);
     }
 
-    public String getConfValue(RequestCycle cycle, String name) {
+    public String getConfValue(ServiceRequestCycle cycle, String name) {
         return DwsRealmHelper.getRealmConfiguration(cycle).getValue(name);
     }
 
@@ -79,20 +80,20 @@ public abstract class AbstractModule {
     }
 
     public static CocoboxCoordinatorClient getCocoboxCordinatorClient(
-            RequestCycle cycle) {
+            ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
     public static ProjectMaterialCoordinatorClient getProjectMaterialCoordinatorClient(
-            RequestCycle cycle) {
+            ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
     }
 
-    public static RandomDataClient getRandomDataClient(RequestCycle cycle) {
+    public static RandomDataClient getRandomDataClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, RandomDataClient.class);
     }
 
-    public static MailTemplateServiceClient getMailTemplateClient(RequestCycle cycle) {
+    public static MailTemplateServiceClient getMailTemplateClient(ServiceRequestCycle cycle) {
         ApiHelper helper = DwsRealmHelper.getRealmApiHelper(cycle);
         String serviceUrl = DwsRealmHelper.getRealmConfiguration(cycle).getValue(
                 CocoSiteConstants.MAILTEMPLATE_URL);
@@ -100,11 +101,11 @@ public abstract class AbstractModule {
         return new MailTemplateServiceClientImpl(helper, serviceUrl);
     }
 
-    public static BrandingClient getBrandingClient(RequestCycle cycle) {
+    public static BrandingClient getBrandingClient(ServiceRequestCycle cycle) {
         return Clients.getClient(cycle, BrandingClient.class);
     }
 
-    public static ProductDirectoryClient getProductDirectoryClient(RequestCycle cycle) {
+    public static ProductDirectoryClient getProductDirectoryClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, ProductDirectoryClient.class);
     }
     
