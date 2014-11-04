@@ -38,6 +38,11 @@ import se.dabox.service.common.coursedesign.CopyDesignRequest;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.UpdateDesignRequest;
+import se.dabox.service.common.coursedesign.v1.CddCodec;
+import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
+import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
+import se.dabox.service.common.duration.DurationString;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
@@ -295,9 +300,11 @@ public class DesignModule extends AbstractWebAuthModule {
 
         EditDesignSettingsForm form = formsess.getObject();
 
+        String newDesign = updateDesign(cycle, bcd, form);
+
         long userId = LoginUserAccountHelper.getUserId(cycle);
         UpdateDesignRequest updateReq =
-                new UpdateDesignRequest(info.getDesignId(), userId);
+                new UpdateDesignRequest(info.getDesignId(), userId, newDesign);
         updateReq.setName(form.getName());
         updateReq.setDescription(StringUtils.trimToEmpty(form.getDescription()));
 
@@ -311,19 +318,19 @@ public class DesignModule extends AbstractWebAuthModule {
         final BucketCourseDesignInfo info = bcd.getInfo();
         EditDesignSettingsForm form = formsess.getObject();
 
-        long userId = LoginUserAccountHelper.getUserId(cycle);
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
         UpdateDesignRequest updateReq =
-                new UpdateDesignRequest(info.getDesignId(), userId);
+                new UpdateDesignRequest(info.getDesignId(), caller);
         updateReq.setName(form.getName());
         updateReq.setDescription(StringUtils.trimToEmpty(form.getDescription()));
 
-        String techInfo = DesignTechInfo.createOrgTechInfo(Long.valueOf(strOrgId));
+        String techInfo = DesignTechInfo.createOrgTechInfo(orgId);
 
-        CopyDesignRequest copyRequest = new CopyDesignRequest(info.getDesignId(), userId, techInfo);
+        CopyDesignRequest copyRequest = new CopyDesignRequest(info.getDesignId(), caller, techInfo);
         final CourseDesignClient cdClient = getCourseDesignClient(cycle);
         long newDesignId = cdClient.copyDesign(copyRequest);
 
-        UpdateDesignRequest udr = new UpdateDesignRequest(newDesignId, userId);
+        UpdateDesignRequest udr = new UpdateDesignRequest(newDesignId, caller);
         udr.setName(form.getName());
         udr.setDescription(form.getDescription());
 
@@ -331,7 +338,12 @@ public class DesignModule extends AbstractWebAuthModule {
 
         long bucketId = new GetCourseDesignBucketCommand(cycle).forOrg(orgId);
 
-        cdClient.addBucketDesign(userId, bucketId, newDesignId);
+        cdClient.addBucketDesign(caller, bucketId, newDesignId);
+
+        BucketCourseDesign newBcd = getOrgCourseDesign(cycle, orgId, newDesignId);
+        String newXml = updateDesign(cycle, newBcd, form);
+        getCourseDesignClient(cycle).updateDesign(new UpdateDesignRequest(newDesignId, caller,
+                newXml));
 
         return toOverviewPage(cycle, strOrgId, newDesignId);
     }
@@ -344,5 +356,27 @@ public class DesignModule extends AbstractWebAuthModule {
     private RequestTarget toListPage(RequestCycle cycle, String strOrgId) {
         return new RedirectUrlRequestTarget(NavigationUtil.
                 toDesignListPageUrl(cycle, strOrgId));
+    }
+
+    private String updateDesign(RequestCycle cycle, BucketCourseDesign bcd,
+            EditDesignSettingsForm form) {
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, bcd.getDesign().getDesign());
+        CourseDesignXmlMutator mutator = new CourseDesignXmlMutator(bcd.getDesign().getDesign());
+
+        DurationString newExpiration = formToDurationString(form);
+
+        CourseDesignInfo oldInfo = cdd.getInfo();
+        CourseDesignInfo newInfo = new CourseDesignInfo(oldInfo.getUserTitle(), oldInfo.
+                getUserDescription(), oldInfo.getThumbnailCrl(), newExpiration);
+        mutator.setInfo(newInfo);
+
+        return mutator.toXmlString();
+    }
+
+    private DurationString formToDurationString(EditDesignSettingsForm form) {
+        DurationString newExpiration
+                = form.getExpiration() == null ? null : DurationString.valueOf(form.getExpiration()
+                        + "D");
+        return newExpiration;
     }
 }

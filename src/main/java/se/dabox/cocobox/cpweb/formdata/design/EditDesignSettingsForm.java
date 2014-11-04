@@ -15,6 +15,7 @@ public class EditDesignSettingsForm implements Serializable {
 
     private String name;
     private String description;
+    private Integer expiration;
 
     @FormField
     public String getName() {
@@ -34,6 +35,13 @@ public class EditDesignSettingsForm implements Serializable {
         this.description = description;
     }
 
+    @FormField(required = false)
+    public Integer getExpiration() {
+        return expiration;
+    }
 
+    public void setExpiration(Integer expiration) {
+        this.expiration = expiration;
+    }
 
 }
