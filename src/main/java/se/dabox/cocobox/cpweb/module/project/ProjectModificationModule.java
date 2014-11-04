@@ -121,6 +121,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         rosterProcessor.addCommand("send", new ProjectParticipantSendMail());
         rosterProcessor.addCommand("activate", new ActivateParticipant());
         rosterProcessor.addCommand("setExpiration", new SetParticipantExpiration());
+        rosterProcessor.addCommand("adjustExpiration", new AdjustParticipantExpiration());
     }
 
     @WebAction(methods = HttpMethod.POST)
