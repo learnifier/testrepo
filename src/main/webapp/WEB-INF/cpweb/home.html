@@ -235,6 +235,20 @@ ${cpweb_foot}
     })
 </script>
 
+<script>
+    require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
+        //log("anonprodcreate loaded");
+    });
+
+    $("#addmatbtn").click(function() {
+        CcbAnonymousProductUpload.open(function(pid) {
+            //Do nothing
+        }, {
+            scope: "O${org.id?c}"
+        });
+
+    });
+</script>
 
 [/#assign]
 
@@ -292,7 +306,9 @@ ${cpweb_foot}
         <h2>Upload your materials</h2>
         <p>Add your own training materials to tailor the learning to your needs.</p>
         <div class="btn-center-wrapper">
-            <a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn navBackgroundColor">Upload Material</a>
+            <div class="ui-helper-hidden" data-anoncreateprodelement="show">
+                <div class="btn navBackgroundColor" id="addmatbtn">Upload Material</div>
+            </div>
         </div>
     </div>
     [/@]
