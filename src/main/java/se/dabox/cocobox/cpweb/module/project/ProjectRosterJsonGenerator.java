@@ -162,6 +162,9 @@ class ProjectRosterJsonGenerator {
                     g.writeNullField("impersonateUrl");
                 }
 
+                writeDateField("expiration", item.getExpiration());
+                g.writeBooleanField("expired", item.isExpired());
+
             }
         }.encodeToStream(participations);
     }
