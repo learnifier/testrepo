@@ -66,17 +66,9 @@ ${cpweb_foot}
     {type: 'text',
         'url': settingsUrl,
         'pk': 'participationexpiration',
-        'value': function() {
-            var millis = parseInt("${(prj.defaultParticipationExpiration?c)!0}");
-            if (millis === 0) {
-                return '';
-            }
-            log(typeof millis);
-            var days = millis / 86400000;
-            log(typeof days);
-            return days;
-        }
+        'value': "${(prj.defaultParticipationExpiration?c)!''})";
     });
+
 
 
     $(function(){
