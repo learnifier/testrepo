@@ -59,6 +59,15 @@ ${cpweb_foot}
         'pk': 'timezone',
         'value': "${prj.timezone.ID?js_string}"
     });
+    
+    cpweb.editable($('#expiration .editable-content'),
+    $('#expiration .edit '),
+    function(value){},
+    {type: 'text',
+        'url': settingsUrl,
+        'pk': 'participationexpiration',
+        'value': "${prj.participationExpiration!''}"
+    });
 
 
     $(function(){
@@ -199,7 +208,7 @@ ${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;
             <span class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
                 <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
-                <span class="short editable-content">${prj}</span>
+                <span class="short editable-content">${prj.defaultParticipationExpiration!''}</span>
             </span>
         </li>
 
