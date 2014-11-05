@@ -16,6 +16,8 @@ ${cpweb_foot}
 [#include "jsr_invitesTemplate.inc"]
 [#include "jsr_invitesTemplate.inc"]
 [#include "jsr_invitesTemplate.inc"]
+[#include "jsr_expirationSetterDialog.inc" /]
+[#include "jsr_expirationAdjustDialog.inc" /]
 
 
 <script>
@@ -269,8 +271,8 @@ ${cpweb_foot}
 
     var showRow = function() {
         require(['dabox-datatables', 'jsrender'], function() {
-            var oTable = $('#projectroster').dataTable(),
-                    detailsData = {};
+            var oTable = $('#projectroster').dataTable();
+            var detailsData = {};
 
             $('.expand').click(function() {
 
@@ -278,6 +280,9 @@ ${cpweb_foot}
                 var clickedRow = $(parentTd).parent()[0];
 
                 var aoData = oTable.fnGetData(clickedRow);
+                
+                log('this is the data for the clicked row', aoData);
+                
                 detailsData.detailsUrl = aoData.detailsUrl;
 
                 $(this).toggleClass('expanded');
@@ -454,7 +459,7 @@ ${cpweb_head}
     [@mbform.listformFields /]
     <input type="hidden" name="projectId" value="${prj.projectId?c}" />
     <input id="expirationdate" type="hidden" name="expirationdate" value="" />
-    <input id="expirationadjustment" type="hidden" name="expirationadjustment" value="5" />
+    <input id="adjusteddate" type="hidden" name="expirationadjustment" value="5" />
     
     <section class="listactions">
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
@@ -473,7 +478,7 @@ ${cpweb_head}
         <button onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
         [/@]
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
-        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'adjustExpiration');        
+        <button onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
                 return false">Adjust Expiration</button>
         [/@]
         
@@ -505,8 +510,6 @@ ${cpweb_head}
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
   [#include "rosterUpload.html" /]
 [/@]
-
-[#include "expirationSetterDialog.html" /]
 
 [#include "bounceInfo.html" /]
 
