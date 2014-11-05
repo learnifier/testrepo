@@ -44,7 +44,8 @@ cpweb.setExpiration = function(button, listform, cmd) {
     log('show some lightbox');
     
     //open modal
-    require(['dabox-jquery'], function() {
+    require(['dabox-jquery', 'jsrender'], function() {
+        $('body').append($('#expirationdialogTemplate').render());
         $('#expirationdialog').dialog({
             width: 400,
             height: 400,
@@ -61,23 +62,30 @@ cpweb.setExpiration = function(button, listform, cmd) {
             }
         });
     });
-    
-    
-    
-    
-    
 }
 
 cpweb.adjustExpiration = function(button, listform, cmd) {
     log('show some dialog to adjust the expirationoffset');
     
-    //open modal
-    
-    //render offset-setter
-    
-    //set value to the #expirationadjustment
-    
-    cpweb.runListCommand(button, listform, cmd);
+    require(['dabox-jquery', 'jsrender'], function() {
+        
+        $('body').append($('#expirationAdjustmentDialogTemplate').render());
+        $('#expirationAdjustmentDialog').dialog({
+            width: 400,
+            height: 400,
+            modal: true,
+            buttons: {
+                "OK" : function() {
+                    //set value to the #adjustedDate
+                    $('#adjustedDate').val($('#adjustedDateSetter').val());
+                    
+                    cpweb.runListCommand(button, listform, cmd);
+                    
+                    $( this ).dialog( "destroy" );
+                }
+            }
+        });
+    });
 }
 
 
