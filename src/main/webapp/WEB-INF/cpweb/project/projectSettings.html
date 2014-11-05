@@ -195,6 +195,13 @@ ${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;
                 <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
+        <li id="expiration">
+            <span class="setting">
+                <span class="label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
+                <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
+                <span class="short editable-content">${prj}</span>
+            </span>
+        </li>
 
         [@dwsrt.feature feature="social"]
         [#-- Only for Course design projects --]
