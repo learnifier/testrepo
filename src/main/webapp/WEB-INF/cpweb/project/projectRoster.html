@@ -43,6 +43,11 @@ ${cpweb_foot}
                         $(nRow).css('opacity', '0.6');
                         return nRow;
                     }
+                    else if (oObj.expired) {
+                        $(nRow).attr('title', 'This participation has expired');
+                        $(nRow).addClass('expired');
+                        return nRow;
+                    }
                 },
                 "fnInitComplete": function() {
                     log('DataTables has finished its initialisation.');
@@ -225,7 +230,12 @@ ${cpweb_foot}
                 $(injectInRow).empty();
                 $(injectInRow).removeClass('loading');
 
-
+                log('detailsData' , detailsData);
+                log('data' , data);
+                
+                var expiration    = detailsData.expiration;
+                var expirationStr = detailsData.expirationStr;
+                
                 var completed = 0;
                 for (var i = 0; i < data.progress.length; i++) {
                     if (data.progress[i].completed) {
@@ -258,8 +268,12 @@ ${cpweb_foot}
                     totalnumberOfCidsWithProgress: data.progress.length,
                     renderedReports: renderedReports,
                     renderedAdminlinks: renderedAdminlinks,
-                    renderedInvites: renderedInvites
+                    renderedInvites: renderedInvites,
+                    expiration: expiration,
+                    expirationStr: expirationStr
                 }));
+                
+                jQuery.timeago.settings.allowFuture = true;
                 $(injectInRow).find('.timeago').timeago();
                 //Hide invite section if no invites
                 if (renderedInvites.len < 1) {
@@ -281,7 +295,11 @@ ${cpweb_foot}
 
                 var aoData = oTable.fnGetData(clickedRow);
                 
-                log('this is the data for the clicked row', aoData);
+                //log('this is the data for the clicked row', aoData);
+                
+                //attach the expirationDetails
+                detailsData.expiration = aoData.expiration;
+                detailsData.expirationStr = aoData.expirationStr;
                 
                 detailsData.detailsUrl = aoData.detailsUrl;
 
