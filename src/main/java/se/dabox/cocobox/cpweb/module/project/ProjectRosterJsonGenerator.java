@@ -163,6 +163,14 @@ class ProjectRosterJsonGenerator {
                 }
 
                 writeDateField("expiration", item.getExpiration());
+
+                if (item.getExpiration() == null) {
+                    g.writeNullField("expirationAgo");
+                } else {
+                    g.writeStringField("expirationAgo", DateFormatters.JQUERYAGO_FORMAT.format(item.
+                            getExpiration()));
+                }
+
                 g.writeBooleanField("expired", item.isExpired());
 
             }
