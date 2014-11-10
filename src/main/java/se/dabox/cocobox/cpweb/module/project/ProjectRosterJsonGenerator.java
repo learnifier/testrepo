@@ -113,7 +113,7 @@ class ProjectRosterJsonGenerator {
                     g.writeStringField("displayName", name);
                     g.writeStringField("email", ua.getPrimaryEmail());
                 }
-                boolean main = mainUserId != null && mainUserId.longValue() == item.getUserId();
+                boolean main = mainUserId != null && mainUserId == item.getUserId();
                 g.writeBooleanField("main", main);
                 writeDateField("firstEmail", item.getFirstMail());
                 writeDateField("lastEmail", item.getLastMail());

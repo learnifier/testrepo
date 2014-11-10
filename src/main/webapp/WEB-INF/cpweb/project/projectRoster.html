@@ -488,10 +488,10 @@ ${cpweb_head}
         <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'delete');
                 return false">Delete</button>
         [/@]
-        [@security.boAdminBlock]
+        [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_USER"]
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
-        [/@security.boAdminBlock]
+        [/@]
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
         <button onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
         [/@]
