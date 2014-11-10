@@ -488,7 +488,7 @@ ${cpweb_head}
         <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'delete');
                 return false">Delete</button>
         [/@]
-        [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_USER"]
+        [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
         [/@]
