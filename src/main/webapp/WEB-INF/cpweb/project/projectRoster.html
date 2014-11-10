@@ -231,6 +231,7 @@ ${cpweb_foot}
                 $(injectInRow).removeClass('loading');
 
                 var expirationStr = detailsData.expirationStr;
+                var expirationAgo = detailsData.expirationAgo;
                 var expired = detailsData.expired;
                 
                 var completed = 0;
@@ -267,7 +268,8 @@ ${cpweb_foot}
                     renderedAdminlinks: renderedAdminlinks,
                     renderedInvites: renderedInvites,
                     expired: expired,
-                    expirationStr: expirationStr
+                    expirationStr: expirationStr,
+                    expirationAgo: expirationAgo
                 }));
                 
                 jQuery.timeago.settings.allowFuture = true;
@@ -296,6 +298,7 @@ ${cpweb_foot}
                 
                 //attach the expirationDetails
                 detailsData.expirationStr = aoData.expirationStr;
+                detailsData.expirationAgo = aoData.expirationAgo;
                 detailsData.expired = aoData.expired;
                 
                 detailsData.detailsUrl = aoData.detailsUrl;
