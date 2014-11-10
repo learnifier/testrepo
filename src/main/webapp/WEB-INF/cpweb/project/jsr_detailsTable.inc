@@ -1,10 +1,16 @@
 [#ftl /]
 <script id="detailsTable" type="text/x-jsrender">
     <div id="details">
+
+        {{if expirationStr}}
         <div class="expirationdetails">
-            <h2>Expiration</h2>
-            <span>This participation will expire </span><span class="timeago" title="{{:expirationStr}}">{{:expirationStr}}</span>
+            {{if expired}}
+                <div class="expired"><span>This participation has expired </span><span class="timeago" title="{{:expirationStr}}">{{:expirationStr}}</span><span class="date"> ({{:expirationStr}})</span></div>
+            {{else}}
+                <div class="futureexpiration"><span>This participation will expire </span><span class="timeago" title="{{:expirationStr}}">{{:expirationStr}}</span><span class="date"> ({{:expirationStr}})</span></div>
+            {{/if}}
         </div>
+        {{/if}}
         <div class="progressdetails">
             <h2>Progress<span>{{:completedCids}} of {{:totalnumberOfCidsWithProgress}} activities completed</span></h2>
             <table class=" list">

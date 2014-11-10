@@ -230,11 +230,8 @@ ${cpweb_foot}
                 $(injectInRow).empty();
                 $(injectInRow).removeClass('loading');
 
-                log('detailsData' , detailsData);
-                log('data' , data);
-                
-                var expiration    = detailsData.expiration;
                 var expirationStr = detailsData.expirationStr;
+                var expired = detailsData.expired;
                 
                 var completed = 0;
                 for (var i = 0; i < data.progress.length; i++) {
@@ -269,7 +266,7 @@ ${cpweb_foot}
                     renderedReports: renderedReports,
                     renderedAdminlinks: renderedAdminlinks,
                     renderedInvites: renderedInvites,
-                    expiration: expiration,
+                    expired: expired,
                     expirationStr: expirationStr
                 }));
                 
@@ -295,11 +292,11 @@ ${cpweb_foot}
 
                 var aoData = oTable.fnGetData(clickedRow);
                 
-                //log('this is the data for the clicked row', aoData);
+                log('this is the data for the clicked row', aoData);
                 
                 //attach the expirationDetails
-                detailsData.expiration = aoData.expiration;
                 detailsData.expirationStr = aoData.expirationStr;
+                detailsData.expired = aoData.expired;
                 
                 detailsData.detailsUrl = aoData.detailsUrl;
 
