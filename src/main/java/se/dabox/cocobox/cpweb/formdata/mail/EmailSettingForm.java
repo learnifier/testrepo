@@ -6,12 +6,14 @@ package se.dabox.cocobox.cpweb.formdata.mail;
 import java.io.Serializable;
 import java.util.Locale;
 import net.unixdeveloper.druwa.formbean.annotation.FormField;
+import net.unixdeveloper.druwa.formbean.annotation.MatchPattern;
 
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class EmailSettingForm implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private String description;
@@ -19,6 +21,7 @@ public class EmailSettingForm implements Serializable {
 
    
     @FormField
+    @MatchPattern("^.{1,96}$")
     public String getName() {
         return name;
     }
