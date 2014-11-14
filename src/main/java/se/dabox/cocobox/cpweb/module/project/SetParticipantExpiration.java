@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -15,7 +16,10 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.module.project.roster.PermissionListformCommand;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
+import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.security.Permission;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.participation.update.UpdateParticipationRequestBuilder;
@@ -28,7 +32,8 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
-public class SetParticipantExpiration extends AbstractRosterListCommand {
+public class SetParticipantExpiration extends AbstractRosterListCommand implements
+        PermissionListformCommand<Long> {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(SetParticipantExpiration.class);
 
@@ -93,6 +98,11 @@ public class SetParticipantExpiration extends AbstractRosterListCommand {
 
     private Date getDate(ListformContext context) {
          return context.getAttribute("expDate", Date.class);
+    }
+
+    @Override
+    public List<Permission> getPermissionsRequired() {
+        return Collections.singletonList(CocoboxPermissions.PRJ_CHANGE_EXPIRATION);
     }
 
 
