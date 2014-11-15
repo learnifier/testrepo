@@ -7,6 +7,8 @@ package se.dabox.cocobox.cpweb.module.mail;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+
+import com.sun.istack.internal.NotNull;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -55,6 +57,12 @@ public class MailModule extends AbstractWebAuthModule {
 
         final MailTemplate template =
                 getOrgMailTemplate(cycle, Long.valueOf(templateId), org.getId());
+
+        if (template == null) {
+            LOGGER.warn("Mail template not found: {}", templateId);
+            String url = NavigationUtil.toEmailListPageUrl(cycle, strOrgId);
+            return new RedirectUrlRequestTarget(url);
+        }
 
         Map<String, Object> map = createMap();
 
