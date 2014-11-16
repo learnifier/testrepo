@@ -272,7 +272,7 @@ class ProjectRosterJsonGenerator {
             return null;
         }
 
-        String msg = StringEscapeUtils.escapeXml(errorMessage);
+        String msg = StringEscapeUtils.escapeXml10(errorMessage);
         return msg.replace("\n", "<br/>");
     }
 
