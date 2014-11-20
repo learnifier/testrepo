@@ -36,16 +36,6 @@ public class FragmentInitializer {
         getFragmentClient().
                 getFragment(cycle, "cpsearch", fragParams);
 
-        getFragmentClient().
-                getFragment(cycle, "cpmenu2", fragParams);
-
-        getFragmentClient().
-                getFragment(cycle, "cpuserinfo2", fragParams);
-
-        getFragmentClient().
-                getFragment(cycle, "cpsearch2", fragParams);
-
-
         setActivatedOrgFragment(cycle, orgId);
     }
 
