@@ -3,14 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.report;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import org.apache.commons.lang3.StringUtils;
-import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.OrgProduct;
@@ -41,10 +39,7 @@ class UsedReportLineEnhancer {
             return reportLines;
         }
 
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, CocositeUserHelper.
-                getUserLocale(cycle));
-
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(reportLines.size());
+        List<Map<String, Object>> list = new ArrayList<>(reportLines.size());
 
         for (Map<String, Object> map : reportLines) {
             String type = (String) map.get("targetType");
@@ -53,14 +48,18 @@ class UsedReportLineEnhancer {
                 continue;
             }
 
-            Map<String, Object> enhancedMap = new HashMap<String, Object>(map);
+            Map<String, Object> enhancedMap = new HashMap<>(map);
 
-            if ("project".equals(type)) {
-                enhancedMap.put("name", getProjectName(map));
-            } else if ("deeplink".equals(type)) {
-                enhancedMap.put("name", getDeeplinkName(map));
-            } else {
-                enhancedMap.put("name", null);
+            switch (type) {
+                case "project":
+                    enhancedMap.put("name", getProjectName(map));
+                    break;
+                case "deeplink":
+                    enhancedMap.put("name", getDeeplinkName(map));
+                    break;
+                default:
+                    enhancedMap.put("name", null);
+                    break;
             }
 
             list.add(enhancedMap);
