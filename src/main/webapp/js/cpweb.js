@@ -76,8 +76,8 @@ cpweb.adjustExpiration = function(button, listform, cmd) {
             modal: true,
             buttons: {
                 "OK" : function() {
-                    //set value to the #adjustedDate
-                    $('#adjustedDate').val($('#adjustedDateSetter').val());
+                    //set value to the #adjusteddate
+                    $('#adjusteddate').val($('#adjustedDateSetter').val());
                     
                     cpweb.runListCommand(button, listform, cmd);
                     
@@ -86,7 +86,7 @@ cpweb.adjustExpiration = function(button, listform, cmd) {
             }
         });
     });
-}
+};
 
 
 
