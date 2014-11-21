@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.project.AbstractRosterListCommand;
@@ -15,6 +17,7 @@ import se.dabox.cocobox.cpweb.module.project.DeleteFailure;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.ParticipationToken;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.tokenmanager.client.TokenStatus;
@@ -29,6 +32,9 @@ import se.dabox.util.collections.Transformer;
  */
 public class RosterDeleteParticipant extends AbstractRosterListCommand {
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(RosterDeleteParticipant.class);
 
     @Override
     public RequestTarget execute(ListformContext context,
@@ -72,6 +78,8 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
         long userId = LoginUserAccountHelper.getCurrentCaller(context.getCycle());
         try {
             ccbcClient.deleteProjectParticipant(userId, getProjectId(context), value);
+        } catch(NotFoundException nfe) {
+            LOGGER.warn("Unable to delete participation {}. Participation not found");
         } catch (DwsServiceErrorCodeException secx) {
 
             if (secx.getErrorCode() != 12) {
