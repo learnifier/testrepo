@@ -83,12 +83,12 @@ ${cpweb_foot}
             <option value="">No Template</option>
             <optgroup label="Generic templates">
                 [#list templateLists.stickyList as template]
-                <option value="${template.id?c}">${template.name}</option>
+                <option value="${template.id?c}" [@selected template/]>${template.name}</option>
                 [/#list]
             </optgroup>
             <optgroup label="Custom templates">
                 [#list templateLists.unstickyList as template]
-                <option value="${template.id?c}">${template.name}</option>
+                <option value="${template.id?c}" [@selected template/]>${template.name}</option>
                 [/#list]
             </optgroup>
         </select>
@@ -145,3 +145,6 @@ ${cpweb_foot}
 
 [/@dws.skin]
 
+[#macro selected template]
+[#if stickyTemplateId?? && template.id == stickyTemplateId]selected="selected"[/#if]
+[/#macro]
