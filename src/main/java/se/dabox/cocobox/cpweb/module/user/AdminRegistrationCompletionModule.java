@@ -27,6 +27,7 @@ import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient
 import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.orgadmin.client.ActivateCpAdminTokenGenerator;
 
 /**
  * Module that completes the admin registration. This logic is in a separate module
@@ -60,7 +61,7 @@ public class AdminRegistrationCompletionModule extends AbstractWebAuthModule {
         }
 
         long orgId = JacksonHelper.getLong(map, "orgId");
-        sendWelcomeMail(cycle, userId, orgId);
+        sendWelcomeMail(cycle, userId, orgId, map);
 
         map.put("consumed", Boolean.TRUE);
         getRandomDataClient(cycle).updateRandomData(userId, id, JsonUtils.encode(map));
@@ -82,17 +83,27 @@ public class AdminRegistrationCompletionModule extends AbstractWebAuthModule {
         return JsonUtils.decode(json);
     }
 
-    private void sendWelcomeMail(RequestCycle cycle, long userId, long orgId) {
+    private void sendWelcomeMail(RequestCycle cycle, long userId, long orgId, Map<String,Object> map) {   
         AdminWelcomeMailProcessor awmp = new AdminWelcomeMailProcessor(userId, orgId);
         SendMailSession session = SendMailSession.createSimple(awmp);
         session.addReceiver(userId);
 
-        SendMailTemplate template = getWelcomeMailTemplate(cycle, orgId, userId);
+        SendMailTemplate template = getWelcomeMailTemplate(cycle, orgId, userId, map);
 
         awmp.processSendMail(cycle, session, template);
     }
 
-    private SendMailTemplate getWelcomeMailTemplate(RequestCycle cycle, long orgId, long userId) {
+    private SendMailTemplate getWelcomeMailTemplate(RequestCycle cycle, long orgId, long userId, Map<String,Object> map) {
+        MailTemplate template = getCustomTemplate(map);
+        if (template == null) {
+            template = getGenericWelcomeTemplate(cycle, orgId, userId);
+        }
+        
+        return new SendMailTemplate(template.getSubject(), template.getMainContent(), template.
+                getType());
+    }
+
+    public MailTemplate getGenericWelcomeTemplate(RequestCycle cycle, long orgId, long userId) {
 
         MailTemplateServiceClient mtClient = getMailTemplateClient(cycle);
         long parentBucket = new GetGenericMailBucketCommand(cycle).getId();
@@ -112,7 +123,21 @@ public class AdminRegistrationCompletionModule extends AbstractWebAuthModule {
             throw new IllegalStateException("Failed to locate welcome mail template for org: "+orgId);
         }
 
-        return new SendMailTemplate(template.getSubject(), template.getMainContent(), template.
-                getType());
+        return template;
+    }
+
+    private MailTemplate getCustomTemplate(Map<String, Object> map) {
+        String mailSubject = (String) map.get(ActivateCpAdminTokenGenerator.MAIL_SUBJECT);
+        String mailBody = (String) map.get(ActivateCpAdminTokenGenerator.MAIL_BODY);
+
+        if (mailSubject == null && mailBody == null) {
+            return null;
+        }
+
+        MailTemplate template = new MailTemplate();
+        template.setSubject(mailSubject);
+        template.setMainContent(mailBody);
+
+        return template;
     }
 }
