@@ -48,7 +48,9 @@ cpweb.setExpiration = function(button, listform, cmd) {
     require(['dabox-jquery', 'jsrender'], function() {
         $('body').append($('#expirationdialogTemplate').render());
         
-        $('#expirationDateSetter').datepicker();
+        $('#expirationDateSetter').datepicker({
+            dateFormat: $.datepicker.ATOM
+        });
     
         $('#expirationdialog').dialog({
             width: 400,
@@ -58,10 +60,12 @@ cpweb.setExpiration = function(button, listform, cmd) {
                 "Cancel" : function() {
                     $(this).dialog('close');
                 },
-                "SET" : function() {
+                "Set" : function() {
                     //set value to the #expirationdate
-                    $('#expirationdate').val($('#expirationDateSetter').val());
-                    
+                    //$('#expirationdate').val($('#expirationDateSetter').datepicker('getDate'));
+                   
+                    log($.datepicker.formatDate($.datepicker.ATOM, $('#expirationDateSetter').datepicker("getDate")));
+                   
                     cpweb.runListCommand(button, listform, cmd);
                     
                     $( this ).dialog( "destroy" );
