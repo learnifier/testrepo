@@ -41,24 +41,32 @@ cpweb.runListCommand = function (button, listform, cmd) {
 }
 
 cpweb.setExpiration = function(button, listform, cmd) {
-    log('show some lightbox');
+    //log('show some lightbox');
+    
     
     //open modal
     require(['dabox-jquery', 'jsrender'], function() {
         $('body').append($('#expirationdialogTemplate').render());
+        
+        $('#expirationDateSetter').datepicker();
+    
         $('#expirationdialog').dialog({
             width: 400,
             height: 400,
             modal: true,
             buttons: {
-                "OK" : function() {
+                "Cancel" : function() {
+                    $(this).dialog('close');
+                },
+                "SET" : function() {
                     //set value to the #expirationdate
                     $('#expirationdate').val($('#expirationDateSetter').val());
                     
                     cpweb.runListCommand(button, listform, cmd);
                     
                     $( this ).dialog( "destroy" );
-                }
+                } 
+                
             }
         });
     });
@@ -75,14 +83,17 @@ cpweb.adjustExpiration = function(button, listform, cmd) {
             height: 400,
             modal: true,
             buttons: {
-                "OK" : function() {
+                "Cancel" : function() {
+                    $(this).dialog('close');
+                },
+                "Adjust" : function() {
                     //set value to the #adjustedDate
                     $('#adjustedDate').val($('#adjustedDateSetter').val());
                     
                     cpweb.runListCommand(button, listform, cmd);
                     
                     $( this ).dialog( "destroy" );
-                }
+                } 
             }
         });
     });
