@@ -8,6 +8,7 @@ import java.util.Locale;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
+import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.tx.UTComplexTxOperation;
@@ -114,9 +115,7 @@ public class CreateCpUserAccountCommand {
             }
 
             private boolean userAccountHasOrgRole(List<UserAccount> ua, long id) {
-                CharSequence name = OrgRoleName.forOrg(orgId);
-                return ua.get(0).getProfileValue(CocoSiteConstants.UA_PROFILE,
-                        name.toString()) != null;
+                return UserAccountRoleCheck.isCpAdmin(ua.get(0), orgId);
             }
         };
 

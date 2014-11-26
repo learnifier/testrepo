@@ -85,33 +85,7 @@ ${cpweb_head}
 [/#assign]
 
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot]
-
-    <section id="userinfo">
-        <div id="itemactions">
-            [#if role == "clientadmin"]
-                <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
-                    <button>Resend invitation</button>
-                </form>
-            [/#if]
-            <form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
-                <button>Edit</button>
-            </form>
-        </div>
-        <div id="usericon">
-            [#if userimg??]
-            <img src="${userimg}" alt="${user.displayName?xhtml} Profile Image"/>
-            [#else]
-            <img src="${cocoboxCdn}/cocobox/img/cp/userImage_64x64.png" alt="${user.displayName?xhtml} Profile Image" />
-            [/#if]
-            <p>User</p><h1>${user.displayName?xhtml}</h1>
-        </div>
-        <div class="itemdetails">
-            <ul>
-                <li><span class="label">Email</span><span class="setting clearfix">${user.primaryEmail?xhtml}</span></li>
-                <li><span class="label">Language</span><span class="setting clearfix">${locale.getDisplayName(userLocale)?xhtml}</span></li>
-            </ul>
-        </div>
-    </section>
+    [#include "userInfo.ftl" /]
 
     [@userMenu.userOverviewMenu selected="roles"][/@userMenu.userOverviewMenu]
     

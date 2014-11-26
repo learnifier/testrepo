@@ -1,0 +1,9 @@
+[#ftl /]
+[#if role != "none"]
+<form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
+    <button>Resend invitation</button>
+</form>
+[/#if]
+<form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
+    <button>Edit</button>
+</form>

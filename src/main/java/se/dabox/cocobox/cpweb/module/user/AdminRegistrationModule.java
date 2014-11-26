@@ -17,7 +17,6 @@ import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
-import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.LoginService;
 import se.dabox.service.orgadmin.client.ActivateCpAdminTokenGenerator;

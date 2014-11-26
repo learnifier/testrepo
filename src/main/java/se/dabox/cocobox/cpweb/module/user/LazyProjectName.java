@@ -16,7 +16,7 @@ public class LazyProjectName {
     private final LazyCache<Long,String> cache;
 
     public LazyProjectName(final CocoboxCoordinatorClient ccbc) {
-        this.cache = new LazyCache<Long, String>(new Transformer<Long, String>() {
+        this.cache = new LazyCache<>(new Transformer<Long, String>() {
 
             @Override
             public String transform(Long pid) {

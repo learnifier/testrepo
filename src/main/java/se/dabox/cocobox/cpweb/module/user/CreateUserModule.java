@@ -260,6 +260,8 @@ public class CreateUserModule extends AbstractWebAuthModule {
         sms.addReceiver(adminAccount.getUserId());
 
         sms.setStickyTemplateHint(CpwebConstants.ADMIN_WELCOME_MAIL_HINT);
+        sms.setStickyTemplateLocale(CocositeUserHelper.getUserAccountUserLocale(adminAccount));
+        sms.setStickyHidesDropdown(false);
 
         sms.storeInSession(cycle);
 
@@ -283,7 +285,9 @@ public class CreateUserModule extends AbstractWebAuthModule {
 
         sms.addReceiver(adminAccount.getUserId());
 
-        sms.setStickyTemplateHint(CpwebConstants.ADMIN_REGISTRATION_MAIL_HINT);
+        sms.setStickyTemplateHint(CpwebConstants.ADMIN_WELCOME_MAIL_HINT);
+        sms.setStickyTemplateLocale(CocositeUserHelper.getUserAccountUserLocale(adminAccount));
+        sms.setStickyHidesDropdown(false);
 
         sms.storeInSession(cycle);
 
