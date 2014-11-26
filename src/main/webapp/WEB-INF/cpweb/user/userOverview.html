@@ -78,10 +78,11 @@ ${cpweb_head}
 <section id="useroverview">
     <section id="userinfo">
         <div id="itemactions">
-            <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
-                <button>Resend invitation</button>
-            </form>
-
+            [#if role != "none"]
+                <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
+                    <button>Resend invitation</button>
+                </form>
+            [/#if]
             <form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
                 <button>Edit</button>
             </form>
