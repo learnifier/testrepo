@@ -62,9 +62,10 @@ cpweb.setExpiration = function(button, listform, cmd) {
                 },
                 "Set" : function() {
                     //set value to the #expirationdate
-                    //$('#expirationdate').val($('#expirationDateSetter').datepicker('getDate'));
+                    
+                    var correctDate = $.datepicker.formatDate($.datepicker.ATOM, $('#expirationDateSetter').datepicker("getDate"));
                    
-                    log($.datepicker.formatDate($.datepicker.ATOM, $('#expirationDateSetter').datepicker("getDate")));
+                    $('#expirationdate').val(correctDate);
                    
                     cpweb.runListCommand(button, listform, cmd);
                     
