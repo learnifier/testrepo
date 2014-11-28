@@ -20,6 +20,15 @@ ${cpweb_head}
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
+
+<script id="setExpirationDialogTemplate" type="text/x-jsrender"> 
+    <div id="setExpirationDialog" title="Set Standard Expiration ">
+        <p>Set the standard time for expirations in this project. Expiration will start counting downwards once the participants has been activated.</p>
+        <input id="expirationToggleSetter" type="number" />
+
+    </div>
+</script>
+
 <script>
     
     
@@ -134,7 +143,46 @@ ${cpweb_foot}
 
         setSocial(clicked === 'true');
     });
+    
+    $('#expirationtoggle-false').click(function() {
+        $.ajax({
+            type: "POST",
+            url: settingsUrl,
+            data: {
+                pk: 'participationexpiration',
+                value: 0
+            }
+        });
+    });
+    
+    $('#expirationtoggle-true').click(function() {
+        require(['jsrender'], function() {
+            $('body').append($('#setExpirationDialogTemplate').render());
+
+            $('#setExpirationDialog').dialog({
+                title: "Set expiration",
+                buttons: {
+                    "Set": function() {
+                        $.ajax({
+                            type: "POST",
+                            url: settingsUrl,
+                            data: {
+                                pk: 'participationexpiration',
+                                value: $('#expirationToggleSetter').val()
+                            }, 
+                            success: function() {
+                                $('#setExpirationDialog').dialog('close');
+                                window.location.reload(); 
+                            }
+                        });
+                    }
+                }
+            });
+        });
+        
+    });
 </script>
+
 [/#assign]
 
 [#macro userNameAndEmail userId]
@@ -207,6 +255,8 @@ ${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;
                 <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
+        
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <li id="expiration">
             <span class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
@@ -214,6 +264,25 @@ ${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;
                 <span class="short editable-content">${(prj.defaultParticipationExpiration/86400000)!''}</span>
             </span>
         </li>
+        [/@]
+        
+        
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <li id="expirationtoggle">
+            <span class="setting">
+                <span class="label">[@dws.txt key="cpweb.project.settings.expirationtoggle.title" /]</span>
+                [#if prj.defaultParticipationExpiration??]
+                    [#if prj.defaultParticipationExpiration?replace(",", "")?number > 0]
+                        [#assign expirationtoggleActive = "true" /]
+                    [#else] 
+                        [#assign expirationtoggleActive = "false" /]
+                    [/#if]
+                [/#if]
+                [@mbform.inputBoolean 'expirationtoggle' 'Expiration' 'ON' 'OFF' expirationtoggleActive session=formsess /]
+            </span>
+        </li>
+        [/@]
+        
 
         [@dwsrt.feature feature="social"]
         [#-- Only for Course design projects --]

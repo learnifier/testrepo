@@ -6,6 +6,17 @@
 ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+    
+    $('#expirationtoggle-false').click(function() {
+        oldExpiration = $('#expiration').val();
+        $('#expiration').attr({'value': 0, 'disabled': 'disabled'});
+    });
+   
+    $('#expirationtoggle-true').click(function() {
+       $('#expiration').attr({'value': oldExpiration}).removeAttr('disabled'); 
+    });
+    
+    
 </script>
 [/#assign]
 
@@ -33,11 +44,21 @@ ${cpweb_foot}
 
                     [@mbform.textarea name="description" tabindex="2" /]
                     
+                    [#if formsess.getDefaultValue("expiration")??]
+                        [#if formsess.getDefaultValue("expiration")?number > 0]
+                            [#assign expirationtoggle = "true" /]
+                        [#else] 
+                            [#assign expirationtoggle = "false" /]
+                        [/#if]
+                    [/#if]
+                    <label>Activate Expiration Timer</label>
+                    [@mbform.inputBoolean name="expirationtoggle" label="Expiration toggle" truetext="Yes" falsetext="No" defaultstate=expirationtoggle /]
+                    
                     <label>
-                    Expiration
-                    [@mbform.inputNumber name="expiration" class="input_full"  tabindex="5" /]
+                    Expiration (Number of days)
+                    [@mbform.inputNumber name="expiration" class="input_full"  tabindex="5"  /]
                     </label>
-
+                    
                 </fieldset>
             </div>
         </section>
