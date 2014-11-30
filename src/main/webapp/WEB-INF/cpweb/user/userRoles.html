@@ -6,7 +6,11 @@
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
+
 <script>
+
+$('#tm_users').addClass('activeItem').prev().addClass('prevItem');
+
 $(document).ready(function() {
     
     require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
@@ -80,7 +84,6 @@ function deleteMember(role) {
 [#assign head]
 ${cpweb_head}
 
-</style>
 
 [/#assign]
 

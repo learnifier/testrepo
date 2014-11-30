@@ -40,25 +40,50 @@ cpweb.runListCommand = function (button, listform, cmd) {
     });
 }
 
+cpweb.rosterDelete = function (button, listform, cmd, title, text) {
+    require(['dabox-common'], function() {
+        cocobox.confirmationDialog(title,
+        text,
+        function() {
+            cpweb.runListCommand(button, listform, cmd);
+        });
+    });
+    //Block the click
+    return false;
+};
+
 cpweb.setExpiration = function(button, listform, cmd) {
-    log('show some lightbox');
+    //log('show some lightbox');
+    
     
     //open modal
     require(['dabox-jquery', 'jsrender'], function() {
         $('body').append($('#expirationdialogTemplate').render());
+        
+        $('#expirationDateSetter').datepicker({
+            dateFormat: $.datepicker.ATOM
+        });
+    
         $('#expirationdialog').dialog({
             width: 400,
             height: 400,
             modal: true,
             buttons: {
-                "OK" : function() {
+                "Cancel" : function() {
+                    $(this).dialog('close');
+                },
+                "Set" : function() {
                     //set value to the #expirationdate
-                    $('#expirationdate').val($('#expirationDateSetter').val());
                     
+                    var correctDate = $.datepicker.formatDate($.datepicker.ATOM, $('#expirationDateSetter').datepicker("getDate"));
+                   
+                    $('#expirationdate').val(correctDate);
+                   
                     cpweb.runListCommand(button, listform, cmd);
                     
                     $( this ).dialog( "destroy" );
-                }
+                } 
+                
             }
         });
     });
@@ -75,14 +100,17 @@ cpweb.adjustExpiration = function(button, listform, cmd) {
             height: 400,
             modal: true,
             buttons: {
-                "OK" : function() {
+                "Cancel" : function() {
+                    $(this).dialog('close');
+                },
+                "Adjust" : function() {
                     //set value to the #adjusteddate
                     $('#adjusteddate').val($('#adjustedDateSetter').val());
                     
                     cpweb.runListCommand(button, listform, cmd);
                     
                     $( this ).dialog( "destroy" );
-                }
+                } 
             }
         });
     });

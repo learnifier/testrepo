@@ -96,7 +96,7 @@ ${cpweb_foot}
                                 <div class="column">
                                     <fieldset>
 
-                                        [#assign defaultValue = formsess.getDefaultValue('passwordEnabled')!'false' /]
+                                        [#assign defaultValue = formsess.getDefaultValue("passwordEnabled")!"false" /]
                                         [@mbform.select name="passwordEnabled" class="input_full" tabindex="1"]
                                         [@mbform.option value="true" defaultValue=defaultValue]ON[/@mbform.option]
                                         [@mbform.option value="false" defaultValue=defaultValue]OFF[/@mbform.option]
