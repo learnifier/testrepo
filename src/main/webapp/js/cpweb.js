@@ -40,6 +40,18 @@ cpweb.runListCommand = function (button, listform, cmd) {
     });
 }
 
+cpweb.rosterDelete = function (button, listform, cmd, title, text) {
+    require(['dabox-common'], function() {
+        cocobox.confirmationDialog(title,
+        text,
+        function() {
+            cpweb.runListCommand(button, listform, cmd);
+        });
+    });
+    //Block the click
+    return false;
+};
+
 cpweb.setExpiration = function(button, listform, cmd) {
     //log('show some lightbox');
     

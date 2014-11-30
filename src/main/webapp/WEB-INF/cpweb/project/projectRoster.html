@@ -485,8 +485,7 @@ ${cpweb_head}
                 return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
         [/@]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'delete');
-                return false">Delete</button>
+        <button onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');">Delete</button>
         [/@]
         [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
             <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
