@@ -14,7 +14,7 @@ ${cpweb_foot}
     });
    
     $('#expirationtoggle-true').click(function() {
-       $('#expiration').attr({'value': oldExpiration}).removeAttr('disabled'); 
+       $('#expiration').attr({'value': oldExpiration}).removeAttr('disabled').focus(); 
     });
     
     
@@ -33,7 +33,7 @@ ${cpweb_foot}
 
 <div>
     [#global formPrefix="cpweb.editdesignsettings" /]
-    <form action="${formLink}" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
+    <form action="${formLink}" id="newMaterial" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
         [@mbform.alertsection]
         [/@mbform.alertsection]
         <section class="field clearfix">
@@ -67,7 +67,7 @@ ${cpweb_foot}
         [/@mbform.infosection]
         <section class="action">
             <input type="hidden" name="orgId" value="${org.id}" />
-            <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savedesignsettings' /></span></button>
+            <button type="submit" tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savedesignsettings' /></span></button>
             <a href="${helper.urlFor('coursedesign.DesignModule','overview',[org.id, info.designId])}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
         </section>
 
