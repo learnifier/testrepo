@@ -5,7 +5,7 @@
         {{if expirationStr}}
         <div class="expirationdetails">
             {{if expired}}
-                <div class="expired"><span>This participation has expired </span><abbr class="timeago" title="{{:expirationAgo}}">{{:expirationAgo}}</abbr><span class="date"> ({{:expirationStr}})</span></div>
+                <div class="expired"><span>This participation expired </span><abbr class="timeago" title="{{:expirationAgo}}">{{:expirationAgo}}</abbr><span class="date"> ({{:expirationStr}})</span></div>
             {{else}}
                 <div class="futureexpiration"><span>This participation will expire </span><abbr class="timeago" title="{{:expirationAgo}}">{{:expirationAgo}}</abbr><span class="date"> ({{:expirationStr}})</span></div>
             {{/if}}

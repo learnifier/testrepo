@@ -381,7 +381,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 getProject(cycle, projectId);
 
         checkPermission(cycle, project);
-        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
 
         Map<String, Object> map = createMap();
 

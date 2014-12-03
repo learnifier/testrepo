@@ -500,7 +500,7 @@ ${cpweb_head}
         [/@]
         
         
-        [@dwsrt.feature feature="autoical"][#if prj.autoIcal]Calendar invitations are ON. <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>[/#if][/@dwsrt.feature]
+        [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
 
     <section class="list">

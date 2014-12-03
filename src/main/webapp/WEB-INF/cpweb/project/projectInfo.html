@@ -6,21 +6,23 @@
 
 [@mbform._onreadyJavascript]
 
-cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
-cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
-cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
-cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+    cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
+    cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
+    cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
+    cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
 
-cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
-{type: 'select',
-    source: [
-    {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
-    {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
-    {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
-    ]
-}
-);
+    cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
+    {type: 'select',
+        source: [
+        {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
+        {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
+        {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
+        ]
+    }
+    );
 
+    [/@]
 [/@mbform._onreadyJavascript]
 
 
@@ -69,7 +71,7 @@ cpweb.editable($('#project-status .editable-content'), $('#project-status .edita
     [#else]	
 
     <div class="itemicon">
-        <p>Project</p><h1 id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span><span class="editable-control">Edit</span></h1>
+        <p>Project</p><h1 id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
     </div>
 
     [/#if]
@@ -92,13 +94,13 @@ cpweb.editable($('#project-status .editable-content'), $('#project-status .edita
     [/#if]
      <div class="itemdetails">
         <ul>
-            <li><span class="label">Status</span><span class="setting clearfix" id="project-status"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="status" data-value="${project.status}">${ctext("project.status."+project.status)?xhtml}</span><span class="editable-control">Edit</span></span></li>
-            <li><span class="label">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="note">${project.note!""?xhtml}</span><span class="editable-control">Edit</span></span></li>
+            <li><span class="label">Status</span><span class="setting clearfix" id="project-status"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="status" data-value="${project.status}">${ctext("project.status."+project.status)?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
+            <li><span class="label">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="note">${project.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
             [#if project.type.ptype == 2]
                 <li><span class="label">Learner Portal Name</span><span class="setting clearfix">${project.displayUserTitle!""?xhtml}</span></li>
             [#else]
-                <li><span class="label">Course Name</span><span class="setting clearfix" id="project-usertitle"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="usertitle">${project.displayUserTitle!""?xhtml}</span><span class="editable-control">Edit</span></span></li>
-                <li><span class="label">Course Description</span><span class="setting clearfix" id="project-userdesc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="userdesc">${project.displayUserDescription!""?xhtml}</span><span class="editable-control">Edit</span></span></li>
+                <li><span class="label">Course Name</span><span class="setting clearfix" id="project-usertitle"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="usertitle">${project.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
+                <li><span class="label">Course Description</span><span class="setting clearfix" id="project-userdesc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="userdesc">${project.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
             [/#if]
         </ul>
     </div>
@@ -111,7 +113,9 @@ cpweb.editable($('#project-status .editable-content'), $('#project-status .edita
             [/@]
 
             [#if project.type.ptype == 2 && !isIdproject(prj)]
-            <li class="[#if selected == 'details']activeItem[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.details' /]</span></a></li>
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+                <li class="[#if selected == 'details']activeItem[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.details' /]</span></a></li>
+            [/@]
             [/#if]
 
             [#if !isIdproject(prj)]
@@ -136,7 +140,10 @@ cpweb.editable($('#project-status .editable-content'), $('#project-status .edita
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
             <li class="[#if selected == 'registration']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
             [/@]
+
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <li class="[#if selected == 'settings']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
+            [/@]
         </ul>
     </nav>
 </section>

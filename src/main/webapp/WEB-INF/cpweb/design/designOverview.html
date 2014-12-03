@@ -79,6 +79,9 @@ ${cpweb_head}
                 <li><span class="label">Created</span><span class="setting clearfix">${design.created?datetime}</span></li>                
                 <li><span class="label">Updated By</span><span class="setting clearfix">${(usernameHelper(design.updatedBy)?xhtml)!''}</span></li>
                 <li><span class="label">Updated</span><span class="setting clearfix">${(design.updated?datetime)!""}</span></li>
+                [#if expiration??]
+                <li><span class="label">Expiration limit</span><span class="setting clearfix">${expiration!""}</span></li>
+                [/#if]
             </ul>
         </div>
     </section>

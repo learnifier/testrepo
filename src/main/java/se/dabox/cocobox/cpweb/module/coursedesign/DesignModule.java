@@ -72,6 +72,7 @@ public class DesignModule extends AbstractWebAuthModule {
         map.put("info", bcd.getInfo());
         map.put("designId", designId);
         map.put("usernameHelper", new UserIdentifierHelper(cycle));
+        map.put("expiration", getExpirationDays(bcd));
 
         return new FreemarkerRequestTarget("/design/designOverview.html", map);
     }
