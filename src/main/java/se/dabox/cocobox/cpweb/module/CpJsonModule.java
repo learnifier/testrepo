@@ -275,6 +275,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
         NumberFormat nf = NumberFormat.getIntegerInstance(userLocale);
+        InfoCacheHelper icHelper = InfoCacheHelper.getInstance(cycle);
 
         try {
             try (JsonGenerator generator = FACTORY.createJsonGenerator(baos)) {
@@ -292,12 +293,12 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                             cycle.urlFor(ProjectModule.class.getName(), "roster",
                             Long.toString(project.getProjectId())));
                     generator.writeNumberField("createdBy", project.getCreatedBy());
-                    generator.writeStringField("createdByName", "Hardy Coded");
+                    generator.writeStringField("createdByName", icHelper.getUserDisplayName(project.getCreatedBy()));
                     writeLongNullField(generator, "updatedBy",
                             project.getUpdatedBy());
                     generator.writeStringField("updatedByName",
                             project.getUpdatedBy() == null ? null
-                            : "Hardcoded Updater");
+                                    : icHelper.getUserDisplayName(project.getUpdatedBy()));
                     generator.writeStringField("locale", project.getLocale().
                             toString());
                     generator.writeNumberField("ptype", project.getType().getPtype());
