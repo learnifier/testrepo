@@ -41,10 +41,11 @@ ${cpweb_foot}
 
                 [@mbform.inputEmail name="email" class="input_full"  tabindex="4" maxlength="96" /]
 
-                [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale /]
+                [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
+
                 [@mbform.select name="lang" class="input_full" tabindex="5"]
                 [#list userLocales as uLocale]
-                    [@mbform.option value=uLocale defaultValue=defaultValue]${uLocale.getDisplayName(userLocale)?xhtml}[/@mbform.option]
+                    [@mbform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@mbform.option]
                 [/#list]
                 [/@mbform.select]
 

@@ -30,13 +30,14 @@ import se.dabox.cocobox.cpweb.module.mail.UrlRequestTargetGenerator;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.event.UserAccountChangedListenerUtil;
+import se.dabox.cocosite.locale.FormLocale;
+import se.dabox.cocosite.locale.PlatformFormLocaleFactory;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.security.role.RoleUuidNamePair;
-import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
@@ -294,8 +295,10 @@ public class CreateUserModule extends AbstractWebAuthModule {
         return sms.getPreSendTarget(Long.valueOf(strOrgId));
     }
 
-    private List<Locale> getUserLocales(RequestCycle cycle) {
-        return new GetUserLocalesCommand().getLocales(cycle);
+    private List<FormLocale> getUserLocales(RequestCycle cycle) {
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        return new PlatformFormLocaleFactory().getLocales(cycle, userLocale);
     }
 
     private Locale getDefaultUserLocale(RequestCycle cycle) {
