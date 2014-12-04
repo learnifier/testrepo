@@ -6,11 +6,13 @@ package se.dabox.cocobox.cpweb.module;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -49,6 +51,7 @@ import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.io.RuntimeIOException;
+import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -270,6 +273,9 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         final Set<Long> favoriteSet = new HashSet<>(favoriteIds);
 
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        NumberFormat nf = NumberFormat.getIntegerInstance(userLocale);
+
         try {
             try (JsonGenerator generator = FACTORY.createJsonGenerator(baos)) {
                 generator.writeStartObject();
@@ -280,8 +286,8 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                     generator.writeStartObject();
                     generator.writeNumberField("id", project.getProjectId());
                     generator.writeStringField("name", project.getName());
-                    generator.writeNumberField("added", project.getUserCount());
-                    generator.writeNumberField("invited", project.getInvited());
+                    generator.writeStringField("added", nf.format(project.getUserCount()));
+                    generator.writeStringField("invited", nf.format(project.getInvited()));
                     generator.writeStringField("link",
                             cycle.urlFor(ProjectModule.class.getName(), "roster",
                             Long.toString(project.getProjectId())));
