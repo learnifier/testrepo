@@ -195,6 +195,12 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         Long projectId = Long.valueOf(strProjectId);
 
         OrgProject prj = getCocoboxCordinatorClient(cycle).getProject(projectId);
+
+        if (prj == null) {
+            LOGGER.warn("Project not found: {}", strProjectId);
+            return NavigationUtil.toProjectPage(projectId);
+        }
+
         checkPermission(cycle, prj);
 
         ListformContext ctx = new ListformContext(cycle);
