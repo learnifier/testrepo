@@ -132,6 +132,9 @@ ${cpweb_foot}
 
 
 <script>
+    
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+    
     var listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
     var listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
     
