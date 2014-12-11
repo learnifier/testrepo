@@ -79,18 +79,19 @@
 	
 	
     [#if project.stageDesignId??]
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+            <div id="incomplete_dd">
+                <h2>Activate Your Updated Course Design</h2>
+                <p>Your updated course design <span class="imp">will not be available to participants </span>until you have clicked the button below and entered any required information.</p>
 
-    <div id="incomplete_dd">
-        <h2>Activate Your Updated Course Design</h2>
-        <p>Your updated course design <span class="imp">will not be available to participants </span>until you have clicked the button below and entered any required information.</p>
-
-        [#if !prj.invitePossible]
-        <p><span class="imp">You cannot invite participants until you have activated the course design.</span></p>
-        [/#if]
-        <form action="${helper.urlFor('project.VerifyProjectDesignModule','verifyNewDesign',[project.projectId])}" method="post">
-            <button type="submit" ><span>Activate Course Design Now</span></button>
-        </form>
-    </div>
+                [#if !prj.invitePossible]
+                <p><span class="imp">You cannot invite participants until you have activated the course design.</span></p>
+                [/#if]
+                <form action="${helper.urlFor('project.VerifyProjectDesignModule','verifyNewDesign',[project.projectId])}" method="post">
+                    <button type="submit" ><span>Activate Course Design Now</span></button>
+                </form>
+            </div>
+        [/@]
     [/#if]
      <div class="itemdetails">
         <ul>
