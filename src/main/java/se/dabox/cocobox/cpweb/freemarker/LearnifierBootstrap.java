@@ -46,7 +46,7 @@ public class LearnifierBootstrap extends AbstractOrgBrandingOutput implements Te
 
         setLetterBubbleColor(branding);
 
-        RequestCycle cycle = DruwaAppication.getCurrentRequestCycle();
+        RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
         BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, CSS_NAME);
     }
 
