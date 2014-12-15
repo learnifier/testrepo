@@ -8,7 +8,8 @@
 
 <#assign cpweb_head>
     <@branding />
-
+    <@learnifierBootstrap />
+    
     <link href="${contextPath}/css/cpweb.css?${cycle.application.formattedStartTime.base36String}" rel="stylesheet" type="text/css" media="screen" />
 
     <link href="${cocoboxCdn}/cocobox/jqueryui-editable/css/jqueryui-editable.css" rel="stylesheet"/>
