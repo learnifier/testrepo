@@ -132,40 +132,6 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
 
-    private OrgProject getProject(RequestCycle cycle, String strProjectId) throws NumberFormatException {
-        final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
-
-        Long projectId = CpwebParameterUtil.stringToLong(strProjectId);
-
-        OrgProject project = null;
-
-        if (projectId != null) {
-            project = cocoboxCordinatorClient.getProject(projectId);
-        }
-        
-        if (project == null) {
-            LOGGER.info("Project {} missing. Redirecting to cpweb main page", strProjectId);
-            throw new RetargetException(NavigationUtil.toMain(cycle));
-        }
-
-        if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.FLIRT)) {
-            if (project.getFlirtId() == null || project.getNewsFlirtId() == null) {
-                LOGGER.debug("Flirt ids are missing from project {}. Resyncing project", strProjectId);
-                try {
-                    cocoboxCordinatorClient.syncProjectState(project.getProjectId());
-                    project = cocoboxCordinatorClient.getProject(project.getProjectId());
-                } catch (NotFoundException nfe) {
-                    LOGGER.info("Project {} missing (stage 2). Redirecting to cpweb main page", strProjectId);
-                    throw new RetargetException(NavigationUtil.toMain(cycle));
-                }
-            }
-        }
-
-        new UpdateRecentProjectList(cycle).addProject(project.getProjectId());
-
-        return project;
-    }
-
     @WebAction
     public RequestTarget onRegistration(RequestCycle cycle, String projectId) {
         OrgProject project =
