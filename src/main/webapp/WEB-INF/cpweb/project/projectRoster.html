@@ -16,6 +16,7 @@ ${cpweb_foot}
 [#include "jsr_invitesTemplate.inc"]
 [#include "jsr_expirationSetterDialog.inc" /]
 [#include "jsr_expirationAdjustDialog.inc" /]
+[#include "projectRosterMoveDialog.html" /]
 
 
 <script>
@@ -109,6 +110,9 @@ ${cpweb_foot}
                                         + ' "><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
                             }
                             [/@]
+
+                            data+='<a class="impersonate-link" onclick="moveParticipation(this)" data-participationid="'+oObj.aData.id+'">Move</a>';
+
                             return data;
                         }
                     },
@@ -388,6 +392,16 @@ ${cpweb_foot}
         return false;
     }
 
+    function moveParticipation(target) {
+        var pid = $(target).data("participationid");
+
+        var moveSrc = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}";
+
+        $("#moveIframe").prop("src", moveSrc+"/"+pid);
+
+        $("#moveDialog").modal();
+    }
+
 </script>
 
 [/#assign]
@@ -397,6 +411,17 @@ ${cpweb_head}
 <!--[if lte IE 8]>
 <script src="${cocoboxCdn}/cocobox/js/excanvas/excanvas.compiled.js"></script>
 <![endif]-->
+
+<style type="text/css">
+    .modal-backdrop
+    {
+        z-index: 1100;
+    }
+    .modal-dialog
+    {
+        z-index: 1200;
+    }
+</style>
 [/#assign]
 
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]

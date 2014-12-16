@@ -8,7 +8,7 @@ ${cpweb_foot}
 [#if valid]
 
 <div class="hidden">
-        <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm">
+    <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm" target="_top">
             <input type="hidden" id="targetProjectId" name="targetProjectId" value="${targetProjectId?c}"/>
         </form>
 </div>
