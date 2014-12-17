@@ -23,12 +23,14 @@
 [#macro productErrors]
 <ul class="list-group">
     [#list result.productErrors as productError]
-        <li class="list-group-item">${productError.productId?xml} - ${productError.type?xml} </li>
+        <li class="list-group-item">${productError.productId?xml} - ${productErrorMessage(productError)?xml} </li>
     [/#list]
 </ul>
 [/#macro]
 
-[#function productErrorMessage type]
+[#function productErrorMessage productError]
+    [#local type = productError.type /]
+    [#local integrationMsg = productError.message!"" /]
     [#if type == "creditAllocationDenied"]
     [#return "Insufficient credits available" /]
     [#elseif type == "creditDeallocationDenied"]
@@ -36,7 +38,7 @@
     [#elseif type == "integrationDeleteDenied"]
     [#return "Not possible to remove this product from source project" /]
     [#elseif type == "integrationMoveDenied"]
-    [#return "Not possible to move this product" /]
+    [#return "Not possible to move this product. " + integrationMsg /]
     [#elseif type == "integrationAddDenied"]
     [#return "Not possible to add this product" /]
     [#elseif type == "productMissing"]
