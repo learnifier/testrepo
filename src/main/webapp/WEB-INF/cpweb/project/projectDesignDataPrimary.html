@@ -46,7 +46,7 @@ ${cpweb_head}
                     }
                     
                     
-                    log(place);
+                    //log('place', place);
                     mapsUrl = createMapsUrl(place);
 
                     //log(elementId);
@@ -73,7 +73,7 @@ ${cpweb_head}
 
                 var long,lat; 
                 if(place.geometry.location) {
-                    lat = (place.geometry.location.B).toString().substring(0,9);
+                    lat = (place.geometry.location.D).toString().substring(0,9);
                     long = (place.geometry.location.k).toString().substring(0,9);
                 }
 
