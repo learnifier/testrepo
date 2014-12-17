@@ -11,7 +11,6 @@ import java.util.Map;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
@@ -35,6 +34,7 @@ import se.dabox.service.common.coursedesign.activity.Activity;
 import se.dabox.service.common.coursedesign.activity.ActivityComponent;
 import se.dabox.service.common.coursedesign.activity.ActivityCourse;
 import se.dabox.service.common.coursedesign.activity.CourseDesignDefinitionActivityCourseFactory;
+import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
 import se.dabox.service.common.coursedesign.progress.ProgressType;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonUtils;
@@ -127,9 +127,11 @@ class ActivityReportBuilder implements StatusSource {
         List<ParticipationProgress> progress
                 = ccbcClient.getParticipationProgress(participant.getParticipationId());
 
+
+
         ActivityCourse activityCourse
-                = new CourseDesignDefinitionActivityCourseFactory().newActivityCourse(cdd,
-                        databankFacade, progress);
+                = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress,
+                        databankFacade, cdd);
 
         List<Map<String,Object>> activities = new ArrayList<>(activityCourse.getActivityCount());
 
@@ -166,8 +168,8 @@ class ActivityReportBuilder implements StatusSource {
             }
         }
 
-        boolean completed = activity.isCompleted();
-        map.put("completed", completed);
+        boolean activityCompleted = activity.isCompleted();
+        map.put("completed", activityCompleted);
         map.put("enabled", activity.isEnabled());
         map.put("visible", activity.isVisible());
 
@@ -175,7 +177,7 @@ class ActivityReportBuilder implements StatusSource {
 
         boolean overdue = false;
 
-        int progressPercent  = completed ? 100 : 0;
+        int progressPercent  = activityCompleted ? 100 : 0;
 
         if (primaryComp != null) {
             overdue = primaryComp.getDueDateInfo().isOverdue();
