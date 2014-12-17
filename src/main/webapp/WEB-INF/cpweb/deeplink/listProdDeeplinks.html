@@ -35,7 +35,7 @@ ${cpweb_foot}
         return "${pListDetails?js_string}";
     }
 
-    listDeeplinksProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+    listDeeplinksProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}?exclude=project,orgunit";
     listDeeplinksProducts.listLinksUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listPurchasedMatLinks',[org.id])}";
     listDeeplinksProducts.listLinksHistoryUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listLinkTokens')}";
     listDeeplinksProducts.toggleActiveUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkStatus')}";

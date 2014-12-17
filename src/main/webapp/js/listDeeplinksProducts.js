@@ -285,7 +285,7 @@ var listDeeplinksProducts = (function() {
             $(".linkdetails", target).last().after($("#prodlinkinfo").render(response.aaData));
         }
 
-        $.each(response.aaData, function(rowIndex, rowData) {
+        $.each(response.aaData, function(rowIndex, rowData) {           
             var lss = $( "#linkstatussetting"+rowData.linkid);
             lss.buttonset();
             log($('#linktitle' + rowData.linkid));
