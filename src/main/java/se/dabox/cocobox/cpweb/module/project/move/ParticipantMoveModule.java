@@ -115,17 +115,19 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         MoveParticipationResponse result
                 = getCocoboxCordinatorClient(cycle).moveParticipation(mpr);
 
-        if (result.getMoveError().equals(MoveError.OK)) {
-            return NavigationUtil.toProjectPage(targetProjectId);
-        }
-
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
 
         map.put("result", result);
         map.put("targetProjectId", targetProjectId);
+        map.put("participation", part);
+        map.put("targetProjectUrl", NavigationUtil.toProjectPageUrl(cycle, targetProjectId));
 
-        return new FreemarkerRequestTarget("/project/move/verificationResult.html", map);
+        if (result.getMoveError().equals(MoveError.OK)) {
+            return new FreemarkerRequestTarget("/project/move/moveSuccessful.html", map);
+        } else {
+            return new FreemarkerRequestTarget("/project/move/moveError.html", map);
+        }
     }
 
 

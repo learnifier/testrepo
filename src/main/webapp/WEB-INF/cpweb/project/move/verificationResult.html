@@ -1,5 +1,7 @@
 [#ftl strip_text="true" /]
 
+[#import "inc_commonError.ftl" as ce /]
+
 [#assign valid = result.moveError.type == "ok" /]
 
 [#assign cpweb_foot]
@@ -8,7 +10,7 @@ ${cpweb_foot}
 [#if valid]
 
 <div class="hidden">
-    <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm" target="_top">
+    <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm">
             <input type="hidden" id="targetProjectId" name="targetProjectId" value="${targetProjectId?c}"/>
         </form>
 </div>
@@ -42,9 +44,23 @@ ${cpweb_foot}
     [#else]
     <div class="row">
         <div class="col-md-12">
-            <div class="alert alert-danger" role="alert">${errorMessage()?xml}</div>
+            <div class="alert alert-danger" role="alert">${ce.errorMessage()?xml}</div>
         </div>
     </div>
+
+
+        [#if result.productErrors?size > 0]
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger" role="alert">
+                    There was problems with the following products
+                    <ul class="list-group">
+                        [@ce.productErrors /]
+                    </ul>
+                </div>
+            </div>
+        </div>
+        [/#if]
     [/#if]
 
     <div class="row">
@@ -81,22 +97,3 @@ ${cpweb_foot}
     [/#if]
 </div>
 [/@dws.skin]
-
-[#function errorMessage]
-[#if result.moveError.type == "same_project"]
-[#return "You selected the same project" /]
-[#elseif result.moveError.type == "invalid_source_project"]
-[#return "There is an error related to the project that the participant belongs to" /]
-[#elseif result.moveError.type == "invalid_target_project"]
-[#return "There is an error related to the selected target project" /]
-[#elseif result.moveError.type == "product_constraint"]
-[#return "It is not possible to move the participant due to one or more product related constraints" /]
-[#elseif result.moveError.type == "participation_error"]
-[#return "There is a problem with the selected participant that blocks the move operation" /]
-[#elseif result.moveError.type == "invalid_participation"]
-[#return "There is a problem with the selected participant that blocks the move operation" /]
-[#else]
-[#return "An unknown error occured: " +  result.moveError.type /]
-[/#if]
-
-[/#function]
