@@ -452,19 +452,19 @@ ${cpweb_head}
 <section id="addtoroster">
     <div id="upload" style="float: right;">
         <button type="button" onclick="showUploadRoster();
-                return false" class="upload"><span>Upload Roster</span></button>
+                return false" class="upload btn btn-primary"><span>Upload Roster</span></button>
     </div>
     <h3>Add participant</h3>
     <div id="manual">
         [#global formPrefix="cpweb" /]
         <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post" onsubmit="return addMemberListener()">
             <section class="field">
-                [@mbform.inputText name="memberfirstname" class=""  tabindex="1" maxlength="64" /]
-                [@mbform.inputText name="memberlastname" class=""  tabindex="2" maxlength="64" /]
-                [@mbform.inputEmail name="memberemail" class=""  tabindex="3" maxlength="96" /]
+                [@mbform.inputText name="memberfirstname" class=""  tabindex="2" maxlength="64" /]
+                [@mbform.inputText name="memberlastname" class=""  tabindex="3" maxlength="64" /]
+                [@mbform.inputEmail name="memberemail" class=""  tabindex="4" maxlength="96" /]
             </section>
             <section class="action">
-                <input type="submit" value="[@dws.txt key='form.action.addmember' /]"  tabindex="100" class="save" />
+                <input type="submit" value="[@dws.txt key='form.action.addmember' /]"  tabindex="100" class="save btn btn-primary" />
             </section>  
         </form>
     </div>
@@ -479,21 +479,21 @@ ${cpweb_head}
     
     <section class="listactions">
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
-        <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
+        <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
                 return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
         [/@]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-        <button onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');">Delete</button>
+        <button class="btn btn-primary btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');">Delete</button>
         [/@]
         [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
-            <button onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
+            <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
         [/@]
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
+        <button class="btn btn-primary btn-sm" onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
         [/@]
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
+        <button class="btn btn-primary btn-sm" onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
                 return false">Adjust Expiration</button>
         [/@]
         
