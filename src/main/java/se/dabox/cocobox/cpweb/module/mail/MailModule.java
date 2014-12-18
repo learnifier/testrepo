@@ -56,10 +56,13 @@ public class MailModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_EMAIL);
 
-        long templateId = CpwebParameterUtil.stringToLongMandatory(strOrgId);
+        Long templateId = CpwebParameterUtil.stringToLong(strOrgId);
 
-        final MailTemplate template =
-                getOrgMailTemplate(cycle, templateId, org.getId());
+        MailTemplate template = null;
+
+        if (templateId != null) {
+            template = getOrgMailTemplate(cycle, templateId, org.getId());
+        }
 
         if (template == null) {
             LOGGER.warn("Mail template not found: {}", strTemplateId);
