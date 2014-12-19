@@ -73,7 +73,7 @@ ${cpweb_head}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
 
 <h1>[@dws.txt key="cpweb.createprojectselectdesign.title" /]</h1>
 
@@ -158,7 +158,7 @@ ${cpweb_head}
     <section class="action crprj_actions">
         <input type="hidden" name="orgId" value="${org.id?c}" />
         <input type="hidden" id="prjtype" name="prjtype" />
-        <button tabindex="100" class="primary next" disabled="disabled" id="next_btn"><span>[@dws.txt key='form.action.next' /]</span></button>
+        <button tabindex="100" class="btn btn-primary btn-lg" disabled="disabled" id="next_btn"><span>[@dws.txt key='form.action.next' /]</span></button>
         <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="cancel">[@dws.txt key="form.action.cancel" /]</a>
     </section>
 
