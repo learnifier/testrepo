@@ -7,9 +7,9 @@
 <#import "/se/dabox/services/dwsfu/ctxMenu.ftl" as ctxMenu />
 
 
-[#assign portalswitch]
-[#include "portalswitch.html"]
-[/#assign]
+<#assign portalswitch>
+<#include "portalswitch.html">
+</#assign>
 
 <#assign cpweb_head>
     <@branding />
