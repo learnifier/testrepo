@@ -24,8 +24,10 @@ import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.mail.EmailSettingForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
 import se.dabox.cocobox.maileditor.initdata.MeInitData;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
+import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.email.EmailLocaleListFactory;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
@@ -50,15 +52,20 @@ public class MailModule extends AbstractWebAuthModule {
 
     @DefaultWebAction
     @WebAction
-    public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String templateId) {
+    public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String strTemplateId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_EMAIL);
 
-        final MailTemplate template =
-                getOrgMailTemplate(cycle, Long.valueOf(templateId), org.getId());
+        Long templateId = CpwebParameterUtil.stringToLong(strTemplateId);
+
+        MailTemplate template = null;
+
+        if (templateId != null) {
+            template = getOrgMailTemplate(cycle, templateId, org.getId());
+        }
 
         if (template == null) {
-            LOGGER.warn("Mail template not found: {}", templateId);
+            LOGGER.warn("Mail template not found: {}({})", strTemplateId, templateId);
             String url = NavigationUtil.toEmailListPageUrl(cycle, strOrgId);
             return new RedirectUrlRequestTarget(url);
         }
