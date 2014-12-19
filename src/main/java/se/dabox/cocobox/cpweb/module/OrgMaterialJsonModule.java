@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,6 +22,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +73,9 @@ import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
+import se.dabox.util.collections.MapUtil;
 import se.dabox.util.collections.NotPredicate;
+import se.dabox.util.collections.OrListPredicate;
 import se.dabox.util.collections.Predicate;
 import se.dabox.util.collections.Transformer;
 import se.dabox.util.converter.ConversionContext;
@@ -169,8 +173,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
 
         List<Product> products = getGrantedProducts(cycle, orgProds);
+        List<Product> filteredProducts = filterProducts(cycle, products);
 
-        return processProducts(cycle, products, orgId, orgProds, strOrgId);
+        return processProducts(cycle, filteredProducts, orgId, orgProds, strOrgId);
     }
 
     @WebAction
@@ -498,6 +503,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 generator.writeNumberField("totalCredits", balance.getAvailable() + balance.
                         getExpired() + balance.getUsed());
                 generator.writeBooleanField("allowDeeplink", deeplinkSet.contains(product));
+
+                generator.writeBooleanField("anonymous", product.isAnonymous());
+                generator.writeBooleanField("orgUnitProduct", product.isOrgUnitProduct());
+                generator.writeBooleanField("projectProduct", product.isProjectProduct());
+                generator.writeBooleanField("realmProduct", product.isRealmProduct());
             }
 
             private String getSingleValue(Product material, String name) {
@@ -882,6 +892,47 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         });
 
         return sortedList;
+    }
+
+    private List<Product> filterProducts(RequestCycle cycle, List<Product> products) {
+        Set<String> excludes = getExcludes(cycle);
+
+        List<Predicate<Product>> predicates = new ArrayList<>();
+
+        if (excludes.contains("project")) {
+            predicates.add(ProductPredicates.getProjectOwnedProductPredicate());
+        }
+
+        if (excludes.contains("orgunit")) {
+            predicates.add(ProductPredicates.getOrgUnitOwnedProductPredicate());
+        }
+
+        if (predicates.isEmpty()) {
+            return products;
+        }
+
+        return CollectionsUtil.sublist(products,
+                new NotPredicate<>(new OrListPredicate<>(predicates)));
+    }
+
+    private Set<String> getExcludes(RequestCycle cycle) {
+        String param = cycle.getRequest().getParameter("exclude");
+        if (StringUtils.isBlank(param)) {
+            return Collections.emptySet();
+        }
+
+
+        String[] splits = StringUtils.split(param, ',');
+        Set<String> excludes = new HashSet<>(MapUtil.calculateSizeWithLoad(splits.length));
+
+        for (String split : splits) {
+            String trimmed = StringUtils.trimToNull(split);
+            if (trimmed != null) {
+                excludes.add(trimmed);
+            }
+        }
+
+        return excludes;
     }
 
     private static class CrispAdminLinkInfo {

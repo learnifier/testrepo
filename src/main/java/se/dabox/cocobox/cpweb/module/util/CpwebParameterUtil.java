@@ -3,6 +3,9 @@
  */
 package se.dabox.cocobox.cpweb.module.util;
 
+import net.unixdeveloper.druwa.RetargetException;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+
 /**
  * Utility class with (request) parameter related utils.
  *
@@ -25,6 +28,27 @@ public class CpwebParameterUtil {
         } catch(NumberFormatException nfe) {
             return null;
         }
+    }
+
+    /**
+     * Converts a string to a long. If the string is null or not a valid long number
+     * a RetargetException with an ErrorCodeRequestTarget(400) (bad request) is thrown.
+     *
+     * @param str A String
+     * @return The parsed long number
+     *
+     * @throws RetargetException Thrown if the string was null or not a valid long number.
+     */
+    public static long stringToLongMandatory(String str) throws RetargetException {
+        if (str != null) {
+            try {
+                return Long.valueOf(str);
+            } catch(NumberFormatException nfe) {
+                //Ignore
+            }
+        }
+
+        throw new RetargetException(new ErrorCodeRequestTarget(400));
     }
 
     private CpwebParameterUtil() {
