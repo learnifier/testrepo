@@ -35,7 +35,7 @@
 
         [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
         <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
-            <button class="delete"><span>Delete</span></button>
+            <button class="delete btn btn-primary"><span>Delete</span></button>
         </form>
         [/#if]
         [#if isIdproject() ]
@@ -105,45 +105,45 @@
             [/#if]
         </ul>
     </div>
-    <nav id="itemnav">
-        <ul>
-            [#--    <li class="[#if selected == 'overview']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>--]
-            <li class="[#if selected == 'participants']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
+    <nav id="itemnav2">
+        <ul class="nav nav-tabs">
+            [#--    <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>--]
+            <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
             [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
-            <li class="[#if selected == 'projectadmin']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
+            <li class="[#if selected == 'projectadmin']active[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
             [/@]
 
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-                <li class="[#if selected == 'details']activeItem[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.details' /]</span></a></li>
+                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.details' /]</span></a></li>
             [/@]
             [/#if]
 
             [#if !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_TASK"]
-            <li class="[#if selected == 'schedule']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','task',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.schedule' /]</span></a></li>
+            <li class="[#if selected == 'schedule']active[/#if]"><a href="${helper.urlFor('ProjectModule','task',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.schedule' /]</span></a></li>
             [/@]
             [/#if]
             [#if project.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
-            <li class="[#if selected == 'discussion']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','discussion',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.discussion' /]</span></a></li>
+            <li class="[#if selected == 'discussion']active[/#if]"><a href="${helper.urlFor('ProjectModule','discussion',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.discussion' /]</span></a></li>
             [/#if]
             
             [#if project.type.ptype == 2]
-            <li class="[#if selected == 'design']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','design',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.design' /]</span></a></li>
+            <li class="[#if selected == 'design']active[/#if]"><a href="${helper.urlFor('ProjectModule','design',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.design' /]</span></a></li>
             [/#if]
             
-            <li class="[#if selected == 'reports']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','reports',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.reports' /]</span></a></li>
+            <li class="[#if selected == 'reports']active[/#if]"><a href="${helper.urlFor('ProjectModule','reports',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.reports' /]</span></a></li>
             [#if project.type.ptype == 1 || project.type.ptype == 2]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
-            <li class="[#if selected == 'materials']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
+            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
             [/@]
             [/#if]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
-            <li class="[#if selected == 'registration']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
+            <li class="[#if selected == 'registration']active[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
             [/@]
 
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-            <li class="[#if selected == 'settings']activeItem[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
+            <li class="[#if selected == 'settings']active[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             [/@]
         </ul>
     </nav>
