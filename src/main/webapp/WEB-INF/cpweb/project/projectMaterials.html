@@ -61,7 +61,7 @@ ${cpweb_foot}
                         "aTargets": [ 3 ],
                         "mData": null,
                         "fnRender": function ( oObj ) {
-                            return  '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+oObj.aData.system+'|'+oObj.aData.id+'" /><button type="submit">Remove</button></form>';
+                            return  '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+oObj.aData.system+'|'+oObj.aData.id+'" /><button type="submit" class="btn btn-primary btn-sm">Remove</button></form>';
                         }
                     }
                 ],
@@ -160,8 +160,8 @@ ${cpweb_foot}
     <form action="${addLink}" name="addMaterial" id="addMaterial" class="fullpage" method="post">
         [@mbform.alertsection]
         [/@mbform.alertsection]
-        <section class="field container_16">
-            <div class="ui-widget grid_8">
+        <section class="field">
+            <div class="ui-widget col-md-6">
                 [@mbform.select name="materialId" class="input_full" tabindex="1"]
                     <option value=""></option>
                     [#list materials?sort_by("title") as mat]
@@ -169,12 +169,12 @@ ${cpweb_foot}
                     [/#list]
                 [/@mbform.select]
                 
-                <button type="submit">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
+                <button type="submit" class="btn btn-primary">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
             </div>
-            <div class="field inputtext grid_8">
+            <div class="field inputtext col-md-6">
                 <label for="addprojmat">[@dws.txt key="cpweb.project.uploadmaterial.label" /]</label> 
                 <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-                    <div class="btn navBackgroundColor" id="addbtn">[@dws.txt key="cpweb.project.uploadmaterial.action" /]</div>
+                    <div class="btn btn-primary" id="addbtn">[@dws.txt key="cpweb.project.uploadmaterial.action" /]</div>
                 </div>
             </div>
         </section>
