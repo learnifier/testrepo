@@ -56,7 +56,7 @@ public class MailModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_EMAIL);
 
-        Long templateId = CpwebParameterUtil.stringToLong(strOrgId);
+        Long templateId = CpwebParameterUtil.stringToLong(strTemplateId);
 
         MailTemplate template = null;
 
