@@ -65,7 +65,7 @@ public class MailModule extends AbstractWebAuthModule {
         }
 
         if (template == null) {
-            LOGGER.warn("Mail template not found: {}", strTemplateId);
+            LOGGER.warn("Mail template not found: {}({})", strTemplateId, templateId);
             String url = NavigationUtil.toEmailListPageUrl(cycle, strOrgId);
             return new RedirectUrlRequestTarget(url);
         }
