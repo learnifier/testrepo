@@ -1,0 +1,98 @@
+[#ftl /]
+
+[#-- [#if portalSwitch.enabled] --] [#-- will probably need something similar --]
+<script id="cpweb-link-template" type="text/x-handlebars-template">
+    
+    <option class="web" data-viewlink="{{viewLink}}">
+        {{displayName}}
+    </option>
+
+</script>
+
+<script>
+    
+    require(['handlebars', 'select2.min'], function(Handlebars) {
+        
+
+        $('.corporatewebs').select2({
+            placeholder: 'Select client',
+            dataType: 'json',
+            quietMillis: 300,
+            ajax: {
+                url: '${portalSwitch.cpwebAjaxUrl}',
+                data: function(term, page) {
+
+                    return {
+                        term: term,
+                        page: page
+                    };
+                },
+                results: function(data) {
+                    var more = data.more;
+                    
+                    return {
+                        results: data.results,
+                        more: more
+                    };
+                }
+            },
+            formatResult: function(data) {
+                return '<span>' + data.text + '</span>';
+            },
+            formatSelection: function(data) {
+                return data.text;
+            }
+             
+        });
+
+        $('.corporatewebs').on('select2-selecting', function(event) {
+            if(event.choice.viewLink) {
+                window.location.href = event.choice.viewLink;
+            }
+        });
+        
+ 
+     }); 
+     
+</script>
+
+
+<link rel='stylesheet' type='text/css' href='${cocoboxCdn}/cocobox/css/select2/select2.css'/>
+<link rel='stylesheet' type='text/css' href='${cocoboxCdn}/cocobox/css/select2/select2-bootstrap.css'/>
+
+
+<div class="portalswitch">
+    <span class="caret caret_lg"></span>
+    <span class="portal">Trainer Portal</span>
+    <span class="glyphicon glyphicon-th"></span> 
+</div>
+<div class="portalswitch--expanded" style="display: none;">
+    <div class="portals">
+        [#if portalSwitch.bowebAvailable]
+        <a class="portal" href="${portalSwitch.bowebUrl!''}">
+            <span class="portal__icon glyphicon glyphicon-globe"></span>
+            <span class="portal__title">Enterprise Portal</span>
+        </a>
+        [/#if]
+        [#if portalSwitch.cpwebAvailable]
+        <div class="portal" >
+            <span class="portal__icon glyphicon glyphicon-home"></span>
+            <span class="portal__title">Corporate Portal</span>
+            <input type="hidden" class="corporatewebs" placeholder="${ctext('portalswitch.selectclient')?xml}">
+        </div>
+        [/#if]
+        [#if portalSwitch.tpwebAvailable]
+        <a class="portal" href="${portalSwitch.tpwebUrl!''}">
+            <span class="portal__icon glyphicon glyphicon-user"></span>
+            <span class="portal__title">Trainer Portal</span>
+        </a>
+        [/#if]
+        [#if portalSwitch.upwebAvailable]
+        <a class="portal" href="${portalSwitch.upwebUrl!''}">
+            <span class="portal__icon glyphicon glyphicon-user"></span>
+            <span class="portal__title">Learner Portal</span>
+        </a>
+        [/#if]
+    </div>
+</div>
+[#-- [/#if] --]
