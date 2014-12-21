@@ -253,13 +253,13 @@ ${cpweb_foot}
 [/#assign]
 
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName earlycss=upweb_earlycss]
 
 <div class="infobox" id="actions" style="display: none;">
     <h1>Action</h1>
     <section id="multiple-actions" style="display: none;">
         <p>There are multiple issues on your account that you need to take action on.</p>
-        <a class="btn secondarybackgroundcolor" onclick="showActionsList();">Show Issues</a>
+        <a class="btn btn-primary" onclick="showActionsList();">Show Issues</a>
     </section>
     <section id="list-actions" style="display: none;">
         <p>Take action on the following issues. Reach out to tech support as needed.</p>
@@ -282,7 +282,7 @@ ${cpweb_foot}
             <h1>New Project</h1>
             <p>Get started with a new project by following the simple step-by-step instructions.</p>
             <p class="btn-center-wrapper ">
-                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-strong secondarybackgroundcolor">Add Project</a>
+                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary btn-lg">Add Project</a>
             </p>
         </section>
         [/@]
