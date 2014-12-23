@@ -1,19 +1,236 @@
 [#ftl strip_text="true" /]
 
+
 [#import "projectInfo.html" as pInfo /]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+    
+        require(['jquery-ui','Chart'], function() {
+        var chartAnimation = false;
+        if ( Modernizr.canvas === true ) {
+                chartAnimation = true;
+        }
+        var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
+        pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
+    });
+    
+    require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
+       
+        var oTable = $('#userroleslist').dataTable({
+            "sDom": 'rt<"dataTables_footer clearfix"i>',
+            "bPaginate": false,            
+            "aaSorting": [[0,'asc']],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mData": "displayName",
+                    "fnRender": function ( oObj ) {
+                        var dName = oObj.aData.displayName;
+                        if (dName.length < 2) {
+                            return oObj.aData.email;
+                        }
+                        return  '<span title="' +dName + '">' + cocobox.trunc(dName, 20) + '</span>';
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mData": null,
+                    "sWidth": "30%",
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                            var roleList='';
+                            for(var i = 0; i < oObj.aData.roles.length; i++) {
+                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + oObj.aData.roles[i].roleName + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')">Remove role</a></p>';
+                            }
+                            return roleList;                            
+                        [#if security.hasPermission("BO_EDIT_USER")]
+                        [#else]
+                          return '';
+                        [/#if]
+                    }
+                }
+
+
+            ],
+                        
+            "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
+             
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>There are no users on this team</span>",
+                "sLoadingRecords": "<p>Loading team members...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+       
+
+        
+    });
+    
+    
+    function deleteMember(role, deleteLink, userId) {
+        $("#delUserId").val(userId);
+        $("#delRole").val(role);
+        var form = $("#deleteRoleForm");
+        form.attr("action", deleteLink);
+        form.submit();
+    };
+        
 </script>
 [/#assign]
+
+[#macro userNameAndEmail userId]
+
+[#if infoHelper.getMiniUserInfo(userId)??]
+[#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
+${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;
+[#else]
+&nbsp;
+[/#if]
+
+[/#macro]
+
+[#assign projectDetailsSettingUrl = "test" /]
+
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
 
 [@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
 
-<h2>[@dws.txt key="cpweb.project.overview.title" /]</h2>
+<div class="itemdetails">
+        <ul>
+            <li><span class="itemLabel">Status</span><span class="setting clearfix" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("prj.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
+            <li><span class="itemLabel">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
+            [#if prj.type.ptype == 2]
+                <li><span class="itemLabel">Learner Portal Name</span><span class="setting clearfix">${prj.displayUserTitle!""?xhtml}</span></li>
+            [#else]
+                <li><span class="itemLabel">Course Name</span><span class="setting clearfix" id="project-usertitle"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="usertitle">${prj.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
+                <li><span class="itemLabel">Course Description</span><span class="setting clearfix" id="project-userdesc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="userdesc">${prj.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
+            [/#if]
+        </ul>
+    </div>
+
+<h2>Information</h2>
+<div class="itemdetails">    
+    <ul>
+        <li>
+            <span class="itemLabel">Created by:</span><span class="setting">[@userNameAndEmail prj.createdBy /]</span>
+        </li>
+        <li>
+            <span class="itemLabel">Created:</span><span class="setting">${(prj.created?datetime?string.full)!''}</span>
+        </li>
+        <li>
+            <span class="itemLabel">Last updated by:</span><span class="setting">[@userNameAndEmail prj.updatedBy /]</span>
+        </li>
+        <li>
+            <span class="itemLabel">Last updated:</span><span class="setting">${(prj.updated?datetime?string.full)!''}</span>
+        </li>        
+    </ul>
+</div>
+
+<section id="prj-charts" class="infobox">
+    <div>Total participants in project: <span id="prj-ch-total"></span></div>
+    <ul>
+        <li>
+            <table>
+                <tr id="prj-ch-status-invited"><td><span>Not Started:</span></td><td><span class="chart-data"></span></td></tr>
+                <tr id="prj-ch-status-inprogress"><td><span>In Progress:</span></td><td><span class="chart-data"></span></td></tr>
+                <tr id="prj-ch-status-completed"><td><span>Completed:</span></td><td><span class="chart-data"></span></td></tr>
+            </table>
+            <div class="prj-ch-wrapper">
+                <canvas id="prj-ch-status" width="100" height="100"></canvas>
+                <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
+            </div>
+        </li>
+        [#if prj.type.ptype == 2]
+        <li>
+            <table>
+                <tbody>
+                <tr id="prj-ch-overdue-ontrack"><td><span>On Track:</span></td><td><span class="chart-data"></span></td></tr>
+                <tr id="prj-ch-overdue-overdue"><td><span>Overdue:</span></td><td><span class="chart-data"></span></td></tr>
+                </tbody>
+            </table>
+            <div class="prj-ch-wrapper">
+                <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
+                <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
+            </div>
+        </li>
+        [/#if]
+        <li>
+            <table>
+                <tbody>
+                    <tr id="prj-ch-notinvited"><td><span>Not Invited:</span></td><td><span class="chart-data"></span></td></tr>
+                    <tr id="prj-ch-bounced"><td><span>Bounce Backs:</span></td><td><span class="chart-data"></span></td></tr>
+                    <tr id="prj-ch-inerror"><td><span>Project Errors:</span></td><td><span class="chart-data"></span></td></tr>
+                </tbody>
+            </table>
+            <div id="prj-action-needed"></div>
+        </li>
+    </ul>
+</section>
+[@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
+     <a href="${helper.urlFor('ProjectModule','roles',[prj.projectId])}" class="btn btn-primary">[@dws.txt key='cpweb.projectmenu.projectadmin' /]</a>
+ [/@]
+
+<section class="list">
+    <table class="list" id="userroleslist">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+    
+<div style="display: none">
+    <form id="deleteRoleForm" method="POST" action="">
+            <input type="hidden" id="delUserId" name="userId" />
+            <input type="hidden" id="delRole" name="role" />
+    </form>
+</div>
+[#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+    <section class="project-flirt-section col-md-6 alpha">
+        <h3><span class="glyphicon glyphicon-bullhorn"></span>Announcements</h3>
+        <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
+    </section>
+    <section class="project-flirt-section col-md-6 omega">
+        <h3><span class="glyphicon glyphicon-comment primarycolor"></span>Discussions</h3>
+        <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
+        <script>
+            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
+                f.startSingleFlirt('${prj.newsFlirtId}', {
+                    templates: {
+                        emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+                    }
+                });
+                f.startSingleFlirt('${prj.flirtId}', {
+                    templates: {
+                        emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
+                        header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
+                    },
+                    success: function(data) {
+                        var len = data.posts.length;
+                        for(var i = 0; i<len; i++) {
+                            var post = data.posts[i];
+                            if (!activityNames[post.tag]) {
+                                continue;
+                            }
+                            post.activityName = activityNames[post.tag].name;
+                        }
+                    }
+                });
+                $('.ccb-flirt-addpost textarea').focus(function() {
+                    $(this).height(80);
+                })
+            });
+        </script>
+
+    </section>
+[/#if]
 
 
 [/@dws.skin]

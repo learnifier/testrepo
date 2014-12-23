@@ -87,6 +87,14 @@ ${cpweb_foot}
 
 [@pInfo.projectInfo selected="details"][/@pInfo.projectInfo]
 
+[#if prj.type.ptype == 2]
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_COURSEDESIGN"]
+    <form action="${helper.urlFor('ProjectModule','gotoDesignBuilder',[prj.projectId])}" method="post">
+        <button class="delete btn btn-primary"><span>Edit Design</span></button>
+    </form>
+    [/@]
+[/#if]
+
 <h2>[@dws.txt key="cpweb.designdatasecondary.title" /]</h2>
 
 <section id="designdata">
