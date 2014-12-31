@@ -128,16 +128,18 @@ ${cpweb_foot}
 
 
 </script>
-[/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
-
-[@pInfo.projectInfo selected="schedule"][/@pInfo.projectInfo]
-
-
-<section id="addtask">
+<div class="modal fade" id="addTask" tabindex="-1" role="dialog" aria-labelledby="addTaskLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
     [#global formPrefix="cpweb" /]
     <form action="${formlink}" name="addTaskForm" id="addTaskForm" class="fullpage" method="post">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Schedule your communications</h4>
+      </div>
+      <div class="modal-body">
+<section id="addtask">
         <section class="field">
             [@mbform.select name="tasktarget" class="input_full" tabindex="2"]
             [@mbform.option value="all"]All participants[/@mbform.option]
@@ -149,15 +151,30 @@ ${cpweb_foot}
 
             [@mbform.inputDateTimeRequireJs name="taskdate" class="input_full"  tabindex="3"/]
         </section>
-        <section class="action">
-            <input type="submit" value="[@dws.txt key='form.action.addtask' /]"  tabindex="100" class="btn btn-primary" />
-        </section>
-    </form>
 
 </section>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" tabindex="100" class="btn btn-primary">Select email</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+[/#assign]
 
-<section class="list">
-    <table class="list" id="projecttasks">
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="schedule"][/@pInfo.projectInfo]
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addTask">
+    <span class="glyphicon glyphicon-plus-sign"></span> Add Scheduled Email
+</button>
+
+
+<section class="">
+    <table class="table table-striped table-hover" id="projecttasks">
         <thead>
             <tr>
                 <th>Name</th>
@@ -165,7 +182,7 @@ ${cpweb_foot}
                 <th>Date</th>
                 <th>Status</th>
                 <th></th>
-				<th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>

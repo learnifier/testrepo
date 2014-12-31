@@ -21,6 +21,13 @@ ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
+
+    function runiCheck() {
+      $('input').iCheck({
+        checkboxClass: 'icheckbox_square-red',
+        radioClass: 'iradio_square-red'
+      });
+    };
 </script>
 
 
@@ -28,7 +35,7 @@ ${cpweb_foot}
     $(document).ready(function() {
         require(['dataTables-bootstrap', 'jquery.timeago'], function() {
             window.oTable = $('#projectroster').dataTable({
-                "sDom": 'rt<"dataTables_footer clearfix"i>',
+                "dom": 'rt<"dataTables_footer clearfix"i>',
                 "bPaginate": false,
                 "aaSorting": [[2, 'asc']],
                 "fnRowCallback": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
@@ -51,6 +58,8 @@ ${cpweb_foot}
                     log('DataTables has finished its initialisation.');
                     showRow();
                     $('.timeago').timeago();
+                    runiCheck();
+                    $('[data-toggle="tooltip"]').tooltip()                    
                 },
                 "aoColumnDefs": [
                     {
@@ -84,7 +93,7 @@ ${cpweb_foot}
 
                                 return data;
                             } else if (oObj.aData.activated) {
-                                var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + oObj.aData.participationLink + '\'); return false"><img src="${cocoboxCdn}/cocobox/img/cp/project_participationLink.png" alt="Participation Link"/></a>';
+                                var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + oObj.aData.participationLink + '\'); return false"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>';
                                 
                                 return data;
                             }
@@ -106,7 +115,7 @@ ${cpweb_foot}
                                         + oObj.aData.displayName
                                         + '" href="${helper.urlFor('ProjectModule','impersonate')}/'
                                         + oObj.aData.id
-                                        + ' "><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
+                                        + ' "><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></a>';
                             }
                             [/@]
                             return data;
@@ -132,7 +141,7 @@ ${cpweb_foot}
                             if (oObj.aData.sending) {
                                 return "Sending..."
                             } else if (oObj.aData.bounced) {
-                                return '<a href="#" onclick="showBounceInfo(' + oObj.aData.id + '); return false" class="alert" title="' + oObj.aData.lastEmailStr + '">Bounced back</a>';
+                                return '<a href="#" onclick="showBounceInfo(' + oObj.aData.id + '); return false" class="bouncealert" title="' + oObj.aData.lastEmailStr + '">Bounced back</a>';
                             } else {
                                 return  oObj.aData.lastEmailStr;
                             }
@@ -155,8 +164,8 @@ ${cpweb_foot}
                         "mData": "status",
                         "sWidth": 120,
                         "fnRender": function(oObj) {
-                            return  '<div class="progress"><div class="bar" style="width:' + oObj.aData.status +
-                                    '%;"><div class="percent">' + oObj.aData.status + '%</div</div>';
+                            return  '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + oObj.aData.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + oObj.aData.status +
+                                    '%;"></div</div>';
                         }
                     },
                     {
@@ -167,7 +176,7 @@ ${cpweb_foot}
                         "sWidth": 25,
                         "fnRender": function(oObj) {
 
-                            return '<div class="expand"></div>';
+                            return '<span class="pe-7s-angle-down-circle expand"></span>';
 
                         }
                     }
@@ -301,7 +310,8 @@ ${cpweb_foot}
                 
                 detailsData.detailsUrl = aoData.detailsUrl;
 
-                $(this).toggleClass('expanded');
+                $(this).toggleClass('pe-7s-angle-down-circle');
+                $(this).toggleClass('pe-7s-angle-up-circle');
                 $(clickedRow).toggleClass('expanded');
 
                 if (oTable.fnIsOpen(clickedRow)) {
@@ -373,7 +383,7 @@ ${cpweb_foot}
     }
 
 </script>
-
+<!-- Temporary for iCheck-->
 [/#assign]
 
 [#assign cpweb_head]
@@ -391,29 +401,47 @@ ${cpweb_head}
 
 
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-<section id="addtoroster">
-    <div id="upload" style="float: right;">
-<!-- Button trigger modal -->
-        <button type="button" data-toggle="modal" data-target="#uploadRoster" class="btn btn-primary"><span>Upload Excel File</span></button>
-        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
-            <a href="${helper.urlFor('ProjectModule','registration',[prj.projectId])}" class="btn btn-primary">[@dws.txt key='cpweb.projectmenu.registration' /]</a>
-        [/@]
+<div role="tabpanel">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-pencil"></span> Manual</a></li>
+    <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</a></li>
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+    <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge">OFF</span></a></li>
+    [/@]
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="manual">
+        <section id="addtoroster">
+            <div>
+                [#global formPrefix="cpweb" /]
+                <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post" onsubmit="return addMemberListener()">
+                    <section class="field">
+                        [@mbform.inputText name="memberfirstname" class=""  tabindex="2" maxlength="64" /]
+                        [@mbform.inputText name="memberlastname" class=""  tabindex="3" maxlength="64" /]
+                        [@mbform.inputEmail name="memberemail" class=""  tabindex="4" maxlength="96" /]
+                    </section>
+                    <section class="action">
+                        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmember' /]</button>
+                    </section>  
+                </form>
+            </div>
+        </section>
+                
     </div>
-    <h3>Add participant</h3>
-    <div id="manual">
-        [#global formPrefix="cpweb" /]
-        <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post" onsubmit="return addMemberListener()">
-            <section class="field">
-                [@mbform.inputText name="memberfirstname" class=""  tabindex="2" maxlength="64" /]
-                [@mbform.inputText name="memberlastname" class=""  tabindex="3" maxlength="64" /]
-                [@mbform.inputEmail name="memberemail" class=""  tabindex="4" maxlength="96" /]
-            </section>
-            <section class="action">
-                <input type="submit" value="[@dws.txt key='form.action.addmember' /]"  tabindex="100" class="save btn btn-primary" />
-            </section>  
-        </form>
+    <div role="tabpanel" class="tab-pane fade" id="uploadroster">
+      [#include "rosterUpload.html" /]
     </div>
-</section>
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+    <div role="tabpanel" class="tab-pane fade" id="selfreg">Do the selfreg</div>
+    [/@]
+  </div>
+
+</div>
+
 [/@]
 
 <form method="post" id="projectrosterform" action="${helper.urlFor('ProjectModificationModule','listCommand')}">
@@ -425,29 +453,29 @@ ${cpweb_head}
     <section class="listactions">
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
         <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
-                return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
+                return false" ${prj.invitePossible?string('','disabled="disabled"')}><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Send Email...</button>
         [/@]
-        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-        <button class="btn btn-primary btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');">Delete</button>
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false"><span class="glyphicon glyphicon-dashboard"></span> Set Expiration</button>
+        [/@]
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
+                return false"><span class="glyphicon glyphicon-time"></span> Adjust Expiration</button>
         [/@]
         [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
-            <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
-                    return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
+            <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
+                    return false" ${prj.invitePossible?string('','disabled="disabled"')} ><span class="glyphicon glyphicon-flash"></span> Activate</button>
         [/@]
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button class="btn btn-primary btn-sm" onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
-        [/@]
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button class="btn btn-primary btn-sm" onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
-                return false">Adjust Expiration</button>
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
+        <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         [/@]
         
         
         [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
 
-    <section class="list">
-        <table class="list" id="projectroster">
+    <section class="">
+        <table class="table table-striped table-hover" id="projectroster">
             <thead>
                 <tr>
                     <th><input type="checkbox" id="cball"></th>
@@ -466,10 +494,6 @@ ${cpweb_head}
         <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}">Download roster as a Excel file</a>
     </section>
 </form>
-
-[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-  [#include "rosterUpload.html" /]
-[/@]
 
 [#include "bounceInfo.html" /]
 

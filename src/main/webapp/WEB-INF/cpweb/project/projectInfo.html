@@ -8,19 +8,6 @@
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
     cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
-    cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
-    cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
-    cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
-
-    cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
-    {type: 'select',
-        source: [
-        {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
-        {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
-        {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
-        ]
-    }
-    );
 
     [/@]
 [/@mbform._onreadyJavascript]
@@ -35,12 +22,12 @@
 
         [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
             <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
-                <button class="delete btn btn-primary"><span>Delete</span></button>
+                <button class="delete btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
             </form>
         [/#if]
         [#if project.type.ptype == 2]
             <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
-                <button class="delete btn btn-primary"><span>Preview</span></button>
+                <button class="delete btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
             </form>
         [/#if]
 
@@ -100,7 +87,7 @@
         [/@]
     [/#if]
     <nav id="itemnav2">
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-underline">
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
  
