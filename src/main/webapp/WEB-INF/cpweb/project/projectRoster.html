@@ -365,15 +365,6 @@ ${cpweb_foot}
     });
 
 
-    require(['jquery-ui','Chart'], function() {
-        var chartAnimation = false;
-        if ( Modernizr.canvas === true ) {
-                chartAnimation = true;
-        }
-        var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
-        pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
-    });
-
     var impersonateBaseUrl = "${helper.urlFor('ProjectModule','impersonate')}";
     
     function impersonate(participationId) {
