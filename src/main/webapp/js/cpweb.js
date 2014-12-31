@@ -168,7 +168,7 @@ $('#uploadRoster').submit(function() {
 // GENERIC EDITABLE HANDLER FOR CPWEB
 
 cpweb.editable = function(selectorContent, selectorControl, changeListener, opts) {
-    require(['jqueryui-editable'], function() {
+    require(['bootstrap/editable'], function() {
         var defaultOpts = {
             mode: 'popup',
             emptytext: ''

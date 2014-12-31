@@ -26,7 +26,7 @@ ${cpweb_foot}
 
 <script>
     $(document).ready(function() {
-        require(['dabox-datatables', 'jquery.timeago'], function() {
+        require(['dataTables-bootstrap', 'jquery.timeago'], function() {
             window.oTable = $('#projectroster').dataTable({
                 "sDom": 'rt<"dataTables_footer clearfix"i>',
                 "bPaginate": false,
@@ -281,7 +281,7 @@ ${cpweb_foot}
     };
 
     var showRow = function() {
-        require(['dabox-datatables', 'jsrender'], function() {
+        require(['dataTables-bootstrap', 'jsrender'], function() {
             var oTable = $('#projectroster').dataTable();
             var detailsData = {};
 
