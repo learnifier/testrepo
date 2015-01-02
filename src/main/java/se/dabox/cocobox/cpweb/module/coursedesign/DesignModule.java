@@ -9,6 +9,7 @@ import java.util.Map;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -18,6 +19,8 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.coursebuilder.initdata.InitData;
 import se.dabox.cocobox.coursebuilder.initdata.InitDataBuilder;
 import se.dabox.cocobox.cpweb.NavigationUtil;
@@ -54,6 +57,8 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 @WebModuleMountpoint("/design")
 public class DesignModule extends AbstractWebAuthModule {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DesignModule.class);
+
     public static final String OVERVIEW_ACTION = "overview";
 
     @DefaultWebAction
@@ -62,8 +67,13 @@ public class DesignModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
-        
+
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(designId));
+
+        if (bcd == null) {
+            LOGGER.warn("Course design {} (in org {}) doesn't exist", designId, strOrgId);
+            return new RedirectUrlRequestTarget(NavigationUtil.toDesignListPageUrl(cycle, strOrgId));
+        }
 
         Map<String, Object> map = createMap();
 
@@ -99,8 +109,8 @@ public class DesignModule extends AbstractWebAuthModule {
 
         EditDesignSettingsForm form = makeFrom(bcd);
 
-        DruwaFormValidationSession<EditDesignSettingsForm> formsess =
-                getValidationSession(EditDesignSettingsForm.class, cycle);
+        DruwaFormValidationSession<EditDesignSettingsForm> formsess = getValidationSession(
+                EditDesignSettingsForm.class, cycle);
         formsess.populateFromObject(form);
 
         Map<String, Object> map = createMap();
@@ -138,8 +148,8 @@ public class DesignModule extends AbstractWebAuthModule {
 
         BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
 
-        DruwaFormValidationSession<EditDesignSettingsForm> formsess =
-                getValidationSession(EditDesignSettingsForm.class, cycle);
+        DruwaFormValidationSession<EditDesignSettingsForm> formsess = getValidationSession(
+                EditDesignSettingsForm.class, cycle);
 
         if (!formsess.process()) {
             return toEditPage(copyMode, strOrgId, strDesignId, strCopy);
@@ -190,7 +200,7 @@ public class DesignModule extends AbstractWebAuthModule {
         InitData id = new InitDataBuilder().setOrgGenericInitData(org.getId(),
                 brandingId,
                 bcd.getDesign().getName(),
-                bcd.getInfo().getDesignId(), 
+                bcd.getInfo().getDesignId(),
                 backUrl).createInitData();
 
         return new RedirectUrlRequestTarget(GotoDesignBuilder.process(cycle, id));
@@ -222,7 +232,7 @@ public class DesignModule extends AbstractWebAuthModule {
         return new RedirectUrlRequestTarget(GotoDesignBuilder.process(cycle, id));
     }
 
-     @WebAction
+    @WebAction
     public RequestTarget onPreview(RequestCycle cycle, String strOrgId, String strDesignId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
@@ -309,8 +319,8 @@ public class DesignModule extends AbstractWebAuthModule {
         String newDesign = updateDesign(cycle, bcd, form);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateDesignRequest updateReq =
-                new UpdateDesignRequest(info.getDesignId(), userId, newDesign);
+        UpdateDesignRequest updateReq = new UpdateDesignRequest(info.getDesignId(), userId,
+                newDesign);
         updateReq.setName(form.getName());
         updateReq.setDescription(StringUtils.trimToEmpty(form.getDescription()));
 
@@ -325,8 +335,7 @@ public class DesignModule extends AbstractWebAuthModule {
         EditDesignSettingsForm form = formsess.getObject();
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
-        UpdateDesignRequest updateReq =
-                new UpdateDesignRequest(info.getDesignId(), caller);
+        UpdateDesignRequest updateReq = new UpdateDesignRequest(info.getDesignId(), caller);
         updateReq.setName(form.getName());
         updateReq.setDescription(StringUtils.trimToEmpty(form.getDescription()));
 
@@ -382,7 +391,7 @@ public class DesignModule extends AbstractWebAuthModule {
     private DurationString formToDurationString(EditDesignSettingsForm form) {
         DurationString newExpiration
                 = form.getExpiration() == null ? null : DurationString.valueOf(form.getExpiration()
-                        + "D");
+                                + "D");
         return newExpiration;
     }
 
