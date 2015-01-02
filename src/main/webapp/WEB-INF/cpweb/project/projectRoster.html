@@ -33,12 +33,12 @@ ${cpweb_foot}
 
 <script>
     $(document).ready(function() {
-        require(['dataTables-bootstrap', 'jquery.timeago'], function() {
-            window.oTable = $('#projectroster').dataTable({
-                "dom": 'rt<"dataTables_footer clearfix"i>',
-                "bPaginate": false,
-                "aaSorting": [[2, 'asc']],
-                "fnRowCallback": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
+        require(['dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function() {
+            window.oTable = $('#projectroster').DataTable({
+                dom: 'rt<"dataTables_footer clearfix"i>',
+                paging: false,
+                order: [[2, 'asc']],
+                createdRow: function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
                     if (oObj.inError) {
                         $(nRow).addClass('error');
                         $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
@@ -54,21 +54,21 @@ ${cpweb_foot}
                         return nRow;
                     }
                 },
-                "fnInitComplete": function() {
+                initComplete: function() {
                     log('DataTables has finished its initialisation.');
                     showRow();
                     $('.timeago').timeago();
-                    runiCheck();
                     $('[data-toggle="tooltip"]').tooltip()                    
+                    runiCheck();
                 },
-                "aoColumnDefs": [
+                columnDefs: [
                     {
-                        "aTargets": [0],
-                        "mData": null,
-                        "bSortable": false,
-                        "sWidth": 12,
-                        "fnRender": function(oObj) {
-                            return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + oObj.aData.id + '"/>';
+                        targets: [0],
+                        data: "id",
+                        orderable: false,
+                        width: "24px",
+                        render: function(data) {
+                            return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + data + '"/>';
                         }
                     },
                     {
@@ -494,7 +494,6 @@ ${cpweb_head}
         <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}">Download roster as a Excel file</a>
     </section>
 </form>
-
 [#include "bounceInfo.html" /]
 
 [#include "projectRosterParticipationErrorBox.html"]

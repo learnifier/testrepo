@@ -73,17 +73,17 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
             }
         ];
 
-        new Chart(ctx).Doughnut(data, {animation: animationState});
+        new Chart(ctx).Doughnut(data, {animation: animationState, percentageInnerCutout : 80});
     }
 
     function renderStatusGraph() {
 
         $('#prj-ch-status-invited .chart-data').html(invited);
-        $('#prj-ch-status-invited, #prj-ch-status-invited span').prop('title', invitedParticipants).tooltip();
+        $('#prj-ch-status-invited, #prj-ch-status-invited span').prop('title', invitedParticipants);
         $('#prj-ch-status-inprogress .chart-data').html(inProgress);
-        $('#prj-ch-status-inprogress, #prj-ch-status-inprogress span').prop('title', inProgressParticipants).tooltip();
+        $('#prj-ch-status-inprogress, #prj-ch-status-inprogress span').prop('title', inProgressParticipants);
         $('#prj-ch-status-completed .chart-data').html(completed);
-        $('#prj-ch-status-completed, #prj-ch-status-completed span').prop('title', completedParticipants).tooltip();
+        $('#prj-ch-status-completed, #prj-ch-status-completed span').prop('title', completedParticipants);
 
         var sum = invited + inProgress + completed;
         if ( sum > 0){
@@ -104,7 +104,7 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
                 color: "#00CC00"
             }
         ];
-        new Chart(ctx).Doughnut(data, {animation: animationState});
+        new Chart(ctx).Doughnut(data, {animation: animationState, percentageInnerCutout : 80});
     }
     ;
 

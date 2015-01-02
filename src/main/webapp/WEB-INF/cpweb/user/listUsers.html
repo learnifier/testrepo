@@ -65,11 +65,11 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-<a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-add navBackgroundColor">Add User</a>
+<a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a>
 [/@]
 <h1>Users</h1>
-<section class="list">
-    <table class="list" id="listusers">
+<section>
+    <table class="table table-hover table-striped ccb-table" id="listusers">
         <thead>
             <tr>
                 <th></th>

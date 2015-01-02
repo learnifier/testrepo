@@ -166,42 +166,42 @@ ${cpweb_foot}
     <span>Last updated by</span>[@userNameAndEmail prj.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span>[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="Created by ${(prj.created?datetime?string.full)!''}">more info</span>     
     <span class="">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span>
 <section id="prj-charts" class="">
-    <div>Total participants in project: <span id="prj-ch-total"></span></div>
+    <div><span id="prj-ch-total"></span>Participants</div>
     <ul>
         <li>
-            <table>
-                <tr id="prj-ch-status-invited"><td><span>Not Started:</span></td><td><span class="chart-data"></span></td></tr>
-                <tr id="prj-ch-status-inprogress"><td><span>In Progress:</span></td><td><span class="chart-data"></span></td></tr>
-                <tr id="prj-ch-status-completed"><td><span>Completed:</span></td><td><span class="chart-data"></span></td></tr>
-            </table>
             <div class="prj-ch-wrapper">
                 <canvas id="prj-ch-status" width="100" height="100"></canvas>
                 <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
             </div>
+            <table>
+                <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
+                <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
+                <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
+            </table>
         </li>
         [#if prj.type.ptype == 2]
         <li>
-            <table>
-                <tbody>
-                <tr id="prj-ch-overdue-ontrack"><td><span>On Track:</span></td><td><span class="chart-data"></span></td></tr>
-                <tr id="prj-ch-overdue-overdue"><td><span>Overdue:</span></td><td><span class="chart-data"></span></td></tr>
-                </tbody>
-            </table>
             <div class="prj-ch-wrapper">
                 <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
                 <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
             </div>
+            <table>
+                <tbody>
+                <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
+                <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
+                </tbody>
+            </table>
         </li>
         [/#if]
         <li>
+            <div id="prj-action-needed"></div>
             <table>
                 <tbody>
-                    <tr id="prj-ch-notinvited"><td><span>Not Invited:</span></td><td><span class="chart-data"></span></td></tr>
-                    <tr id="prj-ch-bounced"><td><span>Bounce Backs:</span></td><td><span class="chart-data"></span></td></tr>
-                    <tr id="prj-ch-inerror"><td><span>Project Errors:</span></td><td><span class="chart-data"></span></td></tr>
+                    <tr id="prj-ch-notinvited"><td><span class="badge chart-data"></span>Not Invited</td></tr>
+                    <tr id="prj-ch-bounced"><td><span class="badge chart-data"></span>Bounce Backs</td></tr>
+                    <tr id="prj-ch-inerror"><td><span class="badge chart-data"></span>Project Errors</td></tr>
                 </tbody>
             </table>
-            <div id="prj-action-needed"></div>
         </li>
     </ul>
 </section>
