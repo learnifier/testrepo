@@ -93,7 +93,22 @@ ${cpweb_foot}
                     "mData": null,
                     "fnRender": function(oObj) {
                         if(oObj.aData.system == 'orgmat') {
-                            return "<select data-action='action' data-id='" + oObj.aData.id + "'><option value=''>Actions</option><option value='edit'>edit</option><option value='delete'>delete</option></select>"
+                            var html = "<select data-action='action' data-id='" + oObj.aData.id + "'><option value=''>Actions</option>";
+                            var actions = 0;
+                            [@portalSecurity.permissionBlock permission="CP_EDIT_ORGMAT"]
+                                html+= "<option value='edit'>edit</option>";
+                                actions++;
+                            [/@]
+                            [@portalSecurity.permissionBlock permission="CP_DELETE_ORGMAT"]
+                                html+= "<option value='delete'>delete</option>";
+                                actions++;
+                            [/@]
+                            if (actions === 0) {
+                                return '';
+                            }
+                            html+= "</select>";
+
+                            return html;
                         } else {
                             return '';
                         }
