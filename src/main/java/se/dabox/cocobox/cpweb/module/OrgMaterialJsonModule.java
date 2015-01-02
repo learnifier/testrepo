@@ -253,7 +253,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
             return createDeleteMaterialResponse(orgmatid, 0, Collections.<String>emptyList(), true);
         }
-        checkOrgPermission(cycle, orgMat.getOrgId());
+        checkOrgPermission(cycle, orgMat.getOrgId(), CocoboxPermissions.CP_DELETE_ORGMAT);
 
         int activeLinks = getActiveLinks(ccbc, orgMat);
         List<String> projectNames = getLinkedProjectNames(ccbc, orgMat);
