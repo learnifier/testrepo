@@ -28,7 +28,7 @@ ${cpweb_foot}
 [/@]
 
 <h1>Projects</h1>
-<section class="list">
+<section>
     <nav id="itemnav" style="margin-bottom: 10px;">
         <ul>
             <li class="${(projectFilter == '')?string('activeItem','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}"><span>${ctext("listprojects.activeandnew")?xml}</span></a></li>
@@ -36,7 +36,7 @@ ${cpweb_foot}
         </ul>
     </nav>
     
-    <table class="list" id="listprojects">
+    <table class="table table-striped table-hover ccb-table" id="listprojects">
         <thead>
             <tr>
                 <th></th>

@@ -6,14 +6,14 @@ define([], function() {
     var exports = {};
 
     $(document).ready(function() {
-        require(['dabox-datatables'], function() {
+        require(['dataTables-bootstrap'], function() {
             $('#listprojects').dataTable({
-                "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
-                "aaSorting": [[1, 'asc']],
-                "aoColumnDefs": [
+                "dom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
+                "order": [[1, 'asc']],
+                "columnDefs": [
                     {
-                        "bSortable": false,
-                        "mData": function(data, type, val) {
+                        "orderable": false,
+                        "data": function(data, type, val) {
                             if (type === 'set') {
                                 data.favorite = val;
                                 
@@ -33,11 +33,11 @@ define([], function() {
                                 return data.favorite;
                             }
                         },
-                        "aTargets": [0]
+                        "targets": [0]
                     },
                     {
-                        "sWidth": "70%",
-                        "mData": function(data, type, val) {
+                        "width": "70%",
+                        "data": function(data, type, val) {
                             if (type === 'set') {
                                 data.name = val;
                                 data.nameFilter = val + ' ' + data.id;
@@ -54,15 +54,15 @@ define([], function() {
                             }
                         },
                         
-                        "aTargets": [1]
+                        "targets": [1]
                     },
                     {
-                        "mData": "added",
-                        "aTargets": [2]
+                        "data": "added",
+                        "targets": [2]
                     },
                     {
-                        "mData": "invited",
-                        "aTargets": [3]
+                        "data": "invited",
+                        "targets": [3]
                     }
                 ],
                 "sAjaxSource": listProjectsAjaxSource,

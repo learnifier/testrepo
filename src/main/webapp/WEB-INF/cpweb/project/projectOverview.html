@@ -27,35 +27,37 @@ ${cpweb_foot}
             "aoColumnDefs": [
                 {
                     "aTargets": [ 0 ],
-                    "mData": "displayName",
+                    "mData": "thumbnail",
+                    "sWidth": "32",
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
-                        var dName = oObj.aData.displayName;
-                        if (dName.length < 2) {
-                            return oObj.aData.email;
-                        }
-                        return  '<span title="' +dName + '">' + cocobox.trunc(dName, 20) + '</span>';
+                        return  '<img class="img-circle userimage" src="' +oObj.aData.thumbnail+ '"/>';
                     }
                 },
                 {
                     "aTargets": [ 1 ],
-                    "mData": null,
-                    "sWidth": "30%",
+                    "mData": "displayName",
+                    "sWidth": "500",
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
-                            var roleList='';
-                            for(var i = 0; i < oObj.aData.roles.length; i++) {
-                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + oObj.aData.roles[i].roleName + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')">Remove role</a></p>';
-                            }
-                            return roleList;                            
+                        var dName = oObj.aData.displayName;
+                        var data='';
+
+                        if (dName.length < 2) {
+                            data = oObj.aData.email;
+                        }
+                        data =  '<p class="team-members__name" title="' +dName + '">' + cocobox.trunc(dName, 20) + '</p>';
+                        
                         [#if security.hasPermission("BO_EDIT_USER")]
+                            for(var i = 0; i < oObj.aData.roles.length; i++) {
+                                data+= '<span class="team-members__role">' + oObj.aData.roles[i].roleName + ' <a onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')"><span class="glyphicon glyphicon-remove-sign"></span></a></span>';
+                            }
+                            return data;                            
                         [#else]
-                          return '';
+                            return data;
                         [/#if]
                     }
                 }
-
-
             ],
                         
             "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
@@ -108,6 +110,24 @@ ${cpweb_foot}
                 })
             });
         </script>
+<div class="modal fade" id="addTeamMember" tabindex="-1" role="dialog" aria-labelledby="addTeamMemberLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add Team Members</h4>
+      </div>
+      <div class="modal-body">
+           Form to add team members
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Invite Team Member</button>
+      </div>
+    </div>
+  </div>
+</div>
+        
 [/#assign]
 
 [#macro userNameAndEmail userId]
@@ -150,10 +170,62 @@ ${cpweb_foot}
 [@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
 
 <div class="col-md-8">
-    <div class="pull-right">
-    <span class="">Status</span>
-    <h3 id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("prj.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
-    </div>
+    <div class="project-status__wrapper">
+        <span class="project-status__label">Status</span>
+        <h3  class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("prj.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
+    </div>                
+    <div class="project-created-updated__wrapper">
+        <p class="project-created-updated__label">Last updated by</p><p class="project-created-updated__info">[@userNameAndEmail prj.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
+        <p class="project-created-updated__label">Created by</p><p class="project-created-updated__info">[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
+    </div>                
+    <section id="prj-charts" class=" clearfix">
+        <div><span id="prj-ch-total"></span>Participants</div>
+        <ul>
+            <li>
+                <div class="prj-ch-wrapper">
+                    <canvas id="prj-ch-status" width="100" height="100"></canvas>
+                    <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
+                </div>
+                <table>
+                    <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
+                    <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
+                    <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
+                </table>
+            </li>
+            [#if prj.type.ptype == 2]
+            <li>
+                <div class="prj-ch-wrapper">
+                    <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
+                    <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
+                </div>
+                <table>
+                    <tbody>
+                    <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
+                    <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
+                    </tbody>
+                </table>
+            </li>
+            [/#if]
+            <li>
+                <div id="prj-action-needed"></div>
+                <table>
+                    <tbody>
+                        <tr id="prj-ch-notinvited"><td><span class="badge chart-data"></span>Not Invited</td></tr>
+                        <tr id="prj-ch-bounced"><td><span class="badge chart-data"></span>Bounce Backs</td></tr>
+                        <tr id="prj-ch-inerror"><td><span class="badge chart-data"></span>Project Errors</td></tr>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+    </section>
+    [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+        <section class="project-flirt-section">
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-comment"></span>Discussions</h3>
+            <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
+
+        </section>
+    [/#if]
+    <p class="">Note</p><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span>
     [#if prj.type.ptype == 2]
         <span class="">Learner Portal Name</span>
         <h2>${prj.displayUserTitle!""?xhtml}</h2>
@@ -163,82 +235,34 @@ ${cpweb_foot}
         <span class="">Course Description</span><span class=" " id="project-userdesc">
             <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="userdesc">${prj.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
     [/#if]
-    <span>Last updated by</span>[@userNameAndEmail prj.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span>[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="Created by ${(prj.created?datetime?string.full)!''}">more info</span>     
-    <span class="">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span>
-<section id="prj-charts" class="">
-    <div><span id="prj-ch-total"></span>Participants</div>
-    <ul>
-        <li>
-            <div class="prj-ch-wrapper">
-                <canvas id="prj-ch-status" width="100" height="100"></canvas>
-                <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
-            </div>
-            <table>
-                <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
-                <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
-                <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
-            </table>
-        </li>
-        [#if prj.type.ptype == 2]
-        <li>
-            <div class="prj-ch-wrapper">
-                <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
-                <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
-            </div>
-            <table>
-                <tbody>
-                <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
-                <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
-                </tbody>
-            </table>
-        </li>
-        [/#if]
-        <li>
-            <div id="prj-action-needed"></div>
-            <table>
-                <tbody>
-                    <tr id="prj-ch-notinvited"><td><span class="badge chart-data"></span>Not Invited</td></tr>
-                    <tr id="prj-ch-bounced"><td><span class="badge chart-data"></span>Bounce Backs</td></tr>
-                    <tr id="prj-ch-inerror"><td><span class="badge chart-data"></span>Project Errors</td></tr>
-                </tbody>
-            </table>
-        </li>
-    </ul>
-</section>
-[#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
-    <section class="project-flirt-section">
-        <h3><span class="glyphicon glyphicon-comment primarycolor"></span>Discussions</h3>
-        <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
-
-    </section>
-[/#if]
 </div>
 <div class="col-md-4">
-<section class="">
-<h3><span class="glyphicon glyphicon-comment primarycolor"></span>Discussions</h3>
-    <table class="list" id="userroleslist">
-        <tbody>
-        </tbody>
-    </table>
-</section>
-[@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
-     <a href="${helper.urlFor('ProjectModule','roles',[prj.projectId])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='cpweb.projectmenu.projectadmin' /]</a>
- [/@]
-    
-<div style="display: none">
-    <form id="deleteRoleForm" method="POST" action="">
-            <input type="hidden" id="delUserId" name="userId" />
-            <input type="hidden" id="delRole" name="role" />
-    </form>
-</div>
-[#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
-    <section class="project-flirt-section">
-        <h3><span class="glyphicon glyphicon-bullhorn"></span>Announcements</h3>
-        <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
+    <section class="">
+    <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Team Members</h3>
+        <table class="table table-hover table-striped ccb-table team-members" id="userroleslist">
+            <tbody>
+            </tbody>
+        </table>
     </section>
-[/#if]
+    [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
+        <button type="button" class="btn btn-primary-outlined btn-sm" data-toggle="modal" data-target="#addTeamMember">
+            <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
+        </button>
+    [/@]
+
+    <div style="display: none">
+        <form id="deleteRoleForm" method="POST" action="">
+                <input type="hidden" id="delUserId" name="userId" />
+                <input type="hidden" id="delRole" name="role" />
+        </form>
+    </div>
+    [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+        <section class="project-flirt-section">
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-bullhorn"></span>Announcements</h3>
+            <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
+        </section>
+    [/#if]
 </div>
     
-
 [/@dws.skin]
 
