@@ -34,7 +34,7 @@ $(document).ready(function() {
                     "bSortable": false,
                     "fnRender": function ( oObj ) {
                         [#if security.hasPermission("BO_EDIT_USER")]
-                          return '<button onclick="deleteMember(\'' +  oObj.aData.uuid +'\')">Delete</button>';
+                          return '<button onclick="deleteMember(\'' +  oObj.aData.uuid +'\')" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>';
                         [#else]
                           return '';
                         [/#if]
@@ -78,6 +78,38 @@ function deleteMember(role) {
 };   
    
 </script>
+<div class="modal fade" id="addRole" tabindex="-1" role="dialog" aria-labelledby="addRoleLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    [#global formPrefix="cpweb" /]
+    <form action="${helper.urlFor('user.UserModule','addRole', [org.id])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Assign role to user</h4>
+      </div>
+      <div class="modal-body">
+       <section id="addrole">
+        <section class="field">
+         <div id="selector_wrapper">
+             <label for="roles">Roles</label>
+             <select name="role" class="input_full">
+                 [#list roles?sort_by('name') as role]
+                 <option value="${role.uuid}">${role.name?xhtml}</option>
+                 [/#list]
+             </select>
+             <input type="hidden" name="userId" value="${user.userId?c}" />
+        </section>
+
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" tabindex="100" class="btn btn-primary">[@dws.txt key='form.action.addrole' /]</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
 
 [/#assign]
 
@@ -88,47 +120,27 @@ ${cpweb_head}
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot]
-    [#include "userInfo.ftl" /]
+    [#include "userInfo.html" /]
 
     [@userMenu.userOverviewMenu selected="roles"][/@userMenu.userOverviewMenu]
     
-    <h2>Roles</h2>
     
-    <section id="addrole">
-        <div id="manual">
-            
-            <form action="${helper.urlFor('user.UserModule','addRole', [org.id])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post">
-                <section class="field">
-                    <div id="selector_wrapper">
-                        <label for="roles">Roles</label>
-                        <select name="role" class="input_full">
-                            [#list roles?sort_by('name') as role]
-                            <option value="${role.uuid}">${role.name?xhtml}</option>
-                            [/#list]
-                        </select>
-                    </div>
-                </section>
-                <section class="action">
-                    <input type="hidden" name="userId" value="${user.userId?c}" />
-                    <input type="submit" value="[@dws.txt key='form.action.addrole' /]"  tabindex="4" class="add" />
-                </section>  
-            </form>
-        </div>
-    </section>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRole">
+    <span class="glyphicon glyphicon-plus-sign"></span> Add Role
+</button>
 
     
-    <section class="list">
-        <table class="list" id="userroleslist">
-            <thead>
-                <tr>
-                    <th>Role</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-    </section>
+<table class="table table-hover table-striped ccb-table" id="userroleslist">
+    <thead>
+        <tr>
+            <th>Role</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
     
     
 

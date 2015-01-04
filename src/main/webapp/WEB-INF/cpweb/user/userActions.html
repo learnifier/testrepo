@@ -2,12 +2,12 @@
 [#if role != "none"]
     [#if security.hasPermission("CP_EDIT_USER")]
     <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
-        <button>Resend invitation</button>
+        <button class="btn btn-primary-outlined"><span class="glyphicon glyphicon-envelope"></span> Resend invitation</button>
     </form>
     [/#if]
 [/#if]
 [#if security.hasPermission("CP_EDIT_USER")]
 <form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
-    <button>Edit</button>
+    <button class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit User</button>
 </form>
 [/#if]

@@ -1,6 +1,5 @@
 [#ftl strip_text="true" /]
 
-
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
@@ -9,52 +8,76 @@ ${cpweb_foot}
 
 <script>
     $(document).ready(function() {
-        require(['dabox-datatables'], function() {
+        require(['dataTables-bootstrap'], function() {
         var oTable = $('#listusers').dataTable({
-            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
-            "aaSorting": [[1,'asc']],
-            "aoColumnDefs": [ 
+            "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "order": [[1,'asc']],
+            "initComplete": function() {
+                $('#listusers_filter input').attr('placeholder', 'Search users');
+            },
+            "columnDefs": [ 
                 {
-                    "bSortable": false,
-                    "mData": null,
-                    "fnRender": function ( oObj ) {
-
-                        if (oObj.aData.imagelink24) {
-                            return  '<a href="'+ oObj.aData.link + '"><img src="'+oObj.aData.imagelink24+'" class="photo" /></a> ';
-                        } else {
-                            return  '<a href="'+ oObj.aData.link + '"><img src="${cocoboxCdn}/cocobox/img/cp/userImage_24x24.png" class="photo" /></a> ';
+                    "targets": [ 0 ],
+                    "orderable": false,
+                    "data" : function(row, type, set) {
+                        if (!row.imagelink24Display) {
+                            if (row.imagelink24) {
+                                row.imagelink24Display = '<a href="'+ row.link + '"><img src="'+row.imagelink24+'" class="userimage" /></a> ';
+                            } else {
+                                row.imagelink24Display = '<a href="'+ row.link + '"><img src="${cocoboxCdn}/cocobox/img/cp/userImage_24x24.png" class="userimage" /></a> ';
+                            }
                         }
-                    },
-                    "aTargets": [ 0 ]
+
+                        if (type === 'display') {
+                            return row.imagelink24Display;
+                        } else if (type === 'filter') {
+                            return row.imagelink24Display;
+                        } else if (type === 'sort') {
+                            return row.imagelink24Display;
+                        } else {
+                            //Anything else and raw row
+                            return row.imagelink24Display;
+                        }
+                    }
                 },
                 {
-                    "sWidth": "50%",
-                    "mData": "name",
-                    "fnRender": function ( oObj ) {
-                            var name = (oObj.aData.name && oObj.aData.name.length > 0) ? oObj.aData.name : "(Name not set yet)";
-                            return  '<a href="'+ oObj.aData.link + '">' +  name +'</a> ';
-                    },
-                    "aTargets": [ 1 ]
+                    "targets": [ 1 ],
+                    "width": "50%",
+                    "data" : function(row, type, set) {
+                        if (!row.nameDisplay) {
+                            var name = (row.name && row.name.length > 0) ? row.name : "(Name not set yet)";
+                            row.nameDisplay = '<a href="'+ row.link + '">' +  name +'</a> ';
+                        }
+
+                        if (type === 'display') {
+                            return row.nameDisplay;
+                        } else if (type === 'filter') {
+                            return row.name;
+                        } else if (type === 'sort') {
+                            return row.name;
+                        } else {
+                            //Anything else and raw row
+                            return row.name;
+                        }
+                    }
                 },
                 {
-                    "mData": "email",
-                    "aTargets": [ 2 ]
+                    "targets": [ 2 ],
+                    "data": "email"
                 }
             ],
-            "sAjaxSource": "${helper.urlFor('CpJsonModule','listUsers',[org.id])}",                      
-            "iDisplayLength": 25,
-            "sPaginationType": "full_numbers",
-            "bDeferRender": true,
+            "ajax": "${helper.urlFor('CpJsonModule','listUsers',[org.id])}",                      
+            "pageLength": 25,
+            "pagingType": "full_numbers",
             "deferRender": true,
-            "oLanguage": {
-                "sSearch": "",
-                "sZeroRecords": "No user matches your query",
-                "sEmptyTable": "<span class='emptytable'>Start now by creating your <a href='${helper.urlFor('CreateUserModule','create',[org.id])}'>first user</a></span>",
-                "sLoadingRecords": "<p>Loading users...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            "language": {
+                "search": "",
+                "zeroRecords": "No user matches your query",
+                "emptyTable": "<span class='emptytable'>Start now by creating your <a href='${helper.urlFor('CreateUserModule','create',[org.id])}'>first user</a></span>",
+                "loadingRecords": "<p>Loading users...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
         });
-        $('#listusers_filter input').attr('placeholder', 'Search users');
                 
     } );
                 
@@ -64,23 +87,23 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-[@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-<a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a>
-[/@]
-<h1>Users</h1>
-<section>
-    <table class="table table-hover table-striped" id="listusers">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Email Address</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<section class="ccb-page-header margin-bottom">
+    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+        <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a>
+    [/@]
+    <h1 class="page-title">Users</h1>
 </section>
+<table class="table table-hover table-striped ccb-table" id="listusers">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Email Address</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 [/@dws.skin]
 
