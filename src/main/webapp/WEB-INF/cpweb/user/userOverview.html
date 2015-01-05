@@ -12,7 +12,7 @@ ${cpweb_foot}
     $(document).ready(function() {
         require(['dataTables-bootstrap'], function() {
         var oTable = $('#listparticipations').dataTable({
-            "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": false,
             "order": [[0,'asc']],
             "columnDefs": [ 
@@ -39,6 +39,8 @@ ${cpweb_foot}
                         
             "ajax": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[org.id, user.userId])}",
             "language": {
+                "search": "",
+                "zeroRecords": "No projects matches your query",
                 "emptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
                 "loadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }

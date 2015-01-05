@@ -35,7 +35,7 @@ ${cpweb_foot}
     $(document).ready(function() {
         require(['dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function() {
             window.oTable = $('#projectroster').dataTable({
-                "dom": 'rt<"dataTables_footer clearfix"i>',
+                "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "paging": false,
                 "order": [[2, 'asc']],
                 "createdRow": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {

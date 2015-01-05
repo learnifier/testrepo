@@ -13,38 +13,62 @@ $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
 
 $(document).ready(function() {
     
-    require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
+    require(['dataTables-bootstrap', 'dabox-common'], function() {
        
         var oTable = $('#userroleslist').dataTable({
-            "sDom": 'rt<"dataTables_footer clearfix"i>',
-            "bPaginate": false,            
-            "aaSorting": [[0,'asc']],
-            "aoColumnDefs": [
+            "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "paging": false,            
+            "order": [[0,'asc']],
+            "columnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "name",
-                    "fnRender": function ( oObj ) {
-                        return  '<span title="' +oObj.aData.name + '">' + cocobox.trunc(oObj.aData.name, 20) + '</span>';
+                    "targets": [ 0 ],
+                    "data" : function(row, type, set) {
+                        if (!row.nameDisplay) {
+                           row.nameDisplay = '<span title="' +row.name + '">' + cocobox.trunc(row.name, 20) + '</span>';
+                        }
+
+                        if (type === 'display') {
+                            return row.nameDisplay;
+                        } else if (type === 'filter') {
+                            return row.nameDisplay;
+                        } else if (type === 'sort') {
+                            return row.name;
+                        } else {
+                            //Anything else and raw row
+                            return row.name;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": null,
-                    "sWidth": "10%",
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
-                        [#if security.hasPermission("BO_EDIT_USER")]
-                          return '<button onclick="deleteMember(\'' +  oObj.aData.uuid +'\')" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>';
-                        [#else]
-                          return '';
-                        [/#if]
+                    "targets": [ 1 ],
+                    "width": "10%",
+                    "orderable": false,
+                    "data" : function(row, type, set) {
+                        if (!row.actionDisplay) {
+                            [#if security.hasPermission("BO_EDIT_USER")]
+                              row.actionDisplay = '<button onclick="deleteMember(\'' +  row.uuid +'\')" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>';
+                            [#else]
+                              row.actionDisplay = '';
+                            [/#if]
+                        }
+
+                        if (type === 'display') {
+                            return row.actionDisplay;
+                        } else if (type === 'filter') {
+                            return null;
+                        } else if (type === 'sort') {
+                            return row.actionDisplay;
+                        } else {
+                            //Anything else and raw row
+                            return row.actionDisplay;
+                        }
                     }
                 }
 
 
             ],
                         
-            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listRoles',[org.id, user.userId?c])}",
+            "ajax": "${helper.urlFor('user.UserJsonModule','listRoles',[org.id, user.userId?c])}",
              
             "oLanguage": {
                 "sEmptyTable": "<span class='emptytable'>${user.displayName?xhtml} has no roles assigned </span>",

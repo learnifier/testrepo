@@ -55,7 +55,7 @@
             <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
         </div>
     [#else]	
-    <div class="ccb-page-header__info clearfix">
+    <div class="ccb-page-header__info">
         <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
         <p class="page-title-label">Project</p>
         <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
@@ -82,6 +82,7 @@
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
  
+            <li class="[#if selected == '']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Info</span></a></li>
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
                 <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Program<!--[@dws.txt key='cpweb.projectmenu.details' /]--></span></a></li>
