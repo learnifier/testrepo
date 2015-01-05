@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project.partdetails;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
-import org.codehaus.jackson.JsonGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;

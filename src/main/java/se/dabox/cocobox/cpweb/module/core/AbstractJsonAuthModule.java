@@ -3,6 +3,9 @@
  */
 package se.dabox.cocobox.cpweb.module.core;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -15,15 +18,9 @@ import net.unixdeveloper.druwa.module.InvocationContext;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.binarysource.ByteArrayBinarySource;
 import net.unixdeveloper.druwa.request.binarysource.ByteArrayOutputStreamBinarySource;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.PrettyPrinter;
-import org.codehaus.jackson.map.ObjectMapper;
 import se.dabox.cocobox.cpweb.JsonEncodingException;
-import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserRoleCheckAfterLoginListener;
-import se.dabox.cocosite.user.MiniUserAccountHelperContext;
-import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
 import se.dabox.service.webutils.json.JsonExceptionHandler;
