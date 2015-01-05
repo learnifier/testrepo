@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.Collator;
@@ -17,7 +18,6 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.codehaus.jackson.JsonGenerator;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
