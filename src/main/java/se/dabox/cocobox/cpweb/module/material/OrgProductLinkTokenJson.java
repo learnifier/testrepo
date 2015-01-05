@@ -3,14 +3,13 @@
  */
 package se.dabox.cocobox.cpweb.module.material;
 
-import se.dabox.cocobox.cpweb.module.deeplink.*;
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.Locale;
 import net.unixdeveloper.druwa.RequestCycle;
-import org.codehaus.jackson.JsonGenerator;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.user.UserAccountNameHelper;
 import se.dabox.service.common.ccbc.org.OrgProductLinkToken;
