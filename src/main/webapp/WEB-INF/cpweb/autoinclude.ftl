@@ -14,7 +14,6 @@
     <@branding />
     <@learnifierBootstrap />
     
-    <link href="${contextPath}/css/cpweb.css?${cycle.application.formattedStartTime.base36String}" rel="stylesheet" type="text/css" media="screen" />
 </#assign>
 
 

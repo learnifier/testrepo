@@ -130,16 +130,6 @@ ${cpweb_foot}
         
 [/#assign]
 
-[#macro userNameAndEmail userId]
-
-[#if infoHelper.getMiniUserInfo(userId)??]
-[#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
-<span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
-[#else]
-&nbsp;
-[/#if]
-
-[/#macro]
 
 [#assign projectDetailsSettingUrl = "test" /]
 
@@ -173,11 +163,7 @@ ${cpweb_foot}
     <div class="project-status__wrapper">
         <span class="project-status__label">Status</span>
         <h3  class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("prj.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
-    </div>                
-    <div class="project-created-updated__wrapper">
-        <p class="project-created-updated__label">Last updated by</p><p class="project-created-updated__info">[@userNameAndEmail prj.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
-        <p class="project-created-updated__label">Created by</p><p class="project-created-updated__info">[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
-    </div>                
+    </div>
     <section id="prj-charts" class=" clearfix">
         <div><span id="prj-ch-total"></span>Participants</div>
         <ul>

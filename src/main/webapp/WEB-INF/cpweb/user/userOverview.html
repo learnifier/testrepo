@@ -18,6 +18,7 @@ ${cpweb_foot}
             "columnDefs": [ 
                 {
                     "targets": [ 0 ],
+                    "className": "block-link",
                     "data" : function(row, type, set) {
                           if (!row.projectnameDisplay) {
                             row.projectnameDisplay = '<a href="'+ row.projectlink + '" style="display:block;">' + row.projectname +'</a> ';

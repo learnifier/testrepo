@@ -38,6 +38,7 @@ define([], function() {
                     {
                         "targets": [1],
                         "width": "70%",
+                        "className": "block-link",
                         "data" : function(row, type, set) {
                             if (!row.nameDisplay | !row.nameFilter) {
                                 row.nameFilter = row.name + ' ' + row.id;
