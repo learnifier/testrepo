@@ -1,7 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "settingsMenu.html" as sMenu /]
-
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
@@ -14,11 +12,6 @@ ${cpweb_foot}
      });
 </script>
 
-[/#assign]
-
-
-[#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="general"][/@sMenu.settingsMenu]
 [/#assign]
 
 [#assign cpweb_head]
@@ -42,24 +35,16 @@ ${cpweb_head}
                 <div class="label">[@dws.txt key="cpweb.setting.language.title" /]</div>
                 <div class="form">
                     [#global formPrefix="cpweb.setting.language" /]
-                    <form action="#" name="setting1" class="fullpage" method="post" enctype="multipart/form-data">
-                        [@mbform.alertsection]
-                        [/@mbform.alertsection]
-                        <section class="field clearfix">
-                            <div class="column">
-                                <fieldset>
-                                    [@mbform.inputText name="currentpw" class="input_full"  tabindex="1" /]
-                                    [@mbform.inputText name="newpw" class="input_full" tabindex="2" /]
-                                    [@mbform.inputText name="repeatnewpw" class="input_full"  tabindex="3" /]
-                                </fieldset>
-                            </div>
-                        </section>
-                        [@mbform.infosection]
-                        [/@mbform.infosection]
-                        <section class="action">
-                            <input type="submit" value="[@dws.txt key='form.action.save' /]"  tabindex="4" class="save" />
-                            <a class="cancel" tabindex="5">[@dws.txt key="form.action.cancel" /]</a>
-                        </section>
+                    <form action="#" name="setting1" method="post" enctype="multipart/form-data">
+                        [@bsform.alertsection]
+                        [/@bsform.alertsection]
+                        [@bsform.inputText name="currentpw"  tabindex="1" /]
+                        [@bsform.inputText name="newpw" tabindex="2" /]
+                        [@bsform.inputText name="repeatnewpw" tabindex="3" /]
+                        [@bsform.infosection]
+                        [/@bsform.infosection]
+                        <button type="submit" tabindex="4" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.save' /]</button>
+                        <a class="btn btn-default" tabindex="5">[@dws.txt key="form.action.cancel" /]</a>
                     </form>
                 </div>
             </div>
@@ -74,24 +59,16 @@ ${cpweb_head}
                 <div class="label">[@dws.txt key="cpweb.setting.email.title" /]</div>
                 <div class="form">
                     [#global formPrefix="cpweb.setting.email" /]
-                    <form action="#" name="setting1" class="fullpage" method="post" enctype="multipart/form-data">
-                        [@mbform.alertsection]
-                        [/@mbform.alertsection]
-                        <section class="field clearfix">
-                            <div class="column">
-                                <fieldset>
-                                    [@mbform.inputText name="currentpw" class="input_full"  tabindex="1" /]
-                                    [@mbform.inputText name="newpw" class="input_full" tabindex="2" /]
-                                    [@mbform.inputText name="repeatnewpw" class="input_full"  tabindex="3" /]
-                                </fieldset>
-                            </div>
-                        </section>
-                        [@mbform.infosection]
-                        [/@mbform.infosection]
-                        <section class="action">
-                            <input type="submit" value="[@dws.txt key='form.action.save' /]"  tabindex="4" class="save" />
-                            <a class="cancel" tabindex="5">[@dws.txt key="form.action.cancel" /]</a>
-                        </section>
+                    <form action="#" name="setting1" method="post" enctype="multipart/form-data">
+                        [@bsform.alertsection]
+                        [/@bsform.alertsection]
+                        [@bsform.inputText name="currentpw"  tabindex="1" /]
+                        [@bsform.inputText name="newpw" tabindex="2" /]
+                        [@bsform.inputText name="repeatnewpw" tabindex="3" /]
+                       [@bsform.infosection]
+                        [/@bsform.infosection]
+                        <button type="submit"  tabindex="4" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.save' /]</button>
+                        <a class="btn btn-default" tabindex="5">[@dws.txt key="form.action.cancel" /]</a>
                     </form>
                 </div>
             </div>
@@ -106,23 +83,17 @@ ${cpweb_head}
                 <div class="label">[@dws.txt key="cpweb.setting.support.title" /]</div>
                 <div class="form">
                     [#global formPrefix="cpweb.setting.support" /]
-                    <form action="#" name="setting1" class="fullpage" method="post" enctype="multipart/form-data">
-                        [@mbform.alertsection]
-                        [/@mbform.alertsection]
-                        <section class="field clearfix">
-                            <div class="column">
-                                <fieldset>
-                                    [@mbform.inputText name="currentpw" class="input_full"  tabindex="1" /]
-                                    [@mbform.inputText name="newpw" class="input_full" tabindex="2" /]
-                                    [@mbform.inputText name="repeatnewpw" class="input_full"  tabindex="3" /]
-                                </fieldset>
-                            </div>
-                        </section>
-                        [@mbform.infosection]
-                        [/@mbform.infosection]
+                    <form action="#" name="setting1" method="post" enctype="multipart/form-data">
+                        [@bsform.alertsection]
+                        [/@bsform.alertsection]
+                        [@bsform.inputText name="currentpw" tabindex="1" /]
+                        [@bsform.inputText name="newpw" tabindex="2" /]
+                        [@bsform.inputText name="repeatnewpw" tabindex="3" /]
+                        [@bsform.infosection]
+                        [/@bsform.infosection]
                         <section class="action">
-                            <input type="submit" value="[@dws.txt key='form.action.save' /]"  tabindex="4" class="save" />
-                            <a class="cancel" tabindex="5">[@dws.txt key="form.action.cancel" /]</a>
+                            <button type="submit" tabindex="4" class="save"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.save' /]</button>
+                            <a class="btn btn-default" tabindex="5">[@dws.txt key="form.action.cancel" /]</a>
                         </section>
                     </form>
                 </div>
