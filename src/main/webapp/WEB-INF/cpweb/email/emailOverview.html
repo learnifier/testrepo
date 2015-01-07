@@ -18,22 +18,28 @@ ${cpweb_foot}
 <script type="text/javascript">
     $(function() {
 
+        require(['dabox-common'], function() {
+
         $("#emailform").submit(function(event) {
             var body = $('#body');
             body.ckeditorGet().updateElement();
 
             if (body.val().length === 0) {
-                cocobox.errorDialog('No email content','The email body cannot be empty.');
-                event.stopPropagation();
+                    cocobox.errorDialog('No email content', 'The email body cannot be empty.');
+                    event.stopPropagation();
+                    return false;
+                }
+            });
+
+            $('#deleteBtn').click(function () {
+                cocobox.confirmationDialog("Delete email template", "Do you want to delete this email template?", function () {
+                    $('#deleteForm').submit();
+                });
                 return false;
-            }
+            });
+
         });
     });
-
-    $('#deleteBtn').click(function() {
-        cocobox.confirmationDialog("Delete email template", "Do you want to delete this email template?", function() { $('#deleteForm').submit(); });
-        return false;
-      });
 
 </script>
 [/#assign]
