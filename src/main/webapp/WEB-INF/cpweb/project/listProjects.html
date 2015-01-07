@@ -1,31 +1,30 @@
 [#ftl strip_text="true" /]
 
-
 [#assign foot]
-${cpweb_foot}
-<script>
-    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
-</script>
-<script>
-    var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
-    var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
-    var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
-    var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
-    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
+    ${cpweb_foot}
+    <script>
+        $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
-    require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-       //No initialization needed
-    });
+        var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
+        var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
+        var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+        var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
+        var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
 
-</script>
+        require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+           //No initialization needed
+        });
 
+    </script>
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
 <section class="ccb-page-header margin-bottom">
     [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
-        <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
+        <div class="ccb-page-header__actions">
+            <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
+       </div>
     [/@]
     <h1 class="page-title">Projects</h1>
 </section>
@@ -48,7 +47,6 @@ ${cpweb_foot}
     <tbody>
     </tbody>
 </table>
-
 
 [/@dws.skin]
 

@@ -1,21 +1,19 @@
 [#ftl strip_text="true" /]
 
 [#macro userNameAndEmail userId]
-
-[#if infoHelper.getMiniUserInfo(userId)??]
-[#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
-<span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
-[#else]
-&nbsp;
-[/#if]
-
+    [#if infoHelper.getMiniUserInfo(userId)??]
+        [#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
+        <span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
+    [#else]
+        &nbsp;
+    [/#if]
 [/#macro]
 
 [#macro projectInfo selected project=prj]
 
 [#assign projectSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[project.projectId]) /]
 
-[@bsform._onreadyJavascript]
+[@mbform._onreadyJavascript]
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
     cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
@@ -32,7 +30,7 @@
     });
     });
 
-[/@bsform._onreadyJavascript]
+[/@mbform._onreadyJavascript]
 
 [#include "../projectDeleteFailure.html" /]
 [#include "error/projectProductError.html" /]
@@ -58,8 +56,8 @@
     </div>
 
     [#if isIdproject() ]
-        <div class="ccb-page-header__info clearfix">
-            <img class="page-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
+        <div class="ccb-page-header__info">
+            <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
             <p class="page-title-label">Project</p>
             <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
             <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
@@ -69,7 +67,7 @@
         <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
         <p class="page-title-label">Project</p>
         <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
-        <ul class="project-created-updated__wrapper list-inline">
+        <ul class="page-created-updated__wrapper list-inline">
             <li>
                 <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
             </li>
@@ -105,13 +103,13 @@
             <li class="[#if selected == '']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Info</span></a></li>
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Program<!--[@dws.txt key='cpweb.projectmenu.details' /]--></span></a></li>
+                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course<!--[@dws.txt key='cpweb.projectmenu.details' /]--></span></a></li>
             [/@]
             [/#if]
 
             [#if project.type.ptype == 1 || project.type.ptype == 2]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
-            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Library<!--[@dws.txt key='cpweb.projectmenu.materials' /]--></span></a></li>
+            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Resources<!--[@dws.txt key='cpweb.projectmenu.materials' /]--></span></a></li>
             [/@]
             [/#if]
 

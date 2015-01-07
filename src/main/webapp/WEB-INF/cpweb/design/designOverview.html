@@ -1,7 +1,13 @@
 [#ftl strip_text="true" /]
 
-[#import "/material/materialsMenu.html" as mMenu /]
-
+[#macro userNameAndEmail userId]
+    [#if infoHelper.getMiniUserInfo(userId)??]
+        [#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
+        <span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
+    [#else]
+        &nbsp;
+    [/#if]
+[/#macro]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
@@ -21,77 +27,71 @@ ${cpweb_foot}
 
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-    [@mMenu.materialsMenu selected="designs"][/@mMenu.materialsMenu]
-[/#assign]
-
-[#assign head]
+[#assign cpweb_head]
 ${cpweb_head}
 
 [/#assign]
 
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-<section id="designoverview">
-    <section id="designinfo">
-        <div id="itemactions">
+<section class="ccb-page-header">
+    <div class="ccb-page-header__actions">
             [#if !info.sticky && portalSecurity.hasPermission("CP_DELETE_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','delete',[org.id, designId])}" method="post" id="deleteForm">
-                <button id="deleteBtn">Delete</button>
+                <button type="submit" id="deleteBtn" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
             </form>
             [/#if]
 
             [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','editDesign',[org.id, designId])}" method="post">
-                <button>Edit Course Template</button>
+                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Course Template</button>
             </form>
             [/#if]
 
             [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
             <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId])}" method="post">
-                <button type="submit">Edit Settings</button>
+                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
             </form>
             [/#if]
 
             [@portalSecurity.permissionBlock permission="CP_COPY_COURSEDESIGN"]
             <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId,'t'])}" method="post">
-                <button>Create copy</button>
+                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-flash"></span> Create copy</button>
             </form>
             [/@]
 
             <form action="${helper.urlFor('coursedesign.DesignModule','view',[org.id, designId])}" method="post">
-                <button>View</button>
+                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-eye-open"></span> View</button>
             </form>
             
              <form action="${helper.urlFor('coursedesign.DesignModule','preview',[org.id, designId])}" method="post" target="_blank">
-                <button>Preview</button>
+                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
             </form>
             
         </div>
-        <div class="itemicon">
-            <p>Course Template<p><h1>${design.name?xhtml}</h1>
+        <div class="ccb-page-header__info">
+            <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
+            <p class="page-title-label">Course Template</p>
+            <h1 class="page-title">${design.name?xhtml}</h1>
+            <ul class="page-created-updated__wrapper list-inline">
+                <li>
+                    <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail design.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(design.created?datetime?string.full)!''}">${(design.created?date?string.full)!''}</span></p>
+                </li>
+                <li>
+                    <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail design.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(design.updated?datetime?string.full)!''}">${(design.updated?date?string.full)!''}</span></p>
+                </li>
+            </ul>
         </div>
-        <div class="itemdetails">
+        <div class="ccb-page-header__details">
             <ul>
-                <li><span class="label">Description</span><span class="setting clearfix">${(design.description!"")?xhtml}</span></li>
-                <li><span class="label">Origin</span><span class="setting clearfix">[@dws.txt key="cpweb.designoverview." + info.sticky?string!""  /]</span></li>
-                <li><span class="label">Created By</span><span class="setting clearfix">${usernameHelper(design.createdBy)!''?xhtml}</span></li>
-                <li><span class="label">Created</span><span class="setting clearfix">${design.created?datetime}</span></li>                
-                <li><span class="label">Updated By</span><span class="setting clearfix">${(usernameHelper(design.updatedBy)?xhtml)!''}</span></li>
-                <li><span class="label">Updated</span><span class="setting clearfix">${(design.updated?datetime)!""}</span></li>
+                <li><span class="row-label">Description</span><span class="row-setting">${(design.description!"")?xhtml}</span></li>
+                <li><span class="row-label">Origin</span><span class="row-setting">[@dws.txt key="cpweb.designoverview." + info.sticky?string!""  /]</span></li>
                 [#if expiration??]
-                <li><span class="label">Expiration limit</span><span class="setting clearfix">${expiration!""}</span></li>
+                <li><span class="row-label">Expiration limit</span><span class="row-setting">${expiration!""}</span></li>
                 [/#if]
             </ul>
         </div>
     </section>
-    [#--
-    <h2>Course design preview</h2>
-    <section id="designpreview">
-        <iframe src="http://www.ted.com" style="width: 100%; height: 500px;"></iframe>
-    </section>
-    --]
-</section>
 
 
 [/@dws.skin]

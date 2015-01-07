@@ -16,6 +16,23 @@ ${cpweb_foot}
 <form action="${formLink}" name="createUser" class="fullpage" method="post">
     [@bsform.alertsection]
     [/@bsform.alertsection]
+                <div class="row">
+                    <div class="col-sm-6">
+                        [@bsform.inputText name="firstname" tabindex="2" maxlength="64" /]
+                    </div>
+                    <div class="col-sm-6">
+                        [@bsform.inputText name="lastname" tabindex="3" maxlength="64" /]
+                    </div>
+                </div>
+                [@bsform.inputEmail name="email" tabindex="4" maxlength="96" /]
+
+                [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
+                [@bsform.select name="lang" tabindex="5"]
+                [#list userLocales as uLocale]
+                    [@bsform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@bsform.option]
+                [/#list]
+                [/@bsform.select]
+
                 [#if editMode]
                 <input type="hidden" name="role" value="edit" />
                 [#else]
@@ -30,21 +47,6 @@ ${cpweb_foot}
                     [/@bsform.select]
 
                 [/#if]
-
-                [@bsform.inputText name="firstname" class="input_full"  tabindex="2" maxlength="64" /]
-
-                [@bsform.inputText name="lastname" class="input_full"  tabindex="3" maxlength="64" /]
-
-                [@bsform.inputEmail name="email" class="input_full"  tabindex="4" maxlength="96" /]
-
-                [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
-
-                [@bsform.select name="lang" class="input_full" tabindex="5"]
-                [#list userLocales as uLocale]
-                    [@bsform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@bsform.option]
-                [/#list]
-                [/@bsform.select]
-
     [@bsform.infosection]
     [/@bsform.infosection]
         <input type="hidden" name="orgId" value="${org.id}" />
