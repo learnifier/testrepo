@@ -1,7 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
-
 [#assign foot]
 ${cpweb_foot}
 <script>
@@ -9,49 +7,32 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="designs"][/@sMenu.settingsMenu]
-[/#assign]
 
-
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
 <h1>[@dws.txt key="cpweb.edittemplatesettings.title" /></h1>
 
-<div>
-    [#global formPrefix="cpweb.edittemplatesettings" /]
-    <form action="${formLink}" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
-        [@mbform.alertsection]
-        [/@mbform.alertsection]
-        <section class="field clearfix">
-            <div class="column">
+[#global formPrefix="cpweb.edittemplatesettings" /]
+<form action="${formLink}" name="newMaterial" method="post" enctype="multipart/form-data">
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
+    [@bsform.inputText name="name" class="input_full"  tabindex="1" /]
 
-                <fieldset>
+    [@bsform.textarea name="description" tabindex="2" /]
 
-                    [@mbform.inputText name="name" class="input_full"  tabindex="1" /]
+    [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
+    [@bsform.select name="lang" class="input_full" tabindex="3"]
+    [#list emailLocales as emailLocale]
+            [@bsform.option value=emailLocale.id defaultValue=defaultValue]${emailLocale.name?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
 
-                    [@mbform.textarea name="description" tabindex="2" /]
+    [@bsform.infosection]
+    [/@bsform.infosection]
+    <input type="hidden" name="orgId" value="${org.id}" />
+    <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.saveemailsettings' /></button>
+    <a href="${helper.urlFor('MailModule','overview',[org.id, template.id])}"  class="btn btn-default" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
 
-                    [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
-                    [@mbform.select name="lang" class="input_full" tabindex="3"]
-                    [#list emailLocales as emailLocale]
-                            [@mbform.option value=emailLocale.id defaultValue=defaultValue]${emailLocale.name?xhtml}[/@mbform.option]
-                    [/#list]
-                    [/@mbform.select]
-
-                                        
-                </fieldset>
-            </div>
-        </section>
-        [@mbform.infosection]
-        [/@mbform.infosection]
-        <section class="action">
-            <input type="hidden" name="orgId" value="${org.id}" />
-            <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.saveemailsettings' /></span></button>
-            <a href="${helper.urlFor('MailModule','overview',[org.id, template.id])}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
-        </section>
-
-    </form>
-</div>
+</form>
 
 [/@dws.skin>

@@ -1,7 +1,13 @@
 [#ftl strip_text="true" /]
 
-[#import "/material/materialsMenu.html" as mMenu /]
-
+[#macro userNameAndEmail userId]
+    [#if infoHelper.getMiniUserInfo(userId)??]
+        [#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
+        <span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
+    [#else]
+        &nbsp;
+    [/#if]
+[/#macro]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
@@ -44,66 +50,63 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@mMenu.materialsMenu selected="emails"][/@mMenu.materialsMenu]
-[/#assign]
-
 [#assign head]
 ${cpweb_head}
-
 [/#assign]
 
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-<section id="emailoverview">
-    <section id="emailinfo">
-        <div id="itemactions">
-            [#if !template.stickyCheck && portalSecurity.hasPermission("CP_DELETE_EMAIL")]
-            <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
-                <button type="submit" id="deleteBtn">Delete</button>
-            </form>
-            [/#if]
-            [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
-            <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
-                <button type="submit">Edit Email</button>
-            </form>
-            [/#if]
-            [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
-            <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
-                <button type="submit">Edit Settings</button>
-            </form>
-            [/#if]
-            [@portalSecurity.permissionBlock permission="CP_COPY_EMAIL"]
-            <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
-                <button type="submit">Copy to New</button>
-            </form>
-            [/@]
-        </div>
-        <div class="itemicon">
-            <p>Email Template</p><h1>${template.name?xhtml}</h1>
-        </div>
-        <div class="itemdetails">
-            <ul>
-                <li><span class="label">Description</span><span class="setting clearfix">${template.description!''?xhtml}</span></li>
-                <li><span class="label">Origin</span><span class="setting clearfix">[@dws.txt key="cpweb.emailoverview." + template.sticky?string!""  /]</span></li>
-                <li><span class="label">Language</span><span class="setting clearfix">${template.locale.getDisplayName(userLocale)?xhtml}</span></li>
-                <li><span class="label">Created By</span><span class="setting clearfix">${usernameHelper(template.createdBy)!''?xhtml}</span></li>
-                <li><span class="label">Created</span><span class="setting clearfix">${template.created?datetime}</span></li>
-                <li><span class="label">Updated By</span><span class="setting clearfix">${usernameHelper(template.updatedBy)!''?xhtml}</span></li>
-                <li><span class="label">Updated</span><span class="setting clearfix">${(template.updated?datetime)!""}</span></li>
-            </ul>
-        </div>
-    </section>
-    <h2>Email template preview</h2>
-    <section id="emailcontent">
-        <p class="label">Subject:</p>
-        <p class="subject">${(template.subject!'')?xhtml}<p/>
-        <p class="label">Body:</p>
-        <textarea id="body" disabled="disabled">${(template.mainContent!'')?xhtml}</textarea>
-    </section>
-
+<section class="ccb-page-header">
+    <div class="ccb-page-header__actions">
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_DELETE_EMAIL")]
+        <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
+            <button type="submit" id="deleteBtn" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </form>
+        [/#if]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
+        <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Email</button>
+        </form>
+        [/#if]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
+        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
+        </form>
+        [/#if]
+        [@portalSecurity.permissionBlock permission="CP_COPY_EMAIL"]
+        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-flash"></span> Copy to New</button>
+        </form>
+        [/@]
+    </div>
+    <div class="ccb-page-header__info">
+        <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
+        <p class="page-title-label">Email Template</p>
+        <h1 class="page-title">${template.name?xhtml}</h1>
+        <ul class="page-created-updated__wrapper list-inline">
+            <li>
+                <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail template.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(template.created?datetime?string.full)!''}">${(template.created?date?string.full)!''}</span></p>
+            </li>
+            <li>
+                <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail template.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(template.updated?datetime?string.full)!''}">${(template.updated?date?string.full)!''}</span></p>
+            </li>
+        </ul>
+    </div>
+    <div class="ccb-page-header__details">
+        <ul>
+            <li><span class="row-label">Description</span><span class="row-setting">${template.description!''?xhtml}</span></li>
+            <li><span class="row-label">Origin</span><span class="row-setting">[@dws.txt key="cpweb.emailoverview." + template.sticky?string!""  /]</span></li>
+            <li><span class="row-label">Language</span><span class="row-setting">${template.locale.getDisplayName(userLocale)?xhtml}</span></li>
+        </ul>
+    </div>
 </section>
-
+<h2>Email template preview</h2>
+<section id="emailcontent">
+    <p class="label">Subject:</p>
+    <p class="subject">${(template.subject!'')?xhtml}<p/>
+    <p class="label">Body:</p>
+    <textarea id="body" disabled="disabled">${(template.mainContent!'')?xhtml}</textarea>
+</section>
 
 [/@dws.skin]
 

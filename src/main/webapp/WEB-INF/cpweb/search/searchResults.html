@@ -1,194 +1,24 @@
 [#ftl strip_text="true" /]
 
-
 [#assign foot]
 ${cpweb_foot}
 <script>
     $('#tm_home').addClass('activeItem').prev().addClass('prevItem');
 </script>
 <script>
-    $(document).ready(function() {
-        require(['dabox-datatables'], function() {
-                var projectTable = $('#listprojects').dataTable({
-                    "sDom": 'irt',
-                    "bPaginate": false,
-                    "aaSorting": [[1, 'asc']],
-                    "aoColumnDefs": [
-                        {
-                            "bSortable": false,
-                            "mData": null,
-                            "fnRender": function(oObj) {
-                                if (oObj.aData.favorite) {
-                                    return  '<div class="favorite isfav" onclick="toggleFavorite(this)"></div> ';
-
-                                } else {
-
-                                    return  '<div class="favorite isnotfav" onclick="toggleFavorite(this)"></div> ';
-                                }
-                            },
-                            "aTargets": [0]
-                        },
-                        {
-                            "sWidth": "70%",
-                            "mData": "name",
-                            "fnRender": function(oObj) {
-                                return  '<a href="' + oObj.aData.link + '">' + oObj.aData.name + '</a> ';
-                            },
-                            "aTargets": [1]
-                        },
-                        {
-                            "mData": "added",
-                            "aTargets": [2]
-                        },
-                        {
-                            "mData": "invited",
-                            "aTargets": [3]
-                        }
-                    ],
-                    "sAjaxSource": "${helper.urlFor('CpJsonModule','searchOrgProjects',[org.id, query])}",
-                    "oLanguage": {
-                        "sInfo": "Projects - _TOTAL_ hits",
-                        "sInfoEmpty": "Projects - _TOTAL_ hits",
-                        "sZeroRecords": "No project matches your query",
-                        "sEmptyTable": "No project matches your query",
-                        "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
-                    },
-                    "fnInitComplete": function() {
-                        var nProjects = projectTable._('tr').length;
-                        $('#lprojects a').append('<span> (' + nProjects + ')</span>');
-                    }
-                });
-
-                var userTable = $('#listusers').dataTable({
-                    "sDom": 'irt',
-                    "bPaginate": false,
-                    "aaSorting": [[1, 'asc']],
-                    "aoColumnDefs": [
-                        {
-                            "bSortable": false,
-                            "mData": null,
-                            "fnRender": function(oObj) {
-
-                                if (oObj.aData.imagelink24) {
-                                    return  '<a href="' + oObj.aData.link + '"><img src="' + oObj.aData.imagelink24 + '" class="photo" /></a> ';
-                                } else {
-                                    return  '<a href="' + oObj.aData.link + '"><img src="${cocoboxCdn}/cocobox/img/cp/userImage_24x24.png" class="photo" /></a> ';
-                                }
-                            },
-                            "aTargets": [0]
-                        },
-                        {
-                            "sWidth": "50%",
-                            "mData": "name",
-                            "fnRender": function(oObj) {
-                                return  '<a href="' + oObj.aData.link + '">' + oObj.aData.name + '</a> ';
-                            },
-                            "aTargets": [1]
-                        },
-                        {
-                            "mData": "email",
-                            "aTargets": [2]
-                        }
-                    ],
-                    "sAjaxSource": "${helper.urlFor('CpJsonModule','searchUsers',[org.id, query])}",
-                    "oLanguage": {
-                        "sInfo": "Users - _TOTAL_ hits",
-                        "sInfoEmpty": "Users - _TOTAL_ hits",
-                        "sZeroRecords": "No user matches your query",
-                        "sEmptyTable": "No user matches your query",
-                        "sLoadingRecords": "<p>Loading users...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
-                    },
-                    "fnInitComplete": function() {
-                        var nUsers = userTable._('tr').length;
-                        $('#lusers a').append('<span> (' + nUsers + ')</span>');
-                    }
-                });
-
-                var materialsTable = $('#listmaterials').dataTable({
-                    "sDom": 'irt',
-                    "bPaginate": false,
-                    "aaSorting": [[1, 'asc']],
-                    "aoColumnDefs": [
-                        {
-                            "aTargets": [0],
-                            "mData": "type",
-                            "bSortable": false,
-                            "sWidth": "15%",
-                            "sClass": "type",
-                            "fnRender": function(oObj) {
-                                return  '<div class="' + oObj.aData.type + '"></div>';
-                            }
-                        },
-                        {
-                            "aTargets": [1],
-                            "mData": "title",
-                            "sWidth": "85%",
-                            "fnRender": function(oObj) {
-                                var desc = oObj.aData.desc || "";
-
-                                return  '<h1>' + oObj.aData.title + '</h1><div class="itemactions"></div><p class="lang">'
-                                        + 'English' + '</p><p class="description">' + desc + '</p>';
-                            }
-                        }
-                    ],
-                    "sAjaxSource": "${helper.urlFor('OrgMaterialJsonModule','searchOrgMats',[org.id, query])}",
-                    "oLanguage": {
-                        "sInfo": "Uploaded materials - _TOTAL_ hits",
-                        "sInfoEmpty": "Uploaded materials - _TOTAL_ hits",
-                        "sZeroRecords": "No uploaded material matches your query",
-                        "sEmptyTable": "No uploaded material matches your query",
-                        "sLoadingRecords": "<p>Loading uploaded materials...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
-                    },
-                    "fnInitComplete": function() {
-                        var nMaterials = materialsTable._('tr').length;
-                        $('#lmaterials a').append('<span> (' + nMaterials + ')</span>');
-                    }
-                });
-
-                var productTable = $('#listproducts').dataTable({
-                    "sDom": 'irt',
-                    "bPaginate": false,
-                    "aaSorting": [[1, 'asc']],
-                    "aoColumnDefs": [
-                        {
-                            "aTargets": [0],
-                            "mData": "type",
-                            "bSortable": false,
-                            "sClass": "type",
-                            "fnRender": function(oObj) {
-                                if (oObj.aData.thumbnail) {
-                                    return  '<img src="' + oObj.aData.thumbnail + '" />';
-                                } else {
-                                    return  '<div class="' + oObj.aData.type + '"></div>';
-                                }
-                            }
-                        },
-                        {
-                            "aTargets": [1],
-                            "mData": "title",
-                            "fnRender": function(oObj) {
-                                return  '<h1>' + oObj.aData.title + '</h1><p class="lang">'
-                                        + 'English' + '</p><p class="description">' + oObj.aData.desc + '</p>';
-                            }
-                        }
-                    ],
-                    "sAjaxSource": "${helper.urlFor('OrgMaterialJsonModule','searchPurchasedMats',[org.id, query])}",
-                    "oLanguage": {
-                        "sInfo": "Purchased materials - _TOTAL_ hits",
-                        "sInfoEmpty": "Purchased materials - _TOTAL_ hits",
-                        "sZeroRecords": "No purchased material matches your query",
-                        "sEmptyTable": "No purchased material matches your query",
-                        "sLoadingRecords": "<p>Loading purchased materials...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
-                    },
-                    "fnInitComplete": function() {
-                        var nProducts = productTable._('tr').length;
-                        $('#lproducts a').append('<span> (' + nProducts + ')</span>');
-                    }
-
-                });
-
-            });
-        });
+    var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
+    var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
+    var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+    
+    var listUsersAjaxSource =  "${helper.urlFor('CpJsonModule','searchUsers',[org.id, query])}";
+    var listProjectsAjaxSource =  "${helper.urlFor('CpJsonModule','searchOrgProjects',[org.id, query])}";
+    var listMaterialsAjaxSource =  "${helper.urlFor('OrgMaterialJsonModule','searchOrgMats',[org.id, query])}";
+    var listProductsAjaxSource =  "${helper.urlFor('OrgMaterialJsonModule','searchPurchasedMats',[org.id, query])}";
+    
+    require(["${contextPath}/js/search/searchResults.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+       //No initialization needed
+    });
+    
     $(function($) {
         $(".scroll").click(function(event){		
             event.preventDefault();
@@ -200,71 +30,63 @@ ${cpweb_foot}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 <article id="searchResult">
     <h1 id="top">Search Results</h1>
     <p>Your search for <span class="query">${query}</span> resulted in the following results.</p>
-    <ul class="categories">
+    <ul class="categories list-inline">
         <li id="lusers" ><a href="#listusers_info" class="scroll">Users</a></li>
         <li id="lprojects"><a href="#listprojects_info" class="scroll">Projects</a></li>
         <li id="lproducts"><a href="#listproducts_info" class="scroll">Purchased materials</a></li>
         <li id="lmaterials"><a href="#listmaterials_info" class="scroll">Uploaded materials</a></li>
     </ul>
-    <section class="list">
-        <table class="list" id="listusers">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Email Address</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <a href="#top" class="scroll backtotop">Back to top</a>
-    </section>
-    <section class="list">
-        <table class="list" id="listprojects">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Project Name</th>
-                    <th># Added</th>
-                    <th># Invited</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <a href="#top" class="scroll backtotop">Back to top</a>
-    </section>
-    <section class="list">
-        <table class="list" id="listproducts">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <a href="#top" class="scroll backtotop">Back to top</a>
-    </section>
-    <section class="list">
-        <table class="list" id="listmaterials">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <a href="#top" class="scroll backtotop">Back to top</a>
-    </section>
+    <table class="table table-hover table-striped ccb-table" id="listusers">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Email Address</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <a href="#top" class="scroll backtotop">Back to top</a>
+    <table class="table table-hover table-striped ccb-table" id="listprojects">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Project Name</th>
+                <th># Added</th>
+                <th># Invited</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <a href="#top" class="scroll backtotop">Back to top</a>
+    <table class="table table-hover table-striped ccb-table" id="listproducts">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <a href="#top" class="scroll backtotop">Back to top</a>
+    <table class="table table-hover table-striped ccb-table" id="listmaterials">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <a href="#top" class="scroll backtotop">Back to top</a>
 </article>
 
 [/@dws.skin]

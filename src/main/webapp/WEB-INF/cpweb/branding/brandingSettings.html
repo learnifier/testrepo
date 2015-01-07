@@ -1,8 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
-
-
 [#assign uploadFoot]
 ${cpweb_foot}
 <script>
@@ -160,11 +157,6 @@ ${cpweb_foot}
         }
     </style>
 [/#assign]
-
-[#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="branding"][/@sMenu.settingsMenu]
-[/#assign]
-
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 [@portalSecurity.permissionBlock permission="CP_EDIT_BRANDING"]

@@ -6,22 +6,21 @@ define([], function() {
     var exports = {};
 
     $(document).ready(function() {
-       require(['dataTables-bootstrap'], function() {
-         var oTable = $('#listdesigns').dataTable({
+    require(['dataTables-bootstrap'], function() {
+        var oTable = $('#listemails').dataTable({
             "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": false,
             "order": [[0,'asc']],
             "initComplete": function() {
-                $('#listdesigns_filter input').attr('placeholder', 'Search course templates');
+                $('#listemails_filter input').attr('placeholder', 'Search email templates');
             },
             "columnDefs": [
                 {
-                    "targets": [ 0 ],
-                    "width": "70%",
-                    "className": "block-link",
+                   "targets": [ 0 ],
+                   "width": "70%",
                     "data" : function(row, type, set) {
                         if (!row.nameDisplay) {
-                            row.nameDisplay =  '<a href="'+ row.editlink + '" title="' + row.description  + '">' + row.name +'</a> ';
+                            row.nameDisplay = '<a href="'+ row.editlink + '" title="' + row.description  + '">' + row.name +'</a> ';
                         }
 
                         if (type === 'display') {
@@ -42,9 +41,9 @@ define([], function() {
                     "data" : function(row, type, set) {
                         if (!row.statusDisplay) {
                             if ( row.sticky ) {
-                                row.statusDisplay = '<span class="on">[@dws.txt key="cpweb.designoverview.true" /]</span>'
+                                row.statusDisplay = '[@dws.txt key="cpweb.emailoverview.true" /]'
                             } else {
-                                row.statusDisplay = '<span class="off">[@dws.txt key="cpweb.designoverview.false" /]</span>'
+                                row.statusDisplay = '[@dws.txt key="cpweb.emailoverview.false" /]'                            
                             }
                         }
 
@@ -59,19 +58,23 @@ define([], function() {
                             return row.statusDisplay;
                         }
                     }
+                },
+				{
+                    "targets": [ 2 ],
+                    "data": "localeStr",
+                    "className": "language"
                 }
             ],
 
-            "ajax": listDesignsAjaxSource,
+            "ajax": listEmailsAjaxSource,
             "language": {
                 "search": "",
-                "zeroRecords": "No course templates matches your query",
-                "emptyTable": "<span class='emptytable'>You have no course templates on your account.</span>",
-                "loadingRecords": "<p>Loading course designs...</p><img src='" + spinnerUrl + "' />"
+                "zeroRecords": "No email templates matches your query",
+                "emptyTable": "<span class='emptytable'>You have no email templates on your account.</span>",
+                "loadingRecords": "<p>Loading email templates...</p><img src='" + spinnerUrl + "' />"
             }
         });
-       });
-
+        });
     } );
 
     return exports;
