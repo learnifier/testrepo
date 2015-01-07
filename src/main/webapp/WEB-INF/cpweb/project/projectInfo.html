@@ -1,5 +1,14 @@
 [#ftl strip_text="true" /]
 
+[#macro userNameAndEmail userId]
+    [#if infoHelper.getMiniUserInfo(userId)??]
+        [#local userInfo =  infoHelper.getMiniUserInfo(userId) /]
+        <span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
+    [#else]
+        &nbsp;
+    [/#if]
+[/#macro]
+
 [#macro projectInfo selected project=prj]
 
 [#assign projectSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[project.projectId]) /]
@@ -8,75 +17,72 @@
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
     cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
-    cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
-    cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
-    cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
-
-    cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
-    {type: 'select',
-        source: [
-        {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
-        {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
-        {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
-        ]
-    }
-    );
 
     [/@]
-[/@mbform._onreadyJavascript]
 
+    require(['dabox-common'], function() {
+    cocobox.ajaxForm("#deleteprojectform", function(data) {
+    if (data.location) {
+    window.location = data.location;
+    } else {
+    cocobox.infoDialog('Delete project','You need to delete all participants to be able to delete the project.');
+    }
+    });
+    });
+
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })    
+
+[/@mbform._onreadyJavascript]
 
 [#include "../projectDeleteFailure.html" /]
 [#include "error/projectProductError.html" /]
 
-
-<section id="projectinfo">
-    <div id="itemactions">
-
+<section class="ccb-page-header">
+    <div class="ccb-page-header__actions">
         [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
-        <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
-            <button class="delete btn btn-primary"><span>Delete</span></button>
-        </form>
+            <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
+                <button class="btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            </form>
         [/#if]
+        [#if project.type.ptype == 2]
+            <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
+                <button class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
+            </form>
+        [/#if]
+
         [#if isIdproject() ]
-        <form action="${helper.urlFor('project.ProjectModule', 'roster',[project.masterProject])}" method="post">
-            <button>Back to parent project</button>
-        </form>
+            <form action="${helper.urlFor('project.ProjectModule', 'roster',[project.masterProject])}" method="post">
+                <button><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
+            </form>
         [/#if]
-        [@mbform._onreadyJavascript]
-        require(['dabox-common'], function() {
-        cocobox.ajaxForm("#deleteprojectform", function(data) {
-        if (data.location) {
-        window.location = data.location;
-        } else {
-        cocobox.infoDialog('Delete project','You need to delete all participants to be able to delete the project.');
-        }
-        });
-        });
-        [/@mbform._onreadyJavascript]
     </div>
 
     [#if isIdproject() ]
-
-    <div class="itemicon">
-        <p>Project</p>
-        <h1>${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
-
-        <p>invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml}
-
-            in ${masterProject.name}</p>
-
-    </div>
-
+        <div class="ccb-page-header__info">
+            <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
+            <p class="page-title-label">Project</p>
+            <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
+            <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
+        </div>
     [#else]	
-
-    <div class="itemicon">
-        <p>Project</p><h1 id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
+    <div class="ccb-page-header__info">
+        <img class="page-thumbnail img-circle img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
+        <p class="page-title-label">Project</p>
+        <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
+        <ul class="page-created-updated__wrapper list-inline">
+            <li>
+                <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
+            </li>
+            <li>
+                <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
+            </li>
+        </ul>
     </div>
-
     [/#if]
-	
-	
+</section>
+
 	
     [#if project.stageDesignId??]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
@@ -93,29 +99,21 @@
             </div>
         [/@]
     [/#if]
-     <div class="itemdetails">
-        <ul>
-            <li><span class="label">Status</span><span class="setting clearfix" id="project-status"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="status" data-value="${project.status}">${ctext("project.status."+project.status)?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
-            <li><span class="label">Note</span><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="note">${project.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
-            [#if project.type.ptype == 2]
-                <li><span class="label">Learner Portal Name</span><span class="setting clearfix">${project.displayUserTitle!""?xhtml}</span></li>
-            [#else]
-                <li><span class="label">Course Name</span><span class="setting clearfix" id="project-usertitle"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="usertitle">${project.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
-                <li><span class="label">Course Description</span><span class="setting clearfix" id="project-userdesc"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="userdesc">${project.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
-            [/#if]
-        </ul>
-    </div>
-    <nav id="itemnav2">
-        <ul class="nav nav-tabs">
-            [#--    <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>--]
+    <nav>
+        <ul class="nav nav-underline">
+            <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
-            [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
-            <li class="[#if selected == 'projectadmin']active[/#if]"><a href="${helper.urlFor('ProjectModule','roles',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.projectadmin' /]</span></a></li>
-            [/@]
-
+ 
+            <li class="[#if selected == '']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Info</span></a></li>
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.details' /]</span></a></li>
+                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course<!--[@dws.txt key='cpweb.projectmenu.details' /]--></span></a></li>
+            [/@]
+            [/#if]
+
+            [#if project.type.ptype == 1 || project.type.ptype == 2]
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
+            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Resources<!--[@dws.txt key='cpweb.projectmenu.materials' /]--></span></a></li>
             [/@]
             [/#if]
 
@@ -124,31 +122,14 @@
             <li class="[#if selected == 'schedule']active[/#if]"><a href="${helper.urlFor('ProjectModule','task',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.schedule' /]</span></a></li>
             [/@]
             [/#if]
-            [#if project.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
-            <li class="[#if selected == 'discussion']active[/#if]"><a href="${helper.urlFor('ProjectModule','discussion',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.discussion' /]</span></a></li>
-            [/#if]
-            
-            [#if project.type.ptype == 2]
-            <li class="[#if selected == 'design']active[/#if]"><a href="${helper.urlFor('ProjectModule','design',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.design' /]</span></a></li>
-            [/#if]
-            
+                        
             <li class="[#if selected == 'reports']active[/#if]"><a href="${helper.urlFor('ProjectModule','reports',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.reports' /]</span></a></li>
-            [#if project.type.ptype == 1 || project.type.ptype == 2]
-            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
-            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
-            [/@]
-            [/#if]
-            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
-            <li class="[#if selected == 'registration']active[/#if]"><a href="${helper.urlFor('ProjectModule','registration',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.registration' /]</span></a></li>
-            [/@]
 
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <li class="[#if selected == 'settings']active[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             [/@]
         </ul>
     </nav>
-</section>
-
 
 [/#macro]
 

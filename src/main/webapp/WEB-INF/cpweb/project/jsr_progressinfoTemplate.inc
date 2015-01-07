@@ -1,12 +1,8 @@
 <script id="progressTemplate" type="text/x-jsrender">
 
     
-    {{if (#index%2 == 0)}}
-    <tr class="even">
-    {{else}}
-    <tr class="odd">
-    {{/if}} 
-        <td class="thumbnail">
+    <tr>
+        <td>
             {{if productThumbnail}}
                 <img src="{{>productThumbnail}}" alt="{{>productShortTitle}}"/>
             {{else type=="TEMPORAL"}}

@@ -78,16 +78,16 @@ ${cpweb_head}
 <h1>[@dws.txt key="cpweb.createprojectselectdesign.title" /]</h1>
 
 [#global formPrefix="cpweb.createproject" /]
-<form action="${formLink}" name="createProjectSelectDesign" class="fullpage" method="post">
-    [@mbform.alertsection]
-    [/@mbform.alertsection]
+<form action="${formLink}" name="createProjectSelectDesign" method="post">
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
     <section class="field clearfix">
         <div class="column">
 
             <fieldset>
                 <div id="projectname">
                     <h2>1 Name your project - seen only by administrators</h2>
-                    [@mbform.inputText name="projectname" class="input_full"  tabindex="1" maxlength="63"/]
+                    [@bsform.inputText name="projectname" tabindex="1" maxlength="63"/]
 
                 </div>
                 <div id="typeselections" class="clearfix">
@@ -101,12 +101,12 @@ ${cpweb_head}
                 <div id="projecttimezone">
                     <h2>3 Set the time zone - can be edited later</h2>
                         [#assign defaultValue = formsess.getDefaultValue('timezone')!(defaultTimezone.ID)!'' /]
-                        [@mbform.select name="timezone" class="input_full" tabindex="7" required="required"]
+                        [@bsform.select name="timezone" tabindex="7" required="required"]
                         <option></option>
                         [#assign tzValueFound = false /]
                         <optgroup label="Recently used">
                             [#list timezones.recentList as tz]
-                                [@mbform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@mbform.option]
+                                [@bsform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@bsform.option]
                                 [#if tz.ID == defaultValue]
                                   [#assign tzValueFound = true /]
                                 [/#if]
@@ -115,51 +115,51 @@ ${cpweb_head}
                         <optgroup label="All timezones">
                             [#list timezones.otherList?sort as tz]
                                 [#if tzValueFound]
-                                    [@mbform.option value=tz.ID defaultValue="xyz"]${tz.ID?xhtml}[/@mbform.option]
+                                    [@bsform.option value=tz.ID defaultValue="xyz"]${tz.ID?xhtml}[/@bsform.option]
                                 [#else]
-                                    [@mbform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@mbform.option]
+                                    [@bsform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@bsform.option]
                                 [/#if]
                             [/#list]
                         </optgroup>
-                        [/@mbform.select]
+                        [/@bsform.select]
                 </div>
                 <div id="projectsettings">
                     <h2>4 Choose your default settings - can be edited later</h2>
 
                     <div id="settings_summary">
-                        <ul>
-                            <li><span class="label">Language: </span>${(defaultLangLocale).getDisplayName(userLocale)?xhtml}</li>
-                            <li><span class="label">Country: </span>${(defaultCountryLocale).getDisplayCountry(userLocale)?xhtml}</li>
+                        <ul class="list-inline">
+                            <li><span class="row-label">Language: </span>${(defaultLangLocale).getDisplayName(userLocale)?xhtml}</li>
+                            <li><span class="row-label">Country: </span>${(defaultCountryLocale).getDisplayCountry(userLocale)?xhtml}</li>
                             <li><a onclick="$('#settings_expanded').toggle();">Edit default settings</a></li>
                         </ul>
                     </div>
                     <div id="settings_expanded" style="display: none;">
 
                         [#assign defaultValue = formsess.getDefaultValue('projectlang')!defaultLangLocale.toLanguageTag() /]
-                        [@mbform.select name="projectlang" class="input_full" tabindex="5"]
+                        [@bsform.select name="projectlang"  tabindex="5"]
                         [#list langs as lang]
-                        [@mbform.option value=lang.toLanguageTag() defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@mbform.option]
+                        [@bsform.option value=lang.toLanguageTag() defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@bsform.option]
                         [/#list]
-                        [/@mbform.select]
+                        [/@bsform.select]
                         
                         [#assign defaultValue = formsess.getDefaultValue('country')!defaultCountryLocale.toLanguageTag() /]
-                        [@mbform.select name="country" class="input_full" tabindex="6"]
+                        [@bsform.select name="country" tabindex="6"]
                         [#list countries as country]
-                        [@mbform.option value=country.toLanguageTag() defaultValue=defaultValue]${country.getDisplayCountry(userLocale)?xhtml}[/@mbform.option]
+                        [@bsform.option value=country.toLanguageTag() defaultValue=defaultValue]${country.getDisplayCountry(userLocale)?xhtml}[/@bsform.option]
                         [/#list]
-                        [/@mbform.select]
+                        [/@bsform.select]
                     </div>
                 </div>
             </fieldset>
         </div>
     </section>
-    [@mbform.infosection]
-    [/@mbform.infosection]
+    [@bsform.infosection]
+    [/@bsform.infosection]
     <section class="action crprj_actions">
         <input type="hidden" name="orgId" value="${org.id?c}" />
         <input type="hidden" id="prjtype" name="prjtype" />
-        <button tabindex="100" class="btn btn-primary btn-lg" disabled="disabled" id="next_btn"><span>[@dws.txt key='form.action.next' /]</span></button>
-        <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="cancel">[@dws.txt key="form.action.cancel" /]</a>
+        <button tabindex="100" class="btn btn-primary btn-lg" disabled="disabled" id="next_btn">[@dws.txt key='form.action.next' /] <span class="glyphicon glyphicon-chevron-right"></span></button>
+        <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
     </section>
 
 </form>

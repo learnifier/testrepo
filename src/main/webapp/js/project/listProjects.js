@@ -6,77 +6,78 @@ define([], function() {
     var exports = {};
 
     $(document).ready(function() {
-        require(['dabox-datatables'], function() {
+        require(['dataTables-bootstrap'], function() {
             $('#listprojects').dataTable({
-                "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
-                "aaSorting": [[1, 'asc']],
-                "aoColumnDefs": [
+                "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "order": [[1, 'asc']],
+                "initComplete": function() {
+                    $('#listprojects_filter input').attr('placeholder', 'Search projects');
+                },
+                "columnDefs": [
                     {
-                        "bSortable": false,
-                        "mData": function(data, type, val) {
-                            if (type === 'set') {
-                                data.favorite = val;
-                                
-                                if (val) {
-                                    data.favoriteDisplay = '<div class="favorite isfav" onclick="toggleFavorite(this)"></div>';
-                                } else {
-                                    data.favoriteDisplay = '<div class="favorite isnotfav" onclick="toggleFavorite(this)"></div>';
-                                }
-                            } else if (type === 'display') {
-                                return data.favoriteDisplay;
+                        "targets": [0],
+                        "orderable": false,
+                        "data": function(row, type, set) {
+                            if (row.favorite) {
+                                row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star favorite-star" ></span></a>';
+                            } else {
+                                row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star-empty favorite-star"></span></a>';
+                            }
+                            if (type === 'display') {
+                                return row.favoriteDisplay;
                             } else if (type === 'filter') {
                                 return null;
                             } else if (type === 'sort') {
-                                return data.favorite;
+                                return row.favorite;
                             } else {
-                                //Anything else and raw data
-                                return data.favorite;
+                                //Anything else and raw row
+                                return row.favorite;
                             }
-                        },
-                        "aTargets": [0]
+                        }
                     },
                     {
-                        "sWidth": "70%",
-                        "mData": function(data, type, val) {
-                            if (type === 'set') {
-                                data.name = val;
-                                data.nameFilter = val + ' ' + data.id;
-                                data.nameDisplay = '<a href="'+ data.link + '">' + val +'</a> ';
-                            } else if (type === 'display') {
-                                return data.nameDisplay;
+                        "targets": [1],
+                        "width": "70%",
+                        "className": "block-link",
+                        "data" : function(row, type, set) {
+                            if (!row.nameDisplay | !row.nameFilter) {
+                                row.nameFilter = row.name + ' ' + row.id;
+                                row.nameDisplay = '<a href="'+ row.link + '">' + row.name +'</a> ';
+                            }
+
+                            if (type === 'display') {
+                                return row.nameDisplay;
                             } else if (type === 'filter') {
-                                return data.nameFilter;
+                                return row.nameFilter;
                             } else if (type === 'sort') {
-                                return data.name;
+                                return row.name;
                             } else {
-                                //Anything else and raw data
-                                return data.name;
+                                //Anything else and raw row
+                                return row.name;
                             }
-                        },
-                        
-                        "aTargets": [1]
+                        }
                     },
                     {
-                        "mData": "added",
-                        "aTargets": [2]
+                        "targets": [2],
+                        "data": "added"
                     },
                     {
-                        "mData": "invited",
-                        "aTargets": [3]
+                        "targets": [3],
+                        "data": "invited"
                     }
                 ],
-                "sAjaxSource": listProjectsAjaxSource,
-                "iDisplayLength": 25,
-                "sPaginationType": "full_numbers",
-                "oLanguage": {
-                    "sSearch": "",
-                    "sZeroRecords": "No projects matches your query",
-                    "sEmptyTable": "<span class='emptytable'>Start now by creating your <a href='" + newProjectUrl + "'>first project</a></span>",
-                    "sLoadingRecords": "<p>Loading projects...</p><img src='" + spinnerUrl + "' />"
+                "ajax": listProjectsAjaxSource,
+                "pageLength": 25,
+                "pagingType": "full_numbers",
+                "deferRender": true,
+                "language": {
+                    "search": "",
+                    "zeroRecords": "No projects matches your query",
+                    "emptyTable": "<span class='emptytable'>Start now by creating your <a href='" + newProjectUrl + "'>first project</a></span>",
+                    "loadingRecords": "<p>Loading projects...</p><img src='" + spinnerUrl + "' />"
                 }
             });
         });
-        $('#listprojects_filter input').attr('placeholder', 'Search projects');
     });
 
     window.toggleFavorite = function(target) {

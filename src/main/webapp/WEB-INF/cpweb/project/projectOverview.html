@@ -1,20 +1,251 @@
 [#ftl strip_text="true" /]
 
+
 [#import "projectInfo.html" as pInfo /]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+        require(['jquery-ui','Chart'], function() {
+        var chartAnimation = false;
+        if ( Modernizr.canvas === true ) {
+                chartAnimation = true;
+        }
+        var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
+        pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
+    });
+    
+    require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
+       
+        var oTable = $('#userroleslist').dataTable({
+            "sDom": 'rt',
+            "bPaginate": false,            
+            "aoColumnDefs": [
+                {
+                    "aTargets": [ 0 ],
+                    "mData": "thumbnail",
+                    "sWidth": "32",
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        return  '<img class="userimage" src="' +oObj.aData.thumbnail+ '"/>';
+                    }
+                },
+                {
+                    "aTargets": [ 1 ],
+                    "mData": "displayName",
+                    "sWidth": "500",
+                    "bSortable": false,
+                    "fnRender": function ( oObj ) {
+                        var dName = oObj.aData.displayName;
+                        var data='';
+
+                        if (dName.length < 2) {
+                            data = oObj.aData.email;
+                        }
+                        data =  '<p class="team-members__name" title="' +dName + '">' + cocobox.trunc(dName, 20) + '</p>';
+                        
+                        [#if security.hasPermission("BO_EDIT_USER")]
+                            for(var i = 0; i < oObj.aData.roles.length; i++) {
+                                data+= '<span class="team-members__role">' + oObj.aData.roles[i].roleName + ' <a onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')"><span class="glyphicon glyphicon-remove-sign"></span></a></span>';
+                            }
+                            return data;                            
+                        [#else]
+                            return data;
+                        [/#if]
+                    }
+                }
+            ],
+                        
+            "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
+             
+            "oLanguage": {
+                "sEmptyTable": "<span class='emptytable'>There are no users on this team</span>",
+                "sLoadingRecords": "<p>Loading team members...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            }
+        });
+       
+
+        
+    });
+    
+    
+    function deleteMember(role, deleteLink, userId) {
+        $("#delUserId").val(userId);
+        $("#delRole").val(role);
+        var form = $("#deleteRoleForm");
+        form.attr("action", deleteLink);
+        form.submit();
+    };
+        
 </script>
+        <script>
+            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
+                f.startSingleFlirt('${prj.newsFlirtId}', {
+                    templates: {
+                        emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+                    }
+                });
+                f.startSingleFlirt('${prj.flirtId}', {
+                    templates: {
+                        emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
+                        header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
+                    },
+                    success: function(data) {
+                        var len = data.posts.length;
+                        for(var i = 0; i<len; i++) {
+                            var post = data.posts[i];
+                            if (!activityNames[post.tag]) {
+                                continue;
+                            }
+                            post.activityName = activityNames[post.tag].name;
+                        }
+                    }
+                });
+                $('.ccb-flirt-addpost textarea').focus(function() {
+                    $(this).height(80);
+                })
+            });
+        </script>
+<div class="modal fade" id="addTeamMember" tabindex="-1" role="dialog" aria-labelledby="addTeamMemberLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add Team Members</h4>
+      </div>
+      <div class="modal-body">
+           Form to add team members
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Invite Team Member</button>
+      </div>
+    </div>
+  </div>
+</div>
+        
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[#assign projectDetailsSettingUrl = "test" /]
+
+[@mbform._onreadyJavascript]
+
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+    cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
+    cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
+    cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
+
+    cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
+    {type: 'select',
+        source: [
+        {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
+        {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
+        {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
+        ]
+    }
+    );
+
+    [/@]
+[/@mbform._onreadyJavascript]
+
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 [@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
 
-<h2>[@dws.txt key="cpweb.project.overview.title" /]</h2>
+<div class="col-md-8">
+    <div class="project-status__wrapper">
+        <span class="project-status__label">Status</span>
+        <h3  class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("prj.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
+    </div>
+    <section id="prj-charts" class=" clearfix">
+        <div><span id="prj-ch-total"></span>Participants</div>
+        <ul>
+            <li>
+                <div class="prj-ch-wrapper">
+                    <canvas id="prj-ch-status" width="100" height="100"></canvas>
+                    <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
+                </div>
+                <table>
+                    <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
+                    <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
+                    <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
+                </table>
+            </li>
+            [#if prj.type.ptype == 2]
+            <li>
+                <div class="prj-ch-wrapper">
+                    <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
+                    <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
+                </div>
+                <table>
+                    <tbody>
+                    <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
+                    <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
+                    </tbody>
+                </table>
+            </li>
+            [/#if]
+            <li>
+                <div id="prj-action-needed"></div>
+                <table>
+                    <tbody>
+                        <tr id="prj-ch-notinvited"><td><span class="badge chart-data"></span>Not Invited</td></tr>
+                        <tr id="prj-ch-bounced"><td><span class="badge chart-data"></span>Bounce Backs</td></tr>
+                        <tr id="prj-ch-inerror"><td><span class="badge chart-data"></span>Project Errors</td></tr>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+    </section>
+    [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+        <section class="project-flirt-section">
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-comment"></span>Discussions</h3>
+            <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
 
+        </section>
+    [/#if]
+    <p class="">Note</p><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span>
+    [#if prj.type.ptype == 2]
+        <span class="">Learner Portal Name</span>
+        <h2>${prj.displayUserTitle!""?xhtml}</h2>
+    [#else]
+        <span class="">Course Name</span><span class=" " id="project-usertitle">
+            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="usertitle">${prj.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
+        <span class="">Course Description</span><span class=" " id="project-userdesc">
+            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="userdesc">${prj.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
+    [/#if]
+</div>
+<div class="col-md-4">
+    <section class="">
+    <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Team Members</h3>
+        <table class="table table-hover ccb-table team-members" id="userroleslist">
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+    [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
+        <button type="button" class="btn btn-primary-outlined btn-sm" data-toggle="modal" data-target="#addTeamMember">
+            <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
+        </button>
+    [/@]
 
+    <div style="display: none">
+        <form id="deleteRoleForm" method="POST" action="">
+                <input type="hidden" id="delUserId" name="userId" />
+                <input type="hidden" id="delRole" name="role" />
+        </form>
+    </div>
+    [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+        <section class="project-flirt-section">
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-bullhorn"></span>Announcements</h3>
+            <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
+        </section>
+    [/#if]
+</div>
+    
 [/@dws.skin]
 

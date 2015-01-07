@@ -74,7 +74,7 @@ ${cpweb_foot}
 		postSetValue(textfield, pk, override, name, value );
 	});
 	
-	requirejs(['jqueryui-editable'], function() {
+	requirejs(['bootstrap/editable'], function() {
 		$('.editable').editable({
 			title: ''
 		});
@@ -86,6 +86,14 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
 
 [@pInfo.projectInfo selected="details"][/@pInfo.projectInfo]
+
+[#if prj.type.ptype == 2]
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_COURSEDESIGN"]
+    <form action="${helper.urlFor('ProjectModule','gotoDesignBuilder',[prj.projectId])}" method="post">
+        <button class="delete btn btn-primary"><span>Edit Design</span></button>
+    </form>
+    [/@]
+[/#if]
 
 <h2>[@dws.txt key="cpweb.designdatasecondary.title" /]</h2>
 

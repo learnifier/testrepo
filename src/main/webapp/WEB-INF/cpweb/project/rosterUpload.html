@@ -1,18 +1,8 @@
 [#ftl]
 [#global formsess=rosterformsess /]
 
-
-
-<div class="modal fade" id="uploadRoster" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-        <form action="${uploadRosterFormLink}" id="uploadRoster" name="uploadRoster" class="fullpage" method="post" enctype="multipart/form-data" onsubmit="$('#rosterUploadBtn').cocobox('inputBlock')">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Select the roster file</h4>
-      </div>
-      <div class="modal-body">
-        <p>Download the roster template below to your desktop. Click Browse, select the file, and then click Open. Then click Upload Roster.</p>
+       <form action="${uploadRosterFormLink}" id="uploadRoster" name="uploadRoster" class="fullpage" method="post" enctype="multipart/form-data" onsubmit="$('#rosterUploadBtn').cocobox('inputBlock')">
+        <p>Download the roster template below to your desktop. Click Browse, select the file, and click Open. Then click Upload Roster.</p>
         <p><a href="${cocoboxCdn}/cocobox/roster/RosterTemplate.xlt">Download roster template</a></p>
         [#global formPrefix="cpweb" /]
             [@mbform.alertsection]
@@ -29,12 +19,5 @@
             <section class="action">
                 <input type="hidden" name="orgId" value="${org.id}" />
             </section>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">[@dws.txt key="form.action.cancel" /]</button>
-        <button type="submit" class="btn btn-primary" id="rosterUploadBtn">[@dws.txt key='form.action.uploadroster' /]</button>
-      </div>
+        <button type="submit" class="btn btn-primary" id="rosterUploadBtn"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> [@dws.txt key='form.action.uploadroster' /]</button>
     </form>
-    </div>
-  </div>
-</div>

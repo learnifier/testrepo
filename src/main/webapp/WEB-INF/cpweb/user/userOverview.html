@@ -1,9 +1,6 @@
 [#ftl strip_text="true" /]
 
-
 [#import "userOverviewMenu.html" as userMenu]
-
-
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
@@ -13,25 +10,40 @@ ${cpweb_foot}
 
 <script>
     $(document).ready(function() {
-        require(['dabox-datatables'], function() {
+        require(['dataTables-bootstrap'], function() {
         var oTable = $('#listparticipations').dataTable({
-            "sDom": 'rt<"dataTables_footer clearfix"i>',
-            "bPaginate": false,
-            "aaSorting": [[1,'asc']],
-            "aoColumnDefs": [ 
+            "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "paging": false,
+            "order": [[0,'asc']],
+            "columnDefs": [ 
                 {
-                    "mData": "projectname",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="'+ oObj.aData.projectlink + '" style="display:block;">' + oObj.aData.projectname +'</a> ';
-                    },
-                    "aTargets": [ 0 ]
+                    "targets": [ 0 ],
+                    "className": "block-link",
+                    "data" : function(row, type, set) {
+                          if (!row.projectnameDisplay) {
+                            row.projectnameDisplay = '<a href="'+ row.projectlink + '" style="display:block;">' + row.projectname +'</a> ';
+                          } 
+
+                          if (type === 'display') {
+                              return row.projectnameDisplay;
+                          } else if (type === 'filter') {
+                              return row.projectname;
+                          } else if (type === 'sort') {
+                              return row.projectname;
+                          } else {
+                              //Anything else and raw row
+                              return row.projectname;
+                          }
+                      }
                 }
             ],
                         
-            "sAjaxSource": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[org.id, user.userId])}",
-            "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
-                "sLoadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            "ajax": "${helper.urlFor('user.UserJsonModule','listUserParticipations',[org.id, user.userId])}",
+            "language": {
+                "search": "",
+                "zeroRecords": "No projects matches your query",
+                "emptyTable": "<span class='emptytable'>This user is not participating in any projects. Open a <a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>project</a> to add the participant</span>",
+                "loadingRecords": "<p>Loading projects...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
         });
@@ -43,55 +55,24 @@ ${cpweb_foot}
 
 [#assign head]
 ${cpweb_head}
-<style>
-    #logoform {
-        display: block;
-        margin: 20px auto;
-        padding: 15px; 
-    }
-    .progress {
-        position:relative;
-        width:400px;
-        border: 1px solid #ddd;
-        padding: 1px;
-        border-radius: 3px;
-        display: none;
-    }
-    .bar {
-        background-color: #B4F5B4;
-        width:0%; 
-        height:20px;
-        border-radius: 3px; 
-    }
-    .percent {
-        position:absolute;
-        display:inline-block;
-        top:3px;
-        left:48%; 
-    }
-</style>
-
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
 
 <section id="useroverview">
-    [#include "userInfo.ftl" /]
+[#include "userInfo.html" /]
 
-    [@userMenu.userOverviewMenu selected="participations"][/@userMenu.userOverviewMenu]
+[@userMenu.userOverviewMenu selected="participations"][/@userMenu.userOverviewMenu]
     
-    <h2>Participations</h2>
-    <section class="list">
-        <table class="list" id="listparticipations">
-            <thead>
-                <tr>
-                    <th>Project Name</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-    </section>
+<table class="table table-hover table-striped ccb-table" id="listparticipations">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
     
 </section>
 

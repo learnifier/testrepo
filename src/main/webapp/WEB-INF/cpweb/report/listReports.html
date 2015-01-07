@@ -7,30 +7,29 @@ ${cpweb_foot}
 </script>
 <script>
     $(document).ready(function() {
-        require(['dabox-datatables'], function() {
+        require(['dataTables-bootstrap'], function() {
         var oTable = $('#listreports').dataTable({
-            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
-            "bPaginate": false,
-            "aaSorting": [[0,'asc']],
-            "aoColumnDefs": [ 
+            "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "paging": false,
+            "order": [[0,'asc']],
+            "initComplete": function() {
+                $('#listreports_filter input').attr('placeholder', 'Search reports');
+            },
+            "columnDefs": [ 
                 {
-                    "sWidth": "70%",
-                    "mData": "name",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.name;
-                    },
-                    "aTargets": [ 0 ]
+                    "targets": [ 0 ],
+                    "width": "70%",
+                    "data": "name"
                 }
             ],
-            "sPaginationType": "full_numbers",
-            "oLanguage": {
-                "sSearch": "",
-                "sZeroRecords": "No reports your query",
-                "sLoadingRecords": "<p>Loading reports...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "zeroRecords": "No reports your query",
+                "loadingRecords": "<p>Loading reports...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
             }
         });
         });
-        $('#listreports_filter input').attr('placeholder', 'Search reports');
     } );
                 
 </script>
@@ -42,61 +41,26 @@ ${cpweb_foot}
 
 <h1>Reports</h1>
 
-<section class="list">
-    <table class="list" id="listreports">
-        <thead>
-            <tr>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-            <tr>
-                <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
-            </tr>
-            [/@]
-            <tr>
-                <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
-            </tr>
-            <tr>
-                <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
-            </tr>
-<!--            <tr>
-                <td>Participant completion status</td>
-            </tr>
-            <tr>
-                <td>Participant completion rate</td>
-            </tr>
-            <tr>
-                <td>Participants - Overdue activities</td>
-            </tr>
-            <tr>
-                <td>Participants  - Not yet invited</td>
-            </tr>
-            <tr>
-                <td>Bounce backs - Unresolved</td>
-            </tr>
-            <tr>
-                <td>Bounce backs - All over time (including resolved)</td>
-            </tr>
-            <tr>
-                <td>Materials - Completion rate</td>
-            </tr>
-            <tr>
-                <td>Materials - Usage</td>
-            </tr>
-            <tr>
-                <td>Credits - All by status</td>
-            </tr>
-            <tr>
-                <td>Credits - All per status</td>
-            </tr>
-            <tr>
-                <td>Credits - All per product</td>
-            </tr>-->
-        </tbody>
-    </table>
-</section>
+<table class="table table-hover table-striped ccb-table" id="listreports">
+    <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
+        <tr>
+            <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
+        </tr>
+        [/@]
+        <tr>
+            <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
+        </tr>
+        <tr>
+            <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
+        </tr>
+    </tbody>
+</table>
 
 [/@dws.skin]
 

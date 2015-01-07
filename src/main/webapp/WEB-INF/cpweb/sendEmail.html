@@ -76,10 +76,10 @@ ${cpweb_foot}
     <h1>Send Email</h1>
     [#-- Only display if we don't have a sticky id --]
     [#if sms.dropdownEnabled]
-    <div id="selecttemplate">   
+    <div id="selecttemplate" class="form-group">
         <h2>${counter} Select Email Template</h2>
         <label for="templates">Email Templates</label>
-        <select id="templates" class="input_full">
+        <select id="templates" class="form-control">
             <option value="">No Template</option>
             <optgroup label="Generic templates">
                 [#list templateLists.stickyList as template]
@@ -101,42 +101,36 @@ ${cpweb_foot}
 
             [#global formPrefix="meweb.createemail" /]
             <form action="${formLink}" name="email" id="emailform" class="fullpage" method="post">
-                [@mbform.alertsection]
-                [/@mbform.alertsection]
+                [@bsform.alertsection]
+                [/@bsform.alertsection]
                 <section class="field clearfix">
                     <div class="column">
 
-                        <fieldset>
+                        <label for="to">To</label>
+                        <ul id="to" class="list-inline">
+                            [#list receivers as receiver]
+                                <li>${receiver.displayName?xhtml} &lt;${receiver.primaryEmail?xhtml}&gt;</li>
+                            [/#list]
+                            [#list displayReceivers as receiver]
+                                <li>${receiver.name?xhtml!''} &lt;${receiver.email?xhtml}&gt;</li>
+                            [/#list]
+                        </ul>
+                        [#if sender??]
+                            <label for="from">From</label>
+                            <p id="from">${sender.name?xhtml} &lt;${sender.email?xhtml}&gt;</p>
+                        [/#if]
 
-                            <label for="to">To</label>
-                            <ul id="to">
-                                [#list receivers as receiver]
-                                    <li>${receiver.displayName?xhtml} &lt;${receiver.primaryEmail?xhtml}&gt;</li>
-                                [/#list]
-                                [#list displayReceivers as receiver]
-                                    <li>${receiver.name?xhtml!''} &lt;${receiver.email?xhtml}&gt;</li>
-                                [/#list]
-                            </ul>
-                            [#if sender??]
-                                <label for="from">From</label>
-                                <p id="from">${sender.name?xhtml} &lt;${sender.email?xhtml}&gt;</p>
-                            [/#if]
-
-                            [@mbform.inputText name="subject" class="input_full"  tabindex="5" /]
-                            [@mbform.textarea name="body" tabindex="6" /]
-
-                        </fieldset>
+                        [@bsform.inputText name="subject" tabindex="5" /]
+                        [@bsform.textarea name="body" tabindex="6" /]
                     </div>
                 </section>
-                [@mbform.infosection]
-                [/@mbform.infosection]
-                <section class="action">
-                    <input type="hidden" name="mtype" />
-                    <button id="submitbutton" tabindex="7" class="primary send"><span>[@dws.txt key='form.action.sendemail' /]</span></button>
-                    [#if showCancel]
-                        <a href="${helper.urlFor('mail.SendMailModule', 'cancel', [org.id, sms.uuid] )}" tabindex="8" class="cancel">[@dws.txt key="form.action.cancel" /]</a>
-                    [/#if]
-                </section>
+                [@bsform.infosection]
+                [/@bsform.infosection]
+                <input type="hidden" name="mtype" />
+                <button id="submitbutton" tabindex="7" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.sendemail' /]</button>
+                [#if showCancel]
+                    <a href="${helper.urlFor('mail.SendMailModule', 'cancel', [org.id, sms.uuid] )}" tabindex="8" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+                [/#if]
             </form>
         </div>
     </div>

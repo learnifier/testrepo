@@ -1,0 +1,21 @@
+[#ftl /]
+<section class="ccb-page-header">
+    <div class="ccb-page-header__actions">
+        [#include "userActions.html" /]
+    </div>
+    <div class="ccb-page-header__info">
+        [#if userimg??]
+        <img src="${userimg}" class="page-thumbnail img-circle img-thumbnail" alt="${user.displayName?xhtml} Profile Image"/>
+        [#else]
+        <img src="${cocoboxCdn}/cocobox/img/cp/userImage_64x64.png" class="page-thumbnail img-circle img-thumbnail" alt="${user.displayName?xhtml} Profile Image" />
+        [/#if]
+        <p class="page-title-label">User</p>
+        <h1 class="page-title">${user.displayName?xhtml}</h1>
+    </div>
+    <div class="ccb-page-header__details">
+        <ul>
+            <li><span class="row-label">Email</span><span class="row-setting clearfix">${user.primaryEmail?xhtml}</span></li>
+            <li><span class="row-label">Language</span><span class="row-setting clearfix">${(locale.getDisplayName(userLocale)?xhtml)!'Not set'}</span></li>
+        </ul>
+    </div>
+</section>

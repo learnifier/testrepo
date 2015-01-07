@@ -1,8 +1,6 @@
 [#ftl strip_text="true" /]
 
-[#import "/material/materialsMenu.html" as mMenu /]
-
-[#assign foot]
+[#assign cpweb_foot]
 ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
@@ -21,57 +19,37 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-    [@mMenu.materialsMenu selected="designs"][/@mMenu.materialsMenu]
-[/#assign]
-
-
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <h1>[@dws.txt key="cpweb.editdesignsettings.title" /></h1>
-<p>
-
-<div>
     [#global formPrefix="cpweb.editdesignsettings" /]
-    <form action="${formLink}" id="newMaterial" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
-        [@mbform.alertsection]
-        [/@mbform.alertsection]
-        <section class="field clearfix">
-            <div class="column">
+    <form action="${formLink}" id="newMaterial" name="newMaterial"method="post" enctype="multipart/form-data">
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
 
-                <fieldset>
+        [@bsform.inputText name="name" tabindex="1" /]
 
-                    [@mbform.inputText name="name" class="input_full"  tabindex="1" /]
+        [@bsform.textarea name="description" tabindex="2" /]
 
-                    [@mbform.textarea name="description" tabindex="2" /]
+        [#assign expirationtoggle = "false" /]
+        [#if formsess.getDefaultValue("expiration")??]
+            [#if formsess.getDefaultValue("expiration")?number > 0]
+                [#assign expirationtoggle = "true" /]        
+            [/#if]
+        [/#if]
+
+        Activate Expiration Timer
+        [@bsform.inputBoolean name="expirationtoggle" label="Expiration toggle" truetext="Yes" falsetext="No" defaultstate=expirationtoggle /]
+
+        Expiration (Number of days)
+        [@bsform.inputNumber name="expiration"  tabindex="5" value=formsess.getDefaultValue("expiration")!"" /]
                     
-                    [#assign expirationtoggle = "false" /]
-                    [#if formsess.getDefaultValue("expiration")??]
-                        [#if formsess.getDefaultValue("expiration")?number > 0]
-                            [#assign expirationtoggle = "true" /]        
-                        [/#if]
-                    [/#if]
-                    
-                    <label>Activate Expiration Timer</label>
-                    [@mbform.inputBoolean name="expirationtoggle" label="Expiration toggle" truetext="Yes" falsetext="No" defaultstate=expirationtoggle /]
-                    
-                    <label>
-                    Expiration (Number of days)
-                    [@mbform.inputNumber name="expiration" class="input_full"  tabindex="5" value=formsess.getDefaultValue("expiration")!"" /]
-                    </label>
-                    
-                </fieldset>
-            </div>
-        </section>
-        [@mbform.infosection]
-        [/@mbform.infosection]
-        <section class="action">
-            <input type="hidden" name="orgId" value="${org.id}" />
-            <button type="submit" tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savedesignsettings' /></span></button>
-            <a href="${helper.urlFor('coursedesign.DesignModule','overview',[org.id, info.designId])}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
-        </section>
+        [@bsform.infosection]
+        [/@bsform.infosection]
+        <input type="hidden" name="orgId" value="${org.id}" />
+        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savedesignsettings' /></button>
+        <a href="${helper.urlFor('coursedesign.DesignModule','overview',[org.id, info.designId])}"  tabindex="101" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
 
     </form>
-</div>
 
 [/@dws.skin>

@@ -13,7 +13,7 @@
         {{/if}}
         <div class="progressdetails">
             <h2>Progress<span>{{:completedCids}} of {{:totalnumberOfCidsWithProgress}} activities completed</span></h2>
-            <table class=" list">
+            <table class="table table-hover table-striped ccb-table">
                 {{:renderedProgress}}
             </table>
         </div>

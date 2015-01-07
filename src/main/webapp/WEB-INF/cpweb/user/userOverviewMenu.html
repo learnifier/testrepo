@@ -4,11 +4,10 @@
 
 [#macro userOverviewMenu selected ]
 
-
-<nav id="itemnav">
-    <ul>
-        <li [#if selected == 'participations']class="activeItem"[/#if]><a href="${helper.urlFor('user.UserModule','overview', [org.id, user.userId])}"><span>Participations</span></a></li>
-        <li [#if selected == 'roles']class="activeItem"[/#if]><a href="${helper.urlFor('user.UserModule','roles', [org.id, user.userId])}"><span>Roles</span></a></li>
+<nav>
+    <ul class="nav nav-underline">
+        <li [#if selected == 'participations']class="active"[/#if]><a href="${helper.urlFor('user.UserModule','overview', [org.id, user.userId])}">Participations</a></li>
+        <li [#if selected == 'roles']class="active"[/#if]><a href="${helper.urlFor('user.UserModule','roles', [org.id, user.userId])}">Roles</a></li>
     </ul>    
 </nav>
 

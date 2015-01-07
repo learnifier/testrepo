@@ -1,55 +1,52 @@
 [#ftl strip_text="true" /]
 
-
 [#assign foot]
-${cpweb_foot}
-<script>
-    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
-</script>
-<script>
-    var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
-    var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
-    var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
-    var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
-    var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
+    ${cpweb_foot}
+    <script>
+        $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
-    require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-       //No initialization needed
-    });
+        var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
+        var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
+        var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+        var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
+        var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
 
-</script>
+        require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+           //No initialization needed
+        });
 
+    </script>
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
-[@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
-<a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-add navBackgroundColor">Add Project</a>
-[/@]
-
-<h1>Projects</h1>
-<section class="list">
-    <nav id="itemnav" style="margin-bottom: 10px;">
-        <ul>
-            <li class="${(projectFilter == '')?string('activeItem','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}"><span>${ctext("listprojects.activeandnew")?xml}</span></a></li>
-            <li class="${(projectFilter == 'archived')?string('activeItem','')}" ><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?f=archived"><span>${ctext("listprojects.disabled")?xml}</span></a></li>
-        </ul>
-    </nav>
-    
-    <table class="list" id="listprojects">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Project Name</th>
-                <th># Added</th>
-                <th># Invited</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<section class="ccb-page-header margin-bottom">
+    [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
+        <div class="ccb-page-header__actions">
+            <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
+       </div>
+    [/@]
+    <h1 class="page-title">Projects</h1>
 </section>
+<nav>
+    <ul class="nav nav-underline">
+        <li class="${(projectFilter == '')?string('active','')}"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}">${ctext("listprojects.activeandnew")?xml}</a></li>
+        <li class="${(projectFilter == 'archived')?string('active','')}" ><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}?f=archived">${ctext("listprojects.disabled")?xml}</a></li>
+    </ul>
+</nav>
 
+<table class="table table-striped table-hover ccb-table" id="listprojects">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Project Name</th>
+            <th># Added</th>
+            <th># Invited</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 [/@dws.skin]
 

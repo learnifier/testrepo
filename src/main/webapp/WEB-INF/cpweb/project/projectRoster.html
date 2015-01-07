@@ -21,17 +21,24 @@ ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
+
+    function runiCheck() {
+      $('input').iCheck({
+        checkboxClass: 'icheckbox_square-red',
+        radioClass: 'iradio_square-red'
+      });
+    };
 </script>
 
 
 <script>
     $(document).ready(function() {
-        require(['dabox-datatables', 'jquery.timeago'], function() {
+        require(['dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function() {
             window.oTable = $('#projectroster').dataTable({
-                "sDom": 'rt<"dataTables_footer clearfix"i>',
-                "bPaginate": false,
-                "aaSorting": [[2, 'asc']],
-                "fnRowCallback": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
+                "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "paging": false,
+                "order": [[2, 'asc']],
+                "createdRow": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
                     if (oObj.inError) {
                         $(nRow).addClass('error');
                         $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
@@ -47,128 +54,210 @@ ${cpweb_foot}
                         return nRow;
                     }
                 },
-                "fnInitComplete": function() {
+                "initComplete": function() {
                     log('DataTables has finished its initialisation.');
                     showRow();
                     $('.timeago').timeago();
+                    $('[data-toggle="tooltip"]').tooltip()                    
+                    runiCheck();
                 },
-                "aoColumnDefs": [
+                "columnDefs": [
                     {
-                        "aTargets": [0],
-                        "mData": null,
-                        "bSortable": false,
-                        "sWidth": 12,
-                        "fnRender": function(oObj) {
-                            return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + oObj.aData.id + '"/>';
+                        "targets": [0],
+                        "data": "id",
+                        "orderable": false,
+                        "width": "24px",
+                        "render": function(data) {
+                            return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + data + '"/>';
                         }
                     },
                     {
-                        "aTargets": [1],
-                        "mData": "participationLink",
-                        "bSortable": false,
-                        "sWidth": 16,
-                        "fnRender": function(oObj) {
-                            if (oObj.aData.inError) {
-                                var msg = oObj.aData.errorMsg;
-                                if (msg == null) {
-                                    msg = 'Participation error reason is not known';
-                                }
-
-                                window.partError = window.partError || {};
-
-                                window.partError[oObj.aData.id] = msg;
-
-                                var onclick = "onclick='showRosterPartErrorBox(window.partError[" + oObj.aData.id + "])'";
-
-                                var data = '<img src="${cocoboxCdn}/cocobox/img/cp/participation_error.png" ' + onclick + ' class="participationTriangle" alt="Participation Link"/>';
-
-                                return data;
-                            } else if (oObj.aData.activated) {
-                                var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + oObj.aData.participationLink + '\'); return false"><img src="${cocoboxCdn}/cocobox/img/cp/project_participationLink.png" alt="Participation Link"/></a>';
+                        "targets": [1],
+                        "orderable": false,
+                        "width": "16px",
+                        "data" : function(row, type, set) {
+                            if (!row.participationLinkDisplay) {
                                 
-                                return data;
-                            }
+                                if (row.inError) {
+                                    var msg = row.errorMsg;
+                                    if (msg == null) {
+                                        msg = 'Participation error reason is not known';
+                                    }
 
-                            return '';
-                        }
-                    },
-                    {
-                        "aTargets": [2],
-                        "mData": "displayName",
-                        "sWidth": 250,
-                        "useRendered": false,
-                        "fnRender": function(oObj) {
-                            var data = '<a class="name" href="' + oObj.aData.link + '" title="' + oObj.aData.email + '">' + oObj.aData.displayName + '</a> ';
+                                    window.partError = window.partError || {};
 
-                            [@projectSecurity.permissionBlock permission="PRJ_IMPERSONATE_PARTICIPANT"]
-                            if (oObj.aData.activated && !oObj.aData.inError) {
-                                data += '<a class="impersonate-link" target="_blank" title="Visit Learner Portal as '
-                                        + oObj.aData.displayName
-                                        + '" href="${helper.urlFor('ProjectModule','impersonate')}/'
-                                        + oObj.aData.id
-                                        + ' "><img src="${contextPath}/img/jump.png" alt="Impersonate"/></a>';
-                            }
-                            [/@]
-                            return data;
-                        }
-                    },
-                    {
-                        "aTargets": [3],
-                        "mData": "firstEmail",
-                        "fnRender": function(oObj) {
-                            if (oObj.aData.firstEmailStr) {
-                                return  oObj.aData.firstEmailStr;
-                            } else if (oObj.aData.sending && !oObj.aData.firstEmailStr) {
-                                return  "Sending...";
+                                    window.partError[row.id] = msg;
+
+                                    var onclick = "onclick='showRosterPartErrorBox(window.partError[" + row.id + "])'";
+
+                                    var data = '<img src="${cocoboxCdn}/cocobox/img/cp/participation_error.png" ' + onclick + ' class="participationTriangle" alt="Participation Link"/>';
+
+                                    row.participationLinkDisplay = data;
+                                } else if (row.activated) {
+                                    var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + row.participationLink + '\'); return false"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>';
+
+                                    row.participationLinkDisplay = data;
+                                } else  {
+                                    row.participationLinkDisplay = "";
+                                }
+                            } 
+                            
+                            if (type === 'display') {
+                                return row.participationLinkDisplay;
+                            } else if (type === 'filter') {
+                                return row.participationLink;
+                            } else if (type === 'sort') {
+                                return row.participationLink;
                             } else {
-                                return null;
+                                //Anything else and raw row
+                                return row.participationLink;
                             }
-                        }
+                        }                        
                     },
                     {
-                        "aTargets": [4],
-                        "mData": "lastEmail",
-                        "fnRender": function(oObj) {
-                            if (oObj.aData.sending) {
-                                return "Sending..."
-                            } else if (oObj.aData.bounced) {
-                                return '<a href="#" onclick="showBounceInfo(' + oObj.aData.id + '); return false" class="alert" title="' + oObj.aData.lastEmailStr + '">Bounced back</a>';
+                        "targets": [2],
+                        "width": "250px",
+                        "data" : function(row, type, set) {
+                            if (!row.displayNameDisplay) {
+                                var data = '<a class="name" href="' + row.link + '" title="' + row.email + '">' + row.displayName + '</a> ';
+
+                                [@projectSecurity.permissionBlock permission="PRJ_IMPERSONATE_PARTICIPANT"]
+                                    if (row.activated && !row.inError) {
+                                        data += '<a class="impersonate-link" target="_blank" title="Visit Learner Portal as '
+                                            + row.displayName
+                                            + '" href="${helper.urlFor('ProjectModule','impersonate')}/'
+                                            + row.id
+                                            + ' "><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></a>';
+                                    }
+                                [/@]
+
+                                row.displayNameDisplay = data;
+                            }
+                            
+                            if (type === 'display') {
+                                return row.displayNameDisplay;
+                            } else if (type === 'filter') {
+                                return row.displayName;
+                            } else if (type === 'sort') {
+                                return row.displayName;
                             } else {
-                                return  oObj.aData.lastEmailStr;
+                                //Anything else and raw row
+                                return row.displayName;
                             }
                         }
                     },
                     {
-                        "aTargets": [5],
-                        "mData": "lastAccess",
-                        "fnRender": function(oObj) {
-
-                            if (oObj.aData.lastAccess) {
-                                return '<abbr class="timeago" title="' + oObj.aData.lastAccessAgo + '">' + oObj.aData.lastAccessStr + '</abbr>';
+                        "targets": [3],
+                        "data" : function(row, type, set) {
+                            if (!row.firstEmailDisplay) {
+                                if (row.firstEmailStr) {
+                                    row.firstEmailDisplay =  row.firstEmailStr;
+                                } else if (row.sending && !row.firstEmailStr) {
+                                    row.firstEmailDisplay =  "Sending...";
+                                } else {
+                                    return null;
+                                }
+                            } 
+                            
+                            if (type === 'display') {
+                                return row.firstEmailDisplay;
+                            } else if (type === 'filter') {
+                                return row.firstEmailStr;
+                            } else if (type === 'sort') {
+                                return row.firstEmail;
                             } else {
-                                return 'Not yet logged in';
+                                //Anything else and raw row
+                                return row.firstEmail;
                             }
                         }
                     },
                     {
-                        "aTargets": [6],
-                        "mData": "status",
-                        "sWidth": 120,
-                        "fnRender": function(oObj) {
-                            return  '<div class="progress"><div class="bar" style="width:' + oObj.aData.status +
-                                    '%;"><div class="percent">' + oObj.aData.status + '%</div</div>';
+                        "targets": [4],
+                        "data" : function(row, type, set) {
+                            if (!row.lastEmailDisplay) {
+                                if (row.sending) {
+                                    row.lastEmailDisplay = "Sending..."
+                                } else if (row.bounced) {
+                                    row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '">Bounced back</a>';
+                                } else {
+                                    row.lastEmailDisplay = row.lastEmailStr;
+                                }
+                            }
+                            
+                            if (type === 'display') {
+                                return row.lastEmailDisplay;
+                            } else if (type === 'filter') {
+                                return row.lastEmailStr;
+                            } else if (type === 'sort') {
+                                return row.lastEmail;
+                            } else {
+                                //Anything else and raw row
+                                return row.lastEmail;
+                            }
                         }
                     },
                     {
-                        "aTargets": [7],
-                        "mData": null,
-                        "bSortable": false,
-                        "useRendered": false,
-                        "sWidth": 25,
-                        "fnRender": function(oObj) {
-
-                            return '<div class="expand"></div>';
-
+                        "targets": [5],
+                        "data" : function(row, type, set) {
+                            if (!row.lastAccessDisplay) {
+                                if (row.lastAccess) {
+                                     row.lastAccessDisplay = '<abbr class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
+                                 } else {
+                                     row.lastAccessDisplay = 'Not yet logged in';
+                                 }
+                            }
+                            
+                            if (type === 'display') {
+                                return row.lastAccessDisplay;
+                            } else if (type === 'filter') {
+                                return row.lastAccessStr;
+                            } else if (type === 'sort') {
+                                return row.lastAccess;
+                            } else {
+                                //Anything else and raw row
+                                return row.lastAccess;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [6],
+                        "width": "120px",
+                        "data" : function(row, type, set) {
+                            if (!row.statusDisplay) {
+                                row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status +'%;"></div</div>';
+                            }
+                            
+                            if (type === 'display') {
+                                return row.statusDisplay;
+                            } else if (type === 'filter') {
+                                return row.status;
+                            } else if (type === 'sort') {
+                                return row.status;
+                            } else {
+                                //Anything else and raw row
+                                return row.status;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [7],
+                        "orderable": false,
+                        "width": "25px",
+                        "data" : function(row, type, set) {
+                            if (!row.iconDisplay) {
+                                row.iconDisplay = '<span class="pe-7s-angle-down-circle expand"></span>';
+                            }
+                            
+                            if (type === 'display') {
+                                return row.iconDisplay;
+                            } else if (type === 'filter') {
+                                return row.iconDisplay;
+                            } else if (type === 'sort') {
+                                return row.iconDisplay;
+                            } else {
+                                //Anything else and raw row
+                                return row.iconDisplay;
+                            }
                         }
                     }
                 ],
@@ -281,7 +370,7 @@ ${cpweb_foot}
     };
 
     var showRow = function() {
-        require(['dabox-datatables', 'jsrender'], function() {
+        require(['dataTables-bootstrap', 'jsrender'], function() {
             var oTable = $('#projectroster').dataTable();
             var detailsData = {};
 
@@ -301,7 +390,8 @@ ${cpweb_foot}
                 
                 detailsData.detailsUrl = aoData.detailsUrl;
 
-                $(this).toggleClass('expanded');
+                $(this).toggleClass('pe-7s-angle-down-circle');
+                $(this).toggleClass('pe-7s-angle-up-circle');
                 $(clickedRow).toggleClass('expanded');
 
                 if (oTable.fnIsOpen(clickedRow)) {
@@ -336,14 +426,7 @@ ${cpweb_foot}
     };
 
 
-    function showUploadRoster() {
-        $("#rosterupload").dialog({
-            width: 400,
-            height: 400,
-            modal: true,
-            resizable: false
-        });
-    }
+
     function showBounceInfo(strPartId) {
         cocobox.ajaxPost("${helper.urlFor('ProjectJsonModule','participationBounceInfo')}/" + strPartId, {
             success: showBounceDialog
@@ -372,15 +455,6 @@ ${cpweb_foot}
     });
 
 
-    require(['jquery-ui','Chart'], function() {
-        var chartAnimation = false;
-        if ( Modernizr.canvas === true ) {
-                chartAnimation = true;
-        }
-        var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
-        pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
-    });
-
     var impersonateBaseUrl = "${helper.urlFor('ProjectModule','impersonate')}";
     
     function impersonate(participationId) {
@@ -389,7 +463,7 @@ ${cpweb_foot}
     }
 
 </script>
-
+<!-- Temporary for iCheck-->
 [/#assign]
 
 [#assign cpweb_head]
@@ -405,74 +479,52 @@ ${cpweb_head}
 
 [@pInfo.projectInfo selected="participants"][/@pInfo.projectInfo]
 
-<section id="prj-charts" class="infobox">
-    <div>Total participants in project: <span id="prj-ch-total"></span></div>
-    <ul>
-        <li>
-            <table>
-                <tr id="prj-ch-status-invited"><td><span>Not Started:</span></td><td><span class="chart-data"></span></td></tr>
-                <tr id="prj-ch-status-inprogress"><td><span>In Progress:</span></td><td><span class="chart-data"></span></td></tr>
-                <tr id="prj-ch-status-completed"><td><span>Completed:</span></td><td><span class="chart-data"></span></td></tr>
-            </table>
-            <div class="prj-ch-wrapper">
-                <canvas id="prj-ch-status" width="100" height="100"></canvas>
-                <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
-            </div>
-        </li>
-        [#if prj.type.ptype == 2]
-        <li>
-            <table>
-                <tbody>
-                <tr id="prj-ch-overdue-ontrack"><td><span>On Track:</span></td><td><span class="chart-data"></span></td></tr>
-                <tr id="prj-ch-overdue-overdue"><td><span>Overdue:</span></td><td><span class="chart-data"></span></td></tr>
-                </tbody>
-            </table>
-            <div class="prj-ch-wrapper">
-                <canvas id="prj-ch-overdue" width="100" height="100"></canvas>
-                <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
-            </div>
-        </li>
-        [/#if]
-        <li>
-            <table>
-                <tbody>
-                    <tr id="prj-ch-notinvited"><td><span>Not Invited:</span></td><td><span class="chart-data"></span></td></tr>
-                    <tr id="prj-ch-bounced"><td><span>Bounce Backs:</span></td><td><span class="chart-data"></span></td></tr>
-                    <tr id="prj-ch-inerror"><td><span>Project Errors:</span></td><td><span class="chart-data"></span></td></tr>
-                </tbody>
-            </table>
-            <div id="prj-action-needed"></div>
-        </li>
-    </ul>
-</section>
-
-<h2>[@dws.txt key="cpweb.project.participants.title" /]</h2>
 
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-<section id="addtoroster">
-    <div id="upload" style="float: right;">
-<!-- Button trigger modal -->
-        <button type="button" data-toggle="modal" data-target="#uploadRoster" class="btn btn-primary"><span>Upload Excel File</span></button>
+<div role="tabpanel">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-pencil"></span> Manual</a></li>
+    <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</a></li>
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+    <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge">OFF</span></a></li>
+    [/@]
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="manual">
+        <div class="row">
+            [#global formPrefix="cpweb" /]
+            <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm"method="post" onsubmit="return addMemberListener()">
+                <div class="col-md-6">
+                    [@bsform.inputText name="memberfirstname" class=""  tabindex="2" maxlength="64" /]
+                </div>
+                <div class="col-md-6">
+                    [@bsform.inputText name="memberlastname" class=""  tabindex="3" maxlength="64" /]
+                </div>
+                <div class="col-xs-12">
+                    [@bsform.inputEmail name="memberemail" class=""  tabindex="4" maxlength="96" /]
+                    <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmember' /]</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <h3>Add participant</h3>
-    <div id="manual">
-        [#global formPrefix="cpweb" /]
-        <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" class="fullpage" method="post" onsubmit="return addMemberListener()">
-            <section class="field">
-                [@mbform.inputText name="memberfirstname" class=""  tabindex="2" maxlength="64" /]
-                [@mbform.inputText name="memberlastname" class=""  tabindex="3" maxlength="64" /]
-                [@mbform.inputEmail name="memberemail" class=""  tabindex="4" maxlength="96" /]
-            </section>
-            <section class="action">
-                <input type="submit" value="[@dws.txt key='form.action.addmember' /]"  tabindex="100" class="save btn btn-primary" />
-            </section>  
-        </form>
+    <div role="tabpanel" class="tab-pane fade" id="uploadroster">
+      [#include "rosterUpload.html" /]
     </div>
-</section>
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+    <div role="tabpanel" class="tab-pane fade" id="selfreg">Do the selfreg</div>
+    [/@]
+  </div>
+
+</div>
+
 [/@]
 
 <form method="post" id="projectrosterform" action="${helper.urlFor('ProjectModificationModule','listCommand')}">
-    [@mbform.listformFields /]
+    [@bsform.listformFields /]
     <input type="hidden" name="projectId" value="${prj.projectId?c}" />
     <input id="expirationdate" type="hidden" name="expirationdate" value="" />
     <input id="adjusteddate" type="hidden" name="expirationadjustment" value="" />
@@ -480,29 +532,29 @@ ${cpweb_head}
     <section class="listactions">
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
         <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
-                return false" ${prj.invitePossible?string('','disabled="disabled"')}>Send Email...</button>
+                return false" ${prj.invitePossible?string('','disabled="disabled"')}><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Send Email...</button>
         [/@]
-        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-        <button class="btn btn-primary btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');">Delete</button>
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false"><span class="glyphicon glyphicon-dashboard"></span> Set Expiration</button>
+        [/@]
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
+                return false"><span class="glyphicon glyphicon-time"></span> Adjust Expiration</button>
         [/@]
         [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
-            <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
-                    return false" ${prj.invitePossible?string('','disabled="disabled"')} >Activate</button>
+            <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
+                    return false" ${prj.invitePossible?string('','disabled="disabled"')} ><span class="glyphicon glyphicon-flash"></span> Activate</button>
         [/@]
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button class="btn btn-primary btn-sm" onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false">Set Expiration</button>
-        [/@]
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button class="btn btn-primary btn-sm" onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
-                return false">Adjust Expiration</button>
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
+        <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         [/@]
         
         
         [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
 
-    <section class="list">
-        <table class="list" id="projectroster">
+    <section class="">
+        <table class="table table-striped table-hover ccb-table" id="projectroster">
             <thead>
                 <tr>
                     <th><input type="checkbox" id="cball"></th>
@@ -521,11 +573,6 @@ ${cpweb_head}
         <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}">Download roster as a Excel file</a>
     </section>
 </form>
-
-[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
-  [#include "rosterUpload.html" /]
-[/@]
-
 [#include "bounceInfo.html" /]
 
 [#include "projectRosterParticipationErrorBox.html"]

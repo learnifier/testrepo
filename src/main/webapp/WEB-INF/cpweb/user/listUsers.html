@@ -1,86 +1,43 @@
 [#ftl strip_text="true" /]
 
-
 [#assign cpweb_foot ]
-${cpweb_foot}
-<script>
-    $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
-</script>
+    ${cpweb_foot}
+    <script>
+        $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
 
-<script>
-    $(document).ready(function() {
-        require(['dabox-datatables'], function() {
-        var oTable = $('#listusers').dataTable({
-            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
-            "aaSorting": [[1,'asc']],
-            "aoColumnDefs": [ 
-                {
-                    "bSortable": false,
-                    "mData": null,
-                    "fnRender": function ( oObj ) {
+        var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+        var newUserUrl = "${helper.urlFor('CreateUserModule','create',[org.id])}";
+        var listUsersAjaxSource =  "${helper.urlFor('CpJsonModule','listUsers',[org.id])}";
 
-                        if (oObj.aData.imagelink24) {
-                            return  '<a href="'+ oObj.aData.link + '"><img src="'+oObj.aData.imagelink24+'" class="photo" /></a> ';
-                        } else {
-                            return  '<a href="'+ oObj.aData.link + '"><img src="${cocoboxCdn}/cocobox/img/cp/userImage_24x24.png" class="photo" /></a> ';
-                        }
-                    },
-                    "aTargets": [ 0 ]
-                },
-                {
-                    "sWidth": "50%",
-                    "mData": "name",
-                    "fnRender": function ( oObj ) {
-                            var name = (oObj.aData.name && oObj.aData.name.length > 0) ? oObj.aData.name : "(Name not set yet)";
-                            return  '<a href="'+ oObj.aData.link + '">' +  name +'</a> ';
-                    },
-                    "aTargets": [ 1 ]
-                },
-                {
-                    "mData": "email",
-                    "aTargets": [ 2 ]
-                }
-            ],
-            "sAjaxSource": "${helper.urlFor('CpJsonModule','listUsers',[org.id])}",                      
-            "iDisplayLength": 25,
-            "sPaginationType": "full_numbers",
-            "bDeferRender": true,
-            "deferRender": true,
-            "oLanguage": {
-                "sSearch": "",
-                "sZeroRecords": "No user matches your query",
-                "sEmptyTable": "<span class='emptytable'>Start now by creating your <a href='${helper.urlFor('CreateUserModule','create',[org.id])}'>first user</a></span>",
-                "sLoadingRecords": "<p>Loading users...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
-            }
+        require(["${contextPath}/js/user/listUsers.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+           //No initialization needed
         });
-        });
-        $('#listusers_filter input').attr('placeholder', 'Search users');
-                
-    } );
-                
-</script>
+
+    </script>
 [/#assign]
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-[@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-<a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-add navBackgroundColor">Add User</a>
-[/@]
-<h1>Users</h1>
-<section class="list">
-    <table class="list" id="listusers">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Email Address</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<section class="ccb-page-header margin-bottom">
+    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+        <div class="ccb-page-header__actions">
+            <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a>
+        </div>
+    [/@]
+    <h1 class="page-title">Users</h1>
 </section>
+<table class="table table-hover table-striped ccb-table" id="listusers">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Email Address</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 [/@dws.skin]
 
