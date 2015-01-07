@@ -3,7 +3,6 @@
 [#assign cpweb_foot ]
 ${cpweb_foot}
 
-
 [#import "/se/dabox/services/dwsfu/ckeditor4.ftl" as ck /]
 
 [@ck.ckeditorScriptTags /]
@@ -100,30 +99,27 @@ ${cpweb_foot}
         <div>
 
             [#global formPrefix="meweb.createemail" /]
-            <form action="${formLink}" name="email" id="emailform" class="fullpage" method="post">
+            <form action="${formLink}" name="email" id="emailform" method="post">
                 [@bsform.alertsection]
                 [/@bsform.alertsection]
-                <section class="field clearfix">
-                    <div class="column">
 
-                        <label for="to">To</label>
-                        <ul id="to" class="list-inline">
-                            [#list receivers as receiver]
-                                <li>${receiver.displayName?xhtml} &lt;${receiver.primaryEmail?xhtml}&gt;</li>
-                            [/#list]
-                            [#list displayReceivers as receiver]
-                                <li>${receiver.name?xhtml!''} &lt;${receiver.email?xhtml}&gt;</li>
-                            [/#list]
-                        </ul>
-                        [#if sender??]
-                            <label for="from">From</label>
-                            <p id="from">${sender.name?xhtml} &lt;${sender.email?xhtml}&gt;</p>
-                        [/#if]
+                <label for="to">To</label>
+                <ul id="to" class="list-inline">
+                    [#list receivers as receiver]
+                        <li>${receiver.displayName?xhtml} &lt;${receiver.primaryEmail?xhtml}&gt;</li>
+                    [/#list]
+                    [#list displayReceivers as receiver]
+                        <li>${receiver.name?xhtml!''} &lt;${receiver.email?xhtml}&gt;</li>
+                    [/#list]
+                </ul>
+                [#if sender??]
+                    <label for="from">From</label>
+                    <p id="from">${sender.name?xhtml} &lt;${sender.email?xhtml}&gt;</p>
+                [/#if]
 
-                        [@bsform.inputText name="subject" tabindex="5" /]
-                        [@bsform.textarea name="body" tabindex="6" /]
-                    </div>
-                </section>
+                [@bsform.inputText name="subject" tabindex="5" /]
+                [@bsform.textarea name="body" tabindex="6" /]
+
                 [@bsform.infosection]
                 [/@bsform.infosection]
                 <input type="hidden" name="mtype" />
