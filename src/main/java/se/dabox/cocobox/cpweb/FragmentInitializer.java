@@ -45,6 +45,10 @@ public class FragmentInitializer {
         getFragmentClient().
                 getFragment(cycle, "cpsearch2", fragParams);
 
+        getFragmentClient().
+                getFragment(cycle, "cpportalswitch", fragParams);
+
+        
 
         setActivatedOrgFragment(cycle, orgId);
     }
