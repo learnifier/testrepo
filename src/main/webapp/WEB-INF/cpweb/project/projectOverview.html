@@ -7,9 +7,6 @@
 ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
-    $(function () {
-      $('[data-toggle="tooltip"]').tooltip()
-    })    
         require(['jquery-ui','Chart'], function() {
         var chartAnimation = false;
         if ( Modernizr.canvas === true ) {
