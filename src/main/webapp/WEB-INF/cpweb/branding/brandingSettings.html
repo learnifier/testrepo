@@ -1,6 +1,6 @@
 [#ftl strip_text="true" /]
 
-[#assign uploadFoot]
+[#assign cpweb_foot]
 ${cpweb_foot}
 <script>
     $('#tm_settings').addClass('activeItem').prev().addClass('prevItem');
@@ -9,7 +9,7 @@ ${cpweb_foot}
 <script>
     require(['cocobox-accountsettings'], function() {
         //Do nothing in here
-    })
+    });
 
    $(function(){
         require(['dabox-common'], function() {
@@ -178,8 +178,8 @@ ${cpweb_foot}
                         <input type="file" name="image" id="image" required="required" />
                         <p class="format"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span> Preferred size is 468x120.</p>
                         <h3>Step 2 - Upload the logo</h3>
-                        <button type="submit" id="uploadPicBtn" disabled="disabled">
-                            [@dws.txt key="form.action.uploadlogo" /]
+                        <button type="submit" id="uploadPicBtn" disabled="disabled" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]
                         </button>
                         <div class="progress_wrapper">
                             <div class="progress">
@@ -217,9 +217,9 @@ ${cpweb_foot}
                             </div>
                         </section>
                         <section class="action">
-                            <button type="submit" class="save primary" disabled="disabled" id="saveLogoBtn"><span>[@dws.txt key="form.action.savelogo" /]</span></button>
-                            <button type="submit" class="reset" id="resetLogoBtn" name="reset"><span>[@dws.txt key="form.action.resetlogo" /]</span></button>
-                            <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+                            <button type="submit" class="btn btn-primary" disabled="disabled" id="saveLogoBtn"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key="form.action.savelogo" /]</button>
+                            <button type="submit" class="btn btn-primary-outlined" id="resetLogoBtn" name="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetlogo" /]</button>
+                            <a class="btn btn-link" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
                         </section>
                     </form>
                 </div>
@@ -237,27 +237,19 @@ ${cpweb_foot}
                 <div class="form">
                     [#global formPrefix="cpweb.colors.language" /]
                     <form action="${helper.urlFor('branding.BrandingModule','colorChange',[org.id])}" method="post" enctype="multipart/form-data" id="colorform" onsubmit="brandingUpdateForm(this)">
-                        [@mbform.alertsection]
-                        [/@mbform.alertsection]
-                        <section class="field clearfix">
-                            <div class="column">
-                                <fieldset>
-                                    [@mbform.inputColor name="navcolor"/]
-                                    [@mbform.inputColor name="primarycolor" /]
-                                    [@mbform.inputColor name="secondarycolor" /]
-                                    [#if dwsrt.hasFeature("cdesign2")]
-                                        [@mbform.inputColor name="topbarcolor" /]
-                                    [/#if]
-                                </fieldset>
-                            </div>
-                        </section>
-                        [@mbform.infosection]
-                        [/@mbform.infosection]
-                        <section class="action">
-                            <button type="submit" tabindex="100" class="save primary"><span>[@dws.txt key='form.action.savecolors' /]</span></button>
-                            <button type="submit" class="reset" id="resetColorBtn" name="reset" value="reset"><span>[@dws.txt key="form.action.resetcolors" /]</span></button>
-                            <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
-                        </section>
+                        [@bsform.alertsection]
+                        [/@bsform.alertsection]
+                        [@bsform.inputColor name="navcolor"/]
+                        [@bsform.inputColor name="primarycolor" /]
+                        [@bsform.inputColor name="secondarycolor" /]
+                        [#if dwsrt.hasFeature("cdesign2")]
+                            [@bsform.inputColor name="topbarcolor" /]
+                        [/#if]
+                        [@bsform.infosection]
+                        [/@bsform.infosection]
+                        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savecolors' /]</button>
+                        <button type="submit" class="btn btn-primary-outlined" id="resetColorBtn" name="reset" value="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetcolors" /]</button>
+                        <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
                     </form>
                 </div>
             </div>

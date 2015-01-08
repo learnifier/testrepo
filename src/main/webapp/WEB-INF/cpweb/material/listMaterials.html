@@ -1,57 +1,10 @@
 [#ftl strip_text="true" /]
 
-[#import "/material/materialsMenu.html" as mMenu /]
 [#import "addAnonProduct.ftl" as addAnonProd /]
 
 [#assign cpweb_head]
-
-
-<script src="../../js/listMaterials.js">
-</script>
-
-${cpweb_head}
-
-<link rel="stylesheet" type="text/css" href="${cocoboxCdn}/cocobox/css/bootstrap3.min.css">
-<link rel="stylesheet" type="text/css" href="${cocoboxCdn}/cocobox/js/libs/dataTables/css/dataTables.bootstrap.css">
-
-<style type="text/css">
-    div.dataTables_info {
-    color: #999;
-    font-size: 12px;
-    padding-top: 0;
-    line-height: 40px;
-    }
-    div.dataTables_paginate {
-    font-size: 12px;
-    text-transform: uppercase;
-    }
-    div.dataTables_paginate paginate_active {
-    color: white;
-    border: none;
-    }
-    table.dataTable thead > tr > th {
-    font-weight: normal;
-    text-transform: uppercase;
-    color: #999;
-    font-size: 12px;
-    padding-left: 8px;
-    }
-    table.dataTable tbody {
-    border-bottom: 2px solid #ddd;
-    }
-    .pagination>li>a, .pagination>li>span {
-    border-radius: 50%;
-    margin: 0 2px;
-    }
-    .pagination>li:first-child>a, .pagination>li:first-child>span,
-    .pagination>li:last-child>a, .pagination>li:last-child>span {
-    border-radius: 4px;
-    }
-
-</style>
-
+    ${cpweb_head}
 [/#assign]
-
 
 [#assign pagetitle='listMaterials' /]
 
@@ -60,83 +13,111 @@ ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
 
+    require(["${contextPath}/js/material/listMaterials.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+       //No initialization needed
+    });
+
     require(['dataTables-bootstrap'], function() {
         var pub = {
-            listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}"
+            listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
+            spinnerUrl: "../../img/spinner-threedots.gif"
         };
             
         var pTable = $('#materialstable').dataTable({
-            "sDom": 'frtip',
-            "bPaginate": true,
-            "aaSorting": [[1,'asc']],
-            "sAjaxSource": pub.listUrl,
-            "aoColumnDefs": [
+            "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "paging": true,
+            "order": [[1,'asc']],
+            "ajax": pub.listUrl,
+            "initComplete": function() {
+                $('#materialstable_filter input').attr('placeholder', 'Search materials');
+            },
+            "columnDefs": [
                 
                 {
-                    "aTargets": [0],
-                    "mData": null, 
-                    "fnRender": function(oObj) {
-                        return "<span class='product-thumbnail' style='background-image: url(" +  oObj.aData.thumbnail + ")'></span>";
+                    "targets": [0],
+                    "className": "material-thumbnail",
+                    "data" : function(row, type, set) {
+                        if (!row.thumbnailDisplay) {
+                            row.thumbnailDisplay = "<img src='" +  row.thumbnail + "' />";
+                        }
+
+                        if (type === 'display') {
+                            return row.thumbnailDisplay;
+                        } else if (type === 'filter') {
+                            return row.thumbnailDisplay;
+                        } else if (type === 'sort') {
+                            return row.thumbnailDisplay;
+                        } else {
+                            //Anything else and raw row
+                            return row.thumbnailDisplay;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": "title",
-                    "sWidth": 350
+                    "targets": [ 1 ],
+                    "data": "title",
+                    "width": 350
                 },
                 {
-                    "aTargets": [ 2 ],
-                    "mData": "typeTitle"
+                    "targets": [ 2 ],
+                    "data": "typeTitle"
                 },
                 {
-                    "aTargets": [ 3 ],
-                    "mData": null,
-                    "fnRender": function(oObj) {
-                        if(oObj.aData.system == 'orgmat') {
-                            var html = "<select data-action='action' data-id='" + oObj.aData.id + "'><option value=''>Actions</option>";
-                            var actions = 0;
-                            [@portalSecurity.permissionBlock permission="CP_EDIT_ORGMAT"]
-                                html+= "<option value='edit'>edit</option>";
-                                actions++;
-                            [/@]
-                            [@portalSecurity.permissionBlock permission="CP_DELETE_ORGMAT"]
-                                html+= "<option value='delete'>delete</option>";
-                                actions++;
-                            [/@]
-                            if (actions === 0) {
-                                return '';
-                            }
-                            html+= "</select>";
+                    "targets": [ 3 ],
+                    "className": "row-actions",
+                    "data" : function(row, type, set) {
+                        if (!row.actionsDisplay) {
+                            if(row.system == 'orgmat') {
+                                var html = "<div class='btn-group'>";
+                                    html+= "<button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>";
+                                    html+= "<ul class='dropdown-menu' role='menu'>";
+                                var actions = 0;
+                                [@portalSecurity.permissionBlock permission="CP_EDIT_ORGMAT"]
+                                    html+= "<li><a href='#' data-trigger='click' data-action='edit' data-id='" + row.id + "'>Edit</a></li>";
+                                    actions++;
+                                [/@]
+                                [@portalSecurity.permissionBlock permission="CP_DELETE_ORGMAT"]
+                                    html+= "<li><a href='#' data-trigger='click' data-action='delete' data-id='" + row.id + "'>Delete</a></li>";
+                                    actions++;
+                                [/@]
+                                if (actions === 0) {
+                                    row.actionsDisplay = '';
+                                }
+                                html+= "</ul></div>";
 
-                            return html;
+                                row.actionsDisplay = html;
+                            } else {
+                                row.actionsDisplay = '';
+                            }
+                        }
+
+                        if (type === 'display') {
+                            return row.actionsDisplay;
+                        } else if (type === 'filter') {
+                            return row.actionsDisplay;
+                        } else if (type === 'sort') {
+                            return row.actionsDisplay;
                         } else {
-                            return '';
+                            //Anything else and raw row
+                            return row.actionsDisplay;
                         }
                     }
                 }
             ],
-
-            
-            "sPaginationType": "full_numbers",
-            "oLanguage": {
-                "sSearch": "",
-                "sZeroRecords": "No materials matches your query",
-                "sEmptyTable": "<span class='emptytable'>No purchased products</span>",
-                "sLoadingRecords": "<p>Loading materials...</p><img src='../../img/spinner-threedots.gif' />"
-            },
-            "fnInitComplete": function() {
-                var nMaterialsProducts = pTable._('tr').length;
-                $('#sm_purchased span').append('<span class="count">' + nMaterialsProducts + '</span>');
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "zeroRecords": "No materials matches your query",
+                "emptyTable": "<span class='emptytable'>No purchased products</span>",
+                "loadingRecords": "<p>Loading materials...</p><img src='" + pub.spinnerUrl + "' />"
             }
-
         });
         
         
-        $('#materialstable').on('change', 'select[data-action=action]', function() {
+        $('#materialstable').on('click', 'a[data-trigger=click]', function() {
            
-            var id = $(this).data('id');
-            
-            var action = $(this).val();
+            var id = $(this).data('id');            
+            var action = $(this).data('action');
             
             if(action == 'delete') {
                 deleteOrgMat(id);
@@ -210,25 +191,26 @@ ${cpweb_foot}
 [@addAnonProd.addScript /]
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@mMenu.materialsMenu selected="materials"][/@mMenu.materialsMenu]
-[/#assign]
 
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
-[@addAnonProd.addButton /]
-<h1>Materials</h1>
-<div class='grid-header'>
-    <div class='list-toggle'>[#include 'listToggle.html' /]</div>
+<section class="ccb-page-header margin-bottom">
+    <div class="ccb-page-header__actions">
+        [@addAnonProd.addButton /]
+    </div>
+    <h1 class="page-title">Materials</h1>
+</section>
+<div class="grid-header">
+    [#include 'listToggle.html' /]
 </div>
 <div id="listmaterials">
-    <table id="materialstable" class="table table-hover ">
+    <table id="materialstable" class="table table-hover ccb-table">
         <thead>
             <tr>
                 <th></th>
                 <th>name</th>
                 <th>kind</th>
-                <th>actions</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
