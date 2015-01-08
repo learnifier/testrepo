@@ -1,12 +1,10 @@
 [#ftl /]
-[#if role != "none"]
-    [#if security.hasPermission("CP_EDIT_USER")]
+[#if portalSecurity.hasPermission("CP_EDIT_USER")]
     <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
         <button>Resend invitation</button>
     </form>
-    [/#if]
 [/#if]
-[#if security.hasPermission("CP_EDIT_USER")]
+[#if portalSecurity.hasPermission("CP_EDIT_USER")]
 <form action="${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}" method="post">
     <button>Edit</button>
 </form>
