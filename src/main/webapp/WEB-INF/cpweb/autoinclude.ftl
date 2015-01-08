@@ -11,9 +11,8 @@
 </#assign>
 
 <#assign cpweb_head>
-    <@branding />
     <@learnifierBootstrap />
-    
+    <@branding />    
 </#assign>
 
 

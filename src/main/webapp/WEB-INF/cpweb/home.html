@@ -19,7 +19,7 @@ ${cpweb_foot}
     }
     
     $(document).ready(function() {
-        require(['dabox-datatables','dabox-common', 'jquery.timeago'], function() {
+        require(['dataTables-bootstrap','dabox-common', 'jquery.timeago'], function() {
             var actTable = $('#tw_actions').dataTable({
                 "sDom": 'rt',
                 "bPaginate": false,
@@ -104,41 +104,60 @@ ${cpweb_foot}
             });
             
             var favTable = $('#tw_favorites').dataTable({
-                "sDom": 'rt',
-                "bPaginate": false,
-                "aaSorting": [[1,'asc']],
-                "aoColumnDefs": [
+                "dom": '<"row"<"col-sm-12"rt>>',
+                "paging": false,
+                "order": [[1,'asc']],
+                "columnDefs": [
                     {
-                        "bSortable": false,
-                        "mData": null,
-                        "sWidth": "5%",
-                        "fnRender": function ( oObj ) {
-                            if (oObj.aData.favorite) {
-                                return  '<div class="favorite isfav" onclick="toggleFavorite(this)"></div>';
-                            
-                            } else {
-                            
-                                return  '<div class="favorite isnotfav" onclick="toggleFavorite(this)"></div> ';
+                        "aTargets": [ 0 ],
+                        "orderable": false,
+                        "width": "5%",
+                        "data": function(row, type, set) {
+                            if (row.favorite) {
+                                row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star favorite-star" ></span></a>';
+                            } else {
+                                row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star-empty favorite-star"></span></a>';
                             }
-                        },
-                        "aTargets": [ 0 ]
+                            if (type === 'display') {
+                                return row.favoriteDisplay;
+                            } else if (type === 'filter') {
+                                return null;
+                            } else if (type === 'sort') {
+                                return row.favorite;
+                            } else {
+                                //Anything else and raw row
+                                return row.favorite;
+                            }
+                        }
                     },
                     {
-                        "sWidth": "95%",
-                        "bSortable": false,
-                        "mData": "name",
-                        "sClass": "favdetails",
-                        "fnRender": function ( oObj ) {
-                            return  '<a href="'+ oObj.aData.link + '"><p>' + oObj.aData.name +'</p>' +
-                                '<p class="details"><span>Added: ' + oObj.aData.added + '</span><span>Invited: ' +  oObj.aData.invited + '</span></p></a>';
-                        },
-                        "aTargets": [ 1 ]
+                        "targets": [ 1 ],
+                        "width": "95%",
+                        "orderable": false,
+                        "className": "favdetails",
+                        "data" : function(row, type, set) {
+                            if (!row.nameDisplay) {
+                                row.nameDisplay =   '<a href="'+ row.link + '"><p>' + row.name +'</p>' +
+                                '<p class="details"><span>Added: ' + row.added + '</span> <span>Invited: ' +  row.invited + '</span></p></a>';
+                            }
+
+                            if (type === 'display') {
+                                return row.nameDisplay;
+                            } else if (type === 'filter') {
+                                return row.name;
+                            } else if (type === 'sort') {
+                                return row.name;
+                            } else {
+                                //Anything else and raw row
+                                return row.name;
+                            }
+                        }
                     }
                 ],
-                "sAjaxSource": "${helper.urlFor('CpJsonModule','listFavoriteOrgProjects',[org.id])}",
-                "oLanguage": {
-                    "sEmptyTable": "<span class='emptytable'><a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>Click the star next to a project to add it as a favorite.</a></span>",
-                    "sLoadingRecords": ""
+                "ajax": "${helper.urlFor('CpJsonModule','listFavoriteOrgProjects',[org.id])}",
+                "language": {
+                    "emptyTable": "<span class='emptytable'><a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>Click the star next to a project to add it as a favorite.</a></span>",
+                    "loadingRecords": ""
                 }
             });
         } );
@@ -255,92 +274,87 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName earlycss=upweb_earlycss]
 
-<div class="infobox" id="actions" style="display: none;">
-    <h1>Action</h1>
+<article id="ccb-page-home">
+<div class="ccb-card ccb-card-padding ccb-card-colored" id="actions" style="display: none;">
     <section id="multiple-actions" style="display: none;">
+        <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-chevron-down"></span> Show Issues</a>
+        <h1>Action</h1>
         <p>There are multiple issues on your account that you need to take action on.</p>
-        <a class="btn btn-primary" onclick="showActionsList();">Show Issues</a>
     </section>
     <section id="list-actions" style="display: none;">
+        <h1>Action</h1>
         <p>Take action on the following issues. Reach out to tech support as needed.</p>
-        <div class="widget" id="sw_actions">
-            <table class="widget" id="tw_actions">
-                <tbody>
-                </tbody>
-            </table>
-        </div>
+        <table class="table table-hover ccb-table" id="tw_actions">
+            <tbody>
+            </tbody>
+        </table>
     </section>
 </div>
 
 
-<section class="column" style="width: 520px; margin-right: 20px; float: left;">
+<div class="row">
+<div class="col-sm-7">
 
     [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
-    <div class="infobox clearfix">
+    <div class="ccb-card ccb-card-padding ccb-card-colored">
         [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
         <section id="new-project">
             <h1>New Project</h1>
             <p>Get started with a new project by following the simple step-by-step instructions.</p>
-            <p class="btn-center-wrapper ">
-                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary btn-lg">Add Project</a>
+            <p class="text-center">
+                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
             </p>
         </section>
         [/@]
         [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
         <section id="manage-projects">
-            <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="home-box-link-h2">View All Projects</a>
-            <h1>Manage Projects</h1>
-            <h3>Favorite Projects</h3>
-            <section class="widget" id="sw_favorites">
-                <table class="widget" id="tw_favorites">
-                    <tbody>
-                    </tbody>
-                </table>
-            </section>
+            <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right">View All Projects</a>
+            <h4>Favorite Projects</h4>
+            <table class="table table-hover ccb-table" id="tw_favorites">
+            </table>
         </section>
         [/@]
     </div>
     [/#if]
     [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
-    <div class="infobox clearfix">
+    <div class="ccb-card ccb-card-padding ccb-card-colored">
         <h2>Upload your materials</h2>
         <p>Add your own training materials to tailor the learning to your needs.</p>
-        <div class="btn-center-wrapper">
+        <div class="text-center">
             <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-                <div class="btn navBackgroundColor" id="addmatbtn">Upload Material</div>
+                <div class="btn btn-primary-outlined" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Upload Material</div>
             </div>
         </div>
     </div>
     [/@]
     [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-    <div class="infobox clearfix">
+    <div class="ccb-card ccb-card-padding ccb-card-colored">
         <h2>Invite an administrator</h2>
         <p>Invite additional administrators to manage projects from this portal.</p>
-        <div class="btn-center-wrapper">
-            <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn navBackgroundColor">Invite Administrator</a>
+        <div class="text-center">
+            <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-plus-sign"></span> Invite Administrator</a>
         </div>
     </div>
     [/@]
-</section>
 
-<section class="column" style="width: 400px; float: left;">
-
+</div>
+<div class="col-sm-5">
     [#if (dwsrt.config["cpweb.support.htmlsnippet"]) != ""]
-        <div id="techsupportinfo" class="infobox">
-            ${dwsrt.config["cpweb.support.htmlsnippet"]}
+        <div id="techsupportinfo" class="ccb-card ccb-card-padding ccb-card-colored">
+            [#-- ${dwsrt.config["cpweb.support.htmlsnippet"]} --]
         </div>
     [/#if]
     [#if welcomeMessage??]
-    <div class="infobox clearfix" id="contact">
+    <div class="ccb-card ccb-card-padding ccb-card-colored" id="contact">
         [@wm.welcomeBox welcomeMessage /]
     </div>
     [/#if]
 
     [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-    <div class="infobox clearfix" id="balance">
-        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="home-box-link-h3">See Full Report</a>
+    <div class="ccb-card ccb-card-padding ccb-card-colored" id="balance">
+        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a>
         <h2>Your Account Status</h2>
-        <div id="product-count" class="secondarybackgroundcolor">
+        <div id="product-count" class="secondaryBackgroundColor">
             <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
         </div>
         <h3>Top 5 balance</h3>
@@ -354,10 +368,10 @@ ${cpweb_foot}
     </div>
     [/@]
 
-</section>
+</div>
+</div>
 
-
-
+</article>
 
 
 [/@dws.skin]
