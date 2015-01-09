@@ -1,6 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "/material/materialsMenu.html" as mMenu /]
 [#import "addAnonProduct.ftl" as addAnonProd /]
 
 [#assign head]
@@ -195,35 +194,32 @@ ${cpweb_foot}
 [@addAnonProd.addScript /]
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@mMenu.materialsMenu selected="materials"][/@mMenu.materialsMenu]
-[/#assign]
-
-[@dws.skin skin="CPAuthMenu2" head=head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+[@dws.skin skin="CPAuth3" head=head foot=foot orgName=orgName]
  
-[@addAnonProd.addButton /]
-<h1>Materials</h1>
-
-<div class='grid-header'>
-    <div class='list-toggle'>[#include 'listToggle.html' /]</div>
-    <div class='filter'>
-        <ul class="grid-filter" id="materials-grid-filter">
-            <li><a class="filter" data-filter="all">All</a></li>
-            <li><a class="filter" data-filter="added">Added</a></li>
-            <li><a class="filter" data-filter="purchased">Purchased</a></li>
-            <li><a class="filter" data-filter="audio">Audio</a></li>
-            <li><a class="filter" data-filter="video">Video</a></li>
-            <li><a class="filter" data-filter="docs">Documents</a></li>
-        </ul>
+<article id="ccb-page-gridMaterials">
+    <section class="ccb-page-header margin-bottom">
+        <div class="ccb-page-header__actions">
+            [@addAnonProd.addButton /]
+        </div>
+        <h1 class="page-title">Materials</h1>
+    </section>
+    <div class="grid-header">
+        [#include 'listToggle.html' /]
+        <div class='filter'>
+            <ul class="grid-filter list-inline" id="materials-grid-filter">
+                <li><a class="filter" data-filter="all">All</a></li>
+                <li><a class="filter" data-filter="added">Added</a></li>
+                <li><a class="filter" data-filter="purchased">Purchased</a></li>
+                <li><a class="filter" data-filter="audio">Audio</a></li>
+                <li><a class="filter" data-filter="video">Video</a></li>
+                <li><a class="filter" data-filter="docs">Documents</a></li>
+            </ul>
+        </div>
     </div>
-</div>
 
-<div id="materials-grid" class="grid-list">
-</div>
-
-
-
-
+    <div id="materials-grid" class="grid-list">
+    </div>
+</article>
 
 [/@dws.skin]
 

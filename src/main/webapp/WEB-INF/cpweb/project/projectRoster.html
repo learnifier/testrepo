@@ -475,6 +475,8 @@ ${cpweb_head}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
 
+<article id="ccb-page-projectRoster">
+
 [#include "../allocationFailure.html" /]
 
 [@pInfo.projectInfo selected="participants"][/@pInfo.projectInfo]
@@ -499,13 +501,13 @@ ${cpweb_head}
             [#global formPrefix="cpweb" /]
             <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm"method="post" onsubmit="return addMemberListener()">
                 <div class="col-md-6">
-                    [@bsform.inputText name="memberfirstname" class=""  tabindex="2" maxlength="64" /]
+                    [@bsform.inputText name="memberfirstname" tabindex="2" maxlength="64" /]
                 </div>
                 <div class="col-md-6">
-                    [@bsform.inputText name="memberlastname" class=""  tabindex="3" maxlength="64" /]
+                    [@bsform.inputText name="memberlastname" tabindex="3" maxlength="64" /]
                 </div>
                 <div class="col-xs-12">
-                    [@bsform.inputEmail name="memberemail" class=""  tabindex="4" maxlength="96" /]
+                    [@bsform.inputEmail name="memberemail" tabindex="4" maxlength="96" /]
                     <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmember' /]</button>
                 </div>
             </form>
@@ -576,6 +578,8 @@ ${cpweb_head}
 [#include "bounceInfo.html" /]
 
 [#include "projectRosterParticipationErrorBox.html"]
+
+</article>
 
 [/@dws.skin]
 

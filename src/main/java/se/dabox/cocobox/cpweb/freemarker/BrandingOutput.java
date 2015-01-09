@@ -28,7 +28,7 @@ public class BrandingOutput extends AbstractOrgBrandingOutput implements Templat
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
 
-        RealmBrandingOutput.addRealmBranding(env);
+//        RealmBrandingOutput.addRealmBranding(env);
         RealmBrandingOutput.addFavIcons(env);
 
         Long orgId = getOrgId(env);
@@ -41,7 +41,7 @@ public class BrandingOutput extends AbstractOrgBrandingOutput implements Templat
 
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
 
-        BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, "cpcss");
+        BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, "branding-styles");
     }
 
 }

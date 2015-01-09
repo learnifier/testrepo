@@ -8,43 +8,35 @@ ${cpweb_foot}
 [/#assign]
 
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
 <h1>[@dws.txt key="cpweb.editmaterial.title" /></h1>
 
 <div>
     [#global formPrefix="cpweb.editmaterial" /]
-    <form action="${formLink}" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
-        [@mbform.alertsection]
-        [/@mbform.alertsection]
-        <section class="field clearfix">
-            <div class="column">
+    <form action="${formLink}" name="newMaterial" method="post" enctype="multipart/form-data">
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
 
-                <fieldset>
+        [@bsform.inputText name="title" tabindex="1" /]
 
-                    [@mbform.inputText name="title" class="input_full"  tabindex="1" /]
+        [@bsform.textarea name="description" tabindex="2" /]
 
-                    [@mbform.textarea name="description" tabindex="2" /]
+        [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
+        [@bsform.select name="lang"  tabindex="3"]
+        [@bsform.option value="en" defaultValue=defaultValue]English[/@bsform.option]
+        [/@bsform.select]
 
-                    [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
-                    [@mbform.select name="lang" class="input_full" tabindex="3"]
-                    [@mbform.option value="en" defaultValue=defaultValue]English[/@mbform.option]
-                    [/@mbform.select]
+        [#if formsess.getDefaultValue('type') == 'link']
+            [@bsform.inputText name="link" tabindex="4" /]
+        [/#if]
 
-                    [#if formsess.getDefaultValue('type') == 'link']
-                        [@mbform.inputText name="link" class="input_full"  tabindex="4" /]
-                    [/#if]
+        [@bsform.infosection]
+        [/@bsform.infosection]
 
-                </fieldset>
-            </div>
-        </section>
-        [@mbform.infosection]
-        [/@mbform.infosection]
-        <section class="action">
-            <input type="hidden" name="orgId" value="${org.id}" />
-            <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savemtrl' /></span></button>
-            <a href="${helper.urlFor("CpMainModule", "listMaterials", [org.id] )}#orgmat"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
-        </section>
+        <input type="hidden" name="orgId" value="${org.id}" />
+        <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savemtrl' /></button>
+        <a class="btn btn-default" href="${helper.urlFor("CpMainModule", "listMaterials", [org.id] )}#orgmat"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
 
     </form>
 </div>

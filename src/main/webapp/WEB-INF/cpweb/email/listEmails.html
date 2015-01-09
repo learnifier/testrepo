@@ -1,89 +1,36 @@
 [#ftl strip_text="true" /]
 
-[#import "/material/materialsMenu.html" as mMenu /]
-
 [#assign foot]
 ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
-</script>
-<script>
-    $(document).ready(function() {
-    require(['dabox-datatables'], function() {
-        var oTable = $('#listemails').dataTable({
-            "sDom": 'f<"clear">rt<"dataTables_footer clearfix"ip>',
-            "bPaginate": false,
-            "aaSorting": [[0,'asc']],
-            "aoColumnDefs": [
-                {
-                   "aTargets": [ 0 ],
-                   "sWidth": "70%",
-                    "mData": "name",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="'+ oObj.aData.editlink + '" title="' + oObj.aData.description  + '">' + oObj.aData.name +'</a> ';
-                    }
-                 },
-                {
-                    "aTargets": [ 1 ],
-                    "mData": null,
-                    "sClass": "control",
-                    "fnRender": function ( oObj ) {
-                        if ( oObj.aData.sticky ) {
-                            return '[@dws.txt key="cpweb.emailoverview.true" /]'
-                        } else {
-                            return '[@dws.txt key="cpweb.emailoverview.false" /]'                            
-                        }
-                    }
-                },
-				{
-                    "aTargets": [ 2 ],
-                    "mData": "localeStr",
-                    "sClass": "language"
-                }
-            ],
 
-            "sAjaxSource": "${helper.urlFor('mail.MailJsonModule','listTemplates', [org.id])}",
-            "oLanguage": {
-                "sSearch": "",
-                "sZeroRecords": "No email templates matches your query",
-                "sEmptyTable": "<span class='emptytable'>You have no email templates on your account.</span>",
-                "sLoadingRecords": "<p>Loading email templates...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
-            }
-        });
-        });
+    var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+    var listEmailsAjaxSource =  "${helper.urlFor('mail.MailJsonModule','listTemplates', [org.id])}";
 
-        $('#listemails_filter input').attr('placeholder', 'Search email templates');
-
-    } );
+    require(["${contextPath}/js/email/listEmails.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+       //No initialization needed
+    });
 
 </script>
 
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@mMenu.materialsMenu selected="emails"][/@mMenu.materialsMenu]
-[/#assign]
-
-
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
 <h1>Email Templates</h1>
-<section class="list">
-    <table class="list" id="listemails">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Origin</th>
-				<th>Language</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</section>
 
-
-
+<table class="table table-hover table-striped ccb-table" id="listemails">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Origin</th>
+            <th>Language</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 [/@dws.skin]
 
