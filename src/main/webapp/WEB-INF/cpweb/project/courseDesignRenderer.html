@@ -5,10 +5,10 @@
         <img src="{{>thumbnail}}" alt="{{>name}} thumbnail" draggable="false"> 
         <h3>{{>name}}</h3>
         <p>{{>description}}</p>
-        <span class="btn secondarybackgroundcolor select">Select</span>
-        <span class="btn primarybackgroundcolor selected">Selected</span>
+        <span class="btn btn-primary select">Select</span>
+        <span class="btn btn-primary selected">Selected</span>
         {{if type == 'design'}}
-            <a href="${helper.urlFor('coursedesign.DesignModule','preview',[org.id])}/{{:designId}}" target="_blank" class="btn secondarybackgroundcolor preview" >
+            <a href="${helper.urlFor('coursedesign.DesignModule','preview',[org.id])}/{{:designId}}" target="_blank" class="btn btn-primary-outlined preview" >
                 Preview
             </a>
         {{/if}}

@@ -114,9 +114,9 @@ function deleteMember(role) {
       <div class="modal-body">
        <section id="addrole">
         <section class="field">
-         <div id="selector_wrapper">
+            <div id="selector_wrapper" class="form-group">
              <label for="roles">Roles</label>
-             <select name="role" class="input_full">
+             <select name="role" class="form-control">
                  [#list roles?sort_by('name') as role]
                  <option value="${role.uuid}">${role.name?xhtml}</option>
                  [/#list]

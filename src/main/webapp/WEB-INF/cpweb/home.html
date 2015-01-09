@@ -103,7 +103,7 @@ ${cpweb_foot}
             }
             });
             
-            var favTable = $('#tw_favorites').dataTable({
+            var favTable = $('#tw-favorites').dataTable({
                 "dom": '<"row"<"col-sm-12"rt>>',
                 "paging": false,
                 "order": [[1,'asc']],
@@ -137,7 +137,7 @@ ${cpweb_foot}
                         "className": "favdetails",
                         "data" : function(row, type, set) {
                             if (!row.nameDisplay) {
-                                row.nameDisplay =   '<a href="'+ row.link + '"><p>' + row.name +'</p>' +
+                                row.nameDisplay =   '<a href="'+ row.link + '"><p class="name">' + row.name +'</p>' +
                                 '<p class="details"><span>Added: ' + row.added + '</span> <span>Invited: ' +  row.invited + '</span></p></a>';
                             }
 
@@ -296,7 +296,7 @@ ${cpweb_foot}
 <div class="col-sm-7">
 
     [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
-    <div class="ccb-card ccb-card-padding ccb-card-colored">
+    <div class="ccb-flat-card ccb-flat-card-colored">
         [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
         <section id="new-project">
             <h1>New Project</h1>
@@ -310,7 +310,7 @@ ${cpweb_foot}
         <section id="manage-projects">
             <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right">View All Projects</a>
             <h4>Favorite Projects</h4>
-            <table class="table table-hover ccb-table" id="tw_favorites">
+            <table class="table table-hover table-condensed ccb-table" id="tw-favorites">
             </table>
         </section>
         [/@]

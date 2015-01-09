@@ -75,6 +75,7 @@ ${cpweb_head}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
 
+<article id="ccb-page-createProject">
 <h1>[@dws.txt key="cpweb.createprojectselectdesign.title" /]</h1>
 
 [#global formPrefix="cpweb.createproject" /]
@@ -128,8 +129,8 @@ ${cpweb_head}
 
                     <div id="settings_summary">
                         <ul class="list-inline">
-                            <li><span class="row-label">Language: </span>${(defaultLangLocale).getDisplayName(userLocale)?xhtml}</li>
-                            <li><span class="row-label">Country: </span>${(defaultCountryLocale).getDisplayCountry(userLocale)?xhtml}</li>
+                            <li><label>Language:</label> ${(defaultLangLocale).getDisplayName(userLocale)?xhtml}</li>
+                            <li><label>Country:</label> ${(defaultCountryLocale).getDisplayCountry(userLocale)?xhtml}</li>
                             <li><a onclick="$('#settings_expanded').toggle();">Edit default settings</a></li>
                         </ul>
                     </div>
@@ -163,6 +164,8 @@ ${cpweb_head}
     </section>
 
 </form>
+
+</article>
 
 [/@dws.skin]
 
