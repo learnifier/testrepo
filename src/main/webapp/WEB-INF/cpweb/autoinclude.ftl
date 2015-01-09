@@ -6,10 +6,6 @@
 <#import "/se/dabox/services/dwsfu/bsform.ftl" as bsform />
 
 
-<#assign portalswitch>
-<#include "portalswitch.html">
-</#assign>
-
 <#assign cpweb_head>
     <@learnifierBootstrap />
     <@branding />    

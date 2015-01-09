@@ -195,6 +195,7 @@ ${cpweb_foot}
                 
 </script>
 
+[@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
 <script>
     require(['knockout'], function(ko) {
 
@@ -253,7 +254,9 @@ ${cpweb_foot}
             
     })
 </script>
+[/@]
 
+[@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
 <script>
     require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
         //log("anonprodcreate loaded");
@@ -268,6 +271,7 @@ ${cpweb_foot}
 
     });
 </script>
+[/@]
 
 [/#assign]
 
@@ -275,21 +279,23 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName earlycss=upweb_earlycss]
 
 <article id="ccb-page-home">
-<div class="ccb-card ccb-card-padding ccb-card-colored" id="actions" style="display: none;">
-    <section id="multiple-actions" style="display: none;">
-        <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-chevron-down"></span> Show Issues</a>
-        <h1>Action</h1>
-        <p>There are multiple issues on your account that you need to take action on.</p>
-    </section>
-    <section id="list-actions" style="display: none;">
-        <h1>Action</h1>
-        <p>Take action on the following issues. Reach out to tech support as needed.</p>
-        <table class="table table-hover ccb-table" id="tw_actions">
-            <tbody>
-            </tbody>
-        </table>
-    </section>
-</div>
+    [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
+        <div class="ccb-card ccb-card-padding ccb-card-colored" id="actions" style="display: none;">
+            <section id="multiple-actions" style="display: none;">
+                <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-chevron-down"></span> Show Issues</a>
+                <h1>Action</h1>
+                <p>There are multiple issues on your account that you need to take action on.</p>
+            </section>
+            <section id="list-actions" style="display: none;">
+                <h1>Action</h1>
+                <p>Take action on the following issues. Reach out to tech support as needed.</p>
+                <table class="table table-hover ccb-table" id="tw_actions">
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    [/#if]
 
 
 <div class="row">
