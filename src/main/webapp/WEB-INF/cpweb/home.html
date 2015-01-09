@@ -176,6 +176,7 @@ ${cpweb_foot}
                 
 </script>
 
+[@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
 <script>
     require(['knockout'], function(ko) {
 
@@ -234,7 +235,9 @@ ${cpweb_foot}
             
     })
 </script>
+[/@]
 
+[@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
 <script>
     require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
         //log("anonprodcreate loaded");
@@ -249,12 +252,14 @@ ${cpweb_foot}
 
     });
 </script>
+[/@]
 
 [/#assign]
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName earlycss=upweb_earlycss]
 
+[#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
 <div class="infobox" id="actions" style="display: none;">
     <h1>Action</h1>
     <section id="multiple-actions" style="display: none;">
@@ -271,6 +276,7 @@ ${cpweb_foot}
         </div>
     </section>
 </div>
+[/#if]
 
 
 <section class="column" style="width: 520px; margin-right: 20px; float: left;">
