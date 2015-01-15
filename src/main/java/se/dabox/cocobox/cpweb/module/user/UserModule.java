@@ -94,8 +94,11 @@ public class UserModule extends AbstractWebAuthModule {
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
         String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
 
+        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
+
         map.put("user", user);
         map.put("role", userRole);
+        map.put("isAdmin", isAdmin);
         map.put("locale", userLocale);
         map.put("roles", roles);
 
