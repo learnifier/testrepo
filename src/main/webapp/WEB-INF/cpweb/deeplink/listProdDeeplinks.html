@@ -11,12 +11,12 @@
 [#import "productRenderer.html" as sProdRender /]
 
 [#assign oListDetails]
-<div class="loadspinner"><img src="${contextPath}/img/spinner-threedots.gif" /></div>
+<div class="loadspinner">[@common.spinner /]</div>
 [/#assign]
 
 [#assign pListDetails]
 <div>
-    <div class="loadspinner"><img src="${contextPath}/img/spinner-threedots.gif" /></div>
+    <div class="loadspinner">[@common.spinner /]</div>
     <div class="linkfooter tooltip" title="Add a link if you want to use multiple links to access this material. This could be used for tracking links separately.">
         <button class="addlinkbutton">Add Link</button>
     </div>

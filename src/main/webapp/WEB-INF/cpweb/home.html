@@ -87,7 +87,7 @@ ${cpweb_foot}
                 "sAjaxSource": "${helper.urlFor('CpJsonModule','listProjectAlerts',[org.id])}",
                 "oLanguage": {
                     "sEmptyTable": "<span class='emptytable'>No bounced back emails.</span>",
-                    "sLoadingRecords": "<p>Loading bounce back notifications...</p><img src='${contextPath}/img/spinner-threedots.gif' />"
+                    "sLoadingRecords": "<p>Loading bounce back notifications...</p><img src='[@common.spinnerUrl /]' />"
                 },
             "fnInitComplete": function() {
                 var itemCount = actTable._('tr').length;

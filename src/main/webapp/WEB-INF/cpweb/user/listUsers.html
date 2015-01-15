@@ -5,7 +5,7 @@
     <script>
         $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
 
-        var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+        var spinnerUrl = "[@common.spinnerUrl /]";
         var newUserUrl = "${helper.urlFor('CreateUserModule','create',[org.id])}";
         var listUsersAjaxSource =  "${helper.urlFor('CpJsonModule','listUsers',[org.id])}";
 
