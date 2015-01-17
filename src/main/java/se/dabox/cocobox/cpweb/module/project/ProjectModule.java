@@ -3,14 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocosite.project.UpdateRecentProjectList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
@@ -33,7 +31,6 @@ import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
-import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
@@ -50,11 +47,9 @@ import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectDatabankSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
-import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
@@ -76,7 +71,6 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
-import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
@@ -130,40 +124,6 @@ public class ProjectModule extends AbstractProjectWebModule {
         addCommonMapValues(map, project, cycle);
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
-    }
-
-    private OrgProject getProject(RequestCycle cycle, String strProjectId) throws NumberFormatException {
-        final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
-
-        Long projectId = CpwebParameterUtil.stringToLong(strProjectId);
-
-        OrgProject project = null;
-
-        if (projectId != null) {
-            project = cocoboxCordinatorClient.getProject(projectId);
-        }
-        
-        if (project == null) {
-            LOGGER.info("Project {} missing. Redirecting to cpweb main page", strProjectId);
-            throw new RetargetException(NavigationUtil.toMain(cycle));
-        }
-
-        if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.FLIRT)) {
-            if (project.getFlirtId() == null || project.getNewsFlirtId() == null) {
-                LOGGER.debug("Flirt ids are missing from project {}. Resyncing project", strProjectId);
-                try {
-                    cocoboxCordinatorClient.syncProjectState(project.getProjectId());
-                    project = cocoboxCordinatorClient.getProject(project.getProjectId());
-                } catch (NotFoundException nfe) {
-                    LOGGER.info("Project {} missing (stage 2). Redirecting to cpweb main page", strProjectId);
-                    throw new RetargetException(NavigationUtil.toMain(cycle));
-                }
-            }
-        }
-
-        new UpdateRecentProjectList(cycle).addProject(project.getProjectId());
-
-        return project;
     }
 
     @WebAction

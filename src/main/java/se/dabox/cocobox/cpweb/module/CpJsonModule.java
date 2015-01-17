@@ -7,10 +7,12 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -273,6 +275,9 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         final Set<Long> favoriteSet = new HashSet<>(favoriteIds);
 
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        projects = sortProjects(userLocale, projects);
+
         NumberFormat nf = NumberFormat.getIntegerInstance(userLocale);
         InfoCacheHelper icHelper = InfoCacheHelper.getInstance(cycle);
 
@@ -480,6 +485,29 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         }
 
         return !"archived".equals(parameter);
+    }
+
+    private List<OrgProject> sortProjects(Locale userLocale, List<OrgProject> projects) {
+        if (projects == null || projects.isEmpty()) {
+            return projects;
+        }
+
+        final Collator collator = Collator.getInstance(userLocale);
+        collator.setStrength(Collator.SECONDARY);
+
+        List<OrgProject> sortedList = new ArrayList<>(projects);
+
+        Collections.sort(sortedList, new Comparator<OrgProject>() {
+
+            @Override
+            public int compare(OrgProject o1, OrgProject o2) {
+                return new CompareToBuilder().
+                        append(o1.getName(), o2.getName(), collator).
+                        append(o1.getProjectId(), o2.getProjectId()).build();
+            }
+        });
+
+        return sortedList;
     }
 
     private static class ComboProjectAlert implements Comparable<ComboProjectAlert> {

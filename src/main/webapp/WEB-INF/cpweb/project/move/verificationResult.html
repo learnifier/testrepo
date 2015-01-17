@@ -1,0 +1,99 @@
+[#ftl strip_text="true" /]
+
+[#import "inc_commonError.ftl" as ce /]
+
+[#assign valid = result.moveError.type == "ok" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+[#if valid]
+
+<div class="hidden">
+    <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm">
+            <input type="hidden" id="targetProjectId" name="targetProjectId" value="${targetProjectId?c}"/>
+        </form>
+</div>
+
+<script>
+    $("#moveButton").one('click', function () {
+        var $btn = $(this).button('loading');
+
+        $("#executeForm").submit();
+    });
+</script>
+[/#if]
+
+[/#assign]
+
+[@dws.skin skin="barebone_bootstrap" head=cpweb_head foot=cpweb_foot title="Confirm move"]
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Confirm move</h1>
+        </div>
+    </div>
+
+    [#if valid]
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert">Verification successful</div>
+        </div>
+    </div>
+    [#else]
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">${ce.errorMessage()?xml}</div>
+        </div>
+    </div>
+
+
+        [#if result.productErrors?size > 0]
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger" role="alert">
+                    There was problems with the following products
+                    <ul class="list-group">
+                        [@ce.productErrors /]
+                    </ul>
+                </div>
+            </div>
+        </div>
+        [/#if]
+    [/#if]
+
+    <div class="row">
+        <div class="col-md-12">
+            The project you try to move are ${(result.similarity*100)?round}% similar.
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            All progress related to the following products will be lost when you move this participant.
+            It will NOT be possible to restore or recover this data after the move operation has completed.
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="list-group">
+                [#list deletedList as deleted]
+                <li class="list-group-item">${deleted.title?xml}</li>
+                [/#list]
+            </ul>
+        </div>
+    </div>
+
+    [#if valid]
+    <div class="row">
+        <div class="col-md-12">
+            <p class="text-right">
+                <button id="moveButton" type="button" class="btn btn-primary" data-loading-text="Moving...">Move</button>
+            </p>
+        </div>
+    </div>
+    [/#if]
+</div>
+[/@dws.skin]

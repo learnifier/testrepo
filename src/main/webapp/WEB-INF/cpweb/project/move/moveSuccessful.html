@@ -1,0 +1,41 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<div class="hidden">
+    <form action="${targetProjectUrl}" method="get" id="targetForm" target="_top"></form>
+</div>
+
+<script>
+    $(function() {
+
+        $("#closeButton").click(function() {
+            $("#targetForm").submit();
+        });
+
+        $("#targetForm").submit();
+    });
+</script>
+
+[/#assign]
+
+[@dws.skin skin="barebone_bootstrap" head=cpweb_head foot=cpweb_foot title="Confirm move"]
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Move successful</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="center-block">
+                <button type="button" class="btn btn-primary btn-lg" id="closeButton">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+[/@dws.skin]
