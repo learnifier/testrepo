@@ -1,5 +1,5 @@
 [#ftl /]
-[#if portalSecurity.hasPermission("CP_EDIT_USER")]
+[#if portalSecurity.hasPermission("CP_EDIT_USER") && isAdmin]
     <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
         <button class="btn btn-primary-outlined"><span class="glyphicon glyphicon-envelope"></span> Resend invitation</button>
     </form>
