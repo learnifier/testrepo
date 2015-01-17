@@ -8,7 +8,7 @@ ${cpweb_foot}
 <script>
     var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
-    var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+    var spinnerUrl = "[@common.spinnerUrl /]";
     
     var listUsersAjaxSource =  "${helper.urlFor('CpJsonModule','searchUsers',[org.id, query])}";
     var listProjectsAjaxSource =  "${helper.urlFor('CpJsonModule','searchOrgProjects',[org.id, query])}";

@@ -71,7 +71,7 @@ var listDeeplinksOrgMats = (function() {
                 "sSearch": "<p>Search</p>",
                 "sZeroRecords": "No materials matches your query",
                 "sEmptyTable": "<span class='emptytable'>No uploaded materials. <a href='" + pub.createOrgMatUrl + "'>Add material.</a></span>",
-                "sLoadingRecords": "<p>Loading materials...</p><img src='../../img/spinner-threedots.gif' />"
+                "sLoadingRecords": "<p>Loading materials...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
 

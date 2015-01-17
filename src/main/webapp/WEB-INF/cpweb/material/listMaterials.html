@@ -20,7 +20,7 @@ ${cpweb_foot}
     require(['dataTables-bootstrap'], function() {
         var pub = {
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
-            spinnerUrl: "../../img/spinner-threedots.gif"
+            spinnerUrl: "[@common.spinnerUrl /]"
         };
             
         var pTable = $('#materialstable').dataTable({

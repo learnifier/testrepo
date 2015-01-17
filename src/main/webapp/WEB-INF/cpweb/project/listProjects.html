@@ -7,7 +7,7 @@
 
         var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
         var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
-        var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+        var spinnerUrl = "[@common.spinnerUrl /]";
         var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
         var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
 

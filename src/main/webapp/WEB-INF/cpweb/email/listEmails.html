@@ -5,7 +5,7 @@ ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
 
-    var spinnerUrl = "${contextPath}/img/spinner-threedots.gif";
+    var spinnerUrl = "[@common.spinnerUrl /]";
     var listEmailsAjaxSource =  "${helper.urlFor('mail.MailJsonModule','listTemplates', [org.id])}";
 
     require(["${contextPath}/js/email/listEmails.js?${cycle.application.formattedStartTime.base36String}"], function(s) {

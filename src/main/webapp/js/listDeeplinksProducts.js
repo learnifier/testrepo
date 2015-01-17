@@ -74,7 +74,7 @@ var listDeeplinksProducts = (function() {
                 "sAjaxSource": pub.listLinksHistoryUrl + '/' + linkId,
                 "oLanguage": {
                     "sEmptyTable": "<span class='emptytable'>This link has no credit history</span>",
-                    "sLoadingRecords": "<p>Loading credit history...</p><img src='../../img/spinner-threedots.gif' />"
+                    "sLoadingRecords": "<p>Loading credit history...</p><img src='[@common.spinnerUrl /]' />"
                 }
             });
             
@@ -166,7 +166,7 @@ var listDeeplinksProducts = (function() {
                 "sSearch": "",
                 "sZeroRecords": "No materials matches your query",
                 "sEmptyTable": "<span class='emptytable'>No purchased products</span>",
-                "sLoadingRecords": "<p>Loading materials...</p><img src='../../img/spinner-threedots.gif' />"
+                "sLoadingRecords": "<p>Loading materials...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
 
