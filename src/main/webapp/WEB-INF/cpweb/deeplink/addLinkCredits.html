@@ -6,18 +6,18 @@
         <p>Type the number of credits that you would like to add to this link.</p>
         [#global formPrefix="cpweb" /]
         <form action="${addLinkCreditsFormLink}" id="addlinkcreditsform" name="addlinkcreditsform" class="fullpage" method="post">
-            [@mbform.alertsection]
-            [/@mbform.alertsection]
+            [@bsform.alertsection]
+            [/@bsform.alertsection]
             <section class="field clearfix">
                 <div class="column">
                     <fieldset>
                         <div id="available">Available credits: <span id="addlinkcreditsBalance"></span></div>
-                        [@mbform.inputText name="credits" class="input_full"  tabindex="1" /]
+                        [@bsform.inputText name="credits" class="input_full"  tabindex="1" /]
                     </fieldset>
                 </div>
             </section>
-            [@mbform.infosection]
-            [/@mbform.infosection]
+            [@bsform.infosection]
+            [/@bsform.infosection]
             <section class="action">
                 <input type="hidden" name="orgId" value="${org.id?c}" />
                 <input type="hidden" name="oplid" id="oplid" value="" />

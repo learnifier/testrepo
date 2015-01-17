@@ -13,7 +13,7 @@
 
 [#assign projectSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[project.projectId]) /]
 
-[@mbform._onreadyJavascript]
+[@bsform._onreadyJavascript]
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
     cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
@@ -34,7 +34,7 @@
       $('[data-toggle="tooltip"]').tooltip()
     })    
 
-[/@mbform._onreadyJavascript]
+[/@bsform._onreadyJavascript]
 
 [#include "../projectDeleteFailure.html" /]
 [#include "error/projectProductError.html" /]
@@ -86,7 +86,7 @@
 	
     [#if project.stageDesignId??]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-            <div id="incomplete_dd">
+            <div id="incomplete_dd" class="alert alert-warning" role="alert">
                 <h2>Activate Your Updated Course Design</h2>
                 <p>Your updated course design <span class="imp">will not be available to participants </span>until you have clicked the button below and entered any required information.</p>
 
@@ -94,7 +94,7 @@
                 <p><span class="imp">You cannot invite participants until you have activated the course design.</span></p>
                 [/#if]
                 <form action="${helper.urlFor('project.VerifyProjectDesignModule','verifyNewDesign',[project.projectId])}" method="post">
-                    <button type="submit" class="btn btn-primary" ><span>Activate Course Design Now</span></button>
+                    <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-flash"></span> Activate Course Design Now</button>
                 </form>
             </div>
         [/@]
@@ -104,7 +104,9 @@
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
  
-            <li class="[#if selected == '']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Info</span></a></li>
+            [#if project.type.ptype == 2 && !isIdproject(prj)]
+                <li class="[#if selected == 'info']active[/#if]"><a href="${helper.urlFor('ProjectModule','details',[project.projectId])}"><span>Info</span></a></li>
+            [/#if]
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
                 <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course<!--[@dws.txt key='cpweb.projectmenu.details' /]--></span></a></li>

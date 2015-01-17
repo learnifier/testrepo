@@ -181,25 +181,25 @@ ${cpweb_head}
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
-<section id="designdata">
+<article id="ccb-page-designData">
     <h1>[@dws.txt key="cpweb.designdata.title" /]<span> ${prj.name?xhtml}</span></h1>
     <p>Bring your course to life by setting duration for activites, when a session starts and ends, the phone number for a conference call, etc...</p>
 
     [#global formPrefix="cpweb" /]
     <form action="${helper.urlFor('project.VerifyProjectDesignModule','updateNewDesign',[prj.projectId])}" name="createProjectGeneral" class="fullpage" method="post">
-        [@mbform.alertsection]
-        [/@mbform.alertsection]
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
         [#if errorFields?size > 0]
             <section class="alert">
               <h1>[@dws.txt key="form.alert.title" /]</h1>
-              <ul>
+              <ul class="list-unstyled">
                   <li>Check your input in the fields marked in red as the input does not match the required format.</li>
               </ul>
             </section>
         [/#if]
         
         <section class="field clearfix design">
-            <ul>
+            <ul class="list-unstyled">
                 [#if components??]
                 [#list components as component]
                 <li class="mainitem clearfix">
@@ -209,17 +209,17 @@ ${cpweb_head}
                 [/#if]
             </ul>
         </section>
-        [@mbform.infosection]
-        [/@mbform.infosection]
+        [@bsform.infosection]
+        [/@bsform.infosection]
         <section class="action">
             <input type="hidden" name="orgId" value="${org.id}" />
-            <button type="submit" tabindex="3" class="btn btn-primary btn-lg"><span>[@dws.txt key='form.action.verifyPrjDesign' /]</span></button>
+            <button type="submit" tabindex="3" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.verifyPrjDesign' /]</button>
             <a href="${helper.urlFor('project.ProjectModule', 'roster', [prj.projectId])}" tabindex="5" class="btn">[@dws.txt key="form.action.cancel" /]</a>
         </section>
 
     </form>
 
-</section>
+</article>
 
 [/@dws.skin]
 
@@ -239,7 +239,7 @@ ${cpweb_head}
                 </div>
             [/#if]
          [/#list]
-         <ul class="subitems">
+         <ul class="subitems list-unstyled">
             [#list component.children as child]
                 [#if !child.properties.splitContainerPosition?? || child.properties.splitContainerPosition != "top" ]
                     <li class="subitem">[@displayComponent child /]</li>
@@ -266,14 +266,14 @@ ${cpweb_head}
 
 
 <div class="details clearfix">
-    <ul>
+    <ul class="list-unstyled">
         [#list fields as field]
         [#if component.type = "ev_classroom" && field.name = "locUrl"]
                 [#assign visibility = "hidden"]
         [#else]
                 [#assign visibility = "visible"]
         [/#if]
-        <li class="${field.name} ${visibility}">[@listComponentField component field /]</li>
+        <li class="${field.name} ${visibility} form-group">[@listComponentField component field /]</li>
         [/#list]
     </ul>
 </div>
@@ -302,7 +302,7 @@ ${cpweb_head}
 [#if fieldType != "hidden"]
 <label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
 [/#if]
-<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="[#if errorFields?seq_contains(fname)]invalid[/#if][#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
+<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if errorFields?seq_contains(fname)]invalid[/#if][#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
 [/#if]
@@ -311,7 +311,7 @@ ${cpweb_head}
 [/#if]
 
 [#if field.dataType == "DATETIME"]
-[@mbform._onreadyJavascript]
+[@bsform._onreadyJavascript]
 [#compress]
 requirejs(['jquery-ui-timepicker-addon'], function() {
 	$("#f${component.cid}_${field.name}").datetimepicker(dpSettings);

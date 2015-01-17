@@ -90,25 +90,25 @@ ${cpweb_foot}
                     <div class="form">
 
                         <form action="${helper.urlFor('project.ProjectJsonModule','setInvitationPassword',[prj.projectId])}" id="setregistrationpassword" name="setregistrationpassword" class="fullpage" method="post">
-                            [@mbform.alertsection]
-                            [/@mbform.alertsection]
+                            [@bsform.alertsection]
+                            [/@bsform.alertsection]
                             <section class="field clearfix">
                                 <div class="column">
                                     <fieldset>
 
                                         [#assign defaultValue = formsess.getDefaultValue("passwordEnabled")!"false" /]
-                                        [@mbform.select name="passwordEnabled" class="input_full" tabindex="1"]
-                                        [@mbform.option value="true" defaultValue=defaultValue]ON[/@mbform.option]
-                                        [@mbform.option value="false" defaultValue=defaultValue]OFF[/@mbform.option]
-                                        [/@mbform.select]
+                                        [@bsform.select name="passwordEnabled" class="input_full" tabindex="1"]
+                                        [@bsform.option value="true" defaultValue=defaultValue]ON[/@bsform.option]
+                                        [@bsform.option value="false" defaultValue=defaultValue]OFF[/@bsform.option]
+                                        [/@bsform.select]
 
-                                        [@mbform.inputText name="password" class="input_full"  tabindex="2" /]
+                                        [@bsform.inputText name="password" class="input_full"  tabindex="2" /]
 
                                     </fieldset>
                                 </div>
                             </section>
-                            [@mbform.infosection]
-                            [/@mbform.infosection]
+                            [@bsform.infosection]
+                            [/@bsform.infosection]
                             <section class="action">
                                 <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savesetting' /]</span></button>
                                 <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
@@ -136,25 +136,25 @@ ${cpweb_foot}
                     <div class="label">[@dws.txt key="cpweb.registration.creditlimit.title" /]</div>
                     <div class="form">
                         <form action="${helper.urlFor('project.ProjectJsonModule','setInvitationCreditLimit',[prj.projectId])}" id="reginvlimitform" name="reginvlimitform" class="fullpage" method="post">
-                            [@mbform.alertsection]
-                            [/@mbform.alertsection]
+                            [@bsform.alertsection]
+                            [/@bsform.alertsection]
                             <section class="field clearfix">
                                 <div class="column">
                                     <fieldset>
 
 
-                                        [@mbform.select name="creditLimitEnabled" class="input_full" tabindex="1"]
-                                        [@mbform.option value="true" defaultValue=defaultValue]ON[/@mbform.option]
-                                        [@mbform.option value="false" defaultValue=defaultValue]OFF[/@mbform.option]
-                                        [/@mbform.select]
+                                        [@bsform.select name="creditLimitEnabled" class="input_full" tabindex="1"]
+                                        [@bsform.option value="true" defaultValue=defaultValue]ON[/@bsform.option]
+                                        [@bsform.option value="false" defaultValue=defaultValue]OFF[/@bsform.option]
+                                        [/@bsform.select]
 
-                                        [@mbform.inputNumber name="creditLimit" class="input_full"  tabindex="2" /]
+                                        [@bsform.inputNumber name="creditLimit" class="input_full"  tabindex="2" /]
 
                                     </fieldset>
                                 </div>
                             </section>
-                            [@mbform.infosection]
-                            [/@mbform.infosection]
+                            [@bsform.infosection]
+                            [/@bsform.infosection]
                             <section class="action">
                                 <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savesetting' /]</span></button>
                                 <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>

@@ -59,7 +59,7 @@ public class UserModule extends AbstractWebAuthModule {
 
         checkOrgUserAccess(cycle, org, user);
 
-        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
         String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());

@@ -158,16 +158,16 @@ ${cpweb_foot}
 <section id="addprojectmaterial">
     [#global formPrefix="cpweb.project.addmaterial" /]
     <form action="${addLink}" name="addMaterial" id="addMaterial" class="fullpage" method="post">
-        [@mbform.alertsection]
-        [/@mbform.alertsection]
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
         <section class="field">
             <div class="ui-widget col-md-6">
-                [@mbform.select name="materialId" class="input_full" tabindex="1"]
+                [@bsform.select name="materialId" class="input_full" tabindex="1"]
                     <option value=""></option>
                     [#list materials?sort_by("title") as mat]
-                        [@mbform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@mbform.option]
+                        [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@bsform.option]
                     [/#list]
-                [/@mbform.select]
+                [/@bsform.select]
                 
                 <button type="submit" class="btn btn-primary">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
             </div>
@@ -178,8 +178,8 @@ ${cpweb_foot}
                 </div>
             </div>
         </section>
-        [@mbform.infosection]
-        [/@mbform.infosection]
+        [@bsform.infosection]
+        [/@bsform.infosection]
     </form>
 </section>
 

@@ -200,7 +200,7 @@ ${cpweb_foot}
         <li id="meeting-maker">
             <a class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
-                [@mbform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
+                [@bsform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
             </a>
         </li>
         [/#if]
@@ -251,7 +251,7 @@ ${cpweb_foot}
                     [/#if]
                 [/#if]
 
-                [@mbform.inputBoolean 'expirationtoggle' 'Expiration' 'ON' 'OFF' expirationtoggleActive session=formsess /]
+                [@bsform.inputBoolean 'expirationtoggle' 'Expiration' 'ON' 'OFF' expirationtoggleActive session=formsess /]
             </span>
         </li>
         [/@]
@@ -263,7 +263,7 @@ ${cpweb_foot}
         <li id="socialfeatures">
             <a class="setting">
                 <span class="label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
-                [@mbform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
+                [@bsform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
             </a>
         </li>
         [/#if]

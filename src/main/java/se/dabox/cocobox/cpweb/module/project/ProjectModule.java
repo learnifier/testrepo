@@ -125,6 +125,22 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
+    
+    @WebAction
+    public RequestTarget onDetails(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        Map<String, Object> map = createMap();
+
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/projectDetails.html", map);
+    }
+    
 
     @WebAction
     public RequestTarget onRegistration(RequestCycle cycle, String projectId) {

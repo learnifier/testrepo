@@ -7,7 +7,8 @@
 ${cpweb_foot}
 <script>
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
-        require(['jquery-ui','Chart'], function() {
+    
+    require(['jquery-ui','Chart'], function() {
         var chartAnimation = false;
         if ( Modernizr.canvas === true ) {
                 chartAnimation = true;
@@ -16,52 +17,75 @@ ${cpweb_foot}
         pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);        
     });
     
-    require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
+    require(['dataTables-bootstrap', 'dabox-common'], function() {
        
         var oTable = $('#userroleslist').dataTable({
-            "sDom": 'rt',
-            "bPaginate": false,            
-            "aoColumnDefs": [
+            "dom": '<"row"<"col-sm-12"rt>>',
+            "paging": false,            
+            "columnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "thumbnail",
-                    "sWidth": "32",
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
-                        return  '<img class="userimage" src="' +oObj.aData.thumbnail+ '"/>';
+                    "targets": [ 0 ],
+                    "width": "32",
+                    "orderable": false,
+                    "className": "userimage",
+                    "data": function(row, type, set) {
+                        if (!row.thumbnailDisplay) {
+                            row.favoriteDisplay = '<img class="userimage" src="' + row.thumbnail + '"/>';
+                        }
+                        if (type === 'display') {
+                            return row.thumbnailDisplay;
+                        } else if (type === 'filter') {
+                            return null;
+                        } else if (type === 'sort') {
+                            return row.thumbnailDisplay;
+                        } else {
+                            //Anything else and raw row
+                            return row.thumbnailDisplay;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": "displayName",
-                    "sWidth": "500",
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
-                        var dName = oObj.aData.displayName;
-                        var data='';
+                    "targets": [ 1 ],
+                    "width": "500",
+                    "orderable": false,
+                    "data": function(row, type, set) {
+                        if (!row.displayNameDisplay) {
+                            var dName = row.displayName;
+                            var data='';
 
-                        if (dName.length < 2) {
-                            data = oObj.aData.email;
-                        }
-                        data =  '<p class="team-members__name" title="' +dName + '">' + cocobox.trunc(dName, 20) + '</p>';
-                        
-                        [#if security.hasPermission("BO_EDIT_USER")]
-                            for(var i = 0; i < oObj.aData.roles.length; i++) {
-                                data+= '<span class="team-members__role">' + oObj.aData.roles[i].roleName + ' <a onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')"><span class="glyphicon glyphicon-remove-sign"></span></a></span>';
+                            if (dName.length < 2) {
+                                data = row.email;
                             }
-                            return data;                            
-                        [#else]
-                            return data;
-                        [/#if]
+                            data =  '<p class="team-members__name" title="' +dName + '">' + cocobox.trunc(dName, 20) + '</p>';
+
+                            [#if security.hasPermission("BO_EDIT_USER")]
+                                for(var i = 0; i < row.roles.length; i++) {
+                                    data+= '<span class="team-members__role">' + row.roles[i].roleName + ' <a onclick="deleteMember(\'' +  row.roles[i].role + '\',\'' + row.roles[i].deleteRoleLink + '\',\'' + row.userId + '\')"><span class="glyphicon glyphicon-remove-sign"></span></a></span>';
+                                }
+                                row.displayNameDisplay = data;                            
+                            [#else]
+                                row.displayNameDisplay = data;
+                            [/#if]
+                        }
+                        if (type === 'display') {
+                            return row.displayNameDisplay;
+                        } else if (type === 'filter') {
+                            return row.displayName;
+                        } else if (type === 'sort') {
+                            return row.displayName;
+                        } else {
+                            //Anything else and raw row
+                            return row.displayName;
+                        }
                     }
                 }
             ],
                         
-            "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
+            "ajax": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
              
-            "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>There are no users on this team</span>",
-                "sLoadingRecords": "<p>Loading team members...</p><img src='[@common.spinnerUrl /]' />"
+            "language": {
+                "emptyTable": "<span class='emptytable'>There are no users on this team</span>",
+                "loadingRecords": "<p>Loading team members...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
        
@@ -79,34 +103,34 @@ ${cpweb_foot}
     };
         
 </script>
-        <script>
-            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
-                f.startSingleFlirt('${prj.newsFlirtId}', {
-                    templates: {
-                        emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+<script>
+    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
+        f.startSingleFlirt('${prj.newsFlirtId}', {
+            templates: {
+                emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+            }
+        });
+        f.startSingleFlirt('${prj.flirtId}', {
+            templates: {
+                emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
+                header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
+            },
+            success: function(data) {
+                var len = data.posts.length;
+                for(var i = 0; i<len; i++) {
+                    var post = data.posts[i];
+                    if (!activityNames[post.tag]) {
+                        continue;
                     }
-                });
-                f.startSingleFlirt('${prj.flirtId}', {
-                    templates: {
-                        emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
-                        header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
-                    },
-                    success: function(data) {
-                        var len = data.posts.length;
-                        for(var i = 0; i<len; i++) {
-                            var post = data.posts[i];
-                            if (!activityNames[post.tag]) {
-                                continue;
-                            }
-                            post.activityName = activityNames[post.tag].name;
-                        }
-                    }
-                });
-                $('.ccb-flirt-addpost textarea').focus(function() {
-                    $(this).height(80);
-                })
-            });
-        </script>
+                    post.activityName = activityNames[post.tag].name;
+                }
+            }
+        });
+        $('.ccb-flirt-addpost textarea').focus(function() {
+            $(this).height(80);
+        })
+    });
+</script>
 <div class="modal fade" id="addTeamMember" tabindex="-1" role="dialog" aria-labelledby="addTeamMemberLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -116,12 +140,11 @@ ${cpweb_foot}
       </div>
       <div class="modal-body">
            Form to add team members
-           
-<ul>
-						<li><strong>Read:</strong> modal windows will probably tell you something important so don't forget to read what they say.</li>
-						<li><strong>Look:</strong> a modal window enjoys a certain kind of attention; just look at it and appreciate its presence.</li>
-						<li><strong>Close:</strong> click on the button below to close the modal.</li>
-					</ul>
+            <ul>
+                <li><strong>Read:</strong> modal windows will probably tell you something important so don't forget to read what they say.</li>
+                <li><strong>Look:</strong> a modal window enjoys a certain kind of attention; just look at it and appreciate its presence.</li>
+                <li><strong>Close:</strong> click on the button below to close the modal.</li>
+            </ul>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -134,9 +157,9 @@ ${cpweb_foot}
 [/#assign]
 
 
-[#assign projectDetailsSettingUrl = "test" /]
+[#assign projectDetailsSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId]) /]
 
-[@mbform._onreadyJavascript]
+[@bsform._onreadyJavascript]
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
     cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
@@ -154,19 +177,20 @@ ${cpweb_foot}
     );
 
     [/@]
-[/@mbform._onreadyJavascript]
+[/@bsform._onreadyJavascript]
 
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 [@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
+
 <article id="ccb-page-projectOverview">
 
 <div class="col-md-8">
     <div class="project-status__wrapper">
         <span class="project-status__label">Status</span>
-        <h3  class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("prj.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
+        <h3  class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("project.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
     </div>
     <section id="prj-charts" class=" clearfix">
         <div><span id="prj-ch-total"></span>Participants</div>
@@ -215,16 +239,6 @@ ${cpweb_foot}
 
         </section>
     [/#if]
-    <p class="">Note</p><span class="setting clearfix" id="project-desc"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>[#include "projectEditLabel.html" /]</span>
-    [#if prj.type.ptype == 2]
-        <span class="">Learner Portal Name</span>
-        <h2>${prj.displayUserTitle!""?xhtml}</h2>
-    [#else]
-        <span class="">Course Name</span><span class=" " id="project-usertitle">
-            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="usertitle">${prj.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
-        <span class="">Course Description</span><span class=" " id="project-userdesc">
-            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="userdesc">${prj.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
-    [/#if]
 </div>
 <div class="col-md-4">
     <section class="">
@@ -239,6 +253,11 @@ ${cpweb_foot}
             <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
         </button>
     [/@]
+    <p class="">Note</p>
+    <span class="setting clearfix" id="project-desc">
+        <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>
+        [#include "projectEditLabel.html" /]
+    </span>
 
     <div style="display: none">
         <form id="deleteRoleForm" method="POST" action="">

@@ -85,6 +85,7 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
 
+<article id="ccb-page-designData">
 [@pInfo.projectInfo selected="details"][/@pInfo.projectInfo]
 
 [#if prj.type.ptype == 2]
@@ -97,15 +98,14 @@ ${cpweb_foot}
 
 <h2>[@dws.txt key="cpweb.designdatasecondary.title" /]</h2>
 
-<section id="designdata">
 
     [#global formPrefix="cpweb" /]    
-        [@mbform.alertsection]
-        [/@mbform.alertsection]
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
         [#if errorFields?size > 0]
             <section class="alert">
               <h1>[@dws.txt key="form.alert.title" /]</h1>
-              <ul>
+              <ul class="list-unstyled">
                   <li>Check your input in the fields marked in red as the input does not match the required format.</li>
               </ul>
             </section>
@@ -130,7 +130,7 @@ ${cpweb_foot}
                         <p>Activate your course by adding important dates and information</p>
                     [/#if]
              [/#if]
-                <ul>
+                <ul class="list-unstyled">
                     [#if components??]
                     [#list components as component]
                     <li class="mainitem clearfix">
@@ -141,11 +141,11 @@ ${cpweb_foot}
 
                 </ul>
             </section>
-        [@mbform.infosection]
-        [/@mbform.infosection]
+        [@bsform.infosection]
+        [/@bsform.infosection]
     </form>
 
-</section>
+</article>
 
 [/@dws.skin]
 
@@ -166,7 +166,7 @@ ${cpweb_foot}
                 </div>
             [/#if]
          [/#list]
-         <ul class="subitems">
+         <ul class="subitems list-unstyled">
             [#list component.children as child]
                 [#if !child.properties.splitContainerPosition?? || child.properties.splitContainerPosition != "top" ]
                     <li class="subitem">[@displayComponent child /]</li>
@@ -188,7 +188,7 @@ ${cpweb_foot}
 [#if componentFieldSet[component.cid]??]
 [#local fields = componentFieldSet[component.cid] /]
 <div class="details clearfix">
-    <ul>
+    <ul class="list-unstyled">
         [#list fields as field]
             [#if field.name = "locUrl" ]
                 [#assign visibility = "hidden"]
@@ -233,7 +233,7 @@ ${cpweb_foot}
 
 [#if field.dataType == "DATETIME" && field.primaryField == false]
 <span class="revertspan" data-hiddenid="f${component.cid}_${field.name}" title="revert to default setting"></span>
-[@mbform._onreadyJavascript]
+[@bsform._onreadyJavascript]
 [#compress]
 requirejs(['jquery-ui-timepicker-addon'], function() {
 	$("#f${component.cid}_${field.name}").datetimepicker(dpSettings);

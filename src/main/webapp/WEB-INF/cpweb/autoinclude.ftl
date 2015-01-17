@@ -2,7 +2,6 @@
 
 <#import "/se/dabox/services/dwsfu/common.ftl" as common />
 <#import "/se/dabox/services/dwsfu/commonCss.ftl" as commonCss />
-<#import "/se/dabox/services/dwsfu/mbform.ftl" as mbform />
 <#import "/se/dabox/services/dwsfu/bsform.ftl" as bsform />
 
 

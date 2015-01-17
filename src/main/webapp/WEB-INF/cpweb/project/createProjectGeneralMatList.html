@@ -51,16 +51,16 @@ $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
 [#global formPrefix="cpweb.createproject" /]
 <form action="${formLink}" name="createProjectGeneral" class="fullpage" method="post" onsubmit="return submitListener()">
-    [@mbform.alertsection]
-    [/@mbform.alertsection]
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
     <section class="field clearfix">
         <div class="column">
             <fieldset>
 
                 <div id="projectname">
                     <h2>4 Set the course information - will be displayed to course participants</h2>
-                    [@mbform.inputText name="userTitle" class="input_full"  tabindex="3" /]
-                    [@mbform.textarea name="userDescription" class="input_full"  tabindex="4" /]
+                    [@bsform.inputText name="userTitle" class="input_full"  tabindex="3" /]
+                    [@bsform.textarea name="userDescription" class="input_full"  tabindex="4" /]
                 </div>
                 <div id="typeselections" class="clearfix">
                     <div id="crprj_materialslist" >
@@ -74,8 +74,8 @@ $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
             </fieldset>
         </div>
     </section>
-    [@mbform.infosection]
-    [/@mbform.infosection]
+    [@bsform.infosection]
+    [/@bsform.infosection]
     <section class="action">
         <input type="hidden" name="orgId" value="${org.id}" />
         <input type="hidden" name="ntarget" id="ntarget" value="" />

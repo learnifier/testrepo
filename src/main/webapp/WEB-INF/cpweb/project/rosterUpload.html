@@ -1,23 +1,28 @@
 [#ftl]
 [#global formsess=rosterformsess /]
 
-       <form action="${uploadRosterFormLink}" id="uploadRoster" name="uploadRoster" class="fullpage" method="post" enctype="multipart/form-data" onsubmit="$('#rosterUploadBtn').cocobox('inputBlock')">
-        <p>Download the roster template below to your desktop. Click Browse, select the file, and click Open. Then click Upload Roster.</p>
-        <p><a href="${cocoboxCdn}/cocobox/roster/RosterTemplate.xlt">Download roster template</a></p>
+
+[@bsform._onreadyJavascript]
+    $('#file').change(function() {
+         $('#uploadRoster').submit();
+    });
+[/@bsform._onreadyJavascript]
+
+
+       <form action="${uploadRosterFormLink}" id="uploadRoster" name="uploadRoster" method="post" enctype="multipart/form-data" onsubmit="$('#rosterUploadBtn').cocobox('inputBlock')">
+           <h3>Upload participant list</h3>
+               
+        <p><a href="${cocoboxCdn}/cocobox/roster/RosterTemplate.xlt">Download the template</a> to get the list in the correct format. When you have completed the list with names and email address, click Upload Roster and select the file.</p>
         [#global formPrefix="cpweb" /]
-            [@mbform.alertsection]
-            [/@mbform.alertsection]
-            <section class="field clearfix">
-                <div class="column">
-                    <fieldset>
-                        [@mbform.inputFile name="file" class="input_full"  tabindex="5" /]
-                    </fieldset>
-                </div>
-            </section>
-            [@mbform.infosection]
-            [/@mbform.infosection]
+            [@bsform.alertsection]
+            [/@bsform.alertsection]
+
+            [@bsform.inputFile name="file" tabindex="5"  style="position: absolute; left: -10000px;"/]
+
+            [@bsform.infosection]
+            [/@bsform.infosection]
             <section class="action">
                 <input type="hidden" name="orgId" value="${org.id}" />
             </section>
-        <button type="submit" class="btn btn-primary" id="rosterUploadBtn"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> [@dws.txt key='form.action.uploadroster' /]</button>
+        <label for="file" type="submit" class="btn btn-primary" id="rosterUploadBtn"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> [@dws.txt key='form.action.uploadroster' /]<label>
     </form>
