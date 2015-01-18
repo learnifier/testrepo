@@ -174,8 +174,9 @@ public class CreateUserModule extends AbstractWebAuthModule {
         UserAccountChangedListenerUtil.triggerEvent(cycle, userAccount.getUserId());
 
         //No need to decorate modal params here
-        return new RedirectUrlRequestTarget(NavigationUtil.toUserPageUrl(cycle, strOrgId,
-                userAccount.getUserId()));
+        String directUrl = NavigationUtil.toUserPageUrl(cycle, strOrgId,userAccount.getUserId());
+        String redirectUrl = createTopRedirectUrl(cycle, directUrl);
+        return new RedirectUrlRequestTarget(redirectUrl);
     }
 
     @WebAction(methods = HttpMethod.POST)
