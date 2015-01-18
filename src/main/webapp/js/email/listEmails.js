@@ -1,11 +1,12 @@
 /* 
  * (c) Dabox AB 2013 All Rights Reserved
  */
-define([], function() {
+define([textSource], function(t) {
     "use strict";
     var exports = {};
 
     $(document).ready(function() {
+        
     require(['dataTables-bootstrap'], function() {
         var oTable = $('#listemails').dataTable({
             "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
@@ -41,9 +42,9 @@ define([], function() {
                     "data" : function(row, type, set) {
                         if (!row.statusDisplay) {
                             if ( row.sticky ) {
-                                row.statusDisplay = '[@dws.txt key="cpweb.emailoverview.true" /]'
+                                row.statusDisplay = t._T('cpweb.emailoverview.true');
                             } else {
-                                row.statusDisplay = '[@dws.txt key="cpweb.emailoverview.false" /]'                            
+                                row.statusDisplay = t._T('cpweb.emailoverview.false');
                             }
                         }
 

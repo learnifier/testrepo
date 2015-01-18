@@ -20,8 +20,8 @@ ${cpweb_foot}
     (function() {
         require(['jquery.form', 'jquery.Jcrop'], function() {
 
-        var bar = $('.bar');
-        var percent = $('.percent');
+        var bar = $('.progress-bar');
+        var percent = $('.progress-bar');
         var status = $('#status');
         
         var width = ${width};
@@ -69,7 +69,7 @@ ${cpweb_foot}
                 percent.html(percentVal);
             },
             complete: function(xhr) {
-                bar.width(396);
+                bar.width('100%');
                 percent.html('100%');
                 //              $('.progress').hide('slow');
 
@@ -143,7 +143,14 @@ ${cpweb_foot}
     });
     
 </script>
+
 [/#assign]
+
+[@bsform._onreadyJavascript]
+    $('#image').change(function() {
+         $('#logoform').submit();
+    });
+[/@bsform._onreadyJavascript]
 
 [#assign head]
     [@commonCss.jcrop /]
@@ -174,21 +181,20 @@ ${cpweb_foot}
                 <div class="form" id="uploadlogo">
                     [#global formPrefix="cpweb.logotype.language" /]
                     <form action="${helper.urlFor('branding.LogoModule','uploadImage',[org.id])}" method="post" enctype="multipart/form-data" id="logoform">
-                        <h3>Step 1 - Select the logo</h3>
-                        <input type="file" name="image" id="image" required="required" />
-                        <p class="format"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span> Preferred size is 468x120.</p>
-                        <h3>Step 2 - Upload the logo</h3>
-                        <button type="submit" id="uploadPicBtn" disabled="disabled" class="btn btn-primary">
+                        <input type="file" name="image" id="image" required="required" style="position: absolute; left: -9999px;" />
+                        <h3>Upload your logo</h3>
+                        <p class="image"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span> Preferred size is 468x120.</p>
+                        <label for="image" id="uploadPicBtn" class="btn btn-primary" style="margin-bottom: 20px">
                             <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]
-                        </button>
-                        <div class="progress_wrapper">
-                            <div class="progress">
-                                <div class="bar"></div>
-                                <div class="percent">0%</div>
-                            </div>                            
-                        </div>
-                        <h3>Step 3 - Crop the uploaded logo</h3>
-                        <ul id="preparepicture_wrapper">
+                        </label>
+                        <div class="progress">
+                          <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                            0%
+                          </div>
+                        </div>                        
+                        [#-- Hiding this section until BS version of cropping is ready --]
+                        <h3 style="display:none">Step 3 - Crop the uploaded logo</h3>
+                        <ul id="preparepicture_wrapper" style="display:none">
                             <li>
                                 <div id="picture_wrapper">
                                     <img id="preview" />
