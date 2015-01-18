@@ -25,12 +25,12 @@ ${cpweb_foot}
     var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
 
-    require(["${contextPath}/js/home.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-       //No initialization needed
+    require(["${contextPath}/js/home.js?${cycle.application.formattedStartTime.base36String}"], function (s) {
+        //No initialization needed
     });
-               
+
     function toggleFavorite(target) {
-        log('Toggle ',target);
+        log('Toggle ', target);
 
         var div = target;
         var tr = $(target).parent().parent().get()[0]
@@ -44,23 +44,23 @@ ${cpweb_foot}
         ajax.data = ajaxData;
 
         if ($(target).hasClass("isfav")) {
-            ajax.success = function() {
+            ajax.success = function () {
                 $(div).removeClass("isfav").addClass("isnotfav");
             }
-            cocobox.ajaxPost(deleteFavorite,ajax);
+            cocobox.ajaxPost(deleteFavorite, ajax);
         } else {
-            ajax.success = function() {
+            ajax.success = function () {
                 $(div).removeClass("isnotfav").addClass("isfav");
             }
-            cocobox.ajaxPost(addFavorite,ajax);
+            cocobox.ajaxPost(addFavorite, ajax);
         }
     }
-                
+
 </script>
 
 [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
 <script>
-    require(['knockout'], function(ko) {
+    require(['knockout'], function (ko) {
         var listPurchasedMatsAjaxSource = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
 
         function ProductBalance(data) {
@@ -75,26 +75,28 @@ ${cpweb_foot}
 
             self.products = ko.observableArray([]);
 
-            self.productCount = ko.computed(function(){
-                return self.products().length;                
+            self.productCount = ko.computed(function () {
+                return self.products().length;
             })
 
-            self.creditCount = ko.computed(function(){
+            self.creditCount = ko.computed(function () {
                 var total = 0;
-                $.each(self.products(),function(){
-                    total+=this.availCredits();
+                $.each(self.products(), function () {
+                    total += this.availCredits();
                 })
                 return total;
             })
-            
-            self.topfive = ko.computed(function(){
-                return self.products().slice(0,5);
+
+            self.topfive = ko.computed(function () {
+                return self.products().slice(0, 5);
             })
 
-            self.loadData = function() {
-                $.getJSON(listPurchasedMatsAjaxSource, function(allData) {
-                    var mappedTasks = $.map(allData.aaData, function(item) { return new ProductBalance(item) });
-                    mappedTasks.sort(function(a,b){
+            self.loadData = function () {
+                $.getJSON(listPurchasedMatsAjaxSource, function (allData) {
+                    var mappedTasks = $.map(allData.aaData, function (item) {
+                        return new ProductBalance(item)
+                    });
+                    mappedTasks.sort(function (a, b) {
                         var diff = b.availCredits() - a.availCredits();
                         if (diff != 0) {
                             return diff;
@@ -104,30 +106,30 @@ ${cpweb_foot}
                         }
                         return 1;
                     });
-                    self.products(mappedTasks);                    
+                    self.products(mappedTasks);
                 });
-            }   
+            }
         }
 
         model = new AccountBalanceModel();
         ko.applyBindings(model);
 
-        $(function() {
+        $(function () {
             model.loadData();
         })
-            
+
     })
 </script>
 [/@]
 
 [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
 <script>
-    require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
+    require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function () {
         //log("anonprodcreate loaded");
     });
 
-    $("#addmatbtn").click(function() {
-        CcbAnonymousProductUpload.open(function(pid) {
+    $("#addmatbtn").click(function () {
+        CcbAnonymousProductUpload.open(function (pid) {
             //Do nothing
         }, {
             scope: "O${org.id?c}"
@@ -137,6 +139,29 @@ ${cpweb_foot}
 </script>
 [/@]
 
+<script>
+    $(function () {
+        $("#inviteAdmin").click(function () {
+            require(["[@modal.javascript /]"], function(modal) {
+                modal.open({
+                    src: "${helper.urlFor('CreateUserModule','create',[org.id])}",
+                    height: "450px",
+                    cssClass: "modal-lg",
+                    title: "Invite administrator",
+                    cancel: function () { /* Do nothing*/
+                    },
+                    cancelUrl: window.location.href,
+                    proceedUrl: "${helper.urlFor('CpMainModule','listUsers',[org.id])}"
+                });
+            });
+
+            return false;
+        });
+
+    })
+
+</script>
+
 [/#assign]
 
 
@@ -144,100 +169,100 @@ ${cpweb_foot}
 
 <article id="ccb-page-home">
     [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
-        <div class="ccb-card ccb-card-padding ccb-card-colored" id="actions" style="display: none;">
-            <section id="multiple-actions" style="display: none;">
-                <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-chevron-down"></span> Show Issues</a>
-                <h1>Action</h1>
-                <p>There are multiple issues on your account that you need to take action on.</p>
-            </section>
-            <section id="list-actions" style="display: none;">
-                <h1>Action</h1>
-                <p>Take action on the following issues. Reach out to tech support as needed.</p>
-                <table class="table table-hover ccb-table" id="tw_actions">
-                </table>
-            </section>
-        </div>
-    [/#if]
-
-
-<div class="row">
-<div class="col-sm-7">
-
-    [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
-    <div class="ccb-card ccb-card-padding ccb-card-colored">
-        [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
-        <section id="new-project">
-            <h1>New Project</h1>
-            <p>Get started with a new project by following the simple step-by-step instructions.</p>
-            <p class="text-center">
-                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
-            </p>
+    <div class="ccb-card ccb-card-padding ccb-card-colored" id="actions" style="display: none;">
+        <section id="multiple-actions" style="display: none;">
+            <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-chevron-down"></span> Show Issues</a>
+            <h1>Action</h1>
+            <p>There are multiple issues on your account that you need to take action on.</p>
         </section>
-        [/@]
-        [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
-        <section id="manage-projects">
-            <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right">View All Projects</a>
-            <h4>Favorite Projects</h4>
-            <table class="table table-hover table-condensed ccb-table" id="tw-favorites">
+        <section id="list-actions" style="display: none;">
+            <h1>Action</h1>
+            <p>Take action on the following issues. Reach out to tech support as needed.</p>
+            <table class="table table-hover ccb-table" id="tw_actions">
             </table>
         </section>
-        [/@]
     </div>
     [/#if]
-    [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
-    <div class="ccb-card ccb-card-padding ccb-card-colored">
-        <h2>Upload your materials</h2>
-        <p>Add your own training materials to tailor the learning to your needs.</p>
-        <div class="text-center">
-            <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-                <div class="btn btn-primary-outlined" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Upload Material</div>
+
+
+    <div class="row">
+        <div class="col-sm-7">
+
+            [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
+            <div class="ccb-card ccb-card-padding ccb-card-colored">
+                [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
+                <section id="new-project">
+                    <h1>New Project</h1>
+                    <p>Get started with a new project by following the simple step-by-step instructions.</p>
+                    <p class="text-center">
+                        <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
+                    </p>
+                </section>
+                [/@]
+                [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
+                <section id="manage-projects">
+                    <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right">View All Projects</a>
+                    <h4>Favorite Projects</h4>
+                    <table class="table table-hover table-condensed ccb-table" id="tw-favorites">
+                    </table>
+                </section>
+                [/@]
             </div>
-        </div>
-    </div>
-    [/@]
-    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-    <div class="ccb-card ccb-card-padding ccb-card-colored">
-        <h2>Invite an administrator</h2>
-        <p>Invite additional administrators to manage projects from this portal.</p>
-        <div class="text-center">
-            <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-plus-sign"></span> Invite Administrator</a>
-        </div>
-    </div>
-    [/@]
+            [/#if]
+            [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
+            <div class="ccb-card ccb-card-padding ccb-card-colored">
+                <h2>Upload your materials</h2>
+                <p>Add your own training materials to tailor the learning to your needs.</p>
+                <div class="text-center">
+                    <div class="ui-helper-hidden" data-anoncreateprodelement="show">
+                        <div class="btn btn-primary-outlined" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Upload Material</div>
+                    </div>
+                </div>
+            </div>
+            [/@]
+            [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+            <div class="ccb-card ccb-card-padding ccb-card-colored">
+                <h2>Invite an administrator</h2>
+                <p>Invite additional administrators to manage projects from this portal.</p>
+                <div class="text-center">
+                    <a href="" class="btn btn-primary-outlined" id="inviteAdmin"><span class="glyphicon glyphicon-plus-sign"></span> Invite Administrator</a>
+                </div>
+            </div>
+            [/@]
 
-</div>
-<div class="col-sm-5">
-    [#if (dwsrt.config["cpweb.support.htmlsnippet"]) != ""]
-        <div id="techsupportinfo" class="ccb-card ccb-card-padding ccb-card-colored">
-            ${dwsrt.config["cpweb.support.htmlsnippet"]}
         </div>
-    [/#if]
-    [#if welcomeMessage??]
-    <div class="ccb-card ccb-card-padding ccb-card-colored" id="contact">
-        [@wm.welcomeBox welcomeMessage /]
-    </div>
-    [/#if]
+        <div class="col-sm-5">
+            [#if (dwsrt.config["cpweb.support.htmlsnippet"]) != ""]
+            <div id="techsupportinfo" class="ccb-card ccb-card-padding ccb-card-colored">
+                ${dwsrt.config["cpweb.support.htmlsnippet"]}
+            </div>
+            [/#if]
+            [#if welcomeMessage??]
+            <div class="ccb-card ccb-card-padding ccb-card-colored" id="contact">
+                [@wm.welcomeBox welcomeMessage /]
+            </div>
+            [/#if]
 
-    [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-    <div class="ccb-card ccb-card-padding ccb-card-colored" id="balance">
-        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a>
-        <h2>Your Account Status</h2>
-        <div id="product-count" class="secondaryBackgroundColor">
-            <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
+            [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
+            <div class="ccb-card ccb-card-padding ccb-card-colored" id="balance">
+                <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a>
+                <h2>Your Account Status</h2>
+                <div id="product-count" class="secondaryBackgroundColor">
+                    <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
+                </div>
+                <h3>Top 5 balance</h3>
+                <ul class="clearfix" data-bind="foreach: topfive">
+                    <li>
+                        <img data-bind="attr: { src: thumbnail}" src="${cocoboxCdn}/cocobox/img/1x1-pixel.png" />
+                        <p class="availCredits" data-bind="text: availCredits"></p>
+                        <p class="title" data-bind="text: title"></p>
+                    </li>
+                </ul>
+            </div>
+            [/@]
+
         </div>
-        <h3>Top 5 balance</h3>
-            <ul class="clearfix" data-bind="foreach: topfive">
-                <li>
-                    <img data-bind="attr: { src: thumbnail}" src="${cocoboxCdn}/cocobox/img/1x1-pixel.png" />
-                    <p class="availCredits" data-bind="text: availCredits"></p>
-                    <p class="title" data-bind="text: title"></p>
-                </li>
-            </ul>   
     </div>
-    [/@]
-
-</div>
-</div>
 
 </article>
 

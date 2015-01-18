@@ -33,6 +33,7 @@ import se.dabox.cocosite.event.UserAccountChangedListenerUtil;
 import se.dabox.cocosite.locale.FormLocale;
 import se.dabox.cocosite.locale.PlatformFormLocaleFactory;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
@@ -70,7 +71,8 @@ public class CreateUserModule extends AbstractWebAuthModule {
         DruwaFormValidationSession<CreateUser> formsess =
                 getValidationSession(CreateUser.class, cycle);
 
-        return genericCreateEditView(cycle, org, formLink, formsess, false);
+        return genericCreateEditView(cycle, org, ModalParamsHelper.decorateUrl(cycle, formLink),
+                formsess, false);
     }
 
     @WebAction
@@ -129,7 +131,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
                 getValidationSession(CreateUser.class, cycle);
 
         if (!formsess.process()) {
-            return toEditUserPage(strOrgId, strUserId);
+            return toEditUserPage(cycle, strOrgId, strUserId);
         }
 
         CreateUser form = formsess.getObject();
@@ -140,7 +142,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
             if (userExistsWithEmail(cycle, newEmail)) {
                 formsess.addError(new ValidationError(ValidationConstraint.CONSISTENCY, "email",
                         "emailalreadyexists"));
-                return toEditUserPage(strOrgId, strUserId);
+                return toEditUserPage(cycle, strOrgId, strUserId);
             }
             emailChanged = true;
         }
@@ -148,7 +150,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
         if (!isValidRole(form.getRole())) {
             formsess.addError(new ValidationError(ValidationConstraint.CONSISTENCY, "role",
                     "invalidrole"));
-            return toEditUserPage(strOrgId, strUserId);
+            return toEditUserPage(cycle, strOrgId, strUserId);
         }
 
         SetUserAccountNameRequest updateReq =
@@ -170,6 +172,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
 
         UserAccountChangedListenerUtil.triggerEvent(cycle, userAccount.getUserId());
 
+        //No need to decorate modal params here
         return new RedirectUrlRequestTarget(NavigationUtil.toUserPageUrl(cycle, strOrgId,
                 userAccount.getUserId()));
     }
@@ -219,8 +222,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
                 getValidationSession(CreateUser.class, cycle);
 
         if (!formsess.process()) {
-            return new WebModuleRedirectRequestTarget(CreateUserModule.class, ACTION_VIEW_CREATE,
-                    strOrgId);
+            return toCreatePage(cycle, strOrgId);
         }
 
         final CreateUser form = formsess.getObject();
@@ -235,8 +237,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
 
             if (vfe.getVerificationStatus() == VerificationStatus.DUPLICATE) {
                 formsess.addError(new ValidationError("duplicate", "email", null));
-                return new WebModuleRedirectRequestTarget(CreateUserModule.class,
-                        ACTION_VIEW_CREATE, strOrgId);
+                return toCreatePage(cycle, strOrgId);
             }
 
             throw vfe;
@@ -247,6 +248,16 @@ public class CreateUserModule extends AbstractWebAuthModule {
         }
 
         return new RedirectUrlRequestTarget(NavigationUtil.toOrgUsersUrl(cycle, strOrgId));
+    }
+
+    private RequestTarget toCreatePage(RequestCycle cycle, String strOrgId) {
+        WebModuleRedirectRequestTarget target
+                = new WebModuleRedirectRequestTarget(CreateUserModule.class, ACTION_VIEW_CREATE,
+                        strOrgId);
+
+        target.setExtraTargetParameterString(ModalParamsHelper.getParameterString(cycle));
+
+        return target;
     }
 
     private RequestTarget createExistingAccountMail(RequestCycle cycle, UserAccount adminAccount,
@@ -317,9 +328,14 @@ public class CreateUserModule extends AbstractWebAuthModule {
         return CacheClients.getClient(cycle, UserAccountService.class);
     }
 
-    private RequestTarget toEditUserPage(String strOrgId, String strUserId) {
-        return new WebModuleRedirectRequestTarget(CreateUserModule.class,
-                ACTION_VIEW_EDIT, strOrgId, strUserId);
+    private RequestTarget toEditUserPage(RequestCycle cycle, String strOrgId, String strUserId) {
+        WebModuleRedirectRequestTarget target
+                = new WebModuleRedirectRequestTarget(CreateUserModule.class,
+                        ACTION_VIEW_EDIT, strOrgId, strUserId);
+
+        target.setExtraTargetParameterString(ModalParamsHelper.getParameterString(cycle));
+
+        return target;
     }
 
     private RequestTarget sendAdminInvitationWithMailPage(RequestCycle cycle, long orgId, long userId) {

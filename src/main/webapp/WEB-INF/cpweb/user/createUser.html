@@ -1,61 +1,87 @@
 [#ftl strip_text="true" /]
 
-[#assign foot]
+[#assign cpweb_foot]
 ${cpweb_foot}
-<script>
-    $('#tm_users').addClass('activeItem').prev().addClass('prevItem');
-</script>
 
+<script>
+    require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+        modalClient.setButtons(
+                [
+                    {
+                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.saveuser')?js_string}",
+                        cssClass: "btn-primary",
+                        action: function (dlg) {
+                          $("#createUser").submit();
+                          //$("#hiddensubmit").click();
+                        }
+                    },
+                    {
+                        text: "Cancel",
+                        cssClass: "btn-cancel",
+                        action: function (dlg) {
+                            dlg.cancel();
+                        }
+                    }
+                ]
+                );
+    });
+</script>
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head  foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+[@dws.skin skin="barebone_bootstrap" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <h1>[@dws.txt key="cpweb.createuser.title" /]</h1>
 
 [#global formPrefix="cpweb.createuser" /]
-<form action="${formLink}" name="createUser" class="fullpage" method="post">
+<form action="${formLink}" name="createUser" id="createUser" class="fullpage" method="post">
     [@bsform.alertsection]
     [/@bsform.alertsection]
-                <div class="row">
-                    <div class="col-sm-6">
-                        [@bsform.inputText name="firstname" tabindex="2" maxlength="64" /]
-                    </div>
-                    <div class="col-sm-6">
-                        [@bsform.inputText name="lastname" tabindex="3" maxlength="64" /]
-                    </div>
-                </div>
-                [@bsform.inputEmail name="email" tabindex="4" maxlength="96" /]
+    <div class="row">
+        <div class="col-sm-6">
+            [@bsform.inputText name="firstname" tabindex="2" maxlength="64" /]
+        </div>
+        <div class="col-sm-6">
+            [@bsform.inputText name="lastname" tabindex="3" maxlength="64" /]
+        </div>
+    </div>
+    [@bsform.inputEmail name="email" tabindex="4" maxlength="96" /]
 
-                [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
-                [@bsform.select name="lang" tabindex="5"]
-                [#list userLocales as uLocale]
-                    [@bsform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@bsform.option]
-                [/#list]
-                [/@bsform.select]
+    [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
+    [@bsform.select name="lang" tabindex="5"]
+    [#list userLocales as uLocale]
+    [@bsform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
 
-                [#if editMode]
-                <input type="hidden" name="role" value="edit" />
-                [#else]
+    [#if editMode]
+    <input type="hidden" name="role" value="edit" />
+    [#else]
 
-                    [#assign defaultValue = formsess.getDefaultValue('role')!'clientadmin' /]
-                    [@bsform.select name="role" class="input_full" tabindex="1"]
-                        [@bsform.option value="" selected="selected" disabled="disabled"][/@bsform.option]
-                        [@bsform.option value="none"]None[/@bsform.option]
-                        [#list roles as role]
-                            [@bsform.option value=role.uuid]${role.name?xhtml}[/@bsform.option]
-                        [/#list]
-                    [/@bsform.select]
+    [#assign defaultValue = formsess.getDefaultValue('role')!'clientadmin' /]
+    [@bsform.select name="role" class="input_full" tabindex="1"]
+    [@bsform.option value="" selected="selected" disabled="disabled"][/@bsform.option]
+    [@bsform.option value="none"]None[/@bsform.option]
+    [#list roles as role]
+    [@bsform.option value=role.uuid]${role.name?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
 
-                [/#if]
+    [/#if]
     [@bsform.infosection]
     [/@bsform.infosection]
-        <input type="hidden" name="orgId" value="${org.id}" />
-        [#if editMode]
-          <button tabindex="101" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-saved"></span> [@dws.txt key='form.action.saveuser' /]</button>
-        [#else]
-          <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.saveinvite' /]</button>
-        [/#if]
-        <a href="${helper.urlFor("CpMainModule", "listUsers", [org.id] )}" tabindex="102" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+    <input type="hidden" name="orgId" value="${org.id?c}" />
+
+    <input type="submit" id="hiddensubmit" style="display: none" />
+    [@modal.formParams /]
+    [#--
+    [#if editMode]
+    <button tabindex="101" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-saved"></span> [@dws.txt key='form.action.saveuser' /]</button>
+    [#else]
+    <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.saveinvite' /]</button>
+    [/#if]
+    <a href="${helper.urlFor('CpMainModule', 'listUsers', [org.id] )}" tabindex="102" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+    --]
 </form>
 
 [/@dws.skin]
