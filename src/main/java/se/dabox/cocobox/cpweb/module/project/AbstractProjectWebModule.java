@@ -74,6 +74,8 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
             Material material = mlf.getList().get(0);
             map.put("material", material);
         }
+
+        map.put("projectThumbnail", new LazyProjectThumbnail(cycle, project));
     }
 
     private Product getProductFromParticipationProjectState(RequestCycle cycle,
