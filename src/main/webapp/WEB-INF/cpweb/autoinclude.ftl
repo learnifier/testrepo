@@ -28,3 +28,13 @@
 </#assign>
 
 <#macro localeLanguage locale>${locale.getDisplayLanguage(resp.locale)?cap_first}</#macro>
+
+
+<#macro userNameAndEmail userId>
+    <#if infoHelper.getMiniUserInfo(userId)??>
+        <#local userInfo =  infoHelper.getMiniUserInfo(userId) />
+        <span data-toggle="tooltip" data-placement="top" title="${userInfo.displayName?xml} &lt;${userInfo.email?xml!''}&gt;">${userInfo.displayName?xml}</span>
+    <#else>
+        &nbsp;
+    </#if>
+</#macro>

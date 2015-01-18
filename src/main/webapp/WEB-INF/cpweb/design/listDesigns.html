@@ -7,6 +7,7 @@ ${cpweb_foot}
     
     var spinnerUrl = "[@common.spinnerUrl /]";
     var listDesignsAjaxSource =  "${helper.urlFor('coursedesign.CourseDesignJsonModule', 'list', [org.id])?js_string}";
+    var textSource = "${helper.urlFor('text.JsTextModule','default',[.locale])}?t=${cycle.application.formattedStartTime.base36String}&type=requirejs";
 
     require(["${contextPath}/js/design/listDesigns.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
        //No initialization needed

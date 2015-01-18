@@ -73,10 +73,10 @@
         <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
         <ul class="page-created-updated__wrapper list-inline">
             <li>
-                <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
+                <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy!-1 /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
             </li>
             <li>
-                <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
+                <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
             </li>
         </ul>
     </div>

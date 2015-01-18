@@ -1,7 +1,7 @@
 /* 
  * (c) Dabox AB 2013 All Rights Reserved
  */
-define([], function() {
+define([textSource], function(t) {
     "use strict";
     var exports = {};
 
@@ -42,9 +42,9 @@ define([], function() {
                     "data" : function(row, type, set) {
                         if (!row.statusDisplay) {
                             if ( row.sticky ) {
-                                row.statusDisplay = '<span class="on">[@dws.txt key="cpweb.designoverview.true" /]</span>'
+                                row.statusDisplay = '<span class="on">' + t._T('cpweb.designoverview.true') + '</span>';
                             } else {
-                                row.statusDisplay = '<span class="off">[@dws.txt key="cpweb.designoverview.false" /]</span>'
+                                row.statusDisplay = '<span class="off">' + t._T('cpweb.designoverview.false') + '</span>';
                             }
                         }
 
