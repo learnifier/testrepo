@@ -19,7 +19,7 @@ ${cpweb_foot}
     [#if session.hasFlashAttribute("missingProducts") ]
     $(function(){
         require(['dabox-common'] , function(){
-            var msg = '${session.getFlashAttribute("missingProducts")?xhtml?js_string}'.split('\n');
+            var msg = '${session.getFlashAttribute("missingProducts")?xhtml?js_string}';
             cocobox.infoDialog('Missing material(s)',msg);
         });
     })
