@@ -5,14 +5,16 @@ ${cpweb_foot}
 
 <script id="list-item-template" type="text/x-handlebars-template">
     <a href="#" class="list-group-item" data-projectid="{{id}}" >
-        <h4 class="list-group-item-heading">{{name}}</h4>
-        <p class="list-group-item-text">Added: {{added}} Invited: {{invited}}</p>
+    <h4 class="list-group-item-heading">{{name}}</h4>
+    <p class="list-group-item-text">Added: {{added}} Invited: {{invited}}</p>
     </a>
 </script>
 
 <script>
     var projectList = "${cycle.urlFor('CpJsonModule','listOrgProjects',[org.id?c])}";
     var projectListArchived = "${cycle.urlFor('CpJsonModule','listOrgProjects',[org.id?c])}?f=archived";
+
+    //[#include "inc_commonMoveJavascript.ftl" /]
 
     function showList(url, selectedPill) {
 
@@ -42,8 +44,8 @@ ${cpweb_foot}
         });
     }
 
-    $(function() {
-        $("#projectLg").on('click','a', null, function() {
+    $(function () {
+        $("#projectLg").on('click', 'a', null, function () {
             var pid = $(this).data("projectid");
 
             $("#targetProjectId").val(pid);
@@ -53,7 +55,7 @@ ${cpweb_foot}
         });
     });
 
-    $(function() {
+    $(function () {
         showList(projectList, "#activePill");
     });
 
@@ -80,26 +82,26 @@ ${cpweb_foot}
     <div class="row">
         <div class="col-md-12">
             <div class="center-block" id="spinnerbox" style="padding-top: 10px;">[@common.spinner /]</p>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="alert alert-danger hidden" role="alert" id="ajaxErrorBox">Failed to get data from the server. Please try again later.</div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div id="projectLg" class="list-group">
-
             </div>
         </div>
-    </div>
 
-    <div class="hidden">
-        <form action="${helper.urlFor('project.move.ParticipantMoveModule','verify',[prj.projectId, participation.participationId])}" method="post" id="verifyForm">
-            <input type="hidden" id="targetProjectId" name="targetProjectId" />
-        </form>
-    </div>
-[/@dws.skin]
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger hidden" role="alert" id="ajaxErrorBox">Failed to get data from the server. Please try again later.</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div id="projectLg" class="list-group">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden">
+            <form action="${formUrl}" method="post" id="verifyForm">
+                <input type="hidden" id="targetProjectId" name="targetProjectId" />
+            </form>
+        </div>
+        [/@dws.skin]

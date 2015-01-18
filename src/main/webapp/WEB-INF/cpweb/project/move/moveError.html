@@ -7,22 +7,23 @@
 [#assign cpweb_foot]
 ${cpweb_foot}
 
-[#if valid]
-
-<div class="hidden">
-    <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm" target="_top">
-            <input type="hidden" id="targetProjectId" name="targetProjectId" value="${targetProjectId?c}"/>
-        </form>
-</div>
-
 <script>
-    $("#moveButton").one('click', function () {
-        var $btn = $(this).button('loading');
+require(["[@modal.clientJavascript /]"], function (modalClient) {
 
-        $("#executeForm").submit();
-    });
+    modalClient.setButtons(
+            [
+                {
+                    text: "Close",
+                    cssClass: "btn-cancel",
+                    id: "closeButton",
+                    action: function (dlg) {
+                        dlg.cancel();
+                    }
+                }
+            ]
+        );
+});
 </script>
-[/#if]
 
 [/#assign]
 

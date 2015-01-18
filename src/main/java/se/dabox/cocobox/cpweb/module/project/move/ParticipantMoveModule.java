@@ -19,6 +19,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectWebModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.participation.move.ActionType;
@@ -58,6 +59,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
         map.put("participation", part);
+        map.put("formUrl", createSelectTargetFormUrl(cycle, project.getProjectId(), strParticipationId));
 
         return new FreemarkerRequestTarget("/project/move/selectTarget.html", map);
     }
@@ -79,10 +81,10 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
                 = DruwaParamHelper.getLongParam(LOGGER, cycle.getRequest(), "targetProjectId");
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
-        
+
         MoveParticipationRequest mpr = new MoveParticipationRequest(caller, part.
                 getParticipationId(), targetProjectId);
-        
+
         MoveParticipationResponse result
                 = getCocoboxCordinatorClient(cycle).verifyMoveParticipation(mpr);
 
@@ -90,6 +92,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         map.put("deletedList", getDeletedProducts(cycle, result));
         map.put("targetProjectId", targetProjectId);
         map.put("participation", part);
+        map.put("formUrl", createExecuteFormUrl(cycle, project.getProjectId(), strParticipationId));
 
         return new FreemarkerRequestTarget("/project/move/verificationResult.html", map);
     }
@@ -129,7 +132,6 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
             return new FreemarkerRequestTarget("/project/move/moveError.html", map);
         }
     }
-
 
     private ProjectParticipation checkParticipation(RequestCycle cycle, ProjectDetails project,
             String strParticipationId) {
@@ -171,4 +173,22 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
 
         return mlf.getList();
     }
+
+    private String createSelectTargetFormUrl(RequestCycle cycle, long projectId,
+            String strParticipationId) {
+
+        String url = cycle.urlFor(ParticipantMoveModule.class, "verify", Long.toString(projectId),
+                strParticipationId);
+
+        return ModalParamsHelper.decorateUrl(cycle, url);
+    }
+
+    private String createExecuteFormUrl(RequestCycle cycle, long projectId,
+            String strParticipationId) {
+        String url = cycle.urlFor(ParticipantMoveModule.class, "execute", Long.toString(projectId),
+                strParticipationId);
+
+        return ModalParamsHelper.decorateUrl(cycle, url);
+    }
+
 }

@@ -3,17 +3,31 @@
 [#assign cpweb_foot]
 ${cpweb_foot}
 
+<script>
+require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+    modalClient.setButtons(
+            [
+                {
+                    text: "Close",
+                    cssClass: "btn-cancel",
+                    id: "closeButton",
+                    action: function (dlg) {
+                        $("#targetForm").submit();
+                    }
+                }
+            ]
+        );
+});
+</script>
+
+
 <div class="hidden">
     <form action="${targetProjectUrl}" method="get" id="targetForm" target="_top"></form>
 </div>
 
 <script>
     $(function() {
-
-        $("#closeButton").click(function() {
-            $("#targetForm").submit();
-        });
-
         $("#targetForm").submit();
     });
 </script>
@@ -26,14 +40,6 @@ ${cpweb_foot}
     <div class="row">
         <div class="col-md-12">
             <h1>Move successful</h1>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="center-block">
-                <button type="button" class="btn btn-primary btn-lg" id="closeButton">Close</button>
-            </div>
         </div>
     </div>
 

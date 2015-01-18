@@ -7,21 +7,47 @@
 [#assign cpweb_foot]
 ${cpweb_foot}
 
+<script>
+require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+    modalClient.setButtons(
+            [
+                //[#if valid]
+                {
+                    text: "Move",
+                    cssClass: "btn-primary",
+                    id: "moveButton",
+                    prepareButton: function(button) {
+                        button.attr("data-loading-text", "Moving...");
+                        button.html("Hejhopp");
+                    },
+                    action: function (dlg) {
+                        $(this).button('loading');
+                        $("#executeForm").submit();
+                    }
+                },
+                //[/#if]
+                {
+                    text: "Cancel",
+                    cssClass: "btn-cancel",
+                    action: function (dlg) {
+                        dlg.cancel();
+                    }
+                }
+            ]
+        );
+});
+</script>
+
 [#if valid]
 
 <div class="hidden">
-    <form action="${helper.urlFor('project.move.ParticipantMoveModule','execute',[prj.projectId, participation.participationId])}" method="post" id="executeForm">
+    <form action="${formUrl}" method="post" id="executeForm">
             <input type="hidden" id="targetProjectId" name="targetProjectId" value="${targetProjectId?c}"/>
+            [@modal.formParams /]
         </form>
 </div>
 
-<script>
-    $("#moveButton").one('click', function () {
-        var $btn = $(this).button('loading');
-
-        $("#executeForm").submit();
-    });
-</script>
 [/#if]
 
 [/#assign]
@@ -86,14 +112,5 @@ ${cpweb_foot}
         </div>
     </div>
 
-    [#if valid]
-    <div class="row">
-        <div class="col-md-12">
-            <p class="text-right">
-                <button id="moveButton" type="button" class="btn btn-primary" data-loading-text="Moving...">Move</button>
-            </p>
-        </div>
-    </div>
-    [/#if]
 </div>
 [/@dws.skin]

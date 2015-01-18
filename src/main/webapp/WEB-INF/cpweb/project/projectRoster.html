@@ -468,11 +468,18 @@ ${cpweb_foot}
     function moveParticipation(target) {
         var pid = $(target).data("participationid");
 
-        var moveSrc = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}";
+        var moveSrc = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}/"+pid;
 
-        $("#moveIframe").prop("src", moveSrc+"/"+pid);
-
-        $("#moveDialog").modal();
+        require(["[@modal.javascript /]"], function(modal) {
+            modal.open({
+	               title: "Move",
+	               src: moveSrc,
+	               height: "400px",
+                       cancel: function() 
+                        {/* Do nothing, otherwise redirect in popup */},
+                       cancelUrl: window.location.href
+            });
+        });
     }
 
 </script>
