@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebSession;
@@ -18,6 +19,7 @@ import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.SendMailModule;
 import se.dabox.cocobox.cpweb.module.mail.SendMailProcessor;
+import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.util.DateUtil;
 import se.dabox.util.ParamUtil;
@@ -42,6 +44,7 @@ public class SendMailSession implements Serializable {
     private Locale stickyTemplateLocale;
     private boolean stickyHidesDropdown = true;
     private PortableMailTemplate portableMailTemplate;
+    private String skin;
 
     public SendMailSession(SendMailProcessor processor,
             RequestTargetGenerator completedTargetGenerator,
@@ -319,6 +322,24 @@ public class SendMailSession implements Serializable {
     }
 
     /**
+     * Returns the skin the edit screen should use. This method never returns null.
+     *
+     * @return The skin name
+     */
+    public String getSkin() {
+        return skin == null ? "CPAuth3" : skin;
+    }
+
+    /**
+     * Sets the skin the edit screen should use.
+     *
+     * @param skin The name of the skin; {@code null} for default.
+     */
+    public void setSkin(String skin) {
+        this.skin = skin;
+    }
+
+    /**
      * Returns a SendMailSession from a WebSession that match the specified uuid.
      *
      * @param session The WebSession to retreive the session from
@@ -340,9 +361,17 @@ public class SendMailSession implements Serializable {
     }
     
     public RequestTarget getPreSendTarget(long orgId) {
-        return new WebModuleRedirectRequestTarget(SendMailModule.class,
-                SendMailModule.VIEW_SENDMAIL_ACTION, Long.toString(orgId),
-                uuid.toString());
+        WebModuleRedirectRequestTarget target
+                = new WebModuleRedirectRequestTarget(SendMailModule.class,
+                        SendMailModule.VIEW_SENDMAIL_ACTION, Long.toString(orgId),
+                        uuid.toString());
+
+        RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
+        String extraParams = ModalParamsHelper.getParameterString(cycle);
+
+        target.setExtraTargetParameterString(extraParams);
+
+        return target;
     }
 
 }

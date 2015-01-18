@@ -22,6 +22,7 @@ import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.cocosite.mail.GetGenericMailBucketCommand;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
@@ -103,6 +104,7 @@ public class SendMailModule extends AbstractWebAuthModule {
         map.put("receivers", getReceivers(cycle, sms));
         map.put("displayReceivers", sms.getDisplayReceivers());
         map.put("sender", sms.getProcessor().getMailSender(cycle));
+        map.put("modalMode", ModalParamsHelper.isModalRequest(cycle));
         
         addOldValueIfMissing(formsess, "body", body);
         addOldValueIfMissing(formsess, "subject", subject);

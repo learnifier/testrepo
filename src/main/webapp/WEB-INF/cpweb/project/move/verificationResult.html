@@ -19,7 +19,6 @@ require(["[@modal.clientJavascript /]"], function (modalClient) {
                     id: "moveButton",
                     prepareButton: function(button) {
                         button.attr("data-loading-text", "Moving...");
-                        button.html("Hejhopp");
                     },
                     action: function (dlg) {
                         $(this).button('loading');

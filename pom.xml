@@ -163,7 +163,14 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
             <type>jar</type>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>se.dabox.cocosite</groupId>
+            <artifactId>cocosite-overlay</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

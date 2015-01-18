@@ -17,6 +17,7 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import net.unixdeveloper.druwa.util.UrlBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -263,6 +264,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     private RequestTarget createExistingAccountMail(RequestCycle cycle, UserAccount adminAccount,
             String strOrgId) {
         String userPageUrl = NavigationUtil.toUserPageUrl(cycle, strOrgId, adminAccount.getUserId());
+        userPageUrl = createTopRedirectUrl(cycle, userPageUrl);
 
         SendMailSession sms = new SendMailSession(new AdminWelcomeMailProcessor(adminAccount.
                 getUserId(), Long.valueOf(strOrgId)),
@@ -274,6 +276,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
         sms.setStickyTemplateHint(CpwebConstants.ADMIN_WELCOME_MAIL_HINT);
         sms.setStickyTemplateLocale(CocositeUserHelper.getUserAccountUserLocale(adminAccount));
         sms.setStickyHidesDropdown(false);
+        sms.setSkin("barebone_bootstrap");
 
         sms.storeInSession(cycle);
 
@@ -283,6 +286,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
     private RequestTarget createNewAccountMail(RequestCycle cycle, UserAccount adminAccount,
             String strOrgId) {
         String userPageUrl = NavigationUtil.toUserPageUrl(cycle, strOrgId, adminAccount.getUserId());
+        userPageUrl = createTopRedirectUrl(cycle, userPageUrl);
 
         UrlRequestTargetGenerator target =
                 new UrlRequestTargetGenerator(userPageUrl);
@@ -300,6 +304,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
         sms.setStickyTemplateHint(CpwebConstants.ADMIN_WELCOME_MAIL_HINT);
         sms.setStickyTemplateLocale(CocositeUserHelper.getUserAccountUserLocale(adminAccount));
         sms.setStickyHidesDropdown(false);
+        sms.setSkin("barebone_bootstrap");
 
         sms.storeInSession(cycle);
 
@@ -345,12 +350,12 @@ public class CreateUserModule extends AbstractWebAuthModule {
 
         if (ua == null) {
             LOGGER.warn("User doesn't exist: {}", userId);
-            return new RedirectUrlRequestTarget(NavigationUtil.toOrgUsersUrl(cycle, strOrgId));
+            return topRedirect(cycle, NavigationUtil.toOrgUsersUrl(cycle, strOrgId));
         }
 
         if (!UserAccountRoleCheck.isCpAdmin(ua, orgId)) {
             LOGGER.warn("User doesn't have a client admin role in ou {}", orgId);
-            return new RedirectUrlRequestTarget(NavigationUtil.toUserPageUrl(cycle, strOrgId, userId));
+            return topRedirect(cycle, NavigationUtil.toUserPageUrl(cycle, strOrgId, userId));
         }
 
         if (ua.isPasswordSet()) {
@@ -364,5 +369,22 @@ public class CreateUserModule extends AbstractWebAuthModule {
 
     private boolean isValidRole(String role) {
         return true;
+    }
+
+    private RedirectUrlRequestTarget redirect(RequestCycle cycle, String url) {
+        String targetUrl = ModalParamsHelper.decorateUrl(cycle, url);
+        return new RedirectUrlRequestTarget(targetUrl);
+    }
+
+    private RedirectUrlRequestTarget topRedirect(RequestCycle cycle, String url) {
+        return new RedirectUrlRequestTarget(createTopRedirectUrl(cycle, url));
+    }
+
+    private String createTopRedirectUrl(RequestCycle cycle, String url) {
+        String target = cycle.getRequest().getContextPath()+"/_fr.html";
+        UrlBuilder builder = new UrlBuilder(target);
+        builder.addParameter("t", url);
+
+        return builder.toString();
     }
 }
