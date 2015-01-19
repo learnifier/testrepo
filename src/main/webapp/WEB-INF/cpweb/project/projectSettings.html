@@ -100,7 +100,14 @@ ${cpweb_foot}
         $.ajax({
             type: 'POST',
             url: "${helper.urlFor('project.ProjectJsonModule','setSocialSetting',[prj.projectId])}",
-            data: {enabled: socialSetting}
+            data: {enabled: socialSetting},
+            success: function(data) {
+                $('#socialfeatures-cb').bootstrapToggle('enable');
+                $('#socialfeatures-cb').bootstrapToggle(socialSetting ? 'on' : 'off');
+            },
+            complete: function() {
+                $('#socialfeatures-cb').bootstrapToggle('enable');
+            }
         });
     };
 
@@ -136,8 +143,15 @@ ${cpweb_foot}
         }
     });
 
-    $('#socialfeatures-cb').on('switchChange.bootstrapSwitch', function(ev, st) {
-        setSocial(st);
+
+    $(function() {
+        require(['bootstrap/toggle'], function() {
+            $('#socialfeatures-h').next().on('click', function(ev) {
+                $('#socialfeatures-cb').bootstrapToggle('disable');
+                setSocial(!$("#socialfeatures-cb").prop("checked"));
+                return false;
+            });
+        });
     });
     
     $('#expirationtoggle-false').click(function() {
