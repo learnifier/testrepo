@@ -82,7 +82,7 @@ import se.dabox.util.collections.ValueUtils;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.vd")
-public class VerifyProjectDesignModule extends AbstractWebAuthModule {
+public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
     public static final String ACTION_VERIFY_NEW_DESIGN = "verifyNewDesign";
     public static final String ACTION_SECONDARY_DATA = "verifyNewDesignSecondary";
@@ -333,6 +333,8 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
                 return NavigationUtil.toProjectPage(project.getProjectId());
             }
         }
+
+        addCommonMapValues(map, project, cycle);
 
         if (primary) {
             return new FreemarkerRequestTarget("/project/projectDesignDataPrimary.html", map);
