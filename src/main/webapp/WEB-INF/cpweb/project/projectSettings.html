@@ -31,12 +31,9 @@ ${cpweb_foot}
 
 <script>
     
-    
-    
     "use strict";
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
-    
     var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
     cpweb.editable($('#language .editable-content'), 
@@ -96,7 +93,7 @@ ${cpweb_foot}
                 log(data);
             }
         });
-    }
+    };
 
     var setSocial = function(socialSetting) {
 
@@ -108,10 +105,10 @@ ${cpweb_foot}
     };
 
 
-    $('#meeting-maker input').click( function() {
-        var clicked = $(this).val();
+    $('#meeting-maker-cb').on('switchChange.bootstrapSwitch', function(ev, st) {
+        var clicked = st;
 	  
-        if(clicked == 'true') {
+        if(clicked) {
             cocobox.confirmationDialog(
             'Turning calendar invitations ON',
             'As you turn this feature on, all participants will automatically receive calendar invitations via email, both as events are added, updated and deleted.' ,
@@ -119,29 +116,28 @@ ${cpweb_foot}
                 setIcal(true, false);
             },
             function() {
-                $('#meeting-maker-false').attr('checked', 'checked'); //do not activate the meeting maker. Check off settings input.
+                //do not activate the meeting maker. Check off settings input.
+                $('#meeting-maker-cb').bootstrapSwitch('state', false, true); 
             }
-        )
+            );
         } else {
             cocobox.confirmationDialogYesNo(
-            'Turning calendar invitations OFF',
-            'Do you want to send cancellations to previously sent calendar invitations?',
-            function() {
-                //log('Send cancels');
-                setIcal(false, true);
-            },
-            function() {
-                //log('No cancels');
-                setIcal(false, false);
-            }
-        )
+                'Turning calendar invitations OFF',
+                'Do you want to send cancellations to previously sent calendar invitations?',
+                function() {
+                    //log('Send cancels');
+                    setIcal(false, true);
+                },
+                function() {
+                    //log('No cancels');
+                    setIcal(false, false);
+                }
+            );
         }
     });
 
-    $('#socialfeatures input').click( function() {
-        var clicked = $(this).val();
-
-        setSocial(clicked === 'true');
+    $('#socialfeatures-cb').on('switchChange.bootstrapSwitch', function(ev, st) {
+        setSocial(st);
     });
     
     $('#expirationtoggle-false').click(function() {
