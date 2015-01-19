@@ -84,13 +84,18 @@ ${cpweb_foot}
     });
 
     var setIcal = function(autoIcal, sendUpdates) {
-		
+        $("#meeting-maker-cb").bootstrapToggle('disable');
         $.ajax({
             type: 'POST',
             url: "${helper.urlFor('project.ProjectJsonModule','setAutoIcalStatus',[prj.projectId])}",
             data: {autoical: autoIcal, sendUpdates: sendUpdates},
             success: function(data) {
+                $("#meeting-maker-cb").bootstrapToggle('enable');
+                $("#meeting-maker-cb").bootstrapToggle(autoIcal ? 'on' : 'off');
                 log(data);
+            },
+            complete: function() {
+                $("#meeting-maker-cb").bootstrapToggle('enable');
             }
         });
     };
@@ -111,47 +116,45 @@ ${cpweb_foot}
         });
     };
 
-
-    $('#meeting-maker-cb').on('switchChange.bootstrapSwitch', function(ev, st) {
-        var clicked = st;
-	  
-        if(clicked) {
-            cocobox.confirmationDialog(
-            'Turning calendar invitations ON',
-            'As you turn this feature on, all participants will automatically receive calendar invitations via email, both as events are added, updated and deleted.' ,
-            function() {
-                setIcal(true, false);
-            },
-            function() {
-                //do not activate the meeting maker. Check off settings input.
-                $('#meeting-maker-cb').bootstrapSwitch('state', false, true); 
-            }
-            );
-        } else {
-            cocobox.confirmationDialogYesNo(
-                'Turning calendar invitations OFF',
-                'Do you want to send cancellations to previously sent calendar invitations?',
-                function() {
-                    //log('Send cancels');
-                    setIcal(false, true);
-                },
-                function() {
-                    //log('No cancels');
-                    setIcal(false, false);
-                }
-            );
-        }
-    });
-
-
+    //onload and require is important. This code must run after toggle buttons are initialized
     $(function() {
         require(['bootstrap/toggle'], function() {
-            $('#socialfeatures-h').next().on('click', function(ev) {
-                $('#socialfeatures-cb').bootstrapToggle('disable');
-                setSocial(!$("#socialfeatures-cb").prop("checked"));
+
+            $('#meeting-maker-h').next().on('click', function(ev, st) {
+                var clicked = !$("#meeting-maker-cb").prop("checked");
+
+                if(clicked) {
+                    cocobox.confirmationDialog(
+                    'Turning calendar invitations ON',
+                    'As you turn this feature on, all participants will automatically receive calendar invitations via email, both as events are added, updated and deleted.' ,
+                    function() {
+                        setIcal(true, false);
+                    }
+                    );
+                } else {
+                    cocobox.confirmationDialogYesNo(
+                        'Turning calendar invitations OFF',
+                                        'Do you want to send cancellations to previously sent calendar invitations?',
+                                    function () {
+                                        //log('Send cancels');
+                                        setIcal(false, true);
+                                    },
+                                    function () {
+                                        //log('No cancels');
+                                        setIcal(false, false);
+                                    }
+                            );
+                }
+
                 return false;
             });
-        });
+
+                $('#socialfeatures-h').next().on('click', function (ev) {
+                    $('#socialfeatures-cb').bootstrapToggle('disable');
+                    setSocial(!$("#socialfeatures-cb").prop("checked"));
+                    return false;
+                });
+            });
     });
     
     $('#expirationtoggle-false').click(function() {
