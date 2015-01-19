@@ -168,7 +168,8 @@ $('#uploadRoster').submit(function() {
 // GENERIC EDITABLE HANDLER FOR CPWEB
 
 cpweb.editable = function(selectorContent, selectorControl, changeListener, opts) {
-    require(['bootstrap/editable'], function() {
+    require(['bootstrap/editable','bootstrap/cocobox-editable-datetime'], function() {
+        
         var defaultOpts = {
             mode: 'popup',
             emptytext: ''

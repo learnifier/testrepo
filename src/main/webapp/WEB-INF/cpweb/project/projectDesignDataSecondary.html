@@ -74,9 +74,10 @@ ${cpweb_foot}
 		postSetValue(textfield, pk, override, name, value );
 	});
 	
-	requirejs(['bootstrap/editable'], function() {
+	requirejs(['bootstrap/editable','bootstrap/cocobox-editable-datetime'], function() {
 		$('.editable').editable({
-			title: ''
+			title: '',
+                        container: 'body'
 		});
 	});
 
@@ -221,8 +222,7 @@ ${cpweb_foot}
 [#assign fname = component.cid+'_'+field.name /]
 
 [#if fieldType == "datetime"]
-<span [#if !field.primaryField]class="editspan"[/#if] data-hiddenid="f${component.cid}_${field.name}" id="text${component.cid}_${field.name}">[#if field.stringValue?length > 0]${field.stringValue}[#else]Click to set a date[/#if]</span>
-<input type="hidden" id="f${component.cid}_${field.name}" data-cid="${component.cid}"  name="f${component.cid}_${field.name}" data-name="${field.name}" value="[@fieldValue fname /]" />
+<span [#if !field.primaryField]class="editable"[/#if] id="f${component.cid}_${field.name}" data-url="${setValueUrl}" data-pk="${component.cid}" data-name="${field.name}" name="f${component.cid}_${field.name}" data-value="[@fieldValue fname /]" data-type="ccbdatetime">${field.stringValue}</span>
 [#else]
 <span [#if !field.primaryField]class="editable"[/#if] id="f${component.cid}_${field.name}" data-url="${setValueUrl}" data-pk="${component.cid}" data-name="${field.name}" name="f${component.cid}_${field.name}" data-value="[@fieldValue fname /]">${field.stringValue}</span>
 [/#if]
@@ -232,13 +232,6 @@ ${cpweb_foot}
 [/#if]
 
 [#if field.dataType == "DATETIME" && field.primaryField == false]
-<span class="revertspan" data-hiddenid="f${component.cid}_${field.name}" title="revert to default setting"></span>
-[@bsform._onreadyJavascript]
-[#compress]
-requirejs(['jquery-ui-timepicker-addon'], function() {
-	$("#f${component.cid}_${field.name}").datetimepicker(dpSettings);
-});
-[/#compress]
-[/@]
+<span class="revertspan" data-hiddenid="f${component.cid}_${field.name}" title="revert to default setting">Revert</span>
 [/#if]
 [/#macro]
