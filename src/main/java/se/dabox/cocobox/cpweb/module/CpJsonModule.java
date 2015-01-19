@@ -25,6 +25,7 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.cpweb.module.user.UserModule;
@@ -282,7 +283,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         InfoCacheHelper icHelper = InfoCacheHelper.getInstance(cycle);
 
         try {
-            try (JsonGenerator generator = FACTORY.createJsonGenerator(baos)) {
+            try (JsonGenerator generator = FACTORY.createGenerator(baos, com.fasterxml.jackson.core.JsonEncoding.UTF8)) {
                 generator.writeStartObject();
 
                 generator.writeArrayFieldStart("aaData");
@@ -294,8 +295,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                     generator.writeStringField("added", nf.format(project.getUserCount()));
                     generator.writeStringField("invited", nf.format(project.getInvited()));
                     generator.writeStringField("link",
-                            cycle.urlFor(ProjectModule.class.getName(), "roster",
-                            Long.toString(project.getProjectId())));
+                            NavigationUtil.toProjectPageUrl(cycle, project.getProjectId()));
                     generator.writeNumberField("createdBy", project.getCreatedBy());
                     generator.writeStringField("createdByName", icHelper.getUserDisplayName(project.getCreatedBy()));
                     writeLongNullField(generator, "updatedBy",
