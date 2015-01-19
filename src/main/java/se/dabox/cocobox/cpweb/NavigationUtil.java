@@ -30,12 +30,17 @@ public final class NavigationUtil {
 
     public static RequestTarget toProjectPage(long projectId) {
         return new WebModuleRedirectRequestTarget(ProjectModule.class,
-                ProjectModule.ROSTER_ACTION, Long.toString(projectId));
+                ProjectModule.OVERVIEW_ACTION, Long.toString(projectId));
     }
 
     
     public static String toProjectPageUrlPrefix(RequestCycle cycle) {
-        return cycle.urlFor(ProjectModule.class, ProjectModule.ROSTER_ACTION);
+        return cycle.urlFor(ProjectModule.class, ProjectModule.OVERVIEW_ACTION);
+    }
+    
+    public static String toProjectPageUrl(RequestCycle cycle, long projectId) {
+        return cycle.urlFor(ProjectModule.class,
+                ProjectModule.OVERVIEW_ACTION, Long.toString(projectId));
     }
 
     public static RequestTarget toProjectTaskPage(long projectId) {
@@ -90,11 +95,6 @@ public final class NavigationUtil {
      */
     public static RequestTarget toMain(RequestCycle cycle) {
         return new RedirectUrlRequestTarget(toMainUrl(cycle));
-    }
-
-    public static String toProjectPageUrl(RequestCycle cycle, long projectId) {
-        return cycle.urlFor(ProjectModule.class,
-                ProjectModule.ROSTER_ACTION, Long.toString(projectId));
     }
 
     public static String toUserPageUrl(RequestCycle cycle, String strOrgId, long userId) {
