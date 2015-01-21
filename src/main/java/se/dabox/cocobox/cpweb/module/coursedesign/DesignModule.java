@@ -9,7 +9,6 @@ import java.util.Map;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -27,6 +26,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.design.EditDesignSettingsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
+import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
 import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
@@ -83,6 +83,7 @@ public class DesignModule extends AbstractWebAuthModule {
         map.put("designId", designId);
         map.put("usernameHelper", new UserIdentifierHelper(cycle));
         map.put("expiration", getExpirationDays(bcd));
+        map.put("thumbnail", new CourseDesignThumbnail(cycle, bcd.getDesign().getDesignId()).get());
 
         return new FreemarkerRequestTarget("/design/designOverview.html", map);
     }
