@@ -84,10 +84,10 @@ $(document).ready(function() {
 
  
 function reloadMemberList(data) {
-    var oTable = $('#userroleslist').dataTable();
-    oTable.fnClearTable();
-    log(data.aaData);
-    oTable.fnAddData(data.aaData);
+    var oTable = $('#userroleslist').DataTable();
+    oTable.clear();
+    oTable.rows.add(data.aaData);
+    oTable.draw();
 };
 
 function deleteMember(role) {
