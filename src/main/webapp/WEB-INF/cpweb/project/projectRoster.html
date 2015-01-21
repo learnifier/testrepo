@@ -23,12 +23,6 @@ ${cpweb_foot}
     $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
 
 
-    function runiCheck() {
-      $('#projectroster input').iCheck({
-        checkboxClass: 'icheckbox_square-red',
-        radioClass: 'iradio_square-red'
-      });
-    };
 </script>
 
 
@@ -291,7 +285,7 @@ ${cpweb_foot}
         });
         [/@]
 
-        $("#cball").click(function(ev) {
+        $("#cball").on('click', function(ev) {
             if (this.checked) {
                 var items = $("input.rowcb").not(":checked");
                 items.trigger('click');
@@ -304,6 +298,14 @@ ${cpweb_foot}
                 items.trigger('change');
             }
         })
+
+    function runiCheck() {
+      $('#projectroster input').icheck({
+        checkboxClass: 'icheckbox_square-red',
+        radioClass: 'iradio_square-red'
+      });
+    };
+
 
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
@@ -484,7 +486,6 @@ ${cpweb_foot}
     }
 
 </script>
-<!-- Temporary for iCheck-->
 [/#assign]
 
 [#assign cpweb_head]
