@@ -157,32 +157,20 @@ ${cpweb_foot}
     [@commonCss.jqueryMinicolors /]
     ${cpweb_head}
 
-    <style>
-        /* Hack for jquery-ui and jcrop */
-        .ui-front {
-            z-index: 1000;
-        }
-    </style>
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
 [@portalSecurity.permissionBlock permission="CP_EDIT_BRANDING"]
-<div id="settingsList">
-    <h1>[@dws.txt key="cpweb.page.branding.title" /]</h1>
-    <ul>
-        <li id="logo" class="expandable">
-            <a class="setting">
-                <span class="label">[@dws.txt key="cpweb.setting.logotype.title" /]</span>
-                <span class="edit">[@dws.txt key="cpweb.setting.edit" /]</span>
-                <span class="short">Set Customized Logo</span>
-            </a>
-            <div class="content">
-                <div class="label">[@dws.txt key="cpweb.setting.logotype.title" /]</div>
+<h1>[@dws.txt key="cpweb.page.branding.title" /]</h1>
+
+<div class="row">
+    <div class="col-xs-6">
+                <h2>[@dws.txt key="cpweb.setting.logotype.title" /]</h2>
                 <div class="form" id="uploadlogo">
                     [#global formPrefix="cpweb.logotype.language" /]
                     <form action="${helper.urlFor('branding.LogoModule','uploadImage',[org.id])}" method="post" enctype="multipart/form-data" id="logoform">
                         <input type="file" name="image" id="image" required="required" style="position: absolute; left: -9999px;" />
-                        <h3>Upload your logo</h3>
                         <p class="image"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span> Preferred size is 468x120.</p>
                         <label for="image" id="uploadPicBtn" class="btn btn-primary" style="margin-bottom: 20px">
                             <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]
@@ -192,12 +180,15 @@ ${cpweb_foot}
                             0%
                           </div>
                         </div>                        
+                                <div id="picture_wrapper">
+                                    <img id="preview" />
+                                </div>
                         [#-- Hiding this section until BS version of cropping is ready --]
                         <h3 style="display:none">Step 3 - Crop the uploaded logo</h3>
                         <ul id="preparepicture_wrapper" style="display:none">
                             <li>
                                 <div id="picture_wrapper">
-                                    <img id="preview" />
+                                    <img id="preview-2"  />
                                 </div>
                             </li>
                             <li>
@@ -223,23 +214,16 @@ ${cpweb_foot}
                             </div>
                         </section>
                         <section class="action">
-                            <button type="submit" class="btn btn-primary" disabled="disabled" id="saveLogoBtn"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key="form.action.savelogo" /]</button>
+                            <button type="submit" class="btn btn-primary btn-lg" disabled="disabled" id="saveLogoBtn"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key="form.action.savelogo" /]</button>
                             <button type="submit" class="btn btn-primary-outlined" id="resetLogoBtn" name="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetlogo" /]</button>
-                            <a class="btn btn-link" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
                         </section>
                     </form>
                 </div>
-            </div>
-        </li>
-        <li id="colors" class="expandable">
+        
+    </div>
+    <div class="col-xs-6">
             [#global formsess=colorformsess /]
-            <a class="setting">
-                <span class="label">[@dws.txt key="cpweb.setting.colors.title" /]</span>
-                <span class="edit">[@dws.txt key="cpweb.setting.edit" /]</span>
-                <span class="short">Set Customized Colors</span>
-            </a>
-            <div class="content">
-                <div class="label">[@dws.txt key="cpweb.setting.colors.title" /]</div>
+                <h2>[@dws.txt key="cpweb.setting.colors.title" /]</h2>
                 <div class="form">
                     [#global formPrefix="cpweb.colors.language" /]
                     <form action="${helper.urlFor('branding.BrandingModule','colorChange',[org.id])}" method="post" enctype="multipart/form-data" id="colorform" onsubmit="brandingUpdateForm(this)">
@@ -253,14 +237,13 @@ ${cpweb_foot}
                         [/#if]
                         [@bsform.infosection]
                         [/@bsform.infosection]
-                        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savecolors' /]</button>
+                        <button type="submit" tabindex="100" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savecolors' /]</button>
                         <button type="submit" class="btn btn-primary-outlined" id="resetColorBtn" name="reset" value="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetcolors" /]</button>
-                        <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
                     </form>
-                </div>
-            </div>
-        </li>
-    </ul>
+                </div>        
+    </div>
+    
 </div>
+
 [/@]
 [/@dws.skin]

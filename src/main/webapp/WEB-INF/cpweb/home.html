@@ -169,7 +169,7 @@ ${cpweb_foot}
 
 <article id="ccb-page-home">
     [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
-    <div class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored" id="actions" style="display: none;">
+    <div class="ccb-flat-card ccb-flat-card-padding" id="actions" style="display: none;">
         <section id="multiple-actions" style="display: none;">
             <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-chevron-down"></span> Show Issues</a>
             <h1>Action</h1>
@@ -189,7 +189,7 @@ ${cpweb_foot}
         <div class="col-sm-7">
 
             [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
-            <div class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored">
+            <div class="ccb-flat-card ccb-flat-card-padding">
                 [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
                 <section id="new-project">
                     <h1>New Project</h1>
@@ -210,7 +210,7 @@ ${cpweb_foot}
             </div>
             [/#if]
             [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
-            <div class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored">
+            <div class="ccb-flat-card ccb-flat-card-padding">
                 <h2>Upload your materials</h2>
                 <p>Add your own training materials to tailor the learning to your needs.</p>
                 <div class="text-center">
@@ -221,7 +221,7 @@ ${cpweb_foot}
             </div>
             [/@]
             [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-            <div class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored">
+            <div class="ccb-flat-card ccb-flat-card-padding ">
                 <h2>Invite an administrator</h2>
                 <p>Invite additional administrators to manage projects from this portal.</p>
                 <div class="text-center">
@@ -233,18 +233,18 @@ ${cpweb_foot}
         </div>
         <div class="col-sm-5">
             [#if (dwsrt.config["cpweb.support.htmlsnippet"]) != ""]
-            <div id="techsupportinfo" class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored">
+            <div id="techsupportinfo" class="ccb-flat-card ccb-flat-card-padding">
                 ${dwsrt.config["cpweb.support.htmlsnippet"]}
             </div>
             [/#if]
             [#if welcomeMessage??]
-            <div class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored" id="contact">
+            <div class="ccb-flat-card ccb-flat-card-padding" id="contact">
                 [@wm.welcomeBox welcomeMessage /]
             </div>
             [/#if]
 
             [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-            <div class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored" id="balance">
+            <div class="ccb-flat-card ccb-flat-card-padding" id="balance">
                 <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a>
                 <h2>Your Account Status</h2>
                 <div id="product-count" class="secondaryBackgroundColor">
