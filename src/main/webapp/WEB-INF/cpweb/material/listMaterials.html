@@ -11,7 +11,8 @@
 [#assign foot]
 ${cpweb_foot}
 <script>
-    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-materials').addClass('active');
 
     require(["${contextPath}/js/material/listMaterials.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
        //No initialization needed

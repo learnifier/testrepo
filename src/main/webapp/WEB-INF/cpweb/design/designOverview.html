@@ -3,7 +3,8 @@
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-coursetemplates').addClass('active');
     
     function deleteCourseDesign () {
         cocobox.confirmationDialog("Delete course design", "Do you want to delete this course design?",

@@ -12,7 +12,7 @@ ${cpweb_foot}
 [#include "courseDesignRenderer.html" />
 
 <script>
-    $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');    
+    $('#menu-projects').addClass('active');    
 
     var listCourseDesigns = "${helper.urlFor('project.NewProjectJsonModule', 'newProjectTypes', [org.id])?js_string}";
 

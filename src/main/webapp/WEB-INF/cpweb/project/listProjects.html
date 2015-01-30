@@ -3,7 +3,7 @@
 [#assign foot]
     ${cpweb_foot}
     <script>
-        $('#tm_projects').addClass('activeItem').prev().addClass('prevItem');
+        $('#menu-projects').addClass('active');
 
         var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
         var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";

@@ -132,7 +132,8 @@ ${cpweb_foot}
 
 <script>
     
-    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-materials').addClass('active');
     
     var listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
     var listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";

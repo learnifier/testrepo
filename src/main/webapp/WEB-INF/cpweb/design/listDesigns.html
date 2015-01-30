@@ -3,7 +3,8 @@
 [#assign cpweb_foot]
 ${cpweb_foot}
 <script>
-    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-coursetemplates').addClass('active');
     
     var spinnerUrl = "[@common.spinnerUrl /]";
     var listDesignsAjaxSource =  "${helper.urlFor('coursedesign.CourseDesignJsonModule', 'list', [org.id])?js_string}";
