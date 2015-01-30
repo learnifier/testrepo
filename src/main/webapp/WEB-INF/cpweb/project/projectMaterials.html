@@ -155,7 +155,7 @@ ${cpweb_foot}
 
 <h2>[@dws.txt key="cpweb.project.materials.title" /]</h2>
 
-<section id="addprojectmaterial">
+<section id="addprojectmaterial" class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored">
     [#global formPrefix="cpweb.project.addmaterial" /]
     <form action="${addLink}" name="addMaterial" id="addMaterial" class="fullpage" method="post">
         [@bsform.alertsection]
@@ -183,20 +183,18 @@ ${cpweb_foot}
     </form>
 </section>
 
-<section class="list">
-    <table class="list" id="projectmaterials">
-        <thead>
-            <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</section>
+<table class="table list" id="projectmaterials">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 [/@dws.skin]
 
