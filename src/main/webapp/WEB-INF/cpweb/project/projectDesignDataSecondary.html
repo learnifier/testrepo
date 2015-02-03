@@ -44,16 +44,20 @@ ${cpweb_foot}
 		}
     };
 	
-	var postSetValue = function(textfield, pk, override, name, value) {
+	var postSetValue = function(textfield, pk, override, name, value, postOp) {
 		$.ajax({
 			type: 'post',
 			url: "${setValueUrl}",
 			data: {'pk': pk, 'override': override, 'name': name, 'value': value},
 			success: function(data) {
-				var modifiedTextValue = data.stringValue.replace(/\:[0-9]{2}\s/, " ");
+				var modifiedTextValue = data.text.replace(/\:[0-9]{2}\s/, " ");
 				if(textfield != null) {
 					$('#'+textfield).text(modifiedTextValue);
 				}
+
+                                if (postOp) {
+                                    postOp(data);
+                                }
 			}
 		});
 	};
@@ -66,12 +70,14 @@ ${cpweb_foot}
 	$('body').on('click', '.revertspan', function() {
 		var hiddenid = $(this).data('hiddenid');
 		var name = $('#'+hiddenid).data('name');
-		var pk = $('#'+hiddenid).data('cid');
+		var pk = $('#'+hiddenid).data('pk');
 		var override = false; //time to revert, set override to false
 		var value = $('#'+hiddenid).val();
 		var textfield = 'text'+hiddenid.substring(1);
 		
-		postSetValue(textfield, pk, override, name, value );
+		postSetValue(textfield, pk, override, name, value, function() {
+                    $("#"+hiddenid).editable('setValue', null);
+                } );
 	});
 	
 	requirejs(['bootstrap/editable','bootstrap/cocobox-editable-datetime'], function() {

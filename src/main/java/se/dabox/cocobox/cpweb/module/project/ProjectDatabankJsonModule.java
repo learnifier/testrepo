@@ -171,7 +171,7 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
 
         Map<String, String> map = new HashMap<>();
         map.put("status", "OK");
-        map.put("stringValue", newValue);
+        map.put("text", newValue);
 
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
