@@ -204,7 +204,7 @@ ${cpweb_foot}
 
 [@pInfo.projectInfo selected="settings"][/@pInfo.projectInfo]
 
-
+<section class="ccb-expandable-list">
 <div id="settingsList">
     <ul>
         [@dwsrt.feature feature="autoical"]
@@ -212,7 +212,7 @@ ${cpweb_foot}
         [#if prj.type.ptype == 2]
         <li id="meeting-maker">
             <a class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
                 [@bsform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
             </a>
         </li>
@@ -221,22 +221,19 @@ ${cpweb_foot}
 
         <li id="language">
             <span class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.language.title" /]</span>
-                <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.language.title" /]</span>
                 <span class="short editable-content">${prj.locale.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
         <li id="country">
             <span class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.country.title" /]</span>
-                <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.country.title" /]</span>
                 <span class="short editable-content">${prj.country.getDisplayCountry(userLocale)?xhtml}</span>
             </span>
         </li>
         <li id="timezone">
             <span class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.timezone.title" /]</span>
-                <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.timezone.title" /]</span>
                 <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
@@ -244,8 +241,7 @@ ${cpweb_foot}
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <li id="expiration">
             <span class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
-                <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
                 <span class="short editable-content">${(prj.defaultParticipationExpiration/86400000)!''}</span>
             </span>
         </li>
@@ -255,7 +251,7 @@ ${cpweb_foot}
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <li id="expirationtoggle">
             <span class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.expirationtoggle.title" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.expirationtoggle.title" /]</span>
                 [#if prj.defaultParticipationExpiration??]
                     [#if prj.defaultParticipationExpiration?c?number?c?number > 0]
                         [#assign expirationtoggleActive = "true" /]
@@ -275,7 +271,7 @@ ${cpweb_foot}
         [#if prj.type.ptype == 2]
         <li id="socialfeatures">
             <a class="setting">
-                <span class="label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
                 [@bsform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
             </a>
         </li>
@@ -283,6 +279,7 @@ ${cpweb_foot}
         [/@dwsrt.feature]
     </ul>
 </div>
+    </section>
 
 [/@dws.skin]
 
