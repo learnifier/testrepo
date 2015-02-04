@@ -146,17 +146,18 @@ ${cpweb_head}
 [/#assign]
 
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-<section id="reportoverview">
+<article id="reportoverview">
 
-    <section id="reportinfo">
-        <div class="itemicon">
-            <p>Report</p><h1>[@dws.txt key="cpweb.report.productcompletion.title" /]</h1>
+    <section class="ccb-page-header">
+        <div class="ccb-page-header__info">
+            <p class="page-title-label">Report</p>
+            <h1 class="page-title">[@dws.txt key="cpweb.report.productcompletion.title" /]</h1>
         </div>
-        <div class="itemdetails">
+        <div class="ccb-page-header__details">
             <ul>
-                <li><span class="label">Description</span><span class="setting clearfix">This report gives provides an overview of the completion status for all products. The report also gives you an idea of how many people within your organization that has been given access to a specific product.</span></li>
+                <li><span class="row-label">Description</span><span class="row-setting">This report gives provides an overview of the completion status for all products. The report also gives you an idea of how many people within your organization that has been given access to a specific product.</span></li>
             </ul>
         </div>
     </section>
@@ -177,6 +178,7 @@ ${cpweb_head}
             </tfoot>
         </table>
     </section>
+</article>
 
-    [/@dws.skin]
+[/@dws.skin]
 

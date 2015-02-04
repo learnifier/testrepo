@@ -9,92 +9,161 @@
 </script>
 <script>
     $(document).ready(function() {
-        require(['dabox-common', 'dabox-report-datatables'], function() {
+//        require(['dabox-common', 'dabox-report-datatables'], function() {
+        require(['dabox-common', 'dataTables-bootstrap', 'dataTables.tableTools'], function() {
 
         var balTable = $('#r_credits_perstatus').dataTable({
-            "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"ip>',
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "oTableTools": {
                 "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf"
              },
-            "bPaginate": true,
-            "iDisplayLength": 50,
-            "aaSorting": [[6,'desc']],
-            "aoColumnDefs": [
+            "paging": true,
+            "pageLength": 50,
+            "order": [[6,'desc']],
+            "initComplete": function() {
+                $('#r_credits_perstatus_filter input').attr('placeholder', 'Search report');
+            },
+            "columnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "thumbnail",
-                    "sClass": "thumbnail",
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
-                        if (oObj.aData.thumbnail) {
-                            return  '<img src="'+oObj.aData.thumbnail+'" />';
+                    "targets": [ 0 ],
+                    "className": " material-thumbnail",
+                    "orderable": false,
+                    "data": function(row, type, set) {
+                        if (!row.thumbnailDisplay) {
+                            row.thumbnailDisplay = '<img src="'+row.thumbnail+'" />';
+                        }
+                        if (type === 'display') {
+                            return row.thumbnailDisplay;
+                        } else if (type === 'filter') {
+                            return null;
+                        } else if (type === 'sort') {
+                            return row.thumbnailDisplay;
                         } else {
-                            return  '';
+                            //Anything else and raw row
+                            return row.thumbnailDisplay;
                         }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": "id",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.id;
+                    "targets": [ 1 ],
+                    "data": function(row, type, set) {
+                        if (type === 'display') {
+                            return row.id;
+                        } else if (type === 'filter') {
+                            return row.id;
+                        } else if (type === 'sort') {
+                            return row.id;
+                        } else {
+                            //Anything else and raw row
+                            return row.id;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 2 ],
-                    "mData": "title",
-                    "sWidth": "55%",
-                    "fnRender": function ( oObj ) {
-                        return  '<span title="' + oObj.aData.title  + '">' + cocobox.trunc(oObj.aData.title , 30) + '</span>';
+                    "targets": [ 2 ],
+                    "width": "55%",
+                    "data": function(row, type, set) {
+                        if (!row.titleDisplay) {
+                            row.titleDisplay = '<span title="' + row.title  + '">' + cocobox.trunc(row.title , 30) + '</span>';
+                        }
+                        if (type === 'display') {
+                            return row.titleDisplay;
+                        } else if (type === 'filter') {
+                            return row.title;
+                        } else if (type === 'sort') {
+                            return row.title;
+                        } else {
+                            //Anything else and raw row
+                            return row.titleDisplay;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 3 ],
-                    "mData": "totalCredits",
-                    "bUseRendered": false,
+                    "targets": [ 3 ],
+                    "className": "center",
+                    "data": function(row, type, set) {
+                        if (!row.totalCreditsDisplay) {
+                            row.totalCreditsDisplay = '<a href="${helper.urlFor('report.ReportModule','creditsPurchased', [org.id])}/' +  row.id + '">' + row.totalCredits + '</a>';
+                        }
+                        if (type === 'display') {
+                            return row.totalCreditsDisplay;
+                        } else if (type === 'filter') {
+                            return row.totalCredits;
+                        } else if (type === 'sort') {
+                            return row.totalCredits;
+                        } else {
+                            //Anything else and raw row
+                            return row.totalCreditsDisplay;
+                        }
+                    }
+               },
+                {
+                    "targets": [ 4 ],
                     "sClass": "center",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="${helper.urlFor('report.ReportModule','creditsPurchased', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.totalCredits + '</a>';
+                    "data": function(row, type, set) {
+                        if (!row.usedCreditsDisplay) {
+                            row.usedCreditsDisplay = '<a href="${helper.urlFor('report.ReportModule','creditsUsed', [org.id])}/' +  row.id + '">' + row.usedCredits + '</a>';
+                        }
+                        if (type === 'display') {
+                            return row.usedCreditsDisplay;
+                        } else if (type === 'filter') {
+                            return row.usedCredits;
+                        } else if (type === 'sort') {
+                            return row.usedCredits;
+                        } else {
+                            //Anything else and raw row
+                            return row.usedCreditsDisplay;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 4 ],
-                    "mData": "usedCredits",
-                    "bUseRendered": false,
-                    "sClass": "center",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="${helper.urlFor('report.ReportModule','creditsUsed', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.usedCredits + '</a>';
+                    "targets": [ 5 ],
+                    "className": "center",
+                    "data": function(row, type, set) {
+                        if (!row.expiredCreditsDisplay) {
+                            row.expiredCreditsDisplay = '<a href="${helper.urlFor('report.ReportModule','creditsExpired', [org.id])}/' +  row.id + '">' + row.expiredCredits + '</a>';
+                        }
+                        if (type === 'display') {
+                            return row.expiredCreditsDisplay;
+                        } else if (type === 'filter') {
+                            return row.expiredCredits;
+                        } else if (type === 'sort') {
+                            return row.expiredCredits;
+                        } else {
+                            //Anything else and raw row
+                            return row.expiredCreditsDisplay;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 5 ],
-                    "mData": "expiredCredits",
-                    "bUseRendered": false,
-                    "sClass": "center",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="${helper.urlFor('report.ReportModule','creditsExpired', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.expiredCredits + '</a>';
-                    }
-                },
-                {
-                    "aTargets": [ 6 ],
-                    "mData": "availCredits",
-                    "bUseRendered": false,
-                    "sClass": "center available",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="${helper.urlFor('report.ReportModule','creditsAvailable', [org.id])}/' +  oObj.aData.id + '">' + oObj.aData.availCredits + '</a>';
+                    "targets": [ 6 ],
+                    "className": "center available",
+                    "data": function(row, type, set) {
+                        if (!row.availCreditsDisplay) {
+                            row.availCreditsDisplay = '<a href="${helper.urlFor('report.ReportModule','creditsAvailable', [org.id])}/' +  row.id + '">' + row.availCredits + '</a>';
+                        }
+                        if (type === 'display') {
+                            return row.availCreditsDisplay;
+                        } else if (type === 'filter') {
+                            return row.availCredits;
+                        } else if (type === 'sort') {
+                            return row.availCredits;
+                        } else {
+                            //Anything else and raw row
+                            return row.availCreditsDisplay;
+                        }
                     }
                 }
             ],
-            "sAjaxSource": "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}",
-            "sPaginationType": "full_numbers",
-            "oLanguage": {
-                "sSearch": "",
-                "sEmptyTable": "<span class='emptytable'>No products available on your account.</span>",
-                "sLoadingRecords": "<p>Loading account balances...</p><img src='[@common.spinnerUrl /]' />"
+            "ajax": "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}",
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "emptyTable": "<span class='emptytable'>No products available on your account.</span>",
+                "loadingRecords": "<p>Loading account balances...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
         });
-        $('#report_filter input').attr('placeholder', 'Search the report data');
 
     } );
 
@@ -107,21 +176,22 @@ ${cpweb_head}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-<section id="reportoverview">
+<article id="reportoverview">
 
-    <section id="reportinfo">
-        <div class="itemicon">
-            <p>Report</p><h1>Credits status per product</h1>
+    <section class="ccb-page-header">
+        <div class="ccb-page-header__info">
+            <p class="page-title-label">Report</p>
+            <h1 class="page-title">Credits status per product</h1>
         </div>
-        <div class="itemdetails">
+        <div class="ccb-page-header__details">
             <ul>
-                <li><span class="label">Description</span><span class="setting clearfix">This report gives provides an overview of the credit balances for all your available products. You can drill down on each number by clicking on it.</span></li>
+                <li><span class="row-label">Description</span><span class="row-setting">This report gives provides an overview of the credit balances for all your available products. You can drill down on each number by clicking on it.</span></li>
             </ul>
         </div>
     </section>
-
+    
     <section id="r_table">
         <table class="table table-condensed table-hover table-hover ccb-table" id="r_credits_perstatus">
             <thead>
@@ -130,7 +200,6 @@ ${cpweb_head}
                     <th>Name</th>
                     <th>Number</th>
                     <th>Purchased</th>
-                    <!--<th>Reserved</th>-->
                     <th>Used</th>
                     <th>Expired</th>
                     <th>Available</th>
@@ -141,7 +210,7 @@ ${cpweb_head}
         </table>
     </section>
 
-</section>
+</article>
 
 
 [/@dws.skin]

@@ -69,20 +69,21 @@ ${cpweb_head}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <section id="reportoverview">
 
-    <section id="reportinfo">
-        <div class="itemicon">
-            <p>Report</p><h1>Credits expired for ${product.title!''?xhtml} (${product.id.id!''?xhtml})</h1>
+    <section class="ccb-page-header">
+        <div class="ccb-page-header__info">
+            <p class="page-title-label">Report</p>
+            <h1 class="page-title">Credits expired for ${product.title!''?xhtml} (${product.id.id!''?xhtml})</h1>
         </div>
-        <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Back to credit status report</a>
-        <div class="itemdetails">
+        <div class="ccb-page-header__details">
             <ul>
-                <li><span class="label">Description</span><span class="setting clearfix">This report provides an overview of the number of credits expired for the selected product. It also provides the details on which order those credits originated from.</span></li>
+                <li><span class="row-label">Description</span><span class="row-setting">This report provides an overview of the number of credits expired for the selected product. It also provides the details on which order those credits originated from.</span></li>
             </ul>
         </div>
+        <a class="btn btn-link" href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Back to credit status report</a>
     </section>
 
     <section id="r_table">

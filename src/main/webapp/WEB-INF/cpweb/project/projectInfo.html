@@ -40,47 +40,43 @@
 [#include "error/projectProductError.html" /]
 
 <section class="ccb-page-header">
-    <div class="ccb-page-header__actions">
-        [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
-            <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
-                <button class="btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
-            </form>
-        [/#if]
-        [#if project.type.ptype == 2]
-            <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
-                <button class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
-            </form>
-        [/#if]
 
-        [#if isIdproject() ]
-            <form action="${helper.urlFor('project.ProjectModule', 'roster',[project.masterProject])}" method="post">
-                <button><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
-            </form>
-        [/#if]
-    </div>
-
-    [#if isIdproject() ]
-        <div class="ccb-page-header__info">
-            <img class="page-thumbnail img-thumbnail" src="${projectThumbnail}" />
-            <p class="page-title-label">Project</p>
-            <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
-            <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
-        </div>
-    [#else]	
-    <div class="ccb-page-header__info">
+    <div class="ccb-page-header__info--thumbnail">
         <img class="page-thumbnail img-thumbnail" src="${projectThumbnail}" />
         <p class="page-title-label">Project</p>
-        <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
-        <ul class="page-created-updated__wrapper list-inline">
-            <li>
-                <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy!-1 /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
-            </li>
-            <li>
-                <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
-            </li>
-        </ul>
+        [#if isIdproject() ]
+                <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
+                <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
+        [#else]	
+            <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
+            <ul class="page-created-updated__wrapper list-inline">
+                <li>
+                    <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy!-1 /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
+                </li>
+                <li>
+                    <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
+                </li>
+            </ul>
+        [/#if]
+        <div class="ccb-page-header__actions">
+            [#if isIdproject() ]
+                <form action="${helper.urlFor('project.ProjectModule', 'roster',[project.masterProject])}" method="post">
+                    <button><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
+                </form>
+            [/#if]
+            [#if project.type.ptype == 2]
+                <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
+                    <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
+                </form>
+            [/#if]
+            [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
+                <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
+                    <button class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                </form>
+            [/#if]
+
+        </div>
     </div>
-    [/#if]
 </section>
 
 	

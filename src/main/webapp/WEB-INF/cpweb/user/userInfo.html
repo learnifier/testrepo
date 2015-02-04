@@ -1,9 +1,6 @@
 [#ftl /]
 <section class="ccb-page-header">
-    <div class="ccb-page-header__actions">
-        [#include "userActions.html" /]
-    </div>
-    <div class="ccb-page-header__info">
+    <div class="ccb-page-header__info--thumbnail">
         [#if userimg??]
         <img src="${userimg}" class="page-thumbnail img-circle img-thumbnail" alt="${user.displayName?xhtml} Profile Image"/>
         [#else]
@@ -11,6 +8,9 @@
         [/#if]
         <p class="page-title-label">User</p>
         <h1 class="page-title">${user.displayName?xhtml}</h1>
+        <div class="ccb-page-header__actions">
+            [#include "userActions.html" /]
+        </div>
     </div>
     <div class="ccb-page-header__details">
         <ul>

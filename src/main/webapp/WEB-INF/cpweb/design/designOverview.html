@@ -43,41 +43,7 @@ ${cpweb_head}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <section class="ccb-page-header">
-    <div class="ccb-page-header__actions">
-            [#if !info.sticky && portalSecurity.hasPermission("CP_DELETE_COURSEDESIGN")]
-            <form action="${helper.urlFor('coursedesign.DesignModule','delete',[org.id, designId])}" method="post" id="deleteForm">
-                <button type="submit" id="deleteBtn" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
-            </form>
-            [/#if]
-
-            [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
-            <form action="${helper.urlFor('coursedesign.DesignModule','editDesign',[org.id, designId])}" method="post">
-                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Course Template</button>
-            </form>
-            [/#if]
-
-            [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
-            <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId])}" method="post">
-                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
-            </form>
-            [/#if]
-
-            [@portalSecurity.permissionBlock permission="CP_COPY_COURSEDESIGN"]
-            <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId,'t'])}" method="post">
-                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-flash"></span> Create copy</button>
-            </form>
-            [/@]
-
-            <form action="${helper.urlFor('coursedesign.DesignModule','view',[org.id, designId])}" method="post">
-                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-eye-open"></span> View</button>
-            </form>
-            
-             <form action="${helper.urlFor('coursedesign.DesignModule','preview',[org.id, designId])}" method="post" target="_blank">
-                <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
-            </form>
-            
-        </div>
-        <div class="ccb-page-header__info">
+        <div class="ccb-page-header__info--thumbnail">
             <img class="page-thumbnail img-thumbnail" src="${thumbnail}" />
             <p class="page-title-label">Course Template</p>
             <h1 class="page-title">${design.name?xhtml}</h1>
@@ -89,6 +55,37 @@ ${cpweb_head}
                     <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail design.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(design.updated?datetime?string.full)!''}">${(design.updated?date?string.full)!''}</span></p>
                 </li>
             </ul>
+        <div class="ccb-page-header__actions">
+            
+             <form action="${helper.urlFor('coursedesign.DesignModule','preview',[org.id, designId])}" method="post" target="_blank">
+                <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
+            </form>
+
+            [@portalSecurity.permissionBlock permission="CP_COPY_COURSEDESIGN"]
+            <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId,'t'])}" method="post">
+                <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-flash"></span> Copy to New</button>
+            </form>
+            [/@]
+
+            [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
+            <form action="${helper.urlFor('coursedesign.DesignModule','edit',[org.id, designId])}" method="post">
+                <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
+            </form>
+            [/#if]
+
+            [#if !info.sticky && portalSecurity.hasPermission("CP_EDIT_COURSEDESIGN")]
+            <form action="${helper.urlFor('coursedesign.DesignModule','editDesign',[org.id, designId])}" method="post">
+                <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit Course Template</button>
+            </form>
+            [/#if]
+
+            [#if !info.sticky && portalSecurity.hasPermission("CP_DELETE_COURSEDESIGN")]
+            <form action="${helper.urlFor('coursedesign.DesignModule','delete',[org.id, designId])}" method="post" id="deleteForm">
+                <button type="submit" id="deleteBtn" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            </form>
+            [/#if]
+            
+        </div>
         </div>
         <div class="ccb-page-header__details">
             <ul>

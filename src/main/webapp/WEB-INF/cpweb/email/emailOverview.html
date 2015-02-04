@@ -49,30 +49,7 @@ ${cpweb_head}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <section class="ccb-page-header">
-    <div class="ccb-page-header__actions">
-        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_DELETE_EMAIL")]
-        <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
-            <button type="submit" id="deleteBtn" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-trash"></span> Delete</button>
-        </form>
-        [/#if]
-        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
-        <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
-            <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Email</button>
-        </form>
-        [/#if]
-        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
-        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
-            <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
-        </form>
-        [/#if]
-        [@portalSecurity.permissionBlock permission="CP_COPY_EMAIL"]
-        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
-            <button type="submit" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-flash"></span> Copy to New</button>
-        </form>
-        [/@]
-    </div>
     <div class="ccb-page-header__info">
-        <img class="page-thumbnail img-thumbnail" src="http://www.harborfinancialgroup.com/news-views/wp-content/uploads/2013/11/Learning.jpg" />
         <p class="page-title-label">Email Template</p>
         <h1 class="page-title">${template.name?xhtml}</h1>
         <ul class="page-created-updated__wrapper list-inline">
@@ -83,6 +60,28 @@ ${cpweb_head}
                 <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail template.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(template.updated?datetime?string.full)!''}">${(template.updated?date?string.full)!''}</span></p>
             </li>
         </ul>
+    </div>
+    <div class="ccb-page-header__actions">
+        [@portalSecurity.permissionBlock permission="CP_COPY_EMAIL"]
+        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-flash"></span> Copy to New</button>
+        </form>
+        [/@]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
+        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
+        </form>
+        [/#if]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
+        <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit Email</button>
+        </form>
+        [/#if]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_DELETE_EMAIL")]
+        <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
+            <button type="submit" id="deleteBtn" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </form>
+        [/#if]
     </div>
     <div class="ccb-page-header__details">
         <ul>
