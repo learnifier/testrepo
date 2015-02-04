@@ -1,13 +1,13 @@
 <#ftl strip_text="true" />
 
 <#import "/se/dabox/services/dwsfu/common.ftl" as common />
-<#import "/se/dabox/services/dwsfu/commonCss.ftl" as commonCss />
 <#import "/se/dabox/services/dwsfu/bsform.ftl" as bsform />
 <#import "/se/dabox/services/dwsfu/modal.ftl" as modal />
 
 
 <#assign cpweb_head>
     <@learnifierBootstrap />
+    <link rel="stylesheet" href="${cocoboxCdn}/cocobox/ccss/clientportalweb/clientportal.css" />
     <@branding />    
 </#assign>
 
