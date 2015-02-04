@@ -1,6 +1,7 @@
 <#ftl strip_text="true" />
 
 <#import "/se/dabox/services/dwsfu/common.ftl" as common />
+<#import "/se/dabox/services/dwsfu/commonCss.ftl" as commonCss />
 <#import "/se/dabox/services/dwsfu/bsform.ftl" as bsform />
 <#import "/se/dabox/services/dwsfu/modal.ftl" as modal />
 

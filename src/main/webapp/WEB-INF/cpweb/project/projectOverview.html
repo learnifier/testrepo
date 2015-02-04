@@ -30,7 +30,7 @@ ${cpweb_foot}
                     "className": "userimage",
                     "data": function(row, type, set) {
                         if (!row.thumbnailDisplay) {
-                            row.favoriteDisplay = '<img class="userimage" src="' + row.thumbnail + '"/>';
+                            row.thumbnailDisplay = '<img class="userimage" src="' + row.thumbnail + '"/>';
                         }
                         if (type === 'display') {
                             return row.thumbnailDisplay;
