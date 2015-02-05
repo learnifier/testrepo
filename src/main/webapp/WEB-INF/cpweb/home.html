@@ -1,6 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "welcomeMessage.html" as wm /]
 
 [#assign foot]
 ${cpweb_foot}
@@ -178,7 +177,7 @@ ${cpweb_foot}
 
             [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
             <div class="ccb-flat-card" id="actions" style="display: none;">
-                <div class="ccb-flat-card__header navBackgroundColor yiq-contrasted-navColor"><h3>Action</h3></div>
+                <div class="ccb-flat-card__header"><h3>Action</h3></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <section id="multiple-actions" style="display: none;">
                         <p>There are multiple issues on your account that you need to take action on.</p>
@@ -202,7 +201,7 @@ ${cpweb_foot}
             [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
             <div class="ccb-flat-card">
                 [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
-                <div class="ccb-flat-card__header navBackgroundColor yiq-contrasted-navColor"><h2>New Project</h2></div>
+                <div class="ccb-flat-card__header"><h2>New Project</h2></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <p>Get started with a new project by following the simple step-by-step instructions.</p>
                     <p class="text-center">
@@ -214,7 +213,7 @@ ${cpweb_foot}
             <div class="ccb-flat-card">
                 <div class="ccb-flat-card__content">
                     [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
-                    <div class="ccb-flat-card__header navBackgroundColor yiq-contrasted-navColor"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right yiq-contrasted-navColor">View All Projects</a><h3>Favorite Projects</h3></div>
+                    <div class="ccb-flat-card__header"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right yiq-contrasted-navColor">View All Projects</a><h3>Favorite Projects</h3></div>
 
                     <table class="table table-hover table-condensed ccb-table" id="tw-favorites">
                     </table>
