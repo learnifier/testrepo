@@ -1,21 +1,21 @@
 [#ftl strip_text="true" /]
 
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+
 
 [#assign cpweb_foot ]
-[#include "/report/reportExport.html" /]
 
 <script>
     $('#menu-reports').addClass('active');
 </script>
 <script>
     $(document).ready(function() {
-//        require(['dabox-common', 'dabox-report-datatables'], function() {
-        require(['dabox-common', 'dataTables-bootstrap', 'dataTables.tableTools'], function() {
+        require(['dabox-common', 'dataTables-bootstrap', 'dataTables-tableTools'], function() {
 
         var balTable = $('#r_credits_perstatus').dataTable({
-            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
-            "oTableTools": {
-                "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf"
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "tableTools": {
+                "sSwfPath": "[@cdt.tableToolsSwf /]"
              },
             "paging": true,
             "pageLength": 50,
@@ -172,7 +172,6 @@
 
 [#assign cpweb_head ]
 ${cpweb_head}
-[#include "/report/reportExportHead.html" /]
 
 [/#assign]
 
