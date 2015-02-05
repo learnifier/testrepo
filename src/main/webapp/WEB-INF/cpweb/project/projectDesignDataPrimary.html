@@ -155,6 +155,10 @@ ${cpweb_head}
 [#elseif field.name = "location"]
   [#assign fieldType = "location"]
 [/#if]
+[#if field.dataType == "DATETIME"]
+  [#assign fieldType = "hidden" /]
+[/#if]
+
 [#assign fname = component.cid+'_'+field.name /]
 [#if fieldType != "hidden"]
 <label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
@@ -166,12 +170,11 @@ ${cpweb_head}
 [#if field.dataType == "DATETIME"]
 <span>  ${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
 [/#if]
-
 [#if field.dataType == "DATETIME"]
 [@bsform._onreadyJavascript]
 [#compress]
-requirejs(['jquery-ui-timepicker-addon'], function() {
-	$("#f${component.cid}_${field.name}").datetimepicker(dpSettings);
+requirejs(['cocobox-datetime'], function(dt) {
+	dt.dateTime("#f${component.cid}_${field.name}");
 });
 [/#compress]
 [/@]
