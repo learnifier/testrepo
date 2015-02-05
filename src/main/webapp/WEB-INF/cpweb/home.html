@@ -171,64 +171,78 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName earlycss=upweb_earlycss]
 
 <article id="ccb-page-home">
-    [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
-    <div class="ccb-flat-card ccb-flat-card-padding" id="actions" style="display: none;">
-        <section id="multiple-actions" style="display: none;">
-            <a class="btn btn-primary pull-right" onclick="showActionsList();"><span class="glyphicon glyphicon-menu-down"></span> Show Issues</a>
-            <h1>Action</h1>
-            <p>There are multiple issues on your account that you need to take action on.</p>
-        </section>
-        <section id="list-actions" style="display: none;">
-            <h1>Action</h1>
-            <p>Take action on the following issues. Reach out to tech support as needed.</p>
-            <table class="table table-hover ccb-table" id="tw_actions">
-            </table>
-        </section>
-    </div>
-    [/#if]
 
 
     <div class="row">
         <div class="col-sm-7">
 
+            [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
+            <div class="ccb-flat-card" id="actions" style="display: none;">
+                <div class="ccb-flat-card__header navBackgroundColor yiq-contrasted-navColor"><h3>Action</h3></div>
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
+                    <section id="multiple-actions" style="display: none;">
+                        <p>There are multiple issues on your account that you need to take action on.</p>
+                        <div class="text-center">
+                            <a class="btn btn-primary" onclick="showActionsList();"><span class="glyphicon glyphicon-menu-down"></span> Show Issues</a>
+                        </div>
+                    </section>
+                </div>
+                <section id="list-actions" style="display: none;">
+                    <div class="ccb-flat-card__content ccb-flat-card__content--padding">
+                            <h1>Action</h1>
+                            <p>Take action on the following issues. Reach out to tech support as needed.</p>
+                    </div>
+                    <div class="ccb-flat-card__content">
+                        <table class="table table-hover ccb-table" id="tw_actions">
+                        </table>
+                    </div>
+                </section>
+            </div>
+            [/#if]
             [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
-            <div class="ccb-flat-card ccb-flat-card-padding">
+            <div class="ccb-flat-card">
                 [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
-                <section id="new-project">
-                    <h1>New Project</h1>
+                <div class="ccb-flat-card__header navBackgroundColor yiq-contrasted-navColor"><h2>New Project</h2></div>
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <p>Get started with a new project by following the simple step-by-step instructions.</p>
                     <p class="text-center">
                         <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
                     </p>
-                </section>
+                </div>
                 [/@]
-                [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
-                <section id="manage-projects">
-                    <a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right">View All Projects</a>
-                    <h4>Favorite Projects</h4>
+            </div>
+            <div class="ccb-flat-card">
+                <div class="ccb-flat-card__content">
+                    [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
+                    <div class="ccb-flat-card__header navBackgroundColor yiq-contrasted-navColor"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right yiq-contrasted-navColor">View All Projects</a><h3>Favorite Projects</h3></div>
+
                     <table class="table table-hover table-condensed ccb-table" id="tw-favorites">
                     </table>
-                </section>
-                [/@]
+                    [/@]
+                </div>
             </div>
             [/#if]
             [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
-            <div class="ccb-flat-card ccb-flat-card-padding">
-                <h2>Upload your materials</h2>
-                <p>Add your own training materials to tailor the learning to your needs.</p>
-                <div class="text-center">
-                    <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-                        <div class="btn btn-primary-outlined" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Upload Material</div>
+            <div class="ccb-flat-card">
+                <div class="ccb-flat-card__header"><h3>Upload your materials</h3></div>
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
+                    <p>Add your own training materials to tailor the learning to your needs.</p>
+                    <div class="text-center">
+                        <div class="ui-helper-hidden" data-anoncreateprodelement="show">
+                            <div class="btn btn-primary-outlined" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Upload Material</div>
+                        </div>
                     </div>
                 </div>
             </div>
             [/@]
             [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-            <div class="ccb-flat-card ccb-flat-card-padding ">
-                <h2>Invite an administrator</h2>
-                <p>Invite additional administrators to manage projects from this portal.</p>
-                <div class="text-center">
-                    <a href="" class="btn btn-primary-outlined" id="inviteAdmin"><span class="glyphicon glyphicon-plus-sign"></span> Invite Administrator</a>
+            <div class="ccb-flat-card">
+                <div class="ccb-flat-card__header"><h3>Invite an administrator</h3></div>
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
+                    <p>Invite additional administrators to manage projects from this portal.</p>
+                    <div class="text-center">
+                        <a href="" class="btn btn-primary-outlined" id="inviteAdmin"><span class="glyphicon glyphicon-plus-sign"></span> Invite Administrator</a>
+                    </div>
                 </div>
             </div>
             [/@]
@@ -241,26 +255,38 @@ ${cpweb_foot}
             </div>
             [/#if]
             [#if welcomeMessage??]
-            <div class="ccb-flat-card ccb-flat-card-padding" id="contact">
-                [@wm.welcomeBox welcomeMessage /]
-            </div>
+            <div class="ccb-flat-card" id="contact">
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
+                    [#assign contact=infoHelper.getMiniUserInfo(welcomeMessage.userId) /]
+                    [#if contact.thumbnail??] 
+                        <img src="${contact.thumbnail}" class="photo">
+                    [/#if]
+                    <h1>${contact.displayName?xhtml}</h1>
+                    <p class="title">[@dws.txt key='cpweb.home.support.title' /]</p>
+                    <p class="email"><a href="mailto:${contact.email?xhtml}">${contact.email?xhtml}</a></p>
+                    [#if (welcomeMessage.message)??]
+                        <p class="message">"[@common.nl2br]${welcomeMessage.message!''}[/@common.nl2br]"</p>
+                    [/#if]
+                    </div>
+           </div>
             [/#if]
 
             [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-            <div class="ccb-flat-card ccb-flat-card-padding" id="balance">
-                <a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a>
-                <h2>Your Account Status</h2>
-                <div id="product-count" class="secondaryBackgroundColor">
-                    <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
+            <div class="ccb-flat-card" id="balance">
+                <div class="ccb-flat-card__header"><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a><h3>Your Account Status</h3></div>
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">                
+                    <div id="product-count" class="secondaryBackgroundColor">
+                        <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
+                    </div>
+                    <h3>Top 5 balance</h3>
+                    <ul class="clearfix" data-bind="foreach: topfive">
+                        <li>
+                            <img data-bind="attr: { src: thumbnail}" src="${cocoboxCdn}/cocobox/img/1x1-pixel.png" />
+                            <p class="availCredits" data-bind="text: availCredits"></p>
+                            <p class="title" data-bind="text: title"></p>
+                        </li>
+                    </ul>
                 </div>
-                <h3>Top 5 balance</h3>
-                <ul class="clearfix" data-bind="foreach: topfive">
-                    <li>
-                        <img data-bind="attr: { src: thumbnail}" src="${cocoboxCdn}/cocobox/img/1x1-pixel.png" />
-                        <p class="availCredits" data-bind="text: availCredits"></p>
-                        <p class="title" data-bind="text: title"></p>
-                    </li>
-                </ul>
             </div>
             [/@]
 
