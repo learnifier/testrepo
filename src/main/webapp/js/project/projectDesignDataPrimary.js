@@ -42,14 +42,14 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
                 town = (place.address_components[2] && place.address_components[2].short_name || '');
             }
 
-            var long, lat;
+            var longitude, lat;
             if (place.geometry.location) {
                 lat = (place.geometry.location.D).toString().substring(0, 9);
-                long = (place.geometry.location.k).toString().substring(0, 9);
+                longitude = (place.geometry.location.k).toString().substring(0, 9);
             }
 
             var mapsBaseUrl = 'http://www.google.com/maps/place/',
-                    mapsUrl = mapsBaseUrl + encodeURIComponent(street) + ',' + encodeURIComponent(num) + ',' + encodeURIComponent(town) + '/@' + long + ',' + lat + ',17z';
+                    mapsUrl = mapsBaseUrl + encodeURIComponent(street) + ',' + encodeURIComponent(num) + ',' + encodeURIComponent(town) + '/@' + longitude + ',' + lat + ',17z';
             return mapsUrl;
 
         }
