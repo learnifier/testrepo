@@ -5,12 +5,14 @@ package se.dabox.cocobox.cpweb.freemarker;
 
 import net.unixdeveloper.druwa.freemarker.ModifyViewDataHandler;
 import net.unixdeveloper.druwa.freemarker.ViewDataEvent;
+import se.dabox.cocosite.branding.GetOrgBrandingCommand;
 import se.dabox.cocosite.druwa.security.ClientPortalSecurityNamespaceFactory;
 import se.dabox.cocosite.druwa.security.ProjectSecurityNamespaceFactory;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.portalswitch.PortalSwitchInfoImpl;
 import se.dabox.cocosite.security.project.ProjectPermissionCheck;
+import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 
@@ -23,8 +25,10 @@ public class CpwebModifyViewHandler implements ModifyViewDataHandler {
 
     @Override
     public void modifyViewData(ViewDataEvent event) {
-        event.getMap().put("branding", new BrandingOutput());
-
+        BrandingOutput brandingOutput = new BrandingOutput();
+        event.getMap().put("branding", brandingOutput);
+        event.getMap().put("brandingPackage", getBrandingPackage(event));
+       
         final InfoCacheHelper infoHelper =
                 InfoCacheHelper.getInstance(event.getCycle());
 
@@ -74,6 +78,15 @@ public class CpwebModifyViewHandler implements ModifyViewDataHandler {
         }
 
         return null;
+    }
+
+    private Branding getBrandingPackage(ViewDataEvent event) {
+        Long orgId = getOrgId(event);
+        if (orgId == null) {
+            return null;
+        }
+
+        return new GetOrgBrandingCommand(event.getCycle()).forOrg(orgId);
     }
 
 }

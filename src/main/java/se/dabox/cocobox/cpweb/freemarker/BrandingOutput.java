@@ -8,6 +8,7 @@ import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
 import java.io.IOException;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
@@ -31,17 +32,24 @@ public class BrandingOutput extends AbstractOrgBrandingOutput implements Templat
         RealmBrandingOutput.addFavIcons(env);
         RealmBrandingOutput.addRealmBranding(env, "branding-styles");
 
+        Branding branding = getBranding(env);
+
+        RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
+        BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, "branding-styles");
+    }
+
+    public Branding getBranding(Environment env) throws TemplateModelException {
         Long orgId = getOrgId(env);
 
         if (orgId == null) {
-            return;
+            return null;
         }
-        
+
         RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
 
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
 
-        BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, "branding-styles");
+        return branding;
     }
 
 }
