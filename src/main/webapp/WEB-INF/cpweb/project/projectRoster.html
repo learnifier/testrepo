@@ -2,6 +2,7 @@
 
 [#import "bounceInfo.html" as bInfoRender /]
 [#import "projectInfo.html" as pInfo /]
+[#import "projectRegistration.html" as pRegistration /]
 
 [#assign foot]
 
@@ -17,7 +18,7 @@ ${cpweb_foot}
 [#include "jsr_expirationSetterDialog.inc" /]
 [#include "jsr_expirationAdjustDialog.inc" /]
 [#include "projectRosterMoveDialog.html" /]
-
+[@pRegistration.foot /]
 
 <script>
     $('#menu-projects').addClass('active');
@@ -579,7 +580,7 @@ ${cpweb_head}
     <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-pencil"></span> Manual</a></li>
     <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</a></li>
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
-    <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge">OFF</span></a></li>
+    <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
     [/@]
   </ul>
 
@@ -606,7 +607,9 @@ ${cpweb_head}
       [#include "rosterUpload.html" /]
     </div>
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
-    <div role="tabpanel" class="tab-pane fade" id="selfreg">Do the selfreg</div>
+    <div role="tabpanel" class="tab-pane fade" id="selfreg">
+            [@pRegistration.html /]
+    </div>
     [/@]
   </div>
 

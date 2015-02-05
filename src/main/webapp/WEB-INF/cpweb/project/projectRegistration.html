@@ -1,79 +1,69 @@
 [#ftl strip_text="true" /]
 
-[#import "projectInfo.html" as pInfo /]
-
-[#assign cpweb_head]
-${cpweb_head}
-<!--[if lt IE 9]>
+[#macro foot]
 <script>
-require(['IE9'], function() {
-    
-    log('will use ie9.js to support some much wanted css-selectors');
-
-});
-</script>
-<![endif]-->
-[/#assign]
-
-[#assign cpweb_foot ]
-${cpweb_foot}
-<script>
-    $('#menu-projects').addClass('active');
-
     $(function(){
-        require(['dabox-common', 'jquery.form', 'dabox-formbeanjs', 'jquery-ui'], function() {
+        require(['dabox-common', 'jquery.form', 'dabox-formbeanjs','bootstrap/toggle'], function() {
             cocobox.setlist.expandableList('#settingsList');
 
-                    [#if !pInfo.isIdproject(prj)] //
-            $("#setregistrationpassword").ajaxForm(cocobox.getAjaxFormbeanHandler("setregistrationpassword", function() {
-                cocobox.setlist.showInfo('#password_updated', 'Password protection changes saved', 'info')
-                cocobox.setlist.closeExpanded("#setregistrationpassword");
-            }));
-                    [/#if]
+            // [#if !pInfo.isIdproject(prj)]
+                $("#setregistrationpassword").ajaxForm(cocobox.getAjaxFormbeanHandler("setregistrationpassword", function() {
+                    cocobox.setlist.showInfo('#password_updated', 'Password protection changes saved', 'info');
+                    cocobox.setlist.closeExpanded("#setregistrationpassword");
+                }));
+            // [/#if]
 
-                    [#if !pInfo.isIdproject(prj) || pInfo.isIdproject(prj) && security.isBoAdmin()]
+            // [#if !pInfo.isIdproject(prj) || pInfo.isIdproject(prj) && security.isBoAdmin()]
             $("#reginvlimitform").ajaxForm(cocobox.getAjaxFormbeanHandler("reginvlimitform", function() {
-                cocobox.setlist.showInfo('#creditlimit_updated', 'Participant limit changes saved', 'info')
+                cocobox.setlist.showInfo('#creditlimit_updated', 'Participant limit changes saved', 'info');
                 cocobox.setlist.closeExpanded("#reginvlimitform");
             }));
-                    [/#if]
+            // [/#if]
 
-            $('#reg_status').buttonset().find("input").click(function() {
-                cocobox.ajaxPost("${helper.urlFor('project.ProjectJsonModule','setInvitationStatus', [prj.projectId])}",{
-                    data: {status: this.value}
+
+           $('#reg_status').bootstrapToggle();
+           
+           $('#reg_status').parent().on('click', function(ev, st) {
+               var clicked = !$("#reg_status").prop("checked");
+            
+               $("#reg_status").bootstrapToggle('disable');
+               $.ajax({
+                    type: 'POST',
+                    url: "${helper.urlFor('project.ProjectJsonModule','setInvitationStatus', [prj.projectId])}",
+                    data: {status: clicked},
+                    success: function (data) {
+                        $("#reg_status").bootstrapToggle('enable');
+                        $("#reg_status").bootstrapToggle(clicked ? 'on' : 'off');
+                        $("#selfreg-badge").text(clicked ? 'On' : 'Off');
+                    },
+                    complete: function () {
+                        $("#reg_status").bootstrapToggle('enable');
+                    }
                 });
-            })
+
+                return false;
+            });
+
         });
+
     });
 
-    $("[name='status']").bootstrapSwitch();
 </script>
-[/#assign]
+[/#macro]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
-<section id="projectregistration">
-    [@pInfo.projectInfo selected="registration"][/@pInfo.projectInfo]
-
+[#macro html]
     <h2>[@dws.txt key="cpweb.project.registration.title" /]</h2>
 
-	
-	
-	[#if !pInfo.isIdproject(prj)]
+    [#if !pInfo.isIdproject(prj)]
     <h3>Registration status</h3>
-    <div id="reg_status" class="reg_status">
-        <input type="radio" value="true" class="statuson" name="status" id="srstateon" [#if prj.selfRegistrationEnabled]checked="checked"[/#if] /><label for="srstateon">OPEN</label>
-        <input type="radio" value="false" class="statusoff" name="status" id="srstateoff" [#if !prj.selfRegistrationEnabled]checked="checked"[/#if] /><label for="srstateoff">CLOSED</label>
-    </div>
-	[/#if]
+    <input data-toggle="toggle" type="checkbox" id="reg_status" [#if prj.selfRegistrationEnabled]checked="checked"[/#if]>
+    [/#if]
 	
     <h3>Registration link to distribute to participants</h3>
     <input type="text" id="reg_link" class="input_full" value="${reglink}" />
 
-
     <div id="settingsList">
         <ul>
-			
-			
 			[#if !pInfo.isIdproject(prj)]
             <li id="password" class="expandable">
                 <a class="setting">
@@ -168,5 +158,5 @@ ${cpweb_foot}
     </div>
 </section>
 
-[/@dws.skin]
+[/#macro]
 

@@ -122,6 +122,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 ProjectModificationModule.UPLOAD_ROSTER_ACTION,
                 projectId));
         addCommonMapValues(map, project, cycle);
+        initSelfReg(cycle, project, map);
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
@@ -142,27 +143,19 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
     
 
-    @WebAction
-    public RequestTarget onRegistration(RequestCycle cycle, String projectId) {
-        OrgProject project =
-                getProject(cycle, projectId);
-
+    public void initSelfReg(RequestCycle cycle, OrgProject project, Map<String,Object> map) {
         checkPermission(cycle, project);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT_SELFREG);
 
-        Map<String, Object> map = createMap();
         DruwaFormValidationSession<SetRegPasswordForm> pwformsess = getPwFormsess(cycle, project);
         DruwaFormValidationSession<SetRegCreditLimitForm> credlimsess =
                 getCredLimitFormsess(cycle, project);
 
         map.put("passwordformsess", pwformsess);
         map.put("creditlimitformsess", credlimsess);
-        addCommonMapValues(map, project, cycle);
         map.put("reglink", getProjectRegistrationLink(cycle, project));
 
-
-        return new FreemarkerRequestTarget("/project/projectRegistration.html", map);
     }
 
     @WebAction
