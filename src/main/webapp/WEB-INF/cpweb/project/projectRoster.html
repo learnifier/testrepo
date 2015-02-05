@@ -21,8 +21,6 @@ ${cpweb_foot}
 
 <script>
     $('#menu-projects').addClass('active');
-
-
 </script>
 
 
@@ -490,20 +488,6 @@ ${cpweb_foot}
 
 [#assign cpweb_head]
 ${cpweb_head}
-<!--[if lte IE 8]>
-<script src="${cocoboxCdn}/cocobox/js/excanvas/excanvas.compiled.js"></script>
-<![endif]-->
-
-<style type="text/css">
-    .modal-backdrop
-    {
-        z-index: 1100;
-    }
-    .modal-dialog
-    {
-        z-index: 1200;
-    }
-</style>
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]

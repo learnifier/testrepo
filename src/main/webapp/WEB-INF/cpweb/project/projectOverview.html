@@ -7,6 +7,10 @@
 ${cpweb_foot}
 <script>
     $('#menu-projects').addClass('active');
+
+    $('.ccb-flirt-addpost textarea').focus(function() {
+        $(this).height(80);   
+    });
     
     require(['jquery-ui','Chart'], function() {
         var chartAnimation = false;
@@ -126,9 +130,6 @@ ${cpweb_foot}
                 }
             }
         });
-        $('.ccb-flirt-addpost textarea').focus(function() {
-            $(this).height(80);
-        })
     });
 </script>
 <div class="modal fade" id="addTeamMember" tabindex="-1" role="dialog" aria-labelledby="addTeamMemberLabel" aria-hidden="true">
@@ -155,6 +156,14 @@ ${cpweb_foot}
 </div>
         
 [/#assign]
+
+[#assign cpweb_head]
+${cpweb_head}
+<!--[if lte IE 8]>
+    <script src="${cocoboxCdn}/cocobox/js/excanvas/excanvas.compiled.js"></script>
+<![endif]-->
+[/#assign]
+
 
 
 [#assign projectDetailsSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId]) /]
