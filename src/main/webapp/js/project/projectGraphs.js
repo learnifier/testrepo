@@ -37,11 +37,11 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
         $('#prj-ch-total').html(sumParticipants);
 
         $('#prj-ch-bounced .chart-data').html(bounced);
-        $('#prj-ch-bounced, #prj-ch-bounced span').prop('title', bouncedParticipants).tooltip();
+        $('#prj-ch-bounced').prop('title', bouncedParticipants).tooltip();
         $('#prj-ch-notinvited .chart-data').html(notInvited);
-        $('#prj-ch-notinvited, #prj-ch-notinvited span').prop('title', notInvitedParticipants).tooltip();
+        $('#prj-ch-notinvited').prop('title', notInvitedParticipants).tooltip();
         $('#prj-ch-inerror .chart-data').html(inError);
-        $('#prj-ch-inerror, #prj-ch-inerror span').prop('title', inErrorParticipants).tooltip();
+        $('#prj-ch-inerror').prop('title', inErrorParticipants).tooltip();
 
         if (bounced > 0 | notInvited > 0 | inError > 0) {
             $('#prj-action-needed').addClass('error').html('!');
@@ -53,9 +53,9 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
     function renderOverdueGraph() {
 
         $('#prj-ch-overdue-overdue .chart-data').html(overDue);
-        $('#prj-ch-overdue-overdue, #prj-ch-overdue-overdue span').prop('title', overDueParticipants).tooltip();
+        $('#prj-ch-overdue-overdue').prop('title', overDueParticipants).tooltip();
         $('#prj-ch-overdue-ontrack .chart-data').html(onTrack);
-        $('#prj-ch-overdue-ontrack, #prj-ch-overdue-ontrack span').prop('title', onTrackParticipants).tooltip();
+        $('#prj-ch-overdue-ontrack').prop('title', onTrackParticipants).tooltip();
 
         var sum = onTrack + overDue;
         if ( sum > 0){
@@ -79,11 +79,11 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
     function renderStatusGraph() {
 
         $('#prj-ch-status-invited .chart-data').html(invited);
-        $('#prj-ch-status-invited, #prj-ch-status-invited span').prop('title', invitedParticipants);
+        $('#prj-ch-status-invited').prop('title', invitedParticipants);
         $('#prj-ch-status-inprogress .chart-data').html(inProgress);
-        $('#prj-ch-status-inprogress, #prj-ch-status-inprogress span').prop('title', inProgressParticipants);
+        $('#prj-ch-status-inprogress').prop('title', inProgressParticipants);
         $('#prj-ch-status-completed .chart-data').html(completed);
-        $('#prj-ch-status-completed, #prj-ch-status-completed span').prop('title', completedParticipants);
+        $('#prj-ch-status-completed').prop('title', completedParticipants);
 
         var sum = invited + inProgress + completed;
         if ( sum > 0){
