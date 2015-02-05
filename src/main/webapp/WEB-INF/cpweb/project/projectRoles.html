@@ -1,25 +1,13 @@
 [#ftl strip_text="true" /]
 
-[#import "projectInfo.html" as pInfo /]
-
-[#assign cpweb_head ]
-${cpweb_head}
-
-<link rel='stylesheet' type='text/css' href='${cocoboxCdn}/cocobox/css/select2/select2.css'/>
-<link rel='stylesheet' type='text/css' href='${cocoboxCdn}/cocobox/css/select2/select2-bootstrap.css'/>
-[/#assign]
-
-
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    $('#menu-projects').addClass('active');
-    
     require(['select2.min'], function() {
-        
+
        $("#userSelect").select2({
             multiple: true,
-            ajax: { 
+            ajax: {
                 url: "${helper.urlFor('project.role.ProjectRoleJsonModule', 'searchUser', [org.id])}",
                 minimumInputLength: -1,
                 dataType: 'json',
@@ -30,7 +18,7 @@ ${cpweb_foot}
                         page_limit: 10
                     };
                 },
-                results: function (data, page) { 
+                results: function (data, page) {
                     //log('result' , data);
                     return {results: data.results};
                 }
@@ -39,78 +27,98 @@ ${cpweb_foot}
                 return '<span>' + data.text + '</span><br/><span>' + data.email + ' </span>' ;
             },
             formatSelection: function(data) {
-                
+
                 //log('formatSelection' , data);
-                
+
                 $('#userSelect').attr('value', data.email);
-                
+
                 return '<p value="' + data.email + '">' + data.text + '</p>';
             },
-            createSearchChoice: function(term, data) { 
-                if ($(data).filter(function() { 
-                    return this.text.localeCompare(term)===0; 
+            createSearchChoice: function(term, data) {
+                if ($(data).filter(function() {
+                    return this.text.localeCompare(term)===0;
                 }).length===0) {
-                    
+
                      $('#userSelect').attr('value', data.email);
-                    
+
                     return {id:term, text: term, email: 'Add email to assign new team member'};
-                } 
+                }
             }
-        }); 
-    }); 
-    
-    require(['dataTables194/jquery.dataTables.min', 'dabox-common'], function() {
-       
+        });
+    });
+
+    require(['dataTables-bootstrap', 'dabox-common'], function() {
+
         var oTable = $('#userroleslist').dataTable({
             "sDom": 'rt<"dataTables_footer clearfix"i>',
-            "bPaginate": false,            
+            "bPaginate": false,
             "aaSorting": [[0,'asc']],
             "aoColumnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "displayName",
-                    "fnRender": function ( oObj ) {
-                        var dName = oObj.aData.displayName;
-                        if (dName.length < 2) {
-                            return oObj.aData.email;
+                    "targets": [ 0 ],
+                    "data": function(row, type, set) {
+                        if (!row.displayNameDisplay) {
+                            var dName = row.displayName;
+                            if (dName.length < 2) {
+                                row.displayNameDisplay = row.email;
+                            } else {
+                                row.displayNameDisplay = '<span title="' + dName + '">' + cocobox.trunc(dName, 20) + '</span>';
+                            }
                         }
-                        return  '<span title="' +dName + '">' + cocobox.trunc(dName, 20) + '</span>';
+                        if (type === 'display') {
+                            return row.displayNameDisplay;
+                        } else if (type === 'filter') {
+                            return row.displayName;
+                        } else if (type === 'sort') {
+                            return row.displayName;
+                        } else {
+                            //Anything else and raw row
+                            return row.displayName;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": null,
-                    "sWidth": "30%",
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
+                    "targets": [ 1 ],
+                    "width": "30%",
+                    "sortable": false,
+                    "data": function(row, type, set) {
+                        if (!row.roleDisplay) {
                             var roleList='';
-                            for(var i = 0; i < oObj.aData.roles.length; i++) {
-                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + oObj.aData.roles[i].roleName + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  oObj.aData.roles[i].role + '\',\'' + oObj.aData.roles[i].deleteRoleLink + '\',\'' + oObj.aData.userId + '\')">Remove role</a></p>';
+                            for(var i = 0; i < row.roles.length; i++) {
+                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + row.roles[i].roleName + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  row.roles[i].role + '\',\'' + row.roles[i].deleteRoleLink + '\',\'' + row.userId + '\')">Remove role</a></p>';
                             }
-                            return roleList;                            
-                        [#if security.hasPermission("BO_EDIT_USER")]
-                        [#else]
-                          return '';
-                        [/#if]
+                            row.roleDisplay = roleList;
+                        }
+                        if (type === 'display') {
+                            return row.roleDisplay;
+                        } else if (type === 'filter') {
+                            return row.roleDisplay;
+                        } else if (type === 'sort') {
+                            return row.roleDisplay;
+                        } else {
+                            //Anything else and raw row
+                            return row.roleDisplay;
+                        }
                     }
+
                 }
 
 
             ],
-                        
+
             "sAjaxSource": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
-             
+
             "oLanguage": {
                 "sEmptyTable": "<span class='emptytable'>There are no users on this team</span>",
                 "sLoadingRecords": "<p>Loading team members...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
-       
 
-        
+
+
     });
-    
-    
+
+
     function deleteMember(role, deleteLink, userId) {
         $("#delUserId").val(userId);
         $("#delRole").val(role);
@@ -118,56 +126,69 @@ ${cpweb_foot}
         form.attr("action", deleteLink);
         form.submit();
     };
-    
-    
+
+
+    require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+        modalClient.setButtons(
+                [
+                    {
+                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.close')?js_string}",
+                        cssClass: "btn-primary",
+                        action: function (dlg) {
+                            dlg.proceed();
+                        }
+                    }
+                ]
+                );
+    });
+
 </script>
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
-[@pInfo.projectInfo selected="projectadmin"][/@pInfo.projectInfo]
+<h1>[@dws.txt key="cpweb.project.roles.title" /]</h1>
 
-<h2>[@dws.txt key="cpweb.project.roles.title" /]</h2>
-
-<form method="POST" action="${helper.urlFor('project.ProjectModificationModule','assignRoleEmail',[prj.projectId])}" >
-    <section id="addtoteam">
-        <section class="field">
-        <div class="inputtext">
-        <label for="userSelect">Select a user or add with a new email</label>
-        <input name="email" type="email" id="userSelect" class="bigdrop">
+<form method="POST" action="${helper.urlFor('project.ProjectModificationModule','assignRoleEmail',[prj.projectId])}" class="form">
+        <div class="form-group">
+            <label for="userSelect">Select a user or add with a new email</label>
+            <input name="email" type="email" id="userSelect" class="form-control">
         </div>
-        <div class="inputtext">
+        <div class="form-group">
             <label for="roleSelect">Select role</label>
-            <select id="roleSelect" name="role">    
+            <select id="roleSelect" name="role" class="form-control">
             [#list projectRoles?keys as pr]
             <option value="${pr}">${projectRoles[pr]}</option>
             [/#list]
             </select>
         </div>
-        </section>
-        <section class="action">
-            <button type="submit" class="btn btn-primary">Assign</button>    
-        </section>
-    </section>
+        <div class="form-group">
+            [@modal.formParams /]
+            <button type="submit" class="btn btn-primary">Assign</button>
+        </div>
 </form>
 
-<section class="list">
-    <table class="list" id="userroleslist">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Role</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</section>
-    
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table" id="userroleslist">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div style="display: none">
     <form id="deleteRoleForm" method="POST" action="">
-            <input type="hidden" id="delUserId" name="userId" />
-            <input type="hidden" id="delRole" name="role" />
+        [@modal.formParams /]
+        <input type="hidden" id="delUserId" name="userId" />
+        <input type="hidden" id="delRole" name="role" />
     </form>
 </div>
 

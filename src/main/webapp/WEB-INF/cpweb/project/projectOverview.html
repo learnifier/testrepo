@@ -88,7 +88,7 @@ ${cpweb_foot}
             "ajax": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
              
             "language": {
-                "emptyTable": "<span class='emptytable'>There are no users on this team</span>",
+                "emptyTable": "<span class='emptytable'>There are no team members in this project</span>",
                 "loadingRecords": "<p>Loading team members...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
@@ -99,14 +99,18 @@ ${cpweb_foot}
     
     
     function deleteMember(role, deleteLink, userId) {
-        $("#delUserId").val(userId);
-        $("#delRole").val(role);
-        var form = $("#deleteRoleForm");
-        form.attr("action", deleteLink);
-        form.submit();
+        var data = {"userId": userId, "role": role};
+        $.post(deleteLink, data, function() {
+            $("#userroleslist").DataTable().ajax.reload();
+        });
     };
         
 </script>
+
+<form id="deleteRoleForm" method="POST" action="">
+                <input type="hidden" id="delUserId" name="userId" />
+                <input type="hidden" id="delRole" name="role" />
+        </form>
 <script>
     require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
         f.startSingleFlirt('${prj.newsFlirtId}', {
@@ -123,6 +127,11 @@ ${cpweb_foot}
                 var len = data.posts.length;
                 for(var i = 0; i<len; i++) {
                     var post = data.posts[i];
+
+                    if(typeof activityNames === "undefined") {
+                        continue;
+                    }
+
                     if (!activityNames[post.tag]) {
                         continue;
                     }
@@ -132,28 +141,31 @@ ${cpweb_foot}
         });
     });
 </script>
-<div class="modal fade" id="addTeamMember" tabindex="-1" role="dialog" aria-labelledby="addTeamMemberLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Add Team Members</h4>
-      </div>
-      <div class="modal-body">
-           Form to add team members
-            <ul>
-                <li><strong>Read:</strong> modal windows will probably tell you something important so don't forget to read what they say.</li>
-                <li><strong>Look:</strong> a modal window enjoys a certain kind of attention; just look at it and appreciate its presence.</li>
-                <li><strong>Close:</strong> click on the button below to close the modal.</li>
-            </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Invite Team Member</button>
-      </div>
-    </div>
-  </div>
-</div>
+<script>
+$(function () {
+        $("#addTeamMemberButton").click(function () {
+            require(["[@modal.javascript /]"], function(modal) {
+                modal.open({
+                    src: "${helper.urlFor('project.ProjectModule','roles',[prj.projectId])}",
+                    height: "450px",
+                    cssClass: "modal-lg",
+                    title: "Add team member",
+                    cancel: function () { /* Do nothing*/
+                    },
+                    cancelUrl: window.location.href,
+                    proceedUrl: window.location.href,
+                    proceed: function(dlg) {
+                        $("#userroleslist").DataTable().ajax.reload();
+                        dlg.close();
+                    }
+                });
+            });
+
+            return false;
+        });
+
+    })
+</script>
         
 [/#assign]
 
@@ -258,7 +270,7 @@ ${cpweb_head}
         </table>
     </section>
     [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
-        <button type="button" class="btn btn-primary-outlined btn-sm" data-toggle="modal" data-target="#addTeamMember">
+        <button type="button" class="btn btn-primary-outlined btn-sm" id="addTeamMemberButton">
             <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
         </button>
     [/@]

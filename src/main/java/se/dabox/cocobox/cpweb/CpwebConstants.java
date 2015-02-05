@@ -27,6 +27,8 @@ public final class CpwebConstants {
      */
     public static final String SEND_PARTICIPATIONS_FLASH = "sendParticipationsFlash";
 
+    public static final String SKIN_MODAL_MAIL = "bootstrap_barebone";
+
     private CpwebConstants() {
     }
 

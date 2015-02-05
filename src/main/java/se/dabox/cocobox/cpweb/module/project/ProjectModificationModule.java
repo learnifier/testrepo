@@ -22,6 +22,7 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.module.WebModuleInfo;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.Permission;
@@ -76,6 +78,7 @@ import se.dabox.service.login.client.CreateBasicUserAccountRequest;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.druwa.FormbeanJsRequestTargetFactory;
+import se.dabox.service.webutils.druwa.JsonRequestUtil;
 import se.dabox.service.webutils.freemarker.text.LangServiceClientFactory;
 import se.dabox.service.webutils.listform.ListformCommand;
 import se.dabox.service.webutils.listform.ListformContext;
@@ -460,7 +463,11 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         LOGGER.info("Revoking role {} in project {} for {} (caller {}): {}",
                 roleId, strProjectId, userId, caller, response);
 
-        return toProjectRolePage(cycle, strProjectId);
+        if (JsonRequestUtil.isModernJsonCall(cycle)) {
+            return new JsonRequestTarget("{\"status\": \"OK\"}");
+        } else {
+            return toProjectRolePage(cycle, strProjectId);
+        }
     }
 
     private WebModuleRedirectRequestTarget toRoster(String projectId) {
@@ -630,6 +637,11 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
     }
 
     private RequestTarget toProjectRolePage(RequestCycle cycle, String strProjectId) {
-        return new WebModuleRedirectRequestTarget(ProjectModule.class, "roles", strProjectId);
+        String params = ModalParamsHelper.getParameterString(cycle);
+        WebModuleRedirectRequestTarget target
+                = new WebModuleRedirectRequestTarget(ProjectModule.class, "roles", strProjectId);
+        target.setExtraTargetParameterString(params);
+
+        return target;
     }
 }

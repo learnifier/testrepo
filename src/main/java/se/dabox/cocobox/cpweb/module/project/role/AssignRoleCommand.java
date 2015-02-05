@@ -100,6 +100,7 @@ public class AssignRoleCommand {
         sms.setStickyTemplateLocale(mailLocale);
         sms.setStickyHidesDropdown(false);
         sms.addDisplayReceiver(new Receiver("", email));
+        sms.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
 
         sms.storeInSession(cycle);
 
@@ -128,6 +129,7 @@ public class AssignRoleCommand {
         Locale mailLocale = getMailLocale();
         sms.setStickyTemplateLocale(mailLocale);
         sms.setStickyHidesDropdown(false);
+        sms.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
         
         UserAccount matching = getMatchingUserAccount();
         
