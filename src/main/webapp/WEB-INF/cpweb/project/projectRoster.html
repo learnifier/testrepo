@@ -21,12 +21,50 @@ ${cpweb_foot}
 
 <script>
     $('#menu-projects').addClass('active');
+    
+</script>
+
+
+<script id="roster-cell-action-template" type="text/x-handlebars-template">
+<div class='btn-group'>
+    <button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='glyphicon glyphicon-menu-down'></span></button>
+    <ul class='dropdown-menu' role='menu'>
+        {{#if activated}}
+        <li><a href='#' data-trigger='roster-row-action' data-action='link'>Get Link</a></li>
+        {{/if}}
+        {{#if impersonateAllowed}}
+        <li><a href='#' data-trigger='roster-row-action' data-action='impersonate'>View As</a></li>
+        {{/if}}
+        {{#if moveAllowed}}
+        <li><a href='#' data-trigger='roster-row-action' data-action='move'>Move</a></li>
+        {{/if}}
+    </ul>
+</div>   
 </script>
 
 
 <script>
+    var impersonateLink = "";
+    var impersonateEnabled = false;
+    [@projectSecurity.permissionBlock permission="PRJ_IMPERSONATE_PARTICIPANT"]
+        impersonateLink = "${helper.urlFor('ProjectModule','impersonate')}";
+        impersonateEnabled = true;
+    [/@]
+
+    var moveLink = "";
+    var moveEnabled = false;
+    [@projectSecurity.permissionBlock permission="PRJ_IMPERSONATE_PARTICIPANT"]
+        moveLink = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}";
+        moveEnabled = true;
+    [/@]
+        
+     
     $(document).ready(function() {
-        require(['dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function() {
+        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function(hb) {
+
+            var source = $("#roster-cell-action-template").html();
+            var rosterCellActionTemplate = hb.compile(source);
+            
             window.oTable = $('#projectroster').dataTable({
                 "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "paging": false,
@@ -86,10 +124,6 @@ ${cpweb_foot}
                                     var data = '<img src="${cocoboxCdn}/cocobox/img/cp/participation_error.png" ' + onclick + ' class="participationTriangle" alt="Participation Link"/>';
 
                                     row.participationLinkDisplay = data;
-                                } else if (row.activated) {
-                                    var data = '<a href="" onclick="cocobox.infoDialog(\'Participation access link\', \'' + row.participationLink + '\'); return false"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>';
-
-                                    row.participationLinkDisplay = data;
                                 } else  {
                                     row.participationLinkDisplay = "";
                                 }
@@ -113,19 +147,6 @@ ${cpweb_foot}
                         "data" : function(row, type, set) {
                             if (!row.displayNameDisplay) {
                                 var data = '<a class="name" href="' + row.link + '" title="' + row.email + '">' + row.displayName + '</a> ';
-
-                                [@projectSecurity.permissionBlock permission="PRJ_IMPERSONATE_PARTICIPANT"]
-                                    if (row.activated && !row.inError) {
-                                        data += '<a class="impersonate-link" target="_blank" title="Visit Learner Portal as '
-                                            + row.displayName
-                                            + '" href="${helper.urlFor('ProjectModule','impersonate')}/'
-                                            + row.id
-                                            + ' "><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></a>';
-                                    }
-                                [/@]
-
-                                data+='<a class="impersonate-link" onclick="moveParticipation(this)" data-participationid="'+row.id+'">Move</a>';
-
                                 row.displayNameDisplay = data;
                             }
                             
@@ -196,7 +217,7 @@ ${cpweb_foot}
                         "data" : function(row, type, set) {
                             if (!row.lastAccessDisplay) {
                                 if (row.lastAccess) {
-                                     row.lastAccessDisplay = '<abbr class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
+                                     row.lastAccessDisplay = '<abbr data-toggle="tooltip" class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
                                  } else {
                                      row.lastAccessDisplay = 'Not yet logged in';
                                  }
@@ -218,6 +239,29 @@ ${cpweb_foot}
                         "targets": [6],
                         "width": "120px",
                         "data" : function(row, type, set) {
+                            if(!row.actionsDisplay) {
+                                row.impersonateAllowed = impersonateEnabled && row.activated;
+                                row.moveAllowed = moveEnabled && !row.inError;
+                                var html = rosterCellActionTemplate(row);
+                                row.actionsDisplay = html;
+                            }
+                            
+                            if (type === 'display') {
+                                return row.actionsDisplay;
+                            } else if (type === 'filter') {
+                                return null;
+                            } else if (type === 'sort') {
+                                return null;
+                            } else {
+                                //Anything else and raw row
+                                return row.actionsDisplay;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [7],
+                        "width": "120px",
+                        "data" : function(row, type, set) {
                             if (!row.statusDisplay) {
                                 row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status +'%;"></div</div>';
                             }
@@ -235,7 +279,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [7],
+                        "targets": [8],
                         "orderable": false,
                         "width": "25px",
                         "data" : function(row, type, set) {
@@ -263,6 +307,35 @@ ${cpweb_foot}
                 }
             });
         });
+        
+        $('#projectroster').on('click', 'a[data-trigger=roster-row-action]',function(ev){            
+            var row = oTable.DataTable().row( $(this).parents('tr').first() ).data();
+            var action = $(this).data('action');
+            if (action==='link'){
+                rowLinkAction(row);
+            } else if (action==='impersonate') {
+                rowImpersonateAction(row);                
+            } else if (action==='move') {
+                rowMoveAction(row);                
+            } else {
+                alert('Undefined row action: ' + action);
+            }
+            
+            return false;
+        });
+        function rowLinkAction(row) {
+            cocobox.infoDialog('Participation access link', row.participationLink);
+            log(row);            
+        };
+        
+        function rowImpersonateAction(row) {
+            window.open(impersonateLink + '/' + row.id,'_blank');
+        };
+        
+        function rowMoveAction(row) {
+            moveParticipation(row.id);
+        };
+        
 
         cpweb.registerListform($("#projectrosterform").first());
         $('#listprojects_filter input').attr('placeholder', 'Search for projects');
@@ -465,10 +538,9 @@ ${cpweb_foot}
         return false;
     }
 
-    function moveParticipation(target) {
-        var pid = $(target).data("participationid");
+    function moveParticipation(pid) {
 
-        var moveSrc = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}/"+pid;
+        var moveSrc = moveLink + '/' +pid;
 
         require(["[@modal.javascript /]"], function(modal) {
             modal.open({
@@ -481,7 +553,7 @@ ${cpweb_foot}
                        cancelUrl: window.location.href
             });
         });
-    }
+    };
 
 </script>
 [/#assign]
@@ -582,6 +654,7 @@ ${cpweb_head}
                     <th>Invited</th>
                     <th>Last Email</th>
                     <th>Last Seen</th>
+                    <th></th>
                     <th>Status</th>
                     <th></th>
                 </tr>
