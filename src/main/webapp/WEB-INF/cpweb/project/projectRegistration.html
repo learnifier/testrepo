@@ -62,10 +62,11 @@
     <h3>Registration link to distribute to participants</h3>
     <input type="text" id="reg_link" class="input_full" value="${reglink}" />
 
+    <section class="ccb-expandable-list">
     <div id="settingsList">
         <ul>
 			[#if !pInfo.isIdproject(prj)]
-            <li id="password" class="expandable">
+            <li id="selfreg_password" class="expandable">
                 <a class="setting">
                     [#global formsess=passwordformsess]
                     [#global formPrefix="cpweb.registration.password" /]
@@ -112,7 +113,7 @@
 			[/#if]
 			
 			[#if !pInfo.isIdproject(prj) || pInfo.isIdproject(prj) && security.isBoAdmin()]
-            <li id="creditstop" class="expandable">
+            <li id="selfreg_creditstop" class="expandable">
                 <a class="setting">
                     [#global formsess=creditlimitformsess]
                     [#global formPrefix="cpweb.registration.creditlimit" /]

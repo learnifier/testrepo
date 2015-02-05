@@ -589,7 +589,7 @@ ${cpweb_head}
     <div role="tabpanel" class="tab-pane fade in active" id="manual">
         <div class="row">
             [#global formPrefix="cpweb" /]
-            <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm"method="post" onsubmit="return addMemberListener()">
+            <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" method="post" onsubmit="return addMemberListener()">
                 <div class="col-md-6">
                     [@bsform.inputText name="memberfirstname" tabindex="2" maxlength="64" /]
                 </div>
