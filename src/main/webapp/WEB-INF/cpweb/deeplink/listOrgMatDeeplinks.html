@@ -1,7 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
-
 
 [#!-- Netbean hint
 <script src="../../js/deeplink/listDeeplinksOrgMats.js">
@@ -96,11 +94,8 @@ ${cpweb_foot}
 
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="orgmat_deeplinks"][/@sMenu.settingsMenu]
-[/#assign]
 
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
  
 <h1>Materials</h1>
 
@@ -111,7 +106,7 @@ ${cpweb_foot}
     </ul>
     <div id="tab_products">
         <section class="list">
-            <table class="list" id="listproducts">
+            <table class="table ccb-table list" id="listproducts">
                 <thead>
                     <tr>
                         <th></th>

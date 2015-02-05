@@ -1,8 +1,5 @@
 [#ftl strip_text="true" /]
 
-[#import "/settings/settingsMenu.html" as sMenu /]
-
-
 [#!-- Netbean hint
 <script src="../../js/deeplink/listDeeplinksProducts.js">
 </script>
@@ -103,18 +100,15 @@ ${cpweb_foot}
 
 [/#assign]
 
-[#assign cpweb_ctxMenu]
-[@sMenu.settingsMenu selected="prod_deeplinks"][/@sMenu.settingsMenu]
-[/#assign]
 
-[@dws.skin skin="CPAuthMenu2" head=cpweb_head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
  
 <h1>Direct Links</h1>
 
 <div id="listmaterialstabs">
     <div id="tab_products">
         <section class="list">
-            <table class="list" id="listproducts">
+            <table class="table ccb-table" id="listproducts">
                 <thead>
                     <tr>
                         <th></th>

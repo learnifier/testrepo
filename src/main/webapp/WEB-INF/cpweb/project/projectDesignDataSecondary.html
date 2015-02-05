@@ -238,6 +238,6 @@ ${cpweb_foot}
 [/#if]
 
 [#if field.dataType == "DATETIME" && field.primaryField == false]
-<span class="revertspan" data-hiddenid="f${component.cid}_${field.name}" title="revert to default setting">Revert</span>
+<a class=" btn btn-link revertspan" data-hiddenid="f${component.cid}_${field.name}" title="Revert to default setting"><span class="glyphicon glyphicon-refresh"></span> Revert</a>
 [/#if]
 [/#macro]
