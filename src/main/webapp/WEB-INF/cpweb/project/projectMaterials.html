@@ -25,6 +25,7 @@ ${cpweb_foot}
                         "aTargets": [ 0 ],
                         "mData": "type",
                         "sClass": "type",
+                        "sWidth": "10%",
                         "fnRender": function ( oObj ) {
                             if (oObj.aData.thumbnail===null ){
                                 return  '<div class="'+oObj.aData.type+'"></div>';
@@ -61,7 +62,7 @@ ${cpweb_foot}
                         "aTargets": [ 3 ],
                         "mData": null,
                         "fnRender": function ( oObj ) {
-                            return  '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+oObj.aData.system+'|'+oObj.aData.id+'" /><button type="submit" class="btn btn-primary btn-sm">Remove</button></form>';
+                            return  '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+oObj.aData.system+'|'+oObj.aData.id+'" /><button type="submit" class="btn btn-primary btn-sm pull-right">Remove</button></form>';
                         }
                     }
                 ],
@@ -144,37 +145,38 @@ ${cpweb_foot}
 
 [@pInfo.projectInfo selected="materials"][/@pInfo.projectInfo]
 
-<h2>[@dws.txt key="cpweb.project.materials.title" /]</h2>
-
-<section id="addprojectmaterial" class="ccb-flat-card ccb-flat-card-padding ccb-flat-card-colored">
+<section id="addprojectmaterial" class="ccb-flat-card">
+    <div class="ccb-flat-card__header"><h3>[@dws.txt key="cpweb.project.materials.title" /]</h3></div>
+    <div class="ccb-flat-card__content ccb-flat-card__content--padding">
     [#global formPrefix="cpweb.project.addmaterial" /]
     <form action="${addLink}" name="addMaterial" id="addMaterial" class="fullpage" method="post">
         [@bsform.alertsection]
         [/@bsform.alertsection]
-        <section class="field">
-            <div class="ui-widget col-md-6">
-                [@bsform.select name="materialId" class="input_full" tabindex="1"]
-                    <option value=""></option>
-                    [#list materials?sort_by("title") as mat]
-                        [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@bsform.option]
-                    [/#list]
-                [/@bsform.select]
-                
-                <button type="submit" class="btn btn-primary">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
-            </div>
-            <div class="field inputtext col-md-6">
-                <label for="addprojmat">[@dws.txt key="cpweb.project.uploadmaterial.label" /]</label> 
-                <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-                    <div class="btn btn-primary" id="addbtn">[@dws.txt key="cpweb.project.uploadmaterial.action" /]</div>
+            <div class="row">
+                <div class="col-md-6">
+                    [@bsform.select name="materialId" class="form-control" tabindex="1"]
+                        <option value=""></option>
+                        [#list materials?sort_by("title") as mat]
+                            [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@bsform.option]
+                        [/#list]
+                    [/@bsform.select]
+
+                    <button type="submit" class="btn btn-primary">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
+                </div>
+                <div class="col-md-6">
+                    <label for="addprojmat">[@dws.txt key="cpweb.project.uploadmaterial.label" /]</label> 
+                    <div class="ui-helper-hidden" data-anoncreateprodelement="show">
+                        <div class="btn btn-primary" id="addbtn">[@dws.txt key="cpweb.project.uploadmaterial.action" /]</div>
+                    </div>
                 </div>
             </div>
-        </section>
         [@bsform.infosection]
         [/@bsform.infosection]
     </form>
+    </div>
 </section>
 
-<table class="table list" id="projectmaterials">
+<table class="table ccb-table list" id="projectmaterials">
     <thead>
         <tr>
             <th></th>

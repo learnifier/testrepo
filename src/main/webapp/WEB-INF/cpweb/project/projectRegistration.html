@@ -52,15 +52,14 @@
 [/#macro]
 
 [#macro html]
-    <h2>[@dws.txt key="cpweb.project.registration.title" /]</h2>
 
     [#if !pInfo.isIdproject(prj)]
     <h3>Registration status</h3>
     <input data-toggle="toggle" type="checkbox" id="reg_status" [#if prj.selfRegistrationEnabled]checked="checked"[/#if]>
     [/#if]
 	
-    <h3>Registration link to distribute to participants</h3>
-    <input type="text" id="reg_link" class="input_full" value="${reglink}" />
+    <h4>Registration link to distribute to participants</h4>
+    <input type="text" id="reg_link" class="form-control" value="${reglink}" />
 
     <section class="ccb-expandable-list">
     <div id="settingsList">
@@ -71,38 +70,30 @@
                     [#global formsess=passwordformsess]
                     [#global formPrefix="cpweb.registration.password" /]
                     [#assign defaultValue = formsess.getDefaultValue('passwordEnabled')!'false' /]
-                    <span class="label">[@dws.txt key="cpweb.registration.password.title" /]</span>
+                    <span class="row-label">[@dws.txt key="cpweb.registration.password.title" /]</span>
                     <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
                     <span class="updatedinfo" id="password_updated"></span>
                     <span class="short">[#if defaultValue == "true"]<span id="regpwstatus" class="on">ON</span>[#else]<span id="regpwstatus" class="off">OFF</span>[/#if]</span>
                 </a>
                 <div class="content">
-                    <div class="label">[@dws.txt key="cpweb.registration.password.title" /]</div>
+                    <div class="row-label">[@dws.txt key="cpweb.registration.password.title" /]</div>
                     <div class="form">
 
                         <form action="${helper.urlFor('project.ProjectJsonModule','setInvitationPassword',[prj.projectId])}" id="setregistrationpassword" name="setregistrationpassword" class="fullpage" method="post">
                             [@bsform.alertsection]
                             [/@bsform.alertsection]
-                            <section class="field clearfix">
-                                <div class="column">
-                                    <fieldset>
+                            [#assign defaultValue = formsess.getDefaultValue("passwordEnabled")!"false" /]
+                            [@bsform.select name="passwordEnabled" class="input_full" tabindex="1"]
+                            [@bsform.option value="true" defaultValue=defaultValue]ON[/@bsform.option]
+                            [@bsform.option value="false" defaultValue=defaultValue]OFF[/@bsform.option]
+                            [/@bsform.select]
 
-                                        [#assign defaultValue = formsess.getDefaultValue("passwordEnabled")!"false" /]
-                                        [@bsform.select name="passwordEnabled" class="input_full" tabindex="1"]
-                                        [@bsform.option value="true" defaultValue=defaultValue]ON[/@bsform.option]
-                                        [@bsform.option value="false" defaultValue=defaultValue]OFF[/@bsform.option]
-                                        [/@bsform.select]
-
-                                        [@bsform.inputText name="password" class="input_full"  tabindex="2" /]
-
-                                    </fieldset>
-                                </div>
-                            </section>
+                            [@bsform.inputText name="password" class="input_full"  tabindex="2" /]
                             [@bsform.infosection]
                             [/@bsform.infosection]
                             <section class="action">
-                                <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savesetting' /]</span></button>
-                                <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+                                <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savesetting' /]</button>
+                                <a class="btn btn-link" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
                             </section>
 
                         </form>
@@ -118,37 +109,31 @@
                     [#global formsess=creditlimitformsess]
                     [#global formPrefix="cpweb.registration.creditlimit" /]
                     [#assign defaultValue = formsess.getDefaultValue('creditLimitEnabled')!'false' /]
-                    <span class="label">[@dws.txt key="cpweb.registration.creditlimit.title" /]</span>
+                    <span class="row-label">[@dws.txt key="cpweb.registration.creditlimit.title" /]</span>
                     <span class="edit">[@dws.txt key="cpweb.registration.edit" /]</span>
                     <span class="updatedinfo" id="creditlimit_updated"></span>
                     <span class="short">[#if defaultValue == "true"]<span id="reginvlimitstatus" class="on">ON</span>[#else]<span id="reginvlimitstatus" class="off">OFF</span>[/#if]</span>
                 </a>
                 <div class="content">
-                    <div class="label">[@dws.txt key="cpweb.registration.creditlimit.title" /]</div>
+                    <div class="row-label">[@dws.txt key="cpweb.registration.creditlimit.title" /]</div>
                     <div class="form">
                         <form action="${helper.urlFor('project.ProjectJsonModule','setInvitationCreditLimit',[prj.projectId])}" id="reginvlimitform" name="reginvlimitform" class="fullpage" method="post">
                             [@bsform.alertsection]
                             [/@bsform.alertsection]
-                            <section class="field clearfix">
-                                <div class="column">
-                                    <fieldset>
 
 
-                                        [@bsform.select name="creditLimitEnabled" class="input_full" tabindex="1"]
-                                        [@bsform.option value="true" defaultValue=defaultValue]ON[/@bsform.option]
-                                        [@bsform.option value="false" defaultValue=defaultValue]OFF[/@bsform.option]
-                                        [/@bsform.select]
+                            [@bsform.select name="creditLimitEnabled" class="input_full" tabindex="1"]
+                            [@bsform.option value="true" defaultValue=defaultValue]ON[/@bsform.option]
+                            [@bsform.option value="false" defaultValue=defaultValue]OFF[/@bsform.option]
+                            [/@bsform.select]
 
-                                        [@bsform.inputNumber name="creditLimit" class="input_full"  tabindex="2" /]
+                            [@bsform.inputNumber name="creditLimit" class="input_full"  tabindex="2" /]
 
-                                    </fieldset>
-                                </div>
-                            </section>
                             [@bsform.infosection]
                             [/@bsform.infosection]
                             <section class="action">
-                                <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savesetting' /]</span></button>
-                                <a class="cancel" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+                                <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savesetting' /]</button>
+                                <a class="btn btn-link" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
                             </section>
                         </form>
                     </div>

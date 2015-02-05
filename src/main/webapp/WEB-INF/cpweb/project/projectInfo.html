@@ -99,19 +99,20 @@
         <ul class="nav nav-underline">
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
- 
+            
+            [#--
             [#if project.type.ptype == 2 && !isIdproject(prj)]
                 <li class="[#if selected == 'info']active[/#if]"><a href="${helper.urlFor('ProjectModule','details',[project.projectId])}"><span>Info</span></a></li>
-            [/#if]
+            [/#if]---]
             [#if project.type.ptype == 2 && !isIdproject(prj)]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course<!--[@dws.txt key='cpweb.projectmenu.details' /]--></span></a></li>
+                <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course[#--[@dws.txt key='cpweb.projectmenu.details' /]--]</span></a></li>
             [/@]
             [/#if]
 
             [#if project.type.ptype == 1 || project.type.ptype == 2]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
-            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>Resources<!--[@dws.txt key='cpweb.projectmenu.materials' /]--></span></a></li>
+            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
             [/@]
             [/#if]
 
