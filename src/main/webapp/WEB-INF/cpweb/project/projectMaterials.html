@@ -26,7 +26,7 @@ ${cpweb_foot}
                         "mData": "type",
                         "sClass": "type",
                         "fnRender": function ( oObj ) {
-                            if (oObj.aData.thumbnail==null ){
+                            if (oObj.aData.thumbnail===null ){
                                 return  '<div class="'+oObj.aData.type+'"></div>';
                             } else {
                                 return  '<img src="'+oObj.aData.thumbnail+'" />';
@@ -112,18 +112,6 @@ ${cpweb_foot}
         return false;
     }
 
-    $(function() {
-        require(['jquery-ui','dabox-jquery'], function() {
-            $( "#materialId" ).combobox({
-                'renderFn': function( ul, item ) {
-                    return $( "<li>" )
-                    .data( "item.autocomplete", item )
-                    .append( "<a>" + item.label + "</a>" )
-                    .appendTo( ul );
-                }
-            });
-        });
-    });
 </script>
 
 <script>
@@ -142,7 +130,10 @@ ${cpweb_foot}
         }, {
             scope: "P${prj.projectId?c}"
         });
+    });
 
+    require(["select2.min"], function() {
+        $("#materialId").select2();
     });
 </script>
 
