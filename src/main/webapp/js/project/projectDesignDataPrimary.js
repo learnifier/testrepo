@@ -34,11 +34,11 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
 
         function createMapsUrl(place) {
 
-            var street, number, town = '';
+            var street, num, town = '';
 
             if (place.address_components) {
                 street = (place.address_components[1] && place.address_components[1].short_name || '');
-                number = (place.address_components[0] && place.address_components[0].short_name || '');
+                num = (place.address_components[0] && place.address_components[0].short_name || '');
                 town = (place.address_components[2] && place.address_components[2].short_name || '');
             }
 
@@ -49,7 +49,7 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
             }
 
             var mapsBaseUrl = 'http://www.google.com/maps/place/',
-                    mapsUrl = mapsBaseUrl + encodeURIComponent(street) + ',' + encodeURIComponent(number) + ',' + encodeURIComponent(town) + '/@' + long + ',' + lat + ',17z';
+                    mapsUrl = mapsBaseUrl + encodeURIComponent(street) + ',' + encodeURIComponent(num) + ',' + encodeURIComponent(town) + '/@' + long + ',' + lat + ',17z';
             return mapsUrl;
 
         }
