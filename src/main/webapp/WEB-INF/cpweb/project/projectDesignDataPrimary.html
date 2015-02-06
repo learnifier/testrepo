@@ -83,14 +83,14 @@ ${cpweb_head}
 [#macro displayComponent component]
 [#if component.children?size > 0 || component.type == 'text' ]
     <div class="text">
-        <h1>${component.properties.title!''}</h1>
+        <h3>${component.properties.title!''}</h3>
         <p class="desc">${component.properties.description!''}</p>
     </div>
     [#if component.children?size > 0]
         [#list component.children as child]
             [#if child.properties.splitContainerPosition?? && child.properties.splitContainerPosition == "top" ]
                 <div class="text">
-                    [#if child.properties["title"]??]<h1>${child.properties["title"]}</h1>[/#if]
+                    [#if child.properties["title"]??]<h3>${child.properties["title"]}</h3>[/#if]
                     [#if child.properties["description"]??]<p class="desc">${child.properties["description"]}</p>[/#if]
                     [@listComponentFields child /]
                 </div>
@@ -106,7 +106,7 @@ ${cpweb_head}
     [/#if]
 [#else]
     <div class="text">
-        [#if component.properties["title"]??]<h1>${component.properties["title"]}</h1>[/#if]
+        [#if component.properties["title"]??]<h3>${component.properties["title"]}</h3>[/#if]
         [#if component.properties["description"]??]<p class="desc">${component.properties["description"]}</p>[/#if]
         [@listComponentFields component /]
     </div>
