@@ -28,22 +28,19 @@ public class FragmentInitializer {
         fragParams.put("orgId", strOrgId);
 
         getFragmentClient().
-                getFragment(cycle, "cpmenu", fragParams);
+                getFragment(cycle, "cpUserInfoFlorida", fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpuserinfo", fragParams);
+                getFragment(cycle, "cpUserInfoMobileFlorida", fragParams);
 
         getFragmentClient().
                 getFragment(cycle, "cpsearch", fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpmenuflorida", fragParams);
+                getFragment(cycle, "cpMenuFlorida", fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpmenumobileflorida", fragParams);
-
-        getFragmentClient().
-                getFragment(cycle, "cpuserinfo2", fragParams);
+                getFragment(cycle, "cpMenuMobileFlorida", fragParams);
 
         getFragmentClient().
                 getFragment(cycle, "cpsearch2", fragParams);
