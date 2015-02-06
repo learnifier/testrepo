@@ -139,7 +139,7 @@ ${cpweb_foot}
                         }                        
                     },
                     {
-                        "targets": [2],
+                        "targets": [8],
                         "orderable": false,
                         "width": "80px",
                         "data" : function(row, type, set) {
@@ -163,7 +163,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [3],
+                        "targets": [2],
                         "width": "250px",
                         "data" : function(row, type, set) {
                             if (!row.displayNameDisplay) {
@@ -184,7 +184,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [4],
+                        "targets": [3],
                         "data" : function(row, type, set) {
                             if (!row.firstEmailDisplay) {
                                 if (row.firstEmailStr) {
@@ -209,7 +209,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [5],
+                        "targets": [4],
                         "data" : function(row, type, set) {
                             if (!row.lastEmailDisplay) {
                                 if (row.sending) {
@@ -234,7 +234,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [6],
+                        "targets": [5],
                         "data" : function(row, type, set) {
                             if (!row.lastAccessDisplay) {
                                 if (row.lastAccess) {
@@ -257,7 +257,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [7],
+                        "targets": [6],
                         "width": "120px",
                         "data" : function(row, type, set) {
                             if (!row.statusDisplay) {
@@ -277,7 +277,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [8],
+                        "targets": [7],
                         "orderable": false,
                         "width": "25px",
                         "data" : function(row, type, set) {
@@ -651,12 +651,12 @@ ${cpweb_head}
             <tr>
                 <th><input type="checkbox" id="cball"></th>
                 <th></th>
-                <th></th>
                 <th>Name</th>
                 <th>Invited</th>
                 <th>Last Email</th>
                 <th>Last Seen</th>
                 <th>Status</th>
+                <th></th>
                 <th></th>
             </tr>
         </thead>
