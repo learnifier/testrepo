@@ -4,106 +4,166 @@
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
+
+<script>
+    var taskFilter = {};
+    taskFilter.all = "${ctext('cpweb.project.schedule.target.all')?xml}";
+    taskFilter.invited = "${ctext('cpweb.project.schedule.target.invited')?xml}";
+    taskFilter.notinvited = "${ctext('cpweb.project.schedule.target.notinvited')?xml}";
+    taskFilter.completed = "${ctext('cpweb.project.schedule.target.completed')?xml}";
+    taskFilter.uncompleted = "${ctext('cpweb.project.schedule.target.uncompleted')?xml}";
+
+    var taskStatus = {};
+
+    taskStatus.N = "${ctext('cpweb.project.schedule.status.new')?xml}";
+    taskStatus.E = "${ctext('cpweb.project.schedule.status.executed')?xml}";
+    taskStatus.C = "${ctext('cpweb.project.schedule.status.cancelled')?xml}";
+    taskStatus.A = "${ctext('cpweb.project.schedule.status.allocfailure')?xml}";
+    taskStatus.M = "${ctext('cpweb.project.schedule.status.missing')?xml}";
+</script>
+
 <script>
     $('#menu-projects').addClass('active');
-    $(document).ready(function() {
-        require(['dabox-datatables', 'dabox-common','dabox-jquery'], function() {
-        var oTable = $('#projecttasks').dataTable({
-            "sDom": 'rt<"dataTables_footer clearfix"i>',
-            "bPaginate": false,
-            "aoColumnDefs": [
-                {
-                    "aTargets": [ 0 ],
-                    "mData": "mailTemplateName"
-                },
-                {
-                    "aTargets": [ 1 ],
-                    "mData": "targetFilter",
-                    "fnRender": function ( oObj ) {
-                        if ( oObj.aData.targetFilter == 'all' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.all" /]'
-                        } else if ( oObj.aData.targetFilter == 'invited' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.invited" /]'
-                        } else if ( oObj.aData.targetFilter == 'notinvited' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.notinvited" /]'
-                        } else if ( oObj.aData.targetFilter == 'completed' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.completed" /]'
-                        } else if ( oObj.aData.targetFilter == 'uncompleted' ) {
-                            return '[@dws.txt key="cpweb.project.schedule.target.uncompleted" /]'
-                        } else {
-                            return oObj.aData.targetFilter;
-                        }
-                    }
-                },
-                {
-                    "aTargets": [ 2 ],
-                    "mData": "scheduled",
-                    "bUseRendered": false,
-                    "fnRender": function ( oObj ) {
-                        return oObj.aData.scheduledString;
-                    }
-                },
-                {
-                    "aTargets": [ 3 ],
-                    "mData": "status",
-                    "bUseRendered": false,
-                    "fnRender": function ( oObj ) {
-                        if ( oObj.aData.status == 'N' ) {
-                            return '<span>[@dws.txt key="cpweb.project.schedule.status.new" /]</span>'
-                        } else if ( oObj.aData.status == 'E' ) {
-                            return '<span class="ok">[@dws.txt key="cpweb.project.schedule.status.executed" /]</span>'
-                        } else if ( oObj.aData.status == 'C' ) {
-                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.cancelled" /]</span>'
-                        } else if ( oObj.aData.status == 'A' ) {
-                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.allocfailure" /]</span>'
-                        } else if ( oObj.aData.status == 'M' ) {
-                            return '<span class="alert">[@dws.txt key="cpweb.project.schedule.status.missing" /]</span>'
-                        } else {
-                            return  null;
-                        }
-                    }
-                },
-                {
-                    "aTargets": [ 4 ],
-                    "mData": null,
+    $(document).ready(function () {
+        require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery'], function () {
+            var oTable = $('#projecttasks').dataTable({
+                "dom": 'rt<"dataTables_footer clearfix"i>',
+                "paging": false,
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "data": "mailTemplateName"
+                    },
+                    {
+                        "targets": [1],
+                        "data": function (row, type, set) {
+                            if (!row.targetFilterDisplay) {
+                                var str = row.targetFilter;
+                                if (taskFilter.hasOwnProperty(str)) {
+                                    str = taskFilter[str];
+                                }
 
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
-                        log(oObj.aData.status);
-                        if ( oObj.aData.status == 'N' ) {
-                           return '<button onclick="deleteTask(\'' +  oObj.aData.taskId + '\',this)">Delete</button>';
-                        } else {
-                            return  null;
-                        }
-                    }
-                },
-				{
-                    "aTargets": [ 5 ],
-                    "mData": null,
+                                row.targetFilterDisplay = str;
+                            }
 
-                    "bSortable": false,
-                    "fnRender": function ( oObj ) {
-                        log(oObj.aData.status);
-                        if ( oObj.aData.status == 'N' ) {
-                           return '<a type="button" href="' + oObj.aData.editLink + '">Edit</a>';
-                        } else {
-                            return  null;
+                            if (type === 'display') {
+                                return row.targetFilterDisplay;
+                            } else if (type === 'filter') {
+                                return row.targetFilterDisplay;
+                            } else if (type === 'sort') {
+                                return row.targetFilterDisplay;
+                            } else {
+                                //Anything else and raw row
+                                return row.targetFilter;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [2],
+                        "data": function (row, type, set) {
+                            if (type === 'display') {
+                                return row.scheduledString;
+                            } else if (type === 'filter') {
+                                return row.scheduledString;
+                            } else if (type === 'sort') {
+                                return row.scheduled;
+                            } else {
+                                //Anything else and raw row
+                                return row.scheduled;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [3],
+                        "data": function (row, type, set) {
+                            if (!row.statusDisplay) {
+                                var str = row.status;
+                                if (taskStatus.hasOwnProperty(str)) {
+                                    str = taskStatus[str];
+                                }
+
+                                row.statusDisplay = str;
+                            }
+
+                            if (type === 'display') {
+                                return row.statusDisplay;
+                            } else if (type === 'filter') {
+                                return row.statusDisplay;
+                            } else if (type === 'sort') {
+                                return row.statusDisplay;
+                            } else {
+                                //Anything else and raw row
+                                return row.status;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [4],
+                        "orderable": false,
+                        "data": function (row, type, set) {
+                            if (!row.delDisplay) {
+                                var str;
+                                if (row.status === 'N') {
+                                    str = '<button onclick="deleteTask(\'' + row.taskId + '\',this)">Delete</button>';
+                                } else {
+                                    str = '';
+                                }
+
+                                row.delDisplay = str;
+                            }
+
+                            if (type === 'display') {
+                                return row.delDisplay;
+                            } else if (type === 'filter') {
+                                return null;
+                            } else if (type === 'sort') {
+                                return null;
+                            } else {
+                                //Anything else and raw row
+                                return null;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [5],
+                        "orderable": false,
+                        "data": function (row, type, set) {
+                            if (!row.editDisplay) {
+                                var str;
+                                if (row.status === 'N') {
+                                    str = '<a type="button" href="' + row.editLink + '">Edit</a>';
+                                } else {
+                                    str = '';
+                                }
+
+                                row.editDisplay = str;
+                            }
+
+                            if (type === 'display') {
+                                return row.editDisplay;
+                            } else if (type === 'filter') {
+                                return null;
+                            } else if (type === 'sort') {
+                                return null;
+                            } else {
+                                //Anything else and raw row
+                                return null;
+                            }
                         }
                     }
-                }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>The schedule is empty. Add a communication above to get started.</span>",
-                "sLoadingRecords": "<p>Loading schedule...</p><img src='[@common.spinnerUrl /]' />"
-            },
-            "sAjaxSource": "${helper.urlFor('ProjectJsonModule','projectTasks',[prj.projectId])}"
+                ],
+                "language": {
+                    "sEmptyTable": "<span class='emptytable'>The schedule is empty. Add a communication above to get started.</span>",
+                    "sLoadingRecords": "<p>Loading schedule...</p><img src='[@common.spinnerUrl /]' />"
+                },
+                "ajaxSource": "${helper.urlFor('ProjectJsonModule','projectTasks',[prj.projectId])}"
+            });
+
+            $("#addTaskForm").submit(function () {
+                cocobox.longOp();
+                $(".schedule").cocobox('inputBlock');
+            });
         });
-
-		$("#addTaskForm").submit(function() {
-            cocobox.longOp();
-            $(".schedule").cocobox('inputBlock');
-        });
-    } );
     });
 
     var reloadTaskList = function (data) {
@@ -113,9 +173,9 @@ ${cpweb_foot}
     };
 
 
-    var deleteTask= function (taskId, button) {
+    var deleteTask = function (taskId, button) {
         log('Delete tsk', button);
-        cocobox.confirmationDialog("Delete scheduled task", "Do you want to delete this scheduled task?", function() {
+        cocobox.confirmationDialog("Delete scheduled task", "Do you want to delete this scheduled task?", function () {
             $(button).cocobox('inputBlock');
             var ajaxData = {taskId: taskId};
             cocobox.ajaxPost('${helper.urlFor("project.ProjectModificationModule","removeTask", [prj.projectId])}', {
@@ -126,49 +186,35 @@ ${cpweb_foot}
         return false;
     };
 
+    $("#addTaskButton").click(function () {
+        require(["[@modal.javascript /]"], function (modal) {
+            modal.open({
+                src: "${helper.urlFor('project.ProjectModule','createTask',[prj.projectId])}",
+                height: "450px",
+                cssClass: "modal-lg",
+                title: "Add Scheduled Email",
+                cancel: function () { /* Do nothing*/
+                },
+                cancelUrl: window.location.href,
+                proceedUrl: window.location.href,
+                proceed: function (dlg) {
+                    $("#projecttasks").DataTable().ajax.reload();
+                    dlg.close();
+                }
+            });
+        });
+        return false;
+    });
+
 
 </script>
-
-<div class="modal fade" id="addTask" tabindex="-1" role="dialog" aria-labelledby="addTaskLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-    [#global formPrefix="cpweb" /]
-    <form action="${formlink}" name="addTaskForm" id="addTaskForm" class="fullpage" method="post">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Schedule your communications</h4>
-      </div>
-      <div class="modal-body">
-<section id="addtask">
-        <section class="field">
-            [@bsform.select name="tasktarget" class="input_full" tabindex="2"]
-            [@bsform.option value="all"]All participants[/@bsform.option]
-            [@bsform.option value="invited"]Invited participants[/@bsform.option]
-            [@bsform.option value="notinvited"]Not invited participants[/@bsform.option]
-            [@bsform.option value="completed"]Invited completed participants[/@bsform.option]
-            [@bsform.option value="uncompleted"]Invited uncompleted participants[/@bsform.option]
-            [/@bsform.select]
-
-            [@bsform.inputDateTimeRequireJs name="taskdate" class="input_full"  tabindex="3"/]
-        </section>
-
-</section>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" tabindex="100" class="btn btn-primary">Select email</button>
-      </div>
-    </form>
-    </div>
-  </div>
-</div>
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
 
 [@pInfo.projectInfo selected="schedule"][/@pInfo.projectInfo]
 
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addTask">
+<button type="button" class="btn btn-primary" id="addTaskButton">
     <span class="glyphicon glyphicon-plus-sign"></span> Add Scheduled Email
 </button>
 

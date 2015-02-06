@@ -88,6 +88,7 @@ public class ProjectModule extends AbstractProjectWebModule {
     public static final String TASK_ACTION = "task";
     public static final String MATERIAL_ACTION = "materials";
     public static final String ROLES_ACTION = "roles";
+    public static final String CREATE_TASK_ACTION = "createTask";
 
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String projectId) {
@@ -337,11 +338,30 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         map.put("formsess", getValidationSession(AddTaskForm.class, cycle));
         map.put("templateLists", getLists(cycle, mailBucket));
+        addCommonMapValues(map, project, cycle);        
+
+        return new FreemarkerRequestTarget("/project/projectSchedule.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onCreateTask(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        Map<String, Object> map = createMap();
+
+        long mailBucket = new GetOrgMailBucketCommand(cycle).forOrg(project.
+                getOrgId());
+
+        map.put("formsess", getValidationSession(AddTaskForm.class, cycle));
+        map.put("templateLists", getLists(cycle, mailBucket));
         addCommonMapValues(map, project, cycle);
         map.put("formlink", cycle.urlFor(ProjectModificationModule.class,
                 ProjectModificationModule.ADD_TASK, projectId));
 
-        return new FreemarkerRequestTarget("/project/projectSchedule.html", map);
+        return new FreemarkerRequestTarget("/project/projectCreateSchedule.html", map);
     }
 
     @WebAction

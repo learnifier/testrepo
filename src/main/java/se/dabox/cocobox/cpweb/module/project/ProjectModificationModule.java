@@ -20,6 +20,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
+import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.module.WebModuleInfo;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
@@ -27,6 +28,7 @@ import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.excel.Contact;
 import se.dabox.cocobox.cpweb.excel.RosterError;
@@ -273,8 +275,12 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         if (taskDate == null) {
             formsess.addError(new ValidationError(ValidationConstraint.DATE_FORMAT, "taskdate",
                     "datetime.invalid"));
-            return new WebModuleRedirectRequestTarget(ProjectModule.class,
-                    ProjectModule.TASK_ACTION, strProjectId);
+            WebModuleRedirectRequestTarget target
+                    = new WebModuleRedirectRequestTarget(ProjectModule.class,
+                            ProjectModule.TASK_ACTION, strProjectId);
+            target.setExtraTargetParameterString(ModalParamsHelper.getParameterString(cycle));
+
+            return target;
         }
 
         AddTaskForm atf = formsess.getObject();
@@ -284,14 +290,22 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                 atf.getTasktarget(),
                 taskDate);
 
-        RequestTargetGenerator taskPage = new UrlRequestTargetGenerator(cycle.urlFor(
-                ProjectModule.class, ProjectModule.TASK_ACTION, strProjectId));
+        String rawUrl = cycle.urlFor(ProjectModificationModule.class, "addTaskCompleted", strProjectId);
+        RequestTargetGenerator taskPage = new UrlRequestTargetGenerator(ModalParamsHelper.
+                decorateUrl(cycle, rawUrl));
 
         SendMailSession session = new SendMailSession(processor, taskPage, taskPage);
+        session.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
 
         session.storeInSession(cycle);
 
         return session.getPreSendTarget(prj.getOrgId());
+    }
+
+    @WebAction
+    public RequestTarget onAddTaskCompleted(RequestCycle cycle, String strProjectId) {
+
+        return new FreemarkerRequestTarget("/project/projectCreateScheduleComplete.html", null);
     }
 
     @WebAction(methods = HttpMethod.POST)

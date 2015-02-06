@@ -1,0 +1,56 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+
+    require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+        modalClient.setButtons(
+                [
+                    {
+                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.next')?js_string}",
+                        cssClass: "btn-primary",
+                        action: function (dlg) {
+                            $("#addTaskForm").submit();
+                        }
+                    },
+                    {
+                        text: "Close",
+                        cssClass: "btn-cancel",
+                        id: "closeButton",
+                        action: function (dlg) {
+                            dlg.cancel();
+                        }
+                    }
+                ]
+                );
+    });
+
+</script>
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<h1>Add Scheduled Email</h1>
+
+
+[#global formPrefix="cpweb" /]
+<form action="${formlink}" name="addTaskForm" id="addTaskForm" class="fullpage" method="post">
+    <section class="field">
+        [@bsform.select name="tasktarget" class="input_full" tabindex="2"]
+        [@bsform.option value="all"]All participants[/@bsform.option]
+        [@bsform.option value="invited"]Invited participants[/@bsform.option]
+        [@bsform.option value="notinvited"]Not invited participants[/@bsform.option]
+        [@bsform.option value="completed"]Invited completed participants[/@bsform.option]
+        [@bsform.option value="uncompleted"]Invited uncompleted participants[/@bsform.option]
+        [/@bsform.select]
+
+        [@bsform.inputDateTime name="taskdate" class="input_full"  tabindex="3"/]
+        [@modal.formParams /]
+    </section>
+</form>
+
+
+[/@dws.skin]
+
