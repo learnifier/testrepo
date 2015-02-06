@@ -15,8 +15,7 @@ ${cpweb_foot}
 [#include "jsr_reportinfoTemplate.inc"]
 [#include "jsr_detailsTable.inc"]
 [#include "jsr_invitesTemplate.inc"]
-[#include "jsr_expirationSetterDialog.inc" /]
-[#include "jsr_expirationAdjustDialog.inc" /]
+[#include "jsr_expirationDialog.inc" /]
 [#include "projectRosterMoveDialog.html" /]
 [@pRegistration.foot /]
 
@@ -554,6 +553,12 @@ ${cpweb_foot}
         });
     };
 
+    function setExpiration(button, listform, cmd) {
+        require(["${contextPath}/js/project/projectRoster.js?${cycle.application.formattedStartTime.base36String}"], function(pr) {
+            pr.setExpiration(button, listform, cmd);
+        });
+    };
+
 </script>
 [/#assign]
 
@@ -627,12 +632,8 @@ ${cpweb_head}
                 return false" ${prj.invitePossible?string('','disabled="disabled"')}><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Send Email...</button>
         [/@]
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false"><span class="glyphicon glyphicon-dashboard"></span> Set Expiration</button>
-        [/@]
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.adjustExpiration(this, $('#projectrosterform'), 'adjustExpiration');        
-                return false"><span class="glyphicon glyphicon-time"></span> Adjust Expiration</button>
-        [/@]
+        <button class="btn btn-primary-outlined btn-sm" onclick="setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false"><span class="glyphicon glyphicon-dashboard"></span> Change Expiration</button>
+        [/@]        
         [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
             <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false" ${prj.invitePossible?string('','disabled="disabled"')} ><span class="glyphicon glyphicon-flash"></span> Activate</button>
