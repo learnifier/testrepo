@@ -344,8 +344,9 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
             return NavigationUtil.toProjectTaskPage(prj.getProjectId());
         }
 
-        RequestTargetGenerator afterTarget = new UrlRequestTargetGenerator(NavigationUtil.
-                toProjectTaskPageUrl(cycle, prj.getProjectId()));
+        String rawUrl = cycle.urlFor(ProjectModificationModule.class, "addTaskCompleted", strProjectId);
+        RequestTargetGenerator afterTarget = new UrlRequestTargetGenerator(ModalParamsHelper.
+                decorateUrl(cycle, rawUrl));
 
         EditMailTaskSendMailProcessor processor
                 = new EditMailTaskSendMailProcessor(task.getTaskId());
@@ -354,6 +355,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         PortableMailTemplate pmt = PortableMailTemplateCodec.decode(task.getPortableMailTemplate());
         session.setPortableMailTemplate(pmt);
+        session.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
 
         session.storeInSession(cycle);
 
