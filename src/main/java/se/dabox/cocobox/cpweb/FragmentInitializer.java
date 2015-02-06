@@ -37,7 +37,10 @@ public class FragmentInitializer {
                 getFragment(cycle, "cpsearch", fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpmenu2", fragParams);
+                getFragment(cycle, "cpmenuflorida", fragParams);
+
+        getFragmentClient().
+                getFragment(cycle, "cpmenumobileflorida", fragParams);
 
         getFragmentClient().
                 getFragment(cycle, "cpuserinfo2", fragParams);
