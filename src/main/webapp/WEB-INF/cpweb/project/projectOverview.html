@@ -98,55 +98,57 @@ ${cpweb_foot}
     <input type="hidden" id="delRole" name="role" />
 </form>
 <script>
-                            require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
-                            f.startSingleFlirt('${prj.newsFlirtId}', {
-                            templates: {
-                            emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
-                            }
-                            });
-                                    f.startSingleFlirt('${prj.flirtId}', {
-                                    templates: {
-                                    emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
-                                            header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
-                                    },
-                                            success: function(data) {
-                                            var len = data.posts.length;
-                                                    for (var i = 0; i < len; i++) {
-                                            var post = data.posts[i];
-                                                    if (typeof activityNames === "undefined") {
-                                            continue;
-                                            }
+    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
+        f.startSingleFlirt('${prj.newsFlirtId}', {
+            templates: {
+                emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+            }
+        });
+        
+        f.startSingleFlirt('${prj.flirtId}', {
+            templates: {
+                emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
+                    header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
+            },
+            success: function(data) {
+                var len = data.posts.length;
+                for (var i = 0; i < len; i++) {
+                    var post = data.posts[i];
+                    if (typeof activityNames === "undefined") {
+                        continue;
+                    }
 
-                                            if (!activityNames[post.tag]) {
-                                            continue;
-                                            }
-                                            post.activityName = activityNames[post.tag].name;
-                                            }
-                                            }
-                                    });
-                            });</script>
+                    if (!activityNames[post.tag]) {
+                        continue;
+                    }
+                    post.activityName = activityNames[post.tag].name;
+                }
+            }
+        });
+    });
+</script>
 <script>
-                            $(function () {
-                            $("#addTeamMemberButton").click(function () {
-                            require(["[@modal.javascript /]"], function(modal) {
-                            modal.open({
-                            src: "${helper.urlFor('project.ProjectModule','roles',[prj.projectId])}",
-                                    height: "450px",
-                                    cssClass: "modal-lg",
-                                    title: "Add team member",
-                                    cancel: function () { /* Do nothing*/
-                                    },
-                                    cancelUrl: window.location.href,
-                                    proceedUrl: window.location.href,
-                                    proceed: function(dlg) {
-                                    $("#userroleslist").DataTable().ajax.reload();
-                                            dlg.close();
-                                    }
-                            });
-                            });
-                                    return false;
-                            });
-                            })
+    $(function () {
+        $("#addTeamMemberButton").click(function () {
+        require(["[@modal.javascript /]"], function(modal) {
+            modal.open({
+                src: "${helper.urlFor('project.ProjectModule','roles',[prj.projectId])}",
+                height: "450px",
+                cssClass: "modal-lg",
+                title: "Add team member",
+                cancel: function () { /* Do nothing*/
+                },
+                cancelUrl: window.location.href,
+                proceedUrl: window.location.href,
+                proceed: function(dlg) {
+                    $("#userroleslist").DataTable().ajax.reload();
+                    dlg.close();
+                }
+            });
+        });
+            return false;
+        });
+    })
 </script>
 
 [/#assign]

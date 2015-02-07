@@ -172,11 +172,11 @@ ${cpweb_foot}
                     <form action="${helper.urlFor('branding.LogoModule','uploadImage',[org.id])}" method="post" enctype="multipart/form-data" id="logoform">
                         <input type="file" name="image" id="image" required="required" style="position: absolute; left: -9999px;" />
                         <p class="image"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span> Preferred size is 468x120.</p>
-                        <label for="image" id="uploadPicBtn" class="btn btn-primary" style="margin-bottom: 20px">
+                        <label for="image" id="uploadPicBtn" class="btn btn-link" style="margin-bottom: 20px">
                             <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]
                         </label>
                         <div class="progress">
-                          <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                             0%
                           </div>
                         </div>                        
@@ -215,7 +215,7 @@ ${cpweb_foot}
                         </section>
                         <section class="action">
                             <button type="submit" class="btn btn-primary btn-lg" disabled="disabled" id="saveLogoBtn"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key="form.action.savelogo" /]</button>
-                            <button type="submit" class="btn btn-primary-outlined" id="resetLogoBtn" name="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetlogo" /]</button>
+                            <button type="submit" class="btn btn-link" id="resetLogoBtn" name="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetlogo" /]</button>
                         </section>
                     </form>
                 </div>
@@ -238,7 +238,7 @@ ${cpweb_foot}
                         [@bsform.infosection]
                         [/@bsform.infosection]
                         <button type="submit" tabindex="100" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savecolors' /]</button>
-                        <button type="submit" class="btn btn-primary-outlined" id="resetColorBtn" name="reset" value="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetcolors" /]</button>
+                        <button type="submit" class="btn btn-link" id="resetColorBtn" name="reset" value="reset"><span class="glyphicon glyphicon-repeat"></span> [@dws.txt key="form.action.resetcolors" /]</button>
                     </form>
                 </div>        
     </div>
