@@ -60,7 +60,7 @@ ${cpweb_foot}
 <script>
     $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
 
-    require(['dataTables-bootstrap'], function() {
+    require(['dabox-report-datatables'], function() {
         var pub = {
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}"
         };
