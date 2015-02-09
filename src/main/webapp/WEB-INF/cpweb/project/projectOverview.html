@@ -97,6 +97,7 @@ ${cpweb_foot}
     <input type="hidden" id="delUserId" name="userId" />
     <input type="hidden" id="delRole" name="role" />
 </form>
+[#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
 <script>
     require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
         f.startSingleFlirt('${prj.newsFlirtId}', {
@@ -127,6 +128,7 @@ ${cpweb_foot}
         });
     });
 </script>
+[/#if]
 <script>
     $(function () {
         $("#addTeamMemberButton").click(function () {
