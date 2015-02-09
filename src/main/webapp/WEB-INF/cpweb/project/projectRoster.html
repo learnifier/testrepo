@@ -488,7 +488,7 @@ ${cpweb_foot}
 
                     } else {
                         $(injectInContainer).attr('class', 'loading');
-                        $(injectInContainer).html('<img src="${cocoboxCdn}/cocobox/img/loading.gif" alt="spinner"/>');
+                        $(injectInContainer).html('<img src="[@common.spinnerUrl /]" alt="spinner"/>');
                         $(injectInContainer).attr('class', 'loading detailscontainer');
                         fetchAndInjectDetails(detailsData, injectInContainer);
                     }
