@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
-import se.dabox.cocobox.cpweb.command.GetOrgBrandingCommand;
+import se.dabox.cocosite.branding.GetOrgBrandingCommand;
 import se.dabox.cocosite.branding.freemarker.AbstractOrgBrandingOutput;
 import se.dabox.cocosite.branding.freemarker.BrandingOutputUtil;
 import se.dabox.cocosite.user.MiniUserAccountHelperContext;
