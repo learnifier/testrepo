@@ -47,10 +47,14 @@
                 {
                     "targets": [ 1 ],
                     "data": function(row, type, set) {
+                        if (!row.idDisplay) {
+                            row.idDisplay = row.anonymous ? '' : row.id;
+                        }
+
                         if (type === 'display') {
-                            return row.id;
+                            return row.idDisplay;
                         } else if (type === 'filter') {
-                            return row.id;
+                            return row.idDisplay;
                         } else if (type === 'sort') {
                             return row.id;
                         } else {
@@ -196,8 +200,8 @@ ${cpweb_head}
             <thead>
                 <tr>
                     <th></th>
+                    <th>Id</th>
                     <th>Name</th>
-                    <th>Number</th>
                     <th>Purchased</th>
                     <th>Used</th>
                     <th>Expired</th>
