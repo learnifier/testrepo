@@ -1,0 +1,79 @@
+[#ftl strip_text="true" /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#tm_materials').addClass('activeItem').prev().addClass('prevItem');
+</script>
+<script>
+    $(document).ready(function() {
+        $("#type").change(function() {        
+            if ($(this).attr('value') == 'link') {
+                $("#file").hide();
+                $("#link").show(); 
+            } else {
+                $("#file").show();
+                $("#link").hide();
+            }
+        });
+
+        $("#type").trigger('change');
+    });
+</script>
+
+[/#assign]
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.creatematerial.title" /></h1>
+
+<div>
+    [#global formPrefix="cpweb.creatematerial" /]
+    <form action="${formLink}" name="newMaterial" class="fullpage" method="post" enctype="multipart/form-data">
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
+        <section class="field clearfix">
+            <div class="column">
+
+                <fieldset>
+
+                    [#assign defaultValue = formsess.getDefaultValue('type')!'' /]
+                    [@bsform.select name="type" class="input_full" tabindex="1"]
+                    [#list types as type]
+                    [@bsform.option value="${type}" defaultValue=defaultValue][@dws.txt key="cpweb.creatematerial.type.${type}" /][/@bsform.option]
+                    [/#list]
+                    [/@bsform.select]
+
+
+                    [@bsform.inputText name="title" class="input_full"  tabindex="2" /]
+
+                    [@bsform.textarea name="description" tabindex="3" /]
+
+                    [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
+                    [@bsform.select name="lang" class="input_full" tabindex="4"]
+                    [@bsform.option value="en" defaultValue=defaultValue]English[/@bsform.option]
+                    [/@bsform.select]
+
+                    <div id="file" style="display: none;">
+                        [@bsform.inputFile name="file" class="input_full"  tabindex="5" /]
+                    </div>
+                    <div id="link" style="display: none;">
+                        [@bsform.inputText name="link" class="input_full"  tabindex="5" /]
+                    </div>
+
+                </fieldset>
+            </div>
+        </section>
+        [@bsform.infosection]
+        [/@bsform.infosection]
+        <section class="action">
+            <input type="hidden" name="orgId" value="${org.id}" />
+            <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.savemtrl' /></span></button>
+            <a href="${helper.urlFor("CpMainModule", "listMaterials", [org.id] )}#orgmat"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+        </section>
+
+    </form>
+</div>
+
+[/@dws.skin>
