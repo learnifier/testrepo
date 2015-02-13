@@ -90,14 +90,27 @@ require(["[@modal.clientJavascript /]"], function (modalClient) {
 
     <div class="row">
         <div class="col-md-12">
-            The project you try to move are ${(result.similarity*100)?round}% similar.
+            <p>
+                The project you try to move are ${(result.similarity*100)?round}% similar.
+            </p>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            All progress related to the following products will be lost when you move this participant.
-            It will NOT be possible to restore or recover this data after the move operation has completed.
+            <p>
+                The learner will no longer have access to the following projects since they are not
+                used in the selected project.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                Any associated progress and information about the following products will be removed.
+                It will <strong>NOT</strong> be possible to recover that information afterwards.
+            </p>
         </div>
     </div>
 
@@ -105,7 +118,10 @@ require(["[@modal.clientJavascript /]"], function (modalClient) {
         <div class="col-md-12">
             <ul class="list-group">
                 [#list deletedList as deleted]
-                <li class="list-group-item">${deleted.title?xml}</li>
+                <li class="list-group-item">
+                    [#if progressSet?seq_contains(deleted.id)]<span class="badge">Progress is recorded</span>[/#if]
+                    ${deleted.title?xml} [@common.materialProductId deleted /]
+                </li>
                 [/#list]
             </ul>
         </div>

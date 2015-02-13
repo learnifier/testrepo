@@ -4,9 +4,12 @@
 package se.dabox.cocobox.cpweb.module.project.move;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -22,6 +25,7 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.participation.move.ActionType;
 import se.dabox.service.common.ccbc.participation.move.MoveError;
 import se.dabox.service.common.ccbc.participation.move.MoveParticipationRequest;
@@ -31,6 +35,10 @@ import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectDetails;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
+import se.dabox.service.common.coursedesign.ComponentUtil;
+import se.dabox.service.common.coursedesign.project.GetProjectCourseDesignCommand;
+import se.dabox.service.common.coursedesign.v1.Component;
+import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
@@ -93,6 +101,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         map.put("targetProjectId", targetProjectId);
         map.put("participation", part);
         map.put("formUrl", createExecuteFormUrl(cycle, project.getProjectId(), strParticipationId));
+        map.put("progressSet", getProgressSet(cycle, part));
 
         return new FreemarkerRequestTarget("/project/move/verificationResult.html", map);
     }
@@ -189,6 +198,32 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
                 strParticipationId);
 
         return ModalParamsHelper.decorateUrl(cycle, url);
+    }
+
+    private Set<String> getProgressSet(RequestCycle cycle, ProjectParticipation participation) {
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+        List<ParticipationProgress> progressList
+                = ccbc.getParticipationProgress(participation.getParticipationId());
+        CourseDesignDefinition cdd
+                = new GetProjectCourseDesignCommand(cycle, null).forProjectId(participation.
+                        getProjectId());
+
+        Set<String> productSet = new HashSet<>();
+
+        for (ParticipationProgress progress : progressList) {
+            UUID cid = progress.getCid();
+
+            Component comp = cdd.getComponentMap().get(cid);
+            if (comp == null) {
+                continue;
+            }
+            ProductId productId = ComponentUtil.getProductId(comp);
+
+            productSet.add(productId.getId());
+        }
+
+        return productSet;
     }
 
 }
