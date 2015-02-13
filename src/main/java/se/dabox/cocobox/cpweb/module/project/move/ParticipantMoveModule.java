@@ -19,6 +19,7 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
+import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectWebModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
@@ -44,6 +45,8 @@ import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.collections.CollectionsUtil;
+import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -102,6 +105,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         map.put("participation", part);
         map.put("formUrl", createExecuteFormUrl(cycle, project.getProjectId(), strParticipationId));
         map.put("progressSet", getProgressSet(cycle, part));
+        map.put("materials", getProjectMaterials(cycle, project));
 
         return new FreemarkerRequestTarget("/project/move/verificationResult.html", map);
     }
@@ -224,6 +228,19 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         }
 
         return productSet;
+    }
+
+    private Map<String,Material> getProjectMaterials(RequestCycle cycle, OrgProject project) {
+        List<Material> materials = OrgMaterialJsonModule.getOrgMaterials(cycle, project.getOrgId(),
+                project, null);
+
+        return CollectionsUtil.createMap(materials, new Transformer<Material,String>() {
+
+            @Override
+            public String transform(Material item) {
+                return item.getId();
+            }
+        });
     }
 
 }

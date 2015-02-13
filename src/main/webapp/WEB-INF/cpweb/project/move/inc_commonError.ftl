@@ -9,7 +9,7 @@
     [#elseif result.moveError.type == "invalid_target_project"]
     [#return "There is an error related to the selected target project" /]
     [#elseif result.moveError.type == "product_constraint"]
-    [#return "It is not possible to move the participant due to one or more product related constraints" /]
+    [#return "It is not possible to move the participant due to one or more products having progress that can't be moved" /]
     [#elseif result.moveError.type == "participation_error"]
     [#return "There is a problem with the selected participant that blocks the move operation" /]
     [#elseif result.moveError.type == "invalid_participation"]
@@ -23,7 +23,8 @@
 [#macro productErrors]
 <ul class="list-group">
     [#list result.productErrors as productError]
-        <li class="list-group-item">${productError.productId?xml} - ${productErrorMessage(productError)?xml} </li>
+        [#assign peMaterial = materials[productError.productId] /]
+        <li class="list-group-item">${peMaterial.title?xml} [@common.materialProductId material=peMaterial suffix=") " /]- ${productErrorMessage(productError)?xml} </li>
     [/#list]
 </ul>
 [/#macro]

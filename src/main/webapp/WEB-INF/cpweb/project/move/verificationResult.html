@@ -91,22 +91,18 @@ require(["[@modal.clientJavascript /]"], function (modalClient) {
     <div class="row">
         <div class="col-md-12">
             <p>
-                The project you try to move are ${(result.similarity*100)?round}% similar.
+                The project you try to move are <mark>${(result.similarity*100)?round}%</mark> similar.
             </p>
         </div>
     </div>
 
+    [#if deletedList?size != 0]
     <div class="row">
         <div class="col-md-12">
             <p>
-                The learner will no longer have access to the following projects since they are not
+                The learner will no longer have access to the following products since they are not
                 used in the selected project.
             </p>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
             <p>
                 Any associated progress and information about the following products will be removed.
                 It will <strong>NOT</strong> be possible to recover that information afterwards.
@@ -126,6 +122,7 @@ require(["[@modal.clientJavascript /]"], function (modalClient) {
             </ul>
         </div>
     </div>
+    [/#if]
 
 </div>
 [/@dws.skin]
