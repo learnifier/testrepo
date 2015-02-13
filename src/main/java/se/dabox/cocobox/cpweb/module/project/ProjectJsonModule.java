@@ -16,13 +16,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import javax.servlet.http.HttpServletResponse;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections.map.Flat3Map;
+import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
@@ -111,7 +114,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
         List<UserAccount> users =
                 Clients.getClient(cycle, UserAccountService.class).
                 getUserGroupAccounts(prj.getUserGroupId());
@@ -141,7 +144,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
         List<UserAccount> users =
                 Clients.getClient(cycle, UserAccountService.class).
                 getUserGroupAccounts(prj.getUserGroupId());
@@ -213,7 +216,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
 
         List<MailTemplate> mailTemplates = getMailTemplates(cycle, prj.getOrgId());
 
@@ -228,7 +231,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
 
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         List<Material> materials = getProjectMaterials(pmcClient, prjId, cycle);
@@ -242,7 +245,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
 
         ListProjectAdminJson json = new ListProjectAdminJson(cycle, ccbc);
 
@@ -255,7 +258,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project);
+        checkPermission(cycle, project, strProjectId);
 
         DruwaFormValidationSession<SetRegCreditLimitForm> formsess =
                 getValidationSession(SetRegCreditLimitForm.class, cycle);
@@ -307,7 +310,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project);
+        checkPermission(cycle, project, strProjectId);
 
         DruwaFormValidationSession<SetRegPasswordForm> formsess =
                 getValidationSession(SetRegPasswordForm.class, cycle);
@@ -361,7 +364,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project);
+        checkPermission(cycle, project, strProjectId);
 
         DruwaFormValidationSession<SetRegPasswordForm> formsess =
                 getValidationSession(SetRegPasswordForm.class, cycle);
@@ -388,7 +391,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project);
+        checkPermission(cycle, project, strProjectId);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "autoical"));
@@ -451,7 +454,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project);
+        checkPermission(cycle, project, strProjectId);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
@@ -491,7 +494,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
 
         List<Locale> countries =
                 NewProjectModule.getProjectCountries(cycle);
@@ -517,7 +520,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
 
         List<Locale> countries =
                 NewProjectModule.getProjectLocales(cycle);
@@ -543,7 +546,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj);
+        checkPermission(cycle, prj, strProjectId);
 
         RecentList<TimeZone> timeZones =
                 OrgProjectTimezoneFactory.newRecentList(cycle, prj.getOrgId());
@@ -732,6 +735,19 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         section.put("children", otherList);
 
         return section;
+    }
+
+    protected void checkPermission(RequestCycle cycle, OrgProject project, String strProjectId) {
+        if (project == null) {
+            LOGGER.warn("Project {} doesn't exist.", strProjectId);
+
+            ErrorCodeRequestTarget error
+                    = new ErrorCodeRequestTarget(HttpServletResponse.SC_NOT_FOUND);
+
+            throw new RetargetException(error);
+        } else {
+            super.checkPermission(cycle, project);
+        }
     }
 
     private static class ProductMaterialCombo {
