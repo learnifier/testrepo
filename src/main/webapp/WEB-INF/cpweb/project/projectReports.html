@@ -9,7 +9,7 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 
     var reportJson = "${helper.urlFor('project.report.ProjectReportJsonModule', 'availableReports', [prj.projectId])}";
-    var spinnerUrl = '[@common.spinnerUrl /]'
+    var spinnerUrl = '[@common.spinnerUrl /]';
     
     require(["${contextPath}/js/project/projectReports.js?${cycle.application.formattedStartTime.base36String}"], function(pr) {
         //Only init
