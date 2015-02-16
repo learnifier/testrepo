@@ -26,7 +26,10 @@ define(["dataTables-bootstrap"], function () {
                 }
             }
         ],
-        "ajax": reportJson
+        "ajax": reportJson,
+        "language": {
+            "loadingRecords": "<img src='"+spinnerUrl+"' />"
+        }
     });
 
 

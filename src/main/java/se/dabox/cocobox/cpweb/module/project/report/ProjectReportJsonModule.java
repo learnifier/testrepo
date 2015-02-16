@@ -58,6 +58,9 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
         List<Material> mats
                 = ProjectJsonModule.getProjectMaterials(pmcClient, project.getProjectId(), cycle);
 
+        infos.add(new ReportInfo(cycle.urlFor(ProjectReportModule.class, "activityReport", Long.
+                toString(project.getProjectId())), "Project Status", false));
+
         for (Material mat : mats) {
             if ("idproject".equals(mat.getNativeType())) {
                 String url = cycle.urlFor(ProjectReportModule.class, "idProductReport", strProjectId, mat.getId());
