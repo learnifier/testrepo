@@ -10,10 +10,12 @@ package se.dabox.cocobox.cpweb.module.project.report;
 class ReportInfo {
     private final String url;
     private final String title;
+    private final boolean ownWindow;
 
-    public ReportInfo(String url, String title) {
+    public ReportInfo(String url, String title, boolean ownWindow) {
         this.url = url;
         this.title = title;
+        this.ownWindow = ownWindow;
     }
 
     public String getUrl() {
@@ -24,4 +26,8 @@ class ReportInfo {
         return title;
     }
 
+    public boolean isOwnWindow() {
+        return ownWindow;
+    }
+    
 }

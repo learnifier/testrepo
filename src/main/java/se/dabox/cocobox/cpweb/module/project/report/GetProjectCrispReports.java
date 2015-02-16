@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.project.report;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +26,9 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.crisp.OrgProjectInfoSource;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.crisp.GetCrispProjectProductCollaborationId;
+import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
+import se.dabox.service.common.material.Material;
+import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
@@ -39,7 +43,24 @@ public class GetProjectCrispReports {
     private final Product product;
     private final CrispContext crispCtx;
     private final OrgProject project;
+    private Material material;
     private final List<ReportInfo> reports = new ArrayList<>();
+
+    public GetProjectCrispReports(RequestCycle cycle, Material material, OrgProject project) {
+        this.cycle = cycle;
+
+        if (material instanceof ProductMaterial) {
+            ProductMaterial prodMat = (ProductMaterial) material;
+            product = prodMat.getProduct();
+            crispCtx = DwsCrispContextHelper.getCrispContext(cycle, product);
+        } else {
+            product = null;
+            crispCtx = null;
+        }
+
+        this.material = material;
+        this.project = project;        
+    }
 
 
     public GetProjectCrispReports(RequestCycle cycle, Product product, OrgProject project) {
@@ -50,6 +71,10 @@ public class GetProjectCrispReports {
     }
 
     List<ReportInfo> getReports() {
+        if (product == null) {
+            return reports;
+        }
+
         if (crispCtx != null) {
             getProductReports();
         }
@@ -95,9 +120,13 @@ public class GetProjectCrispReports {
                 continue;
             }
 
+            Material mat = getMaterial();
+            
+            String linkTitle = mat.getTitle() + " - " + title;
+
             String url = cycle.urlFor(ProjectCrispReportModule.class, "report", Long.toString(project.getProjectId()), product.getId().
                     getId(), id);
-            list.add(new ReportInfo(url, title));
+            list.add(new ReportInfo(url, linkTitle, true));
         }
 
         return list;
@@ -122,6 +151,17 @@ public class GetProjectCrispReports {
         final OrgUnitInfo orgUnitInfo = odClient.getOrgUnitInfo(orgId);
 
         return new StandardOrgUnitInfoSource(orgUnitInfo);
+    }
+
+    private Material getMaterial() {
+        if (material == null) {
+            MaterialListFactory mlf = new MaterialListFactory(cycle, null);
+            mlf.addProducts(Collections.singletonList(product));
+
+            material = mlf.getList().get(0);
+        }
+
+        return material;
     }
 
 }

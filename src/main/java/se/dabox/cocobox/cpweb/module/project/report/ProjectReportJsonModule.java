@@ -62,17 +62,17 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
             if ("idproject".equals(mat.getNativeType())) {
                 String url = cycle.urlFor(ProjectReportModule.class, "idProductReport", strProjectId, mat.getId());
                 String title = mat.getTitle() + " - report for current project";
-                infos.add(new ReportInfo(url, title));
+                infos.add(new ReportInfo(url, title, false));
             } else if (ProductMaterialConstants.NATIVE_SYSTEM.equals(mat.getNativeSystem()) && "EL0873".equals(mat.getId())) {
                 String url = cycle.urlFor(ProjectReportModule.class, "sliiChallengeReport", strProjectId);
                 String title = "SLII Challenge";
-                infos.add(new ReportInfo(url, title));
+                infos.add(new ReportInfo(url, title, false));
             } else if (ProductMaterialConstants.NATIVE_SYSTEM.equals(mat.getNativeSystem())) {
                 Product product = ((ProductMaterial)mat).getProduct();
                 CrispContext crispCtx = DwsCrispContextHelper.getCrispContext(cycle, product);
 
                 if (crispCtx != null) {
-                    List<ReportInfo> productReports = new GetProjectCrispReports(cycle, product,
+                    List<ReportInfo> productReports = new GetProjectCrispReports(cycle, mat,
                             project).getReports();
                     infos.addAll(productReports);
                 }
@@ -89,6 +89,7 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
             protected void encodeItem(ReportInfo item) throws IOException {
                 generator.writeStringField("title", item.getTitle());
                 generator.writeStringField("link", item.getUrl());
+                generator.writeBooleanField("ownWindow", item.isOwnWindow());
             }
         }.encodeToStream(reports);
     }
