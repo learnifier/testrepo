@@ -82,11 +82,11 @@ public class GetProjectCrispReports {
     }
 
     private List<ReportInfo> decodeResponse(Map<String, ?> resp) {
-        List<Map> reports = JacksonHelper.getList(resp, "reports", Map.class);
+        List<Map> jsonReports = JacksonHelper.getList(resp, "reports", Map.class);
 
         List<ReportInfo> list = new ArrayList<>();
 
-        for (Map report : reports) {
+        for (Map report : jsonReports) {
             String id = JacksonHelper.getString(report,"id");
             String title = JacksonHelper.getString(report,"title");
             String scope = JacksonHelper.getString(report,"scope");
@@ -95,7 +95,7 @@ public class GetProjectCrispReports {
                 continue;
             }
 
-            String url = cycle.urlFor(ProjectCrispReportModule.class, "report", product.getId().
+            String url = cycle.urlFor(ProjectCrispReportModule.class, "report", Long.toString(project.getProjectId()), product.getId().
                     getId(), id);
             list.add(new ReportInfo(url, title));
         }
