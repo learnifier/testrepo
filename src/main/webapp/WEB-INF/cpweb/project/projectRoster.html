@@ -102,13 +102,13 @@ ${cpweb_foot}
                             return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + data + '"/>';
                         }
                     },
+
                     {
                         "targets": [1],
                         "orderable": false,
-                        "width": "16px",
+                        "width": "25px",
                         "data" : function(row, type, set) {
-                            if (!row.participationLinkDisplay) {
-                                
+                            if (!row.iconDisplay) {
                                 if (row.inError) {
                                     var msg = row.errorMsg;
                                     if (msg == null) {
@@ -120,31 +120,10 @@ ${cpweb_foot}
                                     var onclick = "onclick='showRosterPartErrorBox(window.partError[" + row.id + "])'";
                                     var data = '<a" ' + onclick + ' class="btn btn-link participationTriangle" alt="Participation Link"><span class="glyphicon glyphicon-alert text-danger"></span></a>';
 
-                                    row.participationLinkDisplay = data;
+                                    row.iconDisplay = data;
                                 } else  {
-                                    row.participationLinkDisplay = "";
+                                    row.iconDisplay = '<span class="pe-7s-plus pe-2x pull-right primaryColor expand"></span>';
                                 }
-                            } 
-                            
-                            if (type === 'display') {
-                                return row.participationLinkDisplay;
-                            } else if (type === 'filter') {
-                                return row.participationLink;
-                            } else if (type === 'sort') {
-                                return row.participationLink;
-                            } else {
-                                //Anything else and raw row
-                                return row.participationLink;
-                            }
-                        }                        
-                    },
-                    {
-                        "targets": [2],
-                        "orderable": false,
-                        "width": "25px",
-                        "data" : function(row, type, set) {
-                            if (!row.iconDisplay) {
-                                row.iconDisplay = '<span class="pe-7s-plus pe-2x pull-right primaryColor expand"></span>';
                             }
                             
                             if (type === 'display') {
@@ -160,7 +139,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [3],
+                        "targets": [2],
                         "width": "250px",
                         "data" : function(row, type, set) {
                             if (!row.displayNameDisplay) {
@@ -181,7 +160,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [4],
+                        "targets": [3],
                         "data" : function(row, type, set) {
                             if (!row.firstEmailDisplay) {
                                 if (row.firstEmailStr) {
@@ -206,7 +185,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [5],
+                        "targets": [4],
                         "data" : function(row, type, set) {
                             if (!row.lastEmailDisplay) {
                                 if (row.sending) {
@@ -231,7 +210,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [6],
+                        "targets": [5],
                         "data" : function(row, type, set) {
                             if (!row.lastAccessDisplay) {
                                 if (row.lastAccess) {
@@ -254,11 +233,11 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [7],
+                        "targets": [6],
                         "width": "120px",
                         "data" : function(row, type, set) {
                             if (!row.statusDisplay) {
-                                row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status +'%;"></div</div>';
+                                row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status +'%;">' + row.status +'%</div</div>';
                             }
                             
                             if (type === 'display') {
@@ -274,7 +253,7 @@ ${cpweb_foot}
                         }
                     },
                     {
-                        "targets": [8],
+                        "targets": [7],
                         "orderable": false,
                         "width": "80px",
                         "data" : function(row, type, set) {
@@ -366,7 +345,7 @@ ${cpweb_foot}
                 //Trigger change so that IE8- picks up the change
                 items.trigger('change');
             }
-        })
+        });
 
     function runiCheck() {
       $('#projectroster input').icheck({
@@ -650,7 +629,6 @@ ${cpweb_head}
         <thead>
             <tr>
                 <th><input type="checkbox" id="cball"></th>
-                <th></th>
                 <th></th>
                 <th>Name</th>
                 <th>Invited</th>

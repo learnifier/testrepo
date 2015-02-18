@@ -10,6 +10,7 @@
 
 [#assign foot]
 ${cpweb_foot}
+
 <script>
     $('#menu-library').addClass('subMenuExpanded');
     $('#menu-library-materials').addClass('active');
@@ -204,19 +205,17 @@ ${cpweb_foot}
 <div class="grid-header">
     [#include 'listToggle.html' /]
 </div>
-<div id="listmaterials" class="table-responsive">
-    <table id="materialstable" class="table table-hover ccb-table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>name</th>
-                <th>kind</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
+<table id="materialstable" class="table table-hover ccb-table dt-responsive">
+    <thead>
+        <tr>
+            <th></th>
+            <th>name</th>
+            <th>kind</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 [/@dws.skin]

@@ -12,25 +12,25 @@
         </div>
         {{/if}}
         <div class="progressdetails">
-            <h2>Progress<span>{{:completedCids}} of {{:totalnumberOfCidsWithProgress}} activities completed</span></h2>
+            <h3>Progress<span class="pull-right">{{:completedCids}} of {{:totalnumberOfCidsWithProgress}} activities completed</span></h3>
             <table class="table table-hover table-striped ccb-table">
                 {{:renderedProgress}}
             </table>
         </div>
         <div class="reportdetails">
-            <h2>Reports</h2>
+            <h3>Reports</h3>
             {{:renderedReports}}
         </div>
         
         [#-- 
         <div class="adminlinks">
-            <h2>Adminlinks</h2>
+            <h3>Adminlinks</h3>
             {{:renderedAdminlinks}}
         </div> --]
 		
         [#if prj.subtype != 'idproject'] [#-- Do not show invites section on idprojects --]
         <div class="invites">
-            <h2>Invites</h2>
+            <h3>Invites</h3>
             <table style="width: 100%;">
             {{:renderedInvites}}
             </table>

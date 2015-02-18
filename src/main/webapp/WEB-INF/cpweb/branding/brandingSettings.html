@@ -7,23 +7,14 @@ ${cpweb_foot}
     $('#menu-settings-branding').addClass('active');</script>
 
 <script>
-    require(['cocobox-accountsettings'], function() {
-        //Do nothing in here
-    });
 
-   $(function(){
-        require(['dabox-common'], function() {
-            cocobox.setlist.expandableList('#settingsList');
-        });
-    });
-    
     (function() {
         require(['jquery.form', 'jquery.Jcrop'], function() {
 
-        var bar = $('.progress-bar');
-        var percent = $('.progress-bar');
-        var status = $('#status');
-        
+        $('#picture_wrapper').click(function(){
+            $('#image').click();
+        });
+
         var width = ${width};
         var height = ${height};
 
@@ -57,26 +48,12 @@ ${cpweb_foot}
             dataType: 'json',
             beforeSend: function() {
                 $('#totalcrop').fadeOut(500);
-                //                $('.progress').show('slow');
-                //                status.empty();
-                var percentVal = '0%';
-                bar.width(percentVal)
-                percent.html(percentVal);
-            },
-            uploadProgress: function(event, position, total, percentComplete) {
-                var percentVal = percentComplete + '%';
-                bar.width(percentVal)
-                percent.html(percentVal);
+                $('#crop_wrapper').slideDown();
+                $('.ccb-bouncer').delay(500).fadeIn(500);                    
             },
             complete: function(xhr) {
-                bar.width('100%');
-                percent.html('100%');
-                //              $('.progress').hide('slow');
 
-                $('#uploadPicBtn #uploaded').show();
-                $('#selectPicBtn #selected').hide();
-              
-                var json = jQuery.parseJSON(xhr.responseText);
+            var json = jQuery.parseJSON(xhr.responseText);
 
                 if (json.status && json.status == 'OK') {
 
@@ -90,6 +67,7 @@ ${cpweb_foot}
                     }));
                     
                     $('#preview').attr('src',json.previewUrl);
+                    $(".ccb-bouncer").fadeOut("slow");
 
                     $("#totalcrop").slideDown("slow");
                     $("#cropboximg").Jcrop({
@@ -108,18 +86,6 @@ ${cpweb_foot}
         });
     })();
 
-    $('#selectPicBtn').click(function(){
-        $('#image').click();
-    });
-    $('#image').change(function(){
-        $('#uploadPicBtn').attr('disabled', null)
-        $('#uploadPicBtn #uploaded').hide();
-        $('#selectPicBtn #selected').show();
-        $('.percent').text('0%')
-        $('.bar').css('width', '0')
-    });
-    //    $('#uploadPicBtn').click(uploadImage);
-    //    $("#saveLogoBtn").click(imageupdateForm);
     
     function brandingUpdateForm(form) {
         require(['dabox-jquery','dabox-common'], function() {
@@ -152,7 +118,7 @@ ${cpweb_foot}
     });
 [/@bsform._onreadyJavascript]
 
-[#assign head]
+[#assign cpweb_head]
     [@commonCss.jcrop /]
     [@commonCss.jqueryMinicolors /]
     ${cpweb_head}
@@ -171,35 +137,27 @@ ${cpweb_foot}
                     [#global formPrefix="cpweb.logotype.language" /]
                     <form action="${helper.urlFor('branding.LogoModule','uploadImage',[org.id])}" method="post" enctype="multipart/form-data" id="logoform">
                         <input type="file" name="image" id="image" required="required" style="position: absolute; left: -9999px;" />
-                        <p class="image"><span>Please note.</span> Supported formats are: <span>png, gif, jpg, jpeg and tiff.</span> Preferred size is 468x120.</p>
-                        <label for="image" id="uploadPicBtn" class="btn btn-link" style="margin-bottom: 20px">
-                            <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]
-                        </label>
-                        <div class="progress">
-                          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                            0%
-                          </div>
-                        </div>                        
+                        <div class="row">
+                            <div class="col-xs-12">
                                 <div id="picture_wrapper">
                                     <img id="preview" />
+                                    <div id="logotype"></div>
                                 </div>
-                        [#-- Hiding this section until BS version of cropping is ready --]
-                        <h3 style="display:none">Step 3 - Crop the uploaded logo</h3>
-                        <ul id="preparepicture_wrapper" style="display:none">
-                            <li>
-                                <div id="picture_wrapper">
-                                    <img id="preview-2"  />
-                                </div>
-                            </li>
-                            <li>
+                                <label for="image" id="uploadPicBtn" class="btn btn-link center-block">
+                                    <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]
+                                </label>
+                                <p class="text-center"><small><strong>Please note.</strong><em> Supported formats are: png, gif, jpg, jpeg and tiff. Preferred size is 468x120.</em></small></p>
+                            </div>
+                            <div class="col-xs-12">
                                 <div id="crop_wrapper">
+                                    [@common.bouncer /]
                                     <div id="totalcrop" style="display: none">
                                         <div id="crop">
                                         </div>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
+                            </div>
+                        </div>
                     </form>
                     <form id="logosaveform" action="${saveurl}" method="post" image="logosaveform" onsubmit="brandingUpdateForm(this)" >
                         <section class="field clearfix">

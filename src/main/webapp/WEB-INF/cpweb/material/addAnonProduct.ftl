@@ -3,7 +3,7 @@
 [#macro addButton]
 [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
 <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-    <div class="btn btn-primary btn-lg" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Add Material</div>
+    <div class="btn btn-primary" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Add Material</div>
 </div>
 [/@portalSecurity.permissionBlock]
 [/#macro]

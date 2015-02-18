@@ -8,11 +8,8 @@
 
 <script>
     function showRosterPartErrorBox(msg) {
-        $("#rosterPartErrorBoxReason").html(msg);
 
-        $("#rosterPartErrorBox").dialog({
-            width: 600,
-            height: 400
-        });
+        cocobox.infoDialog('Acivation error',msg);
+
     }
 </script>
