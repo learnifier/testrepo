@@ -224,7 +224,9 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
             }
             ProductId productId = ComponentUtil.getProductId(comp);
 
-            productSet.add(productId.getId());
+            if (productId != null) {
+                productSet.add(productId.getId());
+            }
         }
 
         return productSet;
