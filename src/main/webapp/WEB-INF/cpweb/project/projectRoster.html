@@ -641,7 +641,7 @@ ${cpweb_head}
         <tbody>
         </tbody>
     </table>
-    <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}">Download roster as a Excel file</a>
+    <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}" class="pull-right">Download roster as a Excel file</a>
 </form>
 [#include "bounceInfo.html" /]
 
