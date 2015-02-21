@@ -13,7 +13,7 @@ ${cpweb_foot}
 </script>
 <script>
 	$(document).ready(function() {
-		require(['dabox-report-datatables', 'dabox-common', 'dabox-jquery'], function() {
+		require(['dabox-report-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function() {
 			$.ajax({
 				url: "${helper.urlFor('project.report.ProjectReportJsonModule','idProductReport',[prj.projectId, productId])}",
 				error: function() {

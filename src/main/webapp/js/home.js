@@ -6,7 +6,7 @@ define([], function() {
     var exports = {};
 
     $(document).ready(function() {
-        require(['dataTables-bootstrap','dabox-common', 'jquery.timeago'], function() {
+        require(['dataTables-bootstrap','dabox-common', 'jquery.timeago', 'dataTables-responsive'], function() {
             var actTable = $('#tw_actions').dataTable({
                 "dom": '<"row"<"col-sm-12"rt>>',
                 "paging": false,

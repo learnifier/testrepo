@@ -19,14 +19,14 @@ ${cpweb_foot}
        //No initialization needed
     });
 
-    require(['dataTables-bootstrap'], function() {
+    require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
         var pub = {
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
             spinnerUrl: "[@common.spinnerUrl /]"
         };
             
         var pTable = $('#materialstable').dataTable({
-            "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": true,
             "order": [[1,'asc']],
             "ajax": pub.listUrl,
@@ -58,7 +58,6 @@ ${cpweb_foot}
                 {
                     "targets": [ 1 ],
                     "data": "title",
-                    "width": 350
                 },
                 {
                     "targets": [ 2 ],
@@ -72,7 +71,7 @@ ${cpweb_foot}
                             if(row.system == 'orgmat') {
                                 var html = "<div class='btn-group'>";
                                     html+= "<button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>";
-                                    html+= "<ul class='dropdown-menu' role='menu'>";
+                                    html+= "<ul class='dropdown-menu dropdown-menu-right' role='menu'>";
                                 var actions = 0;
                                 [@portalSecurity.permissionBlock permission="CP_EDIT_ORGMAT"]
                                     html+= "<li><a href='#' data-trigger='click' data-action='edit' data-id='" + row.id + "'>Edit</a></li>";
@@ -205,12 +204,12 @@ ${cpweb_foot}
 <div class="grid-header">
     [#include 'listToggle.html' /]
 </div>
-<table id="materialstable" class="table table-hover ccb-table dt-responsive">
+<table id="materialstable" class="table table-hover ccb-table dt-responsive" width="100%">
     <thead>
         <tr>
             <th></th>
-            <th>name</th>
-            <th>kind</th>
+            <th>Name</th>
+            <th>Kind</th>
             <th></th>
         </tr>
     </thead>

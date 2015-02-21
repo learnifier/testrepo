@@ -6,7 +6,7 @@ define([textSource], function(t) {
     var exports = {};
 
     $(document).ready(function() {
-       require(['dataTables-bootstrap'], function() {
+       require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
          var oTable = $('#listdesigns').dataTable({
             "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": false,

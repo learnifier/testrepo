@@ -1,5 +1,6 @@
 [#ftl strip_text="true" /]
 
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
 
 [#assign cpweb_foot ]
 <script>
@@ -7,42 +8,57 @@
 
 
     $(document).ready(function() {
-        require(['dabox-report-datatables'], function() {
+        require(['dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive'], function() {
         var balTable = $('#r_credits_used').dataTable({
-            "sDom": 'rt',
-            "bPaginate": false,
-            "aaSorting": [[1,'asc']],
-            "aoColumnDefs": [
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "tableTools": {
+                "sSwfPath": "[@cdt.tableToolsSwf /]"
+             },
+            "paging": true,
+            "pageLength": 50,
+            "order": [[0,'asc']],
+            "initComplete": function() {
+                $('#r_credits_used_filter input').attr('placeholder', 'Search report');
+            },
+            "columnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": null,
-                    "fnRender": function ( oObj ) {
-                        if (oObj.aData.targetType == 'deeplink') {
-                            return  oObj.aData.name == null ? oObj.aData.deeplinkId : oObj.aData.name;
-                        } else if (oObj.aData.targetType == 'project'){
-                            return  oObj.aData.name == null ? oObj.aData.projectId : oObj.aData.name;
+                    "targets": [ 0 ],
+                    "data": function(row, type, set) {
+                        if (!row.linkDisplay) {
+                            if (row.targetType == 'deeplink') {
+                                row.linkDisplay = row.name == null ? row.deeplinkId : row.name;
+                            } else if (row.targetType == 'project'){
+                                row.linkDisplay =  row.name == null ? row.projectId : row.name;
+                            } else {
+                                row.linkDisplay = 'Unknown';
+                            }
+                        }
+                        if (type === 'display') {
+                            return row.linkDisplay;
+                        } else if (type === 'filter') {
+                            return row.linkDisplay;
+                        } else if (type === 'sort') {
+                            return row.linkDisplay;
                         } else {
-                            return 'Unknown';
+                            //Anything else and raw row
+                            return row.linkDisplay;
                         }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": "amount",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.amount;
-                    }
+                    "targets": [ 1 ],
+                    "data": "amount"
                 }
             ],
-            "sAjaxSource": "${helper.urlFor('report.ReportJsonModule','listUsedReport',[org.id, product.id.id])}",
-            "sPaginationType": "full_numbers",
-            "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>No credits have been used.</span>",
-                "sLoadingRecords": "<p>Loading details...</p><img src='[@common.spinnerUrl /]' />"
+            "ajax": "${helper.urlFor('report.ReportJsonModule','listUsedReport',[org.id, product.id.id])}",
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "emptyTable": "<span class='emptytable'>No credits have been used.</span>",
+                "loadingRecords": "<p>Loading details...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
         });
-        $('#report_filter input').attr('placeholder', 'Search the report data');
 
     } );
 
@@ -73,7 +89,7 @@ ${cpweb_head}
     </section>
 
     <section id="r_table">
-        <table class="table table-condensed table-hover table-hover ccb-table" id="r_credits_used">
+        <table class="table table-condensed table-hover ccb-table dt-responsive" width="100%" id="r_credits_used">
             <thead>
                 <tr>
                     <th>Project/Link</th>

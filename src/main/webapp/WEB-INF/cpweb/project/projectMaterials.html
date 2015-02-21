@@ -15,7 +15,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dabox-datatables', 'dabox-common', 'dabox-jquery'], function() {
+        require(['dabox-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function() {
             var oTable = $('#projectmaterials').dataTable({
                 "sDom": 'rt<"dataTables_footer clearfix"i>',
                 "bPaginate": false,
@@ -176,7 +176,7 @@ ${cpweb_foot}
     </div>
 </section>
 
-<table class="table ccb-table list" id="projectmaterials">
+<table class="table ccb-table list dt-responsive" width="100%" id="projectmaterials">
     <thead>
         <tr>
             <th></th>

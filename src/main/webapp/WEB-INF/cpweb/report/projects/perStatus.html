@@ -1,6 +1,7 @@
 [#ftl strip_text="true" /]
 
-<#assign test =  />
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+
 
 [#assign cpweb_foot ]
 
@@ -9,59 +10,63 @@
 </script>
 <script>
     $(document).ready(function() {
-        require(['dabox-report-datatables'], function() {
+        require(['dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive'], function() {
         var balTable = $('#r_projects_status').dataTable({
-            "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"ip>',
-            "oTableTools": {
-                "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "tableTools": {
+                "sSwfPath": "[@cdt.tableToolsSwf /]"
              },
-            "bPaginate": true,
-            "iDisplayLength": 50,
-            "aaSorting": [[0,'asc']],
-            "aoColumnDefs": [
+            "paging": true,
+            "pageLength": 50,
+            "order": [[0,'asc']],
+            "initComplete": function() {
+                $('#r_projects_status_filter input').attr('placeholder', 'Search report');
+            },
+            "columnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "projectName",
-                    "sWidth": "60%",
-                    "fnRender": function ( oObj ) {
-                        return  '<a href="${helper.urlFor('project.report.ProjectReportModule','activityReport')}/' +  oObj.aData.projectId + '">' + oObj.aData.projectName + '</a>';
+                    "targets": [ 0 ],
+                    "width": "60%",
+                    "data": function(row, type, set) {
+                        if (!row.projectNameDisplay) {
+                            row.projectNameDisplay = '<a href="${helper.urlFor('project.report.ProjectReportModule','activityReport')}/' +  row.projectId + '">' + row.projectName + '</a>';
+                        }
+                        if (type === 'display') {
+                            return row.projectNameDisplay;
+                        } else if (type === 'filter') {
+                            return row.projectName;
+                        } else if (type === 'sort') {
+                            return row.projectName;
+                        } else {
+                            //Anything else and raw row
+                            return row.projectNameDisplay;
+                        }
                     }
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": "totalCount",
-                    "sClass": "center",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.totalCount;
-                    }
+                    "targets": [ 1 ],
+                    "className": "center",
+                    "data": "totalCount"
                 },
                 {
-                    "aTargets": [ 2 ],
-                    "mData": "invitedCount",
-                    "sClass": "center",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.invitedCount;
-                    }
+                    "targets": [ 2 ],
+                    "className": "center",
+                    "data": "invitedCount"
                 },
                 {
-                    "aTargets": [ 3 ],
-                    "mData": "completedCount",
-                    "sClass": "center completed",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.completedCount;
-                    }
+                    "targets": [ 3 ],
+                    "className": "center completed",
+                    "data": "completedCount"
                 }
             ],
-            "sAjaxSource": "${helper.urlFor('report.ReportJsonModule','listParticipationStatus',[org.id])}",
-            "sPaginationType": "full_numbers",
-            "oLanguage": {
-                "sSearch": "",
-                "sEmptyTable": "<span class='emptytable'>No projects available on your account.</span>",
-                "sLoadingRecords": "<p>Loading projects...</p><img src='[@common.spinnerUrl /]' />"
+            "ajax": "${helper.urlFor('report.ReportJsonModule','listParticipationStatus',[org.id])}",
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "emptyTable": "<span class='emptytable'>No projects available on your account.</span>",
+                "loadingRecords": "<p>Loading projects...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
         });
-        $('#report_filter input').attr('placeholder', 'Search projects');
 
     } );
 
@@ -90,7 +95,7 @@ ${cpweb_head}
     </section>
 
     <section id="r_table">
-        <table class="table table-condensed table-hover table-hover ccb-table" id="r_projects_status">
+        <table class="table table-condensed table-hover ccb-table dt-responsive" width="100%" id="r_projects_status">
             <thead>
                 <tr>
                     <th>Name</th>

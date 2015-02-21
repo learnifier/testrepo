@@ -60,7 +60,7 @@ ${cpweb_foot}
         
      
     $(document).ready(function() {
-        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function(hb) {
+        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck', 'dataTables-responsive'], function(hb) {
 
             var source = $("#roster-cell-action-template").html();
             var rosterCellActionTemplate = hb.compile(source);
@@ -625,7 +625,7 @@ ${cpweb_head}
         [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
 
-    <table class="table table-striped table-hover ccb-table" id="projectroster">
+    <table class="table table-striped table-hover ccb-table dt-responsive" width="100%" id="projectroster">
         <thead>
             <tr>
                 <th><input type="checkbox" id="cball"></th>

@@ -10,7 +10,7 @@ ${cpweb_foot}
 
 <script>
     $(document).ready(function() {
-        require(['dataTables-bootstrap'], function() {
+        require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
         var oTable = $('#listparticipations').dataTable({
             "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": false,
@@ -64,7 +64,7 @@ ${cpweb_head}
 
 [@userMenu.userOverviewMenu selected="participations"][/@userMenu.userOverviewMenu]
     
-<table class="table table-hover table-striped ccb-table" id="listparticipations">
+<table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listparticipations">
     <thead>
         <tr>
             <th>Project Name</th>

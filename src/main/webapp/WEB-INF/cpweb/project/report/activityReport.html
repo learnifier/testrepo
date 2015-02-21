@@ -10,7 +10,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dabox-ajax-longrun-gui', 'dabox-report-datatables', 'dabox-common', 'dabox-jquery'], function(lr) {
+        require(['dabox-ajax-longrun-gui', 'dabox-report-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function(lr) {
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
@@ -184,7 +184,7 @@ ${cpweb_head}
 <h2>[@dws.txt key="cpweb.project.report.activity.title" /]</h2>
 
 <section id="r_table">
-    <table class="table table-condensed table-hover table-hover ccb-table" id="r_project_activity">
+    <table class="table table-condensed table-hover table-hover ccb-table dt-responsive" width="100%" id="r_project_activity">
         <thead>
         </thead>
         <tbody>

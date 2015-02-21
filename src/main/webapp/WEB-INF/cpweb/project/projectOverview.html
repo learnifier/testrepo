@@ -18,7 +18,7 @@ ${cpweb_foot}
             var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
                     pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);
             });
-            require(['dataTables-bootstrap', 'dabox-common'], function() {
+            require(['dataTables-bootstrap', 'dabox-common', 'dataTables-responsive'], function() {
 
             var oTable = $('#userroleslist').dataTable({
             "dom": '<"row"<"col-sm-12"rt>>',
@@ -261,7 +261,7 @@ source: [
     <div class="col-md-4">
         <section class="">
             <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Team Members</h3>
-            <table class="table ccb-table team-members" id="userroleslist">
+            <table class="table ccb-table dt-responsive team-members" width="100%" id="userroleslist">
                 <tbody>
                 </tbody>
             </table>

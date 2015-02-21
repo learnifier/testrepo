@@ -1,5 +1,6 @@
 [#ftl strip_text="true" /]
 
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
 
 [#assign cpweb_foot ]
 <script>
@@ -7,56 +8,79 @@
 
 
     $(document).ready(function() {
-        require(['dabox-report-datatables'], function() {
+        require(['dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive'], function() {
         var balTable = $('#r_credits_available').dataTable({
-            "sDom": 'rt',
-            "bPaginate": false,
-            "aaSorting": [[1,'asc']],
-            "aoColumnDefs": [
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "tableTools": {
+                "sSwfPath": "[@cdt.tableToolsSwf /]"
+             },
+            "paging": true,
+            "pageLength": 50,
+            "order": [[0,'asc']],
+            "initComplete": function() {
+                $('#r_credits_available_filter input').attr('placeholder', 'Search report');
+            },
+            "columnDefs": [
                 {
-                    "aTargets": [ 0 ],
-                    "mData": "orderNo",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.orderNo;
-                    }
+                    "targets": [ 0 ],
+                    "data": "orderNo"
                 },
                 {
-                    "aTargets": [ 1 ],
-                    "mData": "created",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.createdStr;
-                    }
-                },
-                {
-                    "aTargets": [ 2 ],
-                    "mData": "baseproduct",
-                    "fnRender": function ( oObj ) {
-                        var kitId = oObj.aData.baseproduct;
-                        var productId= '${product.id.id}';
-                        if (kitId == productId) {
-                            return 'N/A';
+                    "targets": [ 1 ],
+                    "data": function(row, type, set) {
+                        if (!row.createdDisplay) {
+                            row.createdDisplay = row.createdStr;
+                        }
+                        if (type === 'display') {
+                            return row.createdDisplay;
+                        } else if (type === 'filter') {
+                            return row.created;
+                        } else if (type === 'sort') {
+                            return row.created;
                         } else {
-                            return  kitId;                            
+                            //Anything else and raw row
+                            return row.createdDisplay;
                         }
                     }
                 },
                 {
-                    "aTargets": [ 3 ],
-                    "mData": "amount",
-                    "fnRender": function ( oObj ) {
-                        return  oObj.aData.amount;
+                    "targets": [ 2 ],
+                    "data": function(row, type, set) {
+                        if (!row.kitIdDisplay) {
+                            var kitId = row.baseproduct;
+                            var productId= '${product.id.id}';
+                            if (kitId == productId) {
+                                row.kitIdDisplay = 'N/A';
+                            } else {
+                                row.kitIdDisplay = kitId;                            
+                            }
+                        }
+                        if (type === 'display') {
+                            return row.kitIdDisplay;
+                        } else if (type === 'filter') {
+                            return row.kitIdDisplay;
+                        } else if (type === 'sort') {
+                            return row.kitIdDisplay;
+                        } else {
+                            //Anything else and raw row
+                            return row.kitIdDisplay;
+                        }
                     }
+                },
+                {
+                    "targets": [ 3 ],
+                    "data": "amount"
                 }
             ],
-            "sAjaxSource": "${helper.urlFor('report.ReportJsonModule','listAvailableReport',[org.id, product.id.id])}",
-            "sPaginationType": "full_numbers",
-            "oLanguage": {
-                "sEmptyTable": "<span class='emptytable'>No orders have been placed.</span>",
-                "sLoadingRecords": "<p>Loading details...</p><img src='[@common.spinnerUrl /]' />"
+            "ajax": "${helper.urlFor('report.ReportJsonModule','listAvailableReport',[org.id, product.id.id])}",
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "emptyTable": "<span class='emptytable'>No orders have been placed.</span>",
+                "loadingRecords": "<p>Loading details...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
         });
-        $('#report_filter input').attr('placeholder', 'Search the report data');
 
     } );
 
@@ -87,7 +111,7 @@ ${cpweb_head}
     </section>
 
     <section id="r_table">
-        <table class="table table-condensed table-hover table-hover ccb-table" id="r_credits_available">
+        <table class="table table-condensed table-hover ccb-table dt-responsive" width="100%" id="r_credits_available">
             <thead>
                 <tr>
                     <th>Order Number</th>

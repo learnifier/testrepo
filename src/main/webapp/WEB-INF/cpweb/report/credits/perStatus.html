@@ -10,10 +10,10 @@
 </script>
 <script>
     $(document).ready(function() {
-        require(['dabox-common', 'dataTables-bootstrap', 'dataTables-tableTools'], function() {
+        require(['dabox-common', 'dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive'], function() {
 
         var balTable = $('#r_credits_perstatus').dataTable({
-            "dom": '<"row"<"col-sm-6"T><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "tableTools": {
                 "sSwfPath": "[@cdt.tableToolsSwf /]"
              },
@@ -196,7 +196,7 @@ ${cpweb_head}
     </section>
     
     <section id="r_table">
-        <table class="table table-condensed table-hover table-hover ccb-table" id="r_credits_perstatus">
+        <table class="table table-condensed table-hover ccb-table dt-responsive" width="100%" id="r_credits_perstatus">
             <thead>
                 <tr>
                     <th></th>

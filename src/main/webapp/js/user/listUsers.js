@@ -6,7 +6,7 @@ define([], function() {
     var exports = {};
 
    $(document).ready(function() {
-        require(['dataTables-bootstrap'], function() {
+        require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
         var oTable = $('#listusers').dataTable({
             "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "order": [[1,'asc']],
@@ -17,6 +17,7 @@ define([], function() {
                 {
                     "targets": [ 0 ],
                     "orderable": false,
+                    "width": "32px",
                     "data" : function(row, type, set) {
                         if (!row.imagelink24Display) {
                             if (row.imagelink24) {
@@ -40,7 +41,6 @@ define([], function() {
                 },
                 {
                     "targets": [ 1 ],
-                    "width": "50%",
                     "className": "block-link",
                     "data" : function(row, type, set) {
                         if (!row.nameDisplay) {
