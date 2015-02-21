@@ -8,7 +8,7 @@ define([], function() {
     $(document).ready(function() {
         require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
             $('#listprojects').dataTable({
-                "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "order": [[1, 'asc']],
                 "initComplete": function() {
                     $('#listprojects_filter input').attr('placeholder', 'Search projects');

@@ -9,7 +9,7 @@ define([textSource], function(t) {
         
     require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
         var oTable = $('#listemails').dataTable({
-            "dom": '<"row"<"col-sm-6"><"col-sm-6"f>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": false,
             "order": [[0,'asc']],
             "initComplete": function() {

@@ -38,7 +38,7 @@ ${cpweb_foot}
 [#global formPrefix="cpweb" /]
 <form action="${formlink}" name="addTaskForm" id="addTaskForm" class="fullpage" method="post">
     <section class="field">
-        [@bsform.select name="tasktarget" class="input_full" tabindex="2"]
+        [@bsform.select name="tasktarget" tabindex="2"]
         [@bsform.option value="all"]All participants[/@bsform.option]
         [@bsform.option value="invited"]Invited participants[/@bsform.option]
         [@bsform.option value="notinvited"]Not invited participants[/@bsform.option]
@@ -46,7 +46,7 @@ ${cpweb_foot}
         [@bsform.option value="uncompleted"]Invited uncompleted participants[/@bsform.option]
         [/@bsform.select]
 
-        [@bsform.inputDateTime name="taskdate" class="input_full"  tabindex="3"/]
+        [@bsform.inputDateTime name="taskdate" tabindex="3"/]
         [@modal.formParams /]
     </section>
 </form>

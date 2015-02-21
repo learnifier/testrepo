@@ -86,6 +86,25 @@ ${cpweb_foot}
                         container: 'body'
 		});
 	});
+        
+        $("#changePrimaryData").click(function () {
+            require(["[@modal.javascript /]"], function (modal) {
+                modal.open({
+                    src: "${helper.urlFor('VerifyProjectDesignModule', 'verifyNewDesign', [prj.projectId])}",
+                    height: "450px",
+                    cssClass: "modal-lg",
+                    title: "Change Mandatory Information",
+                    cancel: function () { /* Do nothing*/
+                    },
+                    cancelUrl: window.location.href,
+                    proceedUrl: window.location.href,
+                    proceed: function (dlg) {
+                        dlg.close();
+                    }
+                });
+            });
+            return false;
+        });
 
 </script>
 [/#assign]
@@ -138,16 +157,16 @@ ${cpweb_foot}
         
        [#if primaryFieldCount > 0 ]
         <section class="action">
-           <h3><b>STEP 1</b> - Start by setting the required course details and then move on to step 2</h3>
+           <h4><b>STEP 1</b> - Start by setting the required course details and then move on to step 2</h4>
             <input type="hidden" name="orgId" value="${org.id}" />
-            <a href="${helper.urlFor('VerifyProjectDesignModule', 'verifyNewDesign', [prj.projectId])}" class="btn btn-primary">[@dws.txt key='form.action.backtoprimary' /]</a>
+            <a class="btn btn-primary" id="changePrimaryData">[@dws.txt key='form.action.backtoprimary' /]</a>
         </section>
         [/#if]
 
         <form action="${helper.urlFor('project.VerifyProjectDesignModule','updateNewDesign',[prj.projectId])}" name="createProjectGeneral" class="fullpage" method="post">
             <section class="field clearfix design">
             [#if primaryFieldCount > 0 ]
-               <h3><b>STEP 2</b> - Set dates and details below</h3>
+               <h4><b>STEP 2</b> - Set dates and details below</h4>
             [#else]
                     [#if (!components??) || (components?size < 1)]
                         <p>No dates or details can be set for this project</p>
@@ -178,14 +197,14 @@ ${cpweb_foot}
 
 [#if component.children?size > 0 || component.type == 'text']
     <div class="text">
-        <h1>${component.properties.title!''}</h1>
+        <h3>${component.properties.title!''}</h3>
         <p class="desc">${component.properties.description!''}</p>
     </div>
     [#if component.children?size > 0]
         [#list component.children as child]
             [#if child.properties.splitContainerPosition?? && child.properties.splitContainerPosition == "top" ]
                 <div class="text">
-                    [#if child.properties["title"]??]<h1>${child.properties["title"]}</h1>[/#if]
+                    [#if child.properties["title"]??]<h3>${child.properties["title"]}</h3>[/#if]
                     [#if child.properties["description"]??]<p class="desc">${child.properties["description"]}</p>[/#if]
                     [@listComponentFields child /]
                 </div>
@@ -201,7 +220,7 @@ ${cpweb_foot}
     [/#if]
 [#else]
     <div class="text">
-        [#if component.properties["title"]??]<h1>${component.properties["title"]}</h1>[/#if]
+        [#if component.properties["title"]??]<h3>${component.properties["title"]}</h3>[/#if]
         [#if component.properties["description"]??]<p class="desc">${component.properties["description"]}</p>[/#if]
         [@listComponentFields component /]
     </div>
