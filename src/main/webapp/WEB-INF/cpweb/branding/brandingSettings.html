@@ -125,6 +125,14 @@ ${cpweb_foot}
 
 [/#assign]
 
+[#function getLogoURL ]
+    [#if brandingPackage.metadata.cphalfbanner?? ]
+        [#return brandingPackage.toBrandingUrl("/img/cpl.png") /]
+    [/#if]
+    [#return realmBrandingPackage.toBrandingUrl("/img/cpl.png") /]
+    
+[/#function]
+
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 [@portalSecurity.permissionBlock permission="CP_EDIT_BRANDING"]
@@ -140,8 +148,7 @@ ${cpweb_foot}
                         <div class="row">
                             <div class="col-xs-12">
                                 <div id="picture_wrapper">
-                                    <img id="preview" />
-                                    <div id="logotype"></div>
+                                    <img src="${getLogoURL()}" id="preview" />
                                 </div>
                                 <label for="image" id="uploadPicBtn" class="btn btn-link center-block">
                                     <span class="glyphicon glyphicon-cloud-upload"></span> [@dws.txt key="form.action.uploadlogo" /]

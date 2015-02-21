@@ -2,6 +2,8 @@
 
 [#import "../projectInfo.html" as pInfo /]
 
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
@@ -10,7 +12,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dabox-ajax-longrun-gui', 'dabox-report-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function(lr) {
+        require(['dabox-ajax-longrun-gui', 'dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive', 'dabox-common', 'dabox-jquery'], function(lr) {
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
@@ -70,11 +72,11 @@ ${cpweb_foot}
                 //create JSON array for aoColumnDefs
                 for (var i = 0; i < tableColTitles.length; i++) {
                     tableJSON.push({
-                        "sTitle": "<span class='pop' title='" + tableColTitles[i] + "'>" + cocobox.trunc(tableColTitles[i], 10) + "</span>",
-                        "mData": tableColIds[i],
-                        "aTargets": [i],
-                        "sDefaultContent": "0",
-                        "fnCreatedCell": function(td, data, oData, row, col) {
+                        "title": "<span class='pop' title='" + tableColTitles[i] + "'>" + cocobox.trunc(tableColTitles[i], 10) + "</span>",
+                        "data": tableColIds[i],
+                        "targets": [i],
+                        "defaultContent": "0",
+                        "createdCell": function(td, data, oData, row, col) {
                             if (oData.activities[col - 1] != undefined) {
                                 if (oData.activities[col - 1].overdue) {
                                     $(td).css('color', 'red');
@@ -99,23 +101,23 @@ ${cpweb_foot}
 
             function initializeTable(JSONdata) {
                 oTable = $('#r_project_activity').dataTable({
-                    "sScrollX": "100%",
-                    "sScrollXInner": "140%",
-                    "aoColumnDefs": tableJSON,
-                    "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
-                    "oTableTools": {
-                        "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf"  
+                    "scrollX": "100%",
+                    "scrollXInner": "140%",
+                    "columnDefs": tableJSON,
+                    "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+                    "tableTools": {
+                        "sSwfPath": "[@cdt.tableToolsSwf /]"
+                     },
+                    "paging": false,
+                    "order": [[0, 'asc']],
+                    "data": JSONdata,                    
+                    "destroy": false,
+                    "language": {
+                        "search": "",
+                        "emptyTable": "<span class='emptytable'>No projects available on your account.</span>",
+                        "loadingRecords": "<p>Loading report...</p><img src='[@common.spinnerUrl /]' />"
                     },
-                    "bPaginate": false,
-                    "aaSorting": [[0, 'asc']],
-                    "aaData": JSONdata,
-                    "bDestroy": false,
-                    "oLanguage": {
-                        "sSearch": "",
-                        "sEmptyTable": "<span class='emptytable'>No projects available on your account.</span>",
-                        "sLoadingRecords": "<p>Loading report...</p><img src='[@common.spinnerUrl /]' />"
-                    },
-                    "fnRowCallback": function(nRow, iDisplayIndex) {
+                    "rowCallback": function(nRow, iDisplayIndex) {
                         var sumCompleted = 0;
                         for (var i = 0; i < iDisplayIndex.activities.length; i++) {
                             if (iDisplayIndex.activities[i].completed === true) {
@@ -124,10 +126,11 @@ ${cpweb_foot}
                         }
                         $('.completedSum', nRow).text(sumCompleted);
                     },
-                    "fnInitComplete": function() {
-                        $('.pop').tooltip();
+                    "initComplete": function() {
+                        $('[data-toggle="tooltip"]').tooltip();
+                        $('#r_project_activity_filter input').attr('placeholder', 'Search report');
                     },
-                    "fnFooterCallback": function( nFoot, aData, iStart, iEnd, aiDisplay ) {
+                    "footerCallback": function( nFoot, aData, iStart, iEnd, aiDisplay ) {
                         //nFoot.getElementsByTagName('th')[0].innerHTML = "Starting index is "+iStart;
                         log(nFoot, aData, iStart, iEnd, aiDisplay);
                         var sumColumns = [];

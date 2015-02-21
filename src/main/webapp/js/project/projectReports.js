@@ -2,6 +2,7 @@ define(["dataTables-bootstrap", 'dataTables-responsive'], function () {
     "use strict";
 
     $('#listreports').dataTable({
+        "dom": '<"row"<"col-sm-6"><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
         "paging": false,
         "columnDefs": [
             {
@@ -28,7 +29,7 @@ define(["dataTables-bootstrap", 'dataTables-responsive'], function () {
         ],
         "ajax": reportJson,
         "language": {
-            "loadingRecords": "<img src='"+spinnerUrl+"' />"
+            "loadingRecords": "<img src='"+spinnerUrl+"' />",
         }
     });
 
