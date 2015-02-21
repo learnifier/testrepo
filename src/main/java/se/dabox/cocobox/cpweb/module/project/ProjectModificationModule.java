@@ -203,7 +203,8 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         if (prj == null) {
             LOGGER.warn("Project not found: {}", strProjectId);
-            return NavigationUtil.toProjectPage(projectId);
+            return WebModuleRedirectRequestTarget(ProjectModule.class, ProjectModule.ROSTER_ACTION,
+                    strProjectId);
         }
 
         checkPermission(cycle, prj);
