@@ -19,6 +19,7 @@ import se.dabox.cocobox.cpweb.formdata.branding.BrandingColorForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.branding.GetCachedBrandingCommand;
 import se.dabox.cocosite.branding.GetOrgBrandingCommand;
+import se.dabox.cocosite.branding.GetRealmBranding;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.event.BrandingChangedListenerUtil;
 import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
@@ -48,6 +49,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         map.put("width", LogoModule.WIDTH);
         map.put("height", LogoModule.HEIGHT);
         map.put("saveurl", cycle.urlFor(LogoModule.class, LogoModule.SAVE_ACTION, strOrgId));
+        map.put("realmBrandingPackage", new GetRealmBranding(cycle).getBranding());
 
         DruwaFormValidationSession<BrandingColorForm> colorformsession =
                 getValidationSession(BrandingColorForm.class, cycle);
