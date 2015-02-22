@@ -195,19 +195,49 @@ source: [
 <article id="ccb-page-projectOverview">
 
     <div class="col-md-8">
-        <div class="project-status__wrapper clearfix">
-            <span class="project-status__label">Status</span>
-            <h3  class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("project.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</h3>
-        </div>
-        <section id="prj-charts" class="container-fluid clearfix">
-            <div class="row">
-                <div class="col-xs-8">
+    <div class="ccb-flat-card ccb-flat-card--colored">
+        <section class="container-fluid clearfix">
+            <div class="row project-status-wrapper">
+                <div class="col-xs-12 col-sm-6">
                     <span id="prj-ch-total"></span> participants
                 </div>
-                <div class="col-xs-1">
-                        <div id="prj-action-needed"></div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="project-status__wrapper">
+                        <span class="project-status__label">Status</span>
+                        <span class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("project.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</span>
+                    </div>
                 </div>
-                <div class="col-xs-3">
+            </div>
+            <div class="row prj-charts-wrapper">
+                    <div class="col-sm-12 col-md-4 prj-charts clearfix">
+                        <div class="prj-ch-wrapper">
+                            <canvas id="prj-ch-status" width="125" height="125"></canvas>
+                            <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
+                        </div>
+                        <table>
+                            <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
+                            <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
+                            <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-sm-12 col-md-4 prj-charts clearfix">
+                        [#if prj.type.ptype == 2]
+                        <div class="prj-ch-wrapper">
+                            <canvas id="prj-ch-overdue" width="125" height="125"></canvas>
+                            <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
+                        </div>
+                        <table>
+                            <tbody>
+                                <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
+                                <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
+                            </tbody>
+                        </table>
+                        [/#if]
+                    </div>
+                    <div class="col-sm-12 col-md-4  prj-charts clearfix">
+                        <div class="prj-ch-wrapper">
+                                <div id="prj-action-needed"></div>
+                        </div>
                         <table>
                             <tbody>
                                 <tr id="prj-ch-notinvited"><td><span class="badge chart-data"></span>Not Invited</td></tr>
@@ -215,41 +245,17 @@ source: [
                                 <tr id="prj-ch-inerror"><td><span class="badge chart-data"></span>Project Errors</td></tr>
                             </tbody>
                         </table>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-6 col-lg-3">
-                        <div class="prj-ch-wrapper">
-                            <canvas id="prj-ch-status" width="125" height="125"></canvas>
-                            <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
-                        </div>
+                <div class="prj-notes">
+                    <p><strong>Note</strong></p>
+                    <span class="setting clearfix" id="project-desc">
+                        <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>
+                        [#include "projectEditLabel.html" /]
+                    </span>
                 </div>
-                <div class="col-xs-6 col-lg-3">
-                        <table>
-                            <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
-                            <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
-                            <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
-                        </table>
-                </div>
-                    [#if prj.type.ptype == 2]
-                <div class="clearfix visible-xs-block"></div>    
-                <div class="col-xs-6 col-lg-3">
-                        <div class="prj-ch-wrapper">
-                            <canvas id="prj-ch-overdue" width="125" height="125"></canvas>
-                            <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
-                        </div>
-                </div>
-                <div class="col-xs-6 col-lg-3">
-                        <table>
-                            <tbody>
-                                <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
-                                <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
-                            </tbody>
-                        </table>
-                </div>
-                    [/#if]
-            </div>
-        </section>
+            </section>
+        </div>
         [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
         <section class="project-flirt-section">
             <h3 class="page-section-title"><span class="glyphicon glyphicon-comment"></span>Discussions</h3>
@@ -260,22 +266,17 @@ source: [
     </div>
     <div class="col-md-4">
         <section class="">
+            [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
+            <button type="button" class="btn btn-primary-outlined btn-sm pull-right" id="addTeamMemberButton">
+                <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
+            </button>
+            [/@]
             <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Team Members</h3>
             <table class="table ccb-table dt-responsive team-members" width="100%" id="userroleslist">
                 <tbody>
                 </tbody>
             </table>
         </section>
-        [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
-        <button type="button" class="btn btn-primary-outlined btn-sm" id="addTeamMemberButton">
-            <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
-        </button>
-        [/@]
-        <p class="">Note</p>
-        <span class="setting clearfix" id="project-desc">
-            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>
-            [#include "projectEditLabel.html" /]
-        </span>
 
         <div style="display: none">
             <form id="deleteRoleForm" method="POST" action="">

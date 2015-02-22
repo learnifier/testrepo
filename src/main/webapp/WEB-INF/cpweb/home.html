@@ -176,7 +176,7 @@ ${cpweb_foot}
         <div class="col-sm-7">
 
             [#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
-            <div class="ccb-flat-card" id="actions" style="display: none;">
+            <div class="ccb-flat-card ccb-flat-card--colored" id="actions" style="display: none;">
                 <div class="ccb-flat-card__header"><h3>Action</h3></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <section id="multiple-actions" style="display: none;">
@@ -199,7 +199,7 @@ ${cpweb_foot}
             </div>
             [/#if]
             [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
-            <div class="ccb-flat-card">
+            <div class="ccb-flat-card ccb-flat-card--colored">
                 [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
                 <div class="ccb-flat-card__header"><h2>New Project</h2></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
@@ -210,7 +210,7 @@ ${cpweb_foot}
                 </div>
                 [/@]
             </div>
-            <div class="ccb-flat-card">
+            <div class="ccb-flat-card ccb-flat-card--colored">
                 <div class="ccb-flat-card__content">
                     [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
                     <div class="ccb-flat-card__header"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right yiq-contrasted-navColor">View All Projects</a><h3>Favorite Projects</h3></div>
@@ -222,7 +222,7 @@ ${cpweb_foot}
             </div>
             [/#if]
             [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
-            <div class="ccb-flat-card">
+            <div class="ccb-flat-card ccb-flat-card--colored">
                 <div class="ccb-flat-card__header"><h3>Upload your materials</h3></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <p>Add your own training materials to tailor the learning to your needs.</p>
@@ -235,7 +235,7 @@ ${cpweb_foot}
             </div>
             [/@]
             [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-            <div class="ccb-flat-card">
+            <div class="ccb-flat-card ccb-flat-card--colored">
                 <div class="ccb-flat-card__header"><h3>Invite an administrator</h3></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <p>Invite additional administrators to manage projects from this portal.</p>
@@ -249,12 +249,12 @@ ${cpweb_foot}
         </div>
         <div class="col-sm-5">
             [#if (dwsrt.config["cpweb.support.htmlsnippet"]) != ""]
-            <div id="techsupportinfo" class="ccb-flat-card ccb-flat-card-padding">
+            <div id="techsupportinfo" class="ccb-flat-card ccb-flat-card-padding ccb-flat-card--colored">
                 ${dwsrt.config["cpweb.support.htmlsnippet"]}
             </div>
             [/#if]
             [#if welcomeMessage??]
-            <div class="ccb-flat-card" id="contact">
+            <div class="ccb-flat-card ccb-flat-card--colored" id="contact">
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     [#assign contact=infoHelper.getMiniUserInfo(welcomeMessage.userId) /]
                     [#if contact.thumbnail??] 
@@ -271,7 +271,7 @@ ${cpweb_foot}
             [/#if]
 
             [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-            <div class="ccb-flat-card" id="balance">
+            <div class="ccb-flat-card ccb-flat-card--colored" id="balance">
                 <div class="ccb-flat-card__header"><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a><h3>Your Account Status</h3></div>
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">                
                     <div id="product-count" class="secondaryBackgroundColor">
