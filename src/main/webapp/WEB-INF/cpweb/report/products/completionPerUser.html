@@ -82,9 +82,9 @@ ${cpweb_foot}
                         "title": "<span data-toggle='tooltip' data-placement='top' title='" + tableColTitles[i] + "'>" + tableColTitles[i] + "</span>",
                         "width": "" + 100 / tableColTitles.length + "%",
                         "targets": [i],
-                        "mData": tableColIds[i],
+                        "data": tableColIds[i],
                         "defaultContent": "",
-                        "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                        "createdCell": function(nTd, sData, oData, iRow, iCol) {
                             if (sData == 'c') {
                                 sumDataC[iCol] = sumDataC[iCol] + 1;
                                 $(nTd).text('Completed').addClass('c');
@@ -165,7 +165,7 @@ ${cpweb_head}
     </section>
 
     <section id="r_table">
-        <table class="table table-condensed table-hover ccb-table" width="100%" id="r_product_completion">
+        <table class="table table-condensed table-hover ccb-table ccb-table-wraptext" width="100%" id="r_product_completion">
             <thead>
             </thead>
             <tbody>

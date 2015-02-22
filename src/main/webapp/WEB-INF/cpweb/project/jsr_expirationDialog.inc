@@ -1,5 +1,5 @@
 <script id="expirationdialogTemplate" type="text/x-jsrender"> 
-        <div role="tabpanel">
+<div role="tabpanel" class="ccb-tabpanel ccb-tabpanel--colored">
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
@@ -15,7 +15,7 @@
     </div>
     <div role="tabpanel" class="tab-pane" id="exp-adjust">
         <p>Adjust the expiration by setting an offset value. The number of days will be added or withdrawn from the current expiration day.</p>
-        <p>for example -7 days to shorten with a week</p>
+        <p><small><em>For example -7 days to shorten with a week</em></small></p>
 
         <input id="adjustedDateSetter" type="number" class="form-control"/>
     </div>
