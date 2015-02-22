@@ -60,7 +60,7 @@ ${cpweb_foot}
         
      
     $(document).ready(function() {
-        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck', 'dataTables-responsive'], function(hb) {
+        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function(hb) {
 
             var source = $("#roster-cell-action-template").html();
             var rosterCellActionTemplate = hb.compile(source);
@@ -625,23 +625,25 @@ ${cpweb_head}
         [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
 
-    <table class="table table-striped table-hover ccb-table dt-responsive" width="100%" id="projectroster">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="cball"></th>
-                <th></th>
-                <th>Name</th>
-                <th>Invited</th>
-                <th>Last Email</th>
-                <th>Last Seen</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}" class="pull-right">Download roster as a Excel file</a>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover ccb-table" width="100%" id="projectroster">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="cball"></th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Invited</th>
+                    <th>Last Email</th>
+                    <th>Last Seen</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <a href="${helper.urlFor('project.ProjectJsonModule','projectRosterExcel',[prj.projectId?c,'roster-'+prj.projectId?c+'.xls'])}" class="pull-right">Download roster as a Excel file</a>
+    </div>
 </form>
 [#include "bounceInfo.html" /]
 
