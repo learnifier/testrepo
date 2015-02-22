@@ -195,6 +195,12 @@ public final class NavigationUtil {
         return new WebModuleRedirectRequestTarget(OrgSelectorModule.class);
     }
 
+    public static String toProjectRosterPageUrl(RequestCycle cycle, long projectId) {
+        return cycle.urlFor(ProjectModule.class,
+                ProjectModule.ROSTER_ACTION,
+                Long.toString(projectId));
+    }
+
     private NavigationUtil() {
     }
 }

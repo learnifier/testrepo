@@ -79,8 +79,7 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
         };
 
         UrlRequestTargetGenerator cancelTarget = new UrlRequestTargetGenerator(NavigationUtil.
-                toProjectPageUrl(context.getCycle(),
-                        projectId));
+                toProjectRosterPageUrl(context.getCycle(), projectId));
 
         sms = new SendMailSession(new ProjectSendMailProcessor(projectId, org.getId()),
                 target, cancelTarget);
