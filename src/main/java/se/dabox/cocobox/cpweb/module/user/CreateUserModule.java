@@ -249,7 +249,8 @@ public class CreateUserModule extends AbstractWebAuthModule {
             return sendAdminInvitationWithMailPage(cycle, org.getId(), adminAccount.getUserId());
         }
 
-        return new RedirectUrlRequestTarget(NavigationUtil.toOrgUsersUrl(cycle, strOrgId));
+        String url = NavigationUtil.toOrgUsersUrl(cycle, strOrgId);
+        return topRedirect(cycle, url);
     }
 
     private RequestTarget toCreatePage(RequestCycle cycle, String strOrgId) {

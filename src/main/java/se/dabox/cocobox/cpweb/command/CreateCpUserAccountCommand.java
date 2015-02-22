@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.command;
 import java.util.List;
 import java.util.Locale;
 import net.unixdeveloper.druwa.RequestCycle;
+import se.dabox.cocobox.cpweb.CpAdminRoles;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
@@ -63,6 +64,9 @@ public class CreateCpUserAccountCommand {
                 }
 
                 if (userAccountHasOrgRole(accounts, orgId)) {
+                    return VerificationStatus.DUPLICATE;
+                } else if (CpAdminRoles.NONE.equals(role)) {
+                    //Also considered a duplicate
                     return VerificationStatus.DUPLICATE;
                 }
 
