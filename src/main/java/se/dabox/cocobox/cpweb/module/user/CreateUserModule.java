@@ -179,7 +179,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
         return new RedirectUrlRequestTarget(redirectUrl);
     }
 
-    @WebAction(methods = HttpMethod.POST)
+    @WebAction
     public RequestTarget onResendInvitation(RequestCycle cycle, String strOrgId, String strUserId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 

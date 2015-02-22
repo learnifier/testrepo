@@ -1,26 +1,44 @@
 [#ftl /]
 [#if portalSecurity.hasPermission("CP_EDIT_USER")]
     <button class="btn btn-primary-outlined btn-sm" type="button" id="edituser"><span class="glyphicon glyphicon-pencil"></span> Edit User</button>
-[@bsform._onreadyJavascript]
-   $("#edituser").click(function() {
-        require(["[@modal.javascript /]"], function(modal) {
+    [@bsform._onreadyJavascript]
+       $("#edituser").click(function() {
+            require(["[@modal.javascript /]"], function(modal) {
 
-                modal.open({
-                    src: "${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}",
-                    height: "450px",
-                    cssClass: "modal-lg",
-                    title: "Edit user",
-                    cancel: function () { /* Do nothing*/
-                    },
-                    cancelUrl: window.location.href,
-                    proceedUrl: window.location.href
-                });
-        });
-   });
-[/@]
-[#if portalSecurity.hasPermission("CP_EDIT_USER") && isAdmin]
-    <form action="${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}" method="post">
-        <button class="btn btn-primary-outlined btn-sm" ><span class="glyphicon glyphicon-envelope"></span> Resend invitation</button>
-    </form>
-[/#if]
+                    modal.open({
+                        src: "${helper.urlFor('user.CreateUserModule','edit',[org.id, user.userId])}",
+                        height: "450px",
+                        cssClass: "modal-lg",
+                        title: "Edit user",
+                        cancel: function () { /* Do nothing*/
+                        },
+                        cancelUrl: window.location.href,
+                        proceedUrl: window.location.href
+                    });
+            });
+       });
+    [/@]
+
+    [#if isAdmin]
+        <button id="resendinv" class="btn btn-primary-outlined btn-sm" ><span class="glyphicon glyphicon-envelope"></span> Resend invitation</button>
+
+        [@bsform._onreadyJavascript]
+        $("#resendinv").click(function() {
+             require(["[@modal.javascript /]"], function(modal) {
+
+                     modal.open({
+                         src: "${helper.urlFor('user.CreateUserModule','resendInvitation',[org.id, user.userId])}",
+                         height: "450px",
+                         cssClass: "modal-lg",
+                         title: "Resend invitation",
+                         cancel: function () { /* Do nothing*/
+                         },
+                         cancelUrl: window.location.href,
+                         proceedUrl: window.location.href
+                     });
+             });
+            });
+        [/@]
+    [/#if]
+
 [/#if]
