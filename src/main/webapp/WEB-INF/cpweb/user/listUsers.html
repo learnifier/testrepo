@@ -14,6 +14,27 @@
         });
 
     </script>
+
+    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+    <script>
+        $("#addUserBtn").click(function () {
+            require(["[@modal.javascript /]"], function(modal) {
+                modal.open({
+                    src: "${helper.urlFor('CreateUserModule','create',[org.id])}",
+                    height: "450px",
+                    cssClass: "modal-lg",
+                    title: "Invite administrator",
+                    cancel: function () { /* Do nothing*/
+                    },
+                    cancelUrl: window.location.href,
+                    proceedUrl: "${helper.urlFor('CpMainModule','listUsers',[org.id])}"
+                });
+            });
+
+            return false;
+        });
+    </script>
+    [/@]
 [/#assign]
 
 
@@ -22,7 +43,7 @@
 <section class="ccb-page-header margin-bottom">
     [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
         <div class="ccb-page-header__actions--right">
-            <a href="${helper.urlFor('CreateUserModule','create',[org.id])}" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a>
+            <button id="addUserBtn" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add User</a>
         </div>
     [/@]
     <h1 class="page-title">Users</h1>
