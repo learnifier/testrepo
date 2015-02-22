@@ -3,14 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.freemarker;
 
-import net.unixdeveloper.druwa.Cookie;
-import net.unixdeveloper.druwa.DruwaApplication;
-import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.freemarker.ModifyViewDataHandler;
 import net.unixdeveloper.druwa.freemarker.ViewDataEvent;
 import se.dabox.cocosite.branding.GetOrgBrandingCommand;
 import se.dabox.cocosite.druwa.security.ClientPortalSecurityNamespaceFactory;
 import se.dabox.cocosite.druwa.security.ProjectSecurityNamespaceFactory;
+import se.dabox.cocosite.freemarker.florida.FloridaCookieContentSourceHandler;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.portalswitch.PortalSwitchInfoImpl;
@@ -19,11 +17,6 @@ import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.orgdir.client.BasicOrgUnitInfo;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
-import se.dabox.service.webutils.skinning.AbstractNamedSkinContentSource;
-import se.dabox.service.webutils.skinning.CharSequenceSkinContent;
-import se.dabox.service.webutils.skinning.MultiSkinContentSourceHelper;
-import se.dabox.service.webutils.skinning.SkinContent;
-import se.dabox.service.webutils.skinning.ViewContext;
 
 /**
  *
@@ -100,20 +93,7 @@ public class CpwebModifyViewHandler implements ModifyViewDataHandler {
     }
 
     private void addPageWrapperCookieHandler(ViewDataEvent event) {
-        MultiSkinContentSourceHelper.add(event.getMap(), new AbstractNamedSkinContentSource(
-                "pagewrapperCssSection") {
-
-                    @Override
-                    protected SkinContent getContent(ViewContext context) {
-                        RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
-                        Cookie cookie = cycle.getCookieManager().getCookie("ccbmenu");
-
-                        boolean maximized = cookie == null || "1".equals(cookie.getValue());
-                        
-                        return new CharSequenceSkinContent(maximized ? "sidebar-maximized"
-                                : "sidebar-minimized");
-                    }
-                });
+        FloridaCookieContentSourceHandler.registerContentSourceHandler(event);
     }
 
 }

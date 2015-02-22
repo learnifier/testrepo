@@ -16,7 +16,7 @@ public final class CpwebConstants {
     public static final String PRJADMIN_REGISTRATION_MAIL_HINT = "mail.projectadmin.registration";
     public static final String PRJADMIN_ROLE_ASSIGNED_HINT = "cpweb.project.roleassigned";
 
-    public static final String MAILEDITOR_SKIN = "CPAuthMenu2";
+    public static final String MAILEDITOR_SKIN = "CPAuth3";
 
     public static final String CREDIT_ALLOC_FLASH = "creditAllocationFailures";
     public static final String DELETE_FAILURE_FLASH = "projectDeleteFailures";

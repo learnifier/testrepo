@@ -215,7 +215,11 @@ public class MailModule extends AbstractWebAuthModule {
                 template.getName(),
                 template.getId(),
                 backUrl,
-                cancelUrl);
+                cancelUrl,
+                null,
+                null,
+                true);
+
 
         return new RedirectUrlRequestTarget(GotoMailEditor.process(cycle, initData));
     }
