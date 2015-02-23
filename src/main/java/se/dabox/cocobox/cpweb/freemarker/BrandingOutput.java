@@ -29,10 +29,11 @@ public class BrandingOutput extends AbstractOrgBrandingOutput implements Templat
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
 
-        RealmBrandingOutput.addFavIcons(env);
-        RealmBrandingOutput.addRealmBranding(env, "branding-styles");
-
         Branding branding = getBranding(env);
+
+        RealmBrandingOutput.addFavIcons(env);
+        RealmBrandingOutput.addThemeColors(env, branding);
+        RealmBrandingOutput.addRealmBranding(env, "branding-styles");
 
         RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
         BrandingOutputUtil.outputLink(cycle, env.getOut(), branding, "branding-styles");
