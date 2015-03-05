@@ -201,8 +201,9 @@ public class ProjectModule extends AbstractProjectWebModule {
         CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
         
         MultiPageActivityCourse actCourse
-                = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress,
-                        databankFacade, cdd);
+                = new MultiPageCourseCddActivityCourseFactory().
+                        setAllowTemporalProgressTracking(true).
+                        newActivityCourse(project, progress,databankFacade, cdd);
 
         map.put("actCourse", actCourse);
 
