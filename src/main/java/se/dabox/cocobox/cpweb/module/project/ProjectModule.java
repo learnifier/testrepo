@@ -14,7 +14,9 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
+import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.coursebuilder.initdata.InitData;
@@ -50,6 +52,7 @@ import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
@@ -183,8 +186,17 @@ public class ProjectModule extends AbstractProjectWebModule {
 
     @WebAction
     public RequestTarget onRaps(RequestCycle cycle, String projectId, String strParticipationId) {
+
+        if (projectId == null || strParticipationId == null) {
+            return new ErrorCodeRequestTarget(404);
+        }
+
         OrgProject project =
                 getProject(cycle, projectId);
+
+        if (project == null) {
+            return new StringRequestTarget("Project not found");
+        }
 
         long participationId = Long.parseLong(strParticipationId);
 
@@ -194,9 +206,15 @@ public class ProjectModule extends AbstractProjectWebModule {
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
 
-        List<ParticipationProgress> progress
-                = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class).
-                getParticipationProgress(participationId);
+        List<ParticipationProgress> progress = null;
+        try {
+            progress
+                    = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class).
+                    getParticipationProgress(participationId);
+        } catch (NotFoundException notFoundException) {
+            Collections.emptyList();
+        }
+
         DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
         CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
         
