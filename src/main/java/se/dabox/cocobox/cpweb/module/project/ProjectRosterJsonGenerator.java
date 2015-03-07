@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
-import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.date.DateFormatters;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ImpersonateUtil;
@@ -43,6 +42,7 @@ import se.dabox.service.common.coursedesign.CourseDesignType;
 import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.activity.ActivityCourse;
 import se.dabox.service.common.coursedesign.activity.CourseDesignDefinitionActivityCourseFactory;
+import se.dabox.service.common.coursedesign.project.GetProjectCourseDesignCommand;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.login.client.UserAccount;
@@ -67,6 +67,9 @@ class ProjectRosterJsonGenerator {
     private DatabankFacade databankFacade;
     private List<ProjectParticipation> participations;
     private Map<Long, Integer> sppProgressMap;
+    private Locale userLocale;
+    private CocoboxCoordinatorClient _ccbcClient;
+    private Map<Long, List<ParticipationProgress>> progressMap;
 
     ByteArrayOutputStream toJson(
             final RequestCycle cycle, List<ProjectParticipation> participations,
@@ -74,7 +77,10 @@ class ProjectRosterJsonGenerator {
             final boolean impersonateAllowed) {
         this.cycle = cycle;
         this.project = prj;
-        this.participations = participations;        
+        this.participations = participations;
+        this.userLocale = CocositeUserHelper.getUserLocale(cycle);
+        _ccbcClient =
+                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         prepare();
 
@@ -128,6 +134,7 @@ class ProjectRosterJsonGenerator {
                 if (item.getCompletedCids() != null) {
                     completedCids = item.getCompletedCids();
                 }
+
                 g.writeNumberField("status", percentage(prj, completedCids, item));
                 g.writeStringField("link", NavigationUtil.toUserPageUrl(cycle,
                         strOrgId, item.getUserId())+'/'+item.getParticipationId());
@@ -250,7 +257,7 @@ class ProjectRosterJsonGenerator {
         }
 
         CocoboxCoordinatorClient ccbcClient =
-                getCocobocCordinatorClient(cycle);
+                getCocobocCordinatorClient();
 
         ProjectParticipation part = ccbcClient.getProjectParticipation(prj.getParticipationOwner());
 
@@ -261,10 +268,8 @@ class ProjectRosterJsonGenerator {
         return part.getUserId();
     }
 
-    private CocoboxCoordinatorClient getCocobocCordinatorClient(RequestCycle cycle) throws ClientFactoryException {
-        CocoboxCoordinatorClient ccbcClient =
-                CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
-        return ccbcClient;
+    private CocoboxCoordinatorClient getCocobocCordinatorClient() throws ClientFactoryException {
+        return _ccbcClient;
     }
 
     private static String toErrorMessageHtml(String errorMessage) {
@@ -282,8 +287,7 @@ class ProjectRosterJsonGenerator {
         }
 
         List<ParticipationProgress> progress
-                = getCocobocCordinatorClient(cycle).getParticipationProgress(item.
-                        getParticipationId());
+                = getParticipationProgress(item.getParticipationId());
 
         ActivityCourse activityCourse
                 = new CourseDesignDefinitionActivityCourseFactory().newActivityCourse(cdd,
@@ -314,7 +318,7 @@ class ProjectRosterJsonGenerator {
                 if (project.getDesignId() == null) {
                     return CddCodec.decode(cycle, CddCodec.getBlankXml());
                 } else {
-                    return new GetProjectCourseDesignCommand(cycle).
+                    return new GetProjectCourseDesignCommand(cycle, userLocale).
                             forProject(project);
                 }
             }
@@ -374,5 +378,20 @@ class ProjectRosterJsonGenerator {
 
     private String getSingleProjectProduct() {
         return project.getProductId().getId();
+    }
+
+    private List<ParticipationProgress> getParticipationProgress(long participationId) {
+        
+        if (progressMap == null) {
+            progressMap = getCocobocCordinatorClient().getProjectProgress(project.
+                    getProjectId());
+        }
+
+        List<ParticipationProgress> list = progressMap.get(participationId);
+        if (list == null) {
+            return Collections.emptyList();
+        }
+
+        return list;
     }
 }
