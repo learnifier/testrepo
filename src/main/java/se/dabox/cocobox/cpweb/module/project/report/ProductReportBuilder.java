@@ -236,6 +236,9 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
         }
 
         for (ParticipationProgress participationProgress : progress) {
+            if (!participationProgress.isCompleted()) {
+                continue;
+            }
             if (cids.contains(participationProgress.getCid())) {
                 return true;
             }
