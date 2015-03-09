@@ -36,7 +36,6 @@ import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
-import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.ParamUtil;
@@ -101,13 +100,8 @@ class ProgressComponentResolver {
         List<TemporalProgressComponent> tcList =
                 TemporalComponentExtractor.extract(cdd, databankEntries, project.getTimezone());
 
-        Map<UUID, TemporalProgressComponent> temporalMap = CollectionsUtil.createMap(tcList,
-                new Transformer<TemporalProgressComponent, UUID>() {
-                    @Override
-                    public UUID transform(TemporalProgressComponent item) {
-                        return item.getCid();
-                    }
-                });
+        Map<UUID, TemporalProgressComponent> temporalMap = CollectionsUtil.createMap(tcList, 
+                TemporalProgressComponent::getCid);
 
         List<ProgressComponentInfo> infos = new ArrayList<>();
 
@@ -153,8 +147,8 @@ class ProgressComponentResolver {
             info.setComponent(comp);
 
             ParticipationProgress progress = progressMap.get(info.getCid());
-            if (progress != null) {
-                info.setCompleted(progress.getCreated());
+            if (progress != null && progress.isCompleted()) {
+                info.setCompleted(progress.getCompletionDate());
             }
 
 
@@ -185,8 +179,8 @@ class ProgressComponentResolver {
 
         for (ProgressComponentInfo progressComponentInfo : infos) {
             ParticipationProgress progress = progressMap.get(progressComponentInfo.getCid());
-            if (progress != null) {
-                progressComponentInfo.setCompleted(progress.getCreated());
+            if (progress != null && progress.isCompleted()) {
+                progressComponentInfo.setCompleted(progress.getCompletionDate());
             }
         }
 
@@ -198,40 +192,32 @@ class ProgressComponentResolver {
     }
 
     private List<ProgressComponentInfo> toInfos(List<OrgMaterial> orgMats) {
-        return CollectionsUtil.transformList(orgMats,
-                new Transformer<OrgMaterial, ProgressComponentInfo>() {
-                    @Override
-                    public ProgressComponentInfo transform(OrgMaterial item) {
-                        ProgressComponentInfo pci = ProgressComponentInfo.forOrgMat(item.getCid(),
-                                item);
-                        return pci;
-                    }
-                });
+        return CollectionsUtil.transformList(orgMats, (OrgMaterial item) -> {
+            ProgressComponentInfo pci = ProgressComponentInfo.forOrgMat(item.getCid(),
+                    item);
+            return pci;
+        });
     }
 
     private List<ProgressComponentInfo> toProjProductInfos(List<ProjectProduct> products) {
-        return CollectionsUtil.transformListNotNull(products,
-                new Transformer<ProjectProduct, ProgressComponentInfo>() {
-                    @Override
-                    public ProgressComponentInfo transform(ProjectProduct item) {
-                        Product product = getProduct(new ProductId(item.getProductId()));
-                        ProgressComponentHelper helper = getProgressComponentHelper();
+        return CollectionsUtil.transformListNotNull(products, (ProjectProduct item) -> {
+            Product product = getProduct(new ProductId(item.getProductId()));
+            ProgressComponentHelper helper = getProgressComponentHelper();
 
-                        if (!helper.isTrackingEnabledForProduct(product)) {
-                            return null;
-                        }
+            if (!helper.isTrackingEnabledForProduct(product)) {
+                return null;
+            }
+            
+            ProgressComponentType type =
+                    ProgressComponentType.CRISP;
+            
+            if (helper.isClickTrackingEnabledForProduct(product)) {
+                type = ProgressComponentType.PRODUCT;
+            }
 
-                        ProgressComponentType type =
-                                ProgressComponentType.CRISP;
-
-                        if (helper.isClickTrackingEnabledForProduct(product)) {
-                            type = ProgressComponentType.PRODUCT;
-                        }
-
-                        return ProgressComponentInfo.forProduct(item.getCid(), type,
-                                product);
-                    }
-                });
+            return ProgressComponentInfo.forProduct(item.getCid(), type,
+                    product);
+        });
     }
 
     private Product getProduct(ProductId productId) {
@@ -274,13 +260,7 @@ class ProgressComponentResolver {
         List<ParticipationProgress> progressList =
                 ccbc.getParticipationProgress(participation.getParticipationId());
 
-        return CollectionsUtil.createMap(progressList,
-                new Transformer<ParticipationProgress, UUID>() {
-                    @Override
-                    public UUID transform(ParticipationProgress item) {
-                        return item.getCid();
-                    }
-                });
+        return CollectionsUtil.createMap(progressList, ParticipationProgress::getCid);
     }
 
     private OrgMaterial getOrgMat(Component comp) {

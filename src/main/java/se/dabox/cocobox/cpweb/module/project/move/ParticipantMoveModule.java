@@ -216,6 +216,9 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         Set<String> productSet = new HashSet<>();
 
         for (ParticipationProgress progress : progressList) {
+            if (!progress.isCompleted()) {
+                continue;
+            }
             UUID cid = progress.getCid();
 
             Component comp = cdd.getComponentMap().get(cid);
