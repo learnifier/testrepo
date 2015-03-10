@@ -87,25 +87,6 @@ ${cpweb_foot}
 		});
 	});
         
-        $("#changePrimaryData").click(function () {
-            require(["[@modal.javascript /]"], function (modal) {
-                modal.open({
-                    src: "${helper.urlFor('VerifyProjectDesignModule', 'verifyNewDesign', [prj.projectId])}",
-                    height: "450px",
-                    cssClass: "modal-lg",
-                    title: "Change Mandatory Information",
-                    cancel: function () { /* Do nothing*/
-                    },
-                    cancelUrl: window.location.href,
-                    proceedUrl: window.location.href,
-                    proceed: function (dlg) {
-                        dlg.close();
-                    }
-                });
-            });
-            return false;
-        });
-
 </script>
 [/#assign]
 
@@ -159,7 +140,7 @@ ${cpweb_foot}
         <section class="action">
            <h4><b>STEP 1</b> - Start by setting the required course details and then move on to step 2</h4>
             <input type="hidden" name="orgId" value="${org.id}" />
-            <a class="btn btn-primary" id="changePrimaryData">[@dws.txt key='form.action.backtoprimary' /]</a>
+            <a class="btn btn-primary" id="changePrimaryData" href="${helper.urlFor('VerifyProjectDesignModule', 'verifyNewDesign', [prj.projectId])}">[@dws.txt key='form.action.backtoprimary' /]</a>
         </section>
         [/#if]
 
