@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.Blank;
-import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.details.DateTimeFormatter;
 import se.dabox.cocobox.cpweb.module.project.details.ExtendedComponentFieldName;
@@ -73,8 +72,6 @@ import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
-import se.dabox.util.collections.Predicate;
-import se.dabox.util.collections.Transformer;
 import se.dabox.util.collections.ValueUtils;
 
 /**
@@ -577,13 +574,8 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
     private List<Component> getPrimaryComponentsView(List<Component> components,
             final Map<String, Set<ExtendedComponentFieldName>> fieldMapSet) {
-        return CollectionsUtil.transformListNotNull(components,
-                new Transformer<Component, Component>() {
-                    @Override
-                    public Component transform(Component item) {
-                        return getPrimaryComponentView(item, fieldMapSet);
-                    }
-                });
+        return CollectionsUtil.transformListNotNull(components, (Component item) ->
+                getPrimaryComponentView(item, fieldMapSet));
     }
 
     /**
@@ -592,13 +584,8 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
      */
     private Component getPrimaryComponentView(Component component,
             final Map<String, Set<ExtendedComponentFieldName>> fieldMapSet) {
-        List<Component> children = CollectionsUtil.transformListNotNull(component.getChildren(),
-                new Transformer<Component, Component>() {
-                    @Override
-                    public Component transform(Component item) {
-                        return getPrimaryComponentView(item, fieldMapSet);
-                    }
-                });
+        List<Component> children = CollectionsUtil.transformListNotNull(component.getChildren(), (Component item) ->
+                getPrimaryComponentView(item, fieldMapSet));
 
         if (children.size() > 0) {
             return component;
@@ -680,14 +667,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             return total;
         }
 
-        final Set<UUID> cids = CollectionsUtil.transform(components,
-                new Transformer<Component, UUID>() {
-
-                    @Override
-                    public UUID transform(Component item) {
-                        return item.getCid();
-                    }
-                });
+        final Set<UUID> cids = CollectionsUtil.transform(components, Component::getCid);
 
         final Set<UUID> allCids = new HashSet<>(cids);
 
@@ -703,13 +683,8 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             }
         }
 
-        return CollectionsUtil.countMatching(vddr.getFields(), new Predicate<ComponentFieldName>() {
-
-            @Override
-            public boolean evalute(ComponentFieldName item) {
-                return allCids.contains(item.getCid());
-            }
-        });
+        return CollectionsUtil.countMatching(vddr.getFields(), (ComponentFieldName item) ->
+                allCids.contains(item.getCid()));
     }
 
     private boolean isAutoRedirect(RequestCycle cycle) {
