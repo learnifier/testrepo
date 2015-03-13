@@ -1,31 +1,13 @@
 [#ftl strip_text="true" /]
 
-
-[#!-- Netbean hint
-<script src="../../js/deeplink/listDeeplinksOrgMats.js">
-</script> -->
-
-[#import "orgMatRenderer.html" as sOrgMatRender /]
-
-[#assign oListDetails]
-<div class="loadspinner">[@common.spinner /]</div>
-[/#assign]
-
-
 [#assign foot]
-[@sOrgMatRender.oRenderer][/@sOrgMatRender.oRenderer]
 
 ${cpweb_foot}
 
 <script>
-    $('#menu-settings').addClass('subMenuExpanded');
-    $('#menu-settings-directlinks-a').addClass('active');
-
-    var fnFormatOrgMatDetails = function (oTable, nTr) {
-        return "${oListDetails?js_string}";
-    }
-
-
+    
+    var listDeeplinksOrgMats = {};
+    
     listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
     listDeeplinksOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
     listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks')}";
@@ -39,104 +21,17 @@ ${cpweb_foot}
     listDeeplinksOrgMats.contextPath = "${contextPath}";
     listDeeplinksOrgMats.sLang = "Search uploaded materials";
 
-    require(['dabox-datatables', 'jsrender', 'jquery-ui', 'bootstrap/editable'], function() {
-        listDeeplinksOrgMats.init();
-    });
-
-    $(document).ready(function() {
-       require(['dabox-common', 'jquery.form', 'dabox-formbeanjs'], function() {
-            $('#addlinkcreditsform').ajaxForm(cocobox.getAjaxFormbeanHandler("addlinkcreditsform", function(data) {
-                var totalId = "#opl"+data.opid;
-                $(totalId).text(parseInt($(totalId).text(),10)+1);
-                var linkId = "#assigned"+data.linkid;
-                $(linkId).text(data.balance);
-                $('#addlinkcredits').dialog('close');
-            }));
-       });
-     });
-
-    function showAddLinkCredits(linkid, opid) {
-        $("#oplid").val(linkid);
-
-        cocobox.getAjaxFormbeanHandler("addlinkcreditsform",null).beforeSend();
-
-        cocobox.ajaxPost("${helper.urlFor('material.ProductMaterialJsonModule','productBalance',[org.id])?js_string}/"+opid, {
-            success: function(data) {
-                $("#addlinkcreditsBalance").html(data.available);
-            }
-        })
-
-        $("#addlinkcredits").dialog({
-            width: 400,
-            height: 400,
-            modal: true,
-            resizable: false
-        });
-    }
-    
-    function renderDeleteTokenColumn(oObj, linkId){
-        [#if security.isBoAdmin()]
-                return '<button type="button" onclick="listMaterialsProducts.deleteToken(\'' +  oObj.aData.deleteLink + '\',\'' +  linkId + '\','+oObj.aData.amount+')">Delete</button>';
-        [#else]
-                return '';
-        [/#if]
-    }
-
-    function updateProductLinkTitle(linkId, title) {
-        cocobox.ajaxPost("${helper.urlFor('material.ProductMaterialJsonModule','changeLinkTitle')}",{
-            data: {
-                "linkid": linkId,
-                "title": title
-            }
-        })
-    }
+   require(['${contextPath}/js/deeplink/listOrgMatDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
+       
+   });
     </script>
 
 [/#assign]
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
- 
-<h1>Materials</h1>
 
-<div id="listmaterialstabs">
-    <ul style="display:none;">
-        <li><a href="#tab_products" id="tab_prodlist">Purchased materials </a></li>
-        <li><a href="#tab_orgmats" id="tab_orgmatslist">Uploaded materials </a></li>
-    </ul>
-    <div id="tab_products">
-        <section class="list">
-            <table class="table ccb-table dt-responsive" width="100%" id="listproducts">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </section>
-    </div>
-    <div id="tab_orgmats">
-        <section class="list">
-            <table class="list" id="listmaterials">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </section>
-    </div>
-</div>
 
-[#include "addLinkCredits.html" /]
 
 [/@dws.skin]
 
