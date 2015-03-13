@@ -45,6 +45,7 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
+import se.dabox.service.common.ccbc.material.OrgMaterialConverter;
 import se.dabox.service.common.ccbc.material.OrgMaterialLink;
 import se.dabox.service.common.ccbc.material.UpdateOrgMaterialLink;
 import se.dabox.service.common.ccbc.org.OrgProduct;
@@ -408,8 +409,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                     orgId = Long.toString(materials.get(0).getOrgId());
                 }
 
+                OrgMaterialConverter converter = new OrgMaterialConverter(cycle);
+
                 for (OrgMaterial material : materials) {
                     generator.writeStartObject();
+                    generator.writeNumberField("materialId", material.getOrgMaterialId());
                     generator.writeNumberField("id", material.getOrgMaterialId());
                     generator.writeStringField("title", material.getTitle());
                     generator.writeStringField("type", material.getType());
@@ -427,6 +431,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                             orgId, Long.toString(material.getOrgMaterialId())));
                     generator.writeNumberField("activeLinks", material.getActiveLinks());
                     generator.writeNumberField("inactiveLinks", material.getInactiveLinks());
+                    generator.writeStringField("thumbnail", converter.convert(material).getThumbnail(64));
                     generator.writeEndObject();
                 }
 
@@ -587,6 +592,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return new DataTablesJson<Material>() {
             @Override
             protected void encodeItem(Material material) throws IOException {
+                generator.writeStringField("materialId", material.getCompositeId());
                 generator.writeStringField("id", material.getId());
                 generator.writeStringField("title", material.getTitle());
                 generator.writeStringField("system", material.getNativeSystem());
