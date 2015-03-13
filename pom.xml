@@ -207,14 +207,6 @@
                             <developmentName>js/cpweb.js</developmentName>
                         </file>
                         <file>
-                            <name>js/deeplink/listDeeplinksProducts-min.js</name>
-                            <developmentName>js/deeplink/listDeeplinksProducts.js</developmentName>
-                        </file>
-                        <file>
-                            <name>js/deeplink/listDeeplinksOrgMats-min.js</name>
-                            <developmentName>js/deeplink/listDeeplinksOrgMats.js</developmentName>
-                        </file>
-                        <file>
                             <name>js/project/projectGraphs-min.js</name>
                             <developmentName>js/project/projectGraphs.js</developmentName>
                         </file>
