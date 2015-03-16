@@ -6,20 +6,18 @@ ${cpweb_foot}
 
 <script>
     
-    var listDeeplinksOrgMats = {};
+    var listDeeplinksProducts = {};
     
-    listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
-    listDeeplinksOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-    listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks')}";
-    listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus')}";
-    listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo')}";
-    listDeeplinksOrgMats.newOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','newOrgMatLink')}";
-    listDeeplinksOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
-    listDeeplinksOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
-    listDeeplinksOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
-    listDeeplinksOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
-    listDeeplinksOrgMats.contextPath = "${contextPath}";
-    listDeeplinksOrgMats.sLang = "Search uploaded materials";
+    listDeeplinksProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}?exclude=project,orgunit";
+    listDeeplinksProducts.listLinksUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listPurchasedMatLinks',[org.id])}";
+    listDeeplinksProducts.listLinksHistoryUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listLinkTokens')}";
+    listDeeplinksProducts.toggleActiveUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkStatus')}";
+    listDeeplinksProducts.toggleActiveToUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkActiveTo')}";
+    listDeeplinksProducts.toggleAutoaddUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeAutoAddStatus')}";
+    listDeeplinksProducts.newOrgMatUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','newProdLink',[org.id])}";
+    listDeeplinksProducts.deleteOrgMatLinkUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','deleteLink',[org.id])}";
+    listDeeplinksProducts.contextPath = "${contextPath}";
+    listDeeplinksProducts.sLang = "Search purchased materials";
 
    require(['${contextPath}/js/deeplink/listProdDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
        

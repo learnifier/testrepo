@@ -33,7 +33,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
             if (self.linkSectionVisible() == true) {
                 self.linkSectionVisible(false);
             } else {
-                $.post(listDeeplinksOrgMats.listOrgMatLinksUrl, {orgmatid: self.id()}, function (data) {
+                $.post(listDeeplinksProducts.listLinksUrl, {opid: self.id()}, function (data) {
                     self.activeUntil(data.aaData[0].activeto);
                     self.url(data.aaData[0].deeplink);
                     self.activeLinks(data.aaData[0].active);
@@ -64,7 +64,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
   
     
 
-    $.get(listDeeplinksOrgMats.listPurchasedMatsUrl, function (data) {
+    $.get(listDeeplinksProducts.listPurchasedMatsUrl, function (data) {
         var ProductModel = new DeepLinkModel();
 
         $.each(data.aaData, function () {
