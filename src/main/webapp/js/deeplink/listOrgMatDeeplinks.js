@@ -19,6 +19,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.activeUntil = ko.observable();
         self.url = ko.observable();
         self.linkSectionVisible = ko.observable(false);
+           
 
         self.toggleLinkSection = function () {
             if (self.linkSectionVisible() == true) {
