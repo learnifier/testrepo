@@ -31,34 +31,13 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
 
-<!--
-<div data-bind="foreach: materials">
-    <div>
-        <p data-bind="text: id"></p>
-        <p data-bind="text: thumbnail"></p>
-        <p data-bind="text: title"></p>
-        <p data-bind="text: description"></p>
-        <p data-bind="text: status"></p>
-        <button data-bind="click: toggleLinkSection">get data</button>
-        <div data-bind="visible: linkSectionVisible">
-            loaded data:
-            <p data-bind="text: url"></p>
-            <p data-bind="text: status"></p>
-            <div class="input-group date" data-bind="datePicker: null">
-                <input type="text" class="form-control" data-bind="textInput: activeUntil, event: {blur: changeActiveUntil}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
-            </div>
-        </div>      
-    </div>
-</div>
--->
-
 <div class="container-fluid">
  
 <div class="list-group" data-bind="foreach: materials">
 
     <div class="list-group-item" style="min-height: 124px;">
 
-        <img class="img-thumbnail pull-left" data-bind="attr:{src: thumbnail}" style="max-height: 100px; max-width: 100px; margin-right: 25px;">
+        <img class="img-thumbnail pull-left" data-bind="attr:{src: thumbnail}" style="height: 100px; width: 100px; margin-right: 25px;">
         <button type="button" class="btn btn-primary-outlined pull-right" data-bind="click: toggleLinkSection">Get Link</button>
         <small class="pull-right" style="clear:right; margin-right: 9px; margin-top: 5px; margin-bottom: 5px;">Link Status</small>
         <span class="label label-success pull-right" style="clear:right; margin-right: 24px;" data-bind="visible: status()">ON</span>
