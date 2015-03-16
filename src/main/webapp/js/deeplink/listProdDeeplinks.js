@@ -37,7 +37,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                     self.activeUntil(data.aaData[0].activeto);
                     self.url(data.aaData[0].deeplink);
                     self.activeLinks(data.aaData[0].active);
-
+                        
                     self.linkSectionVisible(true);
                 }).fail(function () {
                     alert('failed to post data');
