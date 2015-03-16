@@ -1,129 +1,61 @@
 [#ftl strip_text="true" /]
 
-[#!-- Netbean hint
-<script src="../../js/deeplink/listDeeplinksProducts.js">
-</script>
--->
-
-[#import "productRenderer.html" as sProdRender /]
-
-[#assign oListDetails]
-<div class="loadspinner">[@common.spinner /]</div>
-[/#assign]
-
-[#assign pListDetails]
-<div>
-    <div class="loadspinner">[@common.spinner /]</div>
-    <div class="linkfooter tooltip" title="Add a link if you want to use multiple links to access this material. This could be used for tracking links separately.">
-        <button class="addlinkbutton">Add Link</button>
-    </div>
-</div>
-[/#assign]
-
 [#assign foot]
-[@sProdRender.pRenderer][/@sProdRender.pRenderer]
 
 ${cpweb_foot}
 
 <script>
-    $('#menu-settings').addClass('subMenuExpanded');
-    $('#menu-settings-directlinks-p').addClass('active');
-
-    var fnFormatProdDetails = function (pTable, nTr) {
-        return "${pListDetails?js_string}";
-    }
-
-    listDeeplinksProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}?exclude=project,orgunit";
-    listDeeplinksProducts.listLinksUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listPurchasedMatLinks',[org.id])}";
-    listDeeplinksProducts.listLinksHistoryUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listLinkTokens')}";
-    listDeeplinksProducts.toggleActiveUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkStatus')}";
-    listDeeplinksProducts.toggleActiveToUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkActiveTo')}";
-    listDeeplinksProducts.toggleAutoaddUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','changeAutoAddStatus')}";
-    listDeeplinksProducts.newOrgMatUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','newProdLink',[org.id])}";
-    listDeeplinksProducts.deleteOrgMatLinkUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','deleteLink',[org.id])}";
-    listDeeplinksProducts.contextPath = "${contextPath}";
-    listDeeplinksProducts.sLang = "Search purchased materials";
     
-    require(['dabox-datatables', 'jsrender', 'jquery-ui', 'bootstrap/editable'], function() {
-        listDeeplinksProducts.init();
-    });
-
-    $(document).ready(function() {
-        require(['dabox-common', 'jquery.form', 'dabox-formbeanjs'], function() {
-
-            $('#addlinkcreditsform').ajaxForm(cocobox.getAjaxFormbeanHandler("addlinkcreditsform", function(data) {
-                var totalId = "#opl"+data.opid;
-                $(totalId).text(parseInt($(totalId).text(),10)+1);
-                var linkId = "#assigned"+data.linkid;
-                $(linkId).text(data.balance);
-                $('#addlinkcredits').dialog('close');
-            }));
-        });
-    });
-
-    function showAddLinkCredits(linkid, opid) {
-        $("#oplid").val(linkid);
-
-        cocobox.getAjaxFormbeanHandler("addlinkcreditsform",null).beforeSend();
-
-        cocobox.ajaxPost("${helper.urlFor('deeplink.ProductMaterialJsonModule','productBalance',[org.id])?js_string}/"+opid, {
-            success: function(data) {
-                $("#addlinkcreditsBalance").html(data.available);
-            }
-        })
-
-        $("#addlinkcredits").dialog({
-            width: 400,
-            height: 400,
-            modal: true,
-            resizable: false
-        });
-    }
+    var listDeeplinksOrgMats = {};
     
-    function renderDeleteTokenColumn(oObj, linkId){
-        [#if security.isBoAdmin()]
-                return '<button type="button" onclick="listDeeplinksProducts.deleteToken(\'' +  oObj.aData.deleteLink + '\',\'' +  linkId + '\','+oObj.aData.amount+')">Delete</button>';
-        [#else]
-                return '';
-        [/#if]
-    }
+    listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
+    listDeeplinksOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+    listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks')}";
+    listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus')}";
+    listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo')}";
+    listDeeplinksOrgMats.newOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','newOrgMatLink')}";
+    listDeeplinksOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
+    listDeeplinksOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+    listDeeplinksOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
+    listDeeplinksOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
+    listDeeplinksOrgMats.contextPath = "${contextPath}";
+    listDeeplinksOrgMats.sLang = "Search uploaded materials";
 
-    function updateProductLinkTitle(linkId, title) {
-        cocobox.ajaxPost("${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkTitle')}",{
-            data: {
-                "linkid": linkId,
-                "title": title
-            }
-        })
-    }
+   require(['${contextPath}/js/deeplink/listProdDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
+       
+   });
     </script>
 
 [/#assign]
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
+
+<div class="container-fluid">
  
-<h1>Direct Links</h1>
+<div class="list-group" data-bind="foreach: materials">
 
-<div id="listmaterialstabs">
-    <div id="tab_products">
-        <section class="list">
-            <table class="table ccb-table dt-responsive" width="100%" id="listproducts">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </section>
+    <div class="list-group-item" style="min-height: 124px;">
+
+        <img class="img-thumbnail pull-left" data-bind="attr:{src: thumbnail}" style="max-height: 100px; max-width: 100px; margin-right: 25px;">
+        <button type="button" class="btn btn-primary-outlined pull-right" data-bind="click: toggleLinkSection">Get Link</button>
+
+    <h4 class="list-group-item-heading" data-bind="text: title" style="color:#5AB9D2;"></h4>
+    <p class="list-group-item-text" data-bind="text: description" style="max-width: 52%; display: flex;"></p>
     </div>
+    
+    <div class="list-group-item" style="min-height: 124px; background-color: #f5f5f5; border:1px solid #e3e3e3;" data-bind="visible: linkSectionVisible">
+        
+            <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Access Link</h4>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active</p>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active Until</p>
+            <p class="list-group-item-text pull-left">URL</p>
+            <input type="text" class="form-control" style="width: 40%;" data-bind="value: url">
+    </div>
+
 </div>
-
-[#include "addLinkCredits.html" /]
-
+         
+</div>
+ 
 [/@dws.skin]
 
