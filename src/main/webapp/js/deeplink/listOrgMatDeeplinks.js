@@ -1,4 +1,4 @@
-define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
+define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bindings', 'bootstrap/toggle'], function (ko,datepicker) {
     "use strict";
 
     var DeepLinkModel = function () {
@@ -15,7 +15,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.thumbnail = ko.observable();
         self.title = ko.observable();
         self.description = ko.observable();
-        self.status = ko.observable();
+        self.status = ko.observable(false);
         self.activeUntil = ko.observable();
         self.url = ko.observable();
         self.linkSectionVisible = ko.observable(false);
@@ -41,20 +41,32 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.changeActiveUntil = function(){
             alert(self.activeUntil());
         };
+
+        self.changed = function(val) {
+            alert('It has been changed to '+ko.unwrap(val));
+        };
     };
-    
-    
-        ko.bindingHandlers.datePicker = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-            
-            $(element).datepicker({
-                
-            });
-        }
-    };
-    
-  
-    
+
+        ko.bindingHandlers.ccbEditable = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var rawParam = valueAccessor();
+                var param = ko.unwrap(rawParam);
+
+                $(element).editable({
+                    success: function(response, newValue) {
+                        if (ko.isObservable(rawParam)) {
+                            rawParam(newValue);
+                        }
+
+                        if (allBindings.has("ccbEditableChange")) {
+                            return allBindings.get("ccbEditableChange")(rawParam);
+                        }
+                    }
+                });
+            }
+        };
+
+
 
     $.get(listDeeplinksOrgMats.listOrgMatsUrl, function (data) {
         var rootModel = new DeepLinkModel();
@@ -71,6 +83,8 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         });
 
         ko.applyBindings(rootModel);
+
+        window.model = rootModel;
 
     }).fail(function () {
         alert('failed to load data');
