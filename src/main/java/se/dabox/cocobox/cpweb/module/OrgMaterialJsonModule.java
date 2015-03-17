@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +34,7 @@ import se.dabox.cocosite.converter.cds.CdsUtil;
 import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.langservice.LangBundle;
@@ -43,11 +43,13 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.material.MaterialLink;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
 import se.dabox.service.common.ccbc.material.OrgMaterialConverter;
 import se.dabox.service.common.ccbc.material.OrgMaterialLink;
 import se.dabox.service.common.ccbc.material.UpdateOrgMaterialLink;
+import se.dabox.service.common.ccbc.org.AddOrgProductLinkRequest;
 import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
@@ -56,6 +58,7 @@ import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.material.Material;
+import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
@@ -78,7 +81,6 @@ import se.dabox.util.collections.MapUtil;
 import se.dabox.util.collections.NotPredicate;
 import se.dabox.util.collections.OrListPredicate;
 import se.dabox.util.collections.Predicate;
-import se.dabox.util.collections.Transformer;
 import se.dabox.util.converter.ConversionContext;
 
 /**
@@ -246,7 +248,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
-        OrgMaterial orgMat = null;
+        OrgMaterial orgMat;
         try {
             orgMat = ccbc.getOrgMaterial(orgmatid);
         } catch (NotFoundException nfe){
@@ -283,15 +285,30 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onListOrgMatLinks(RequestCycle cycle) {
+    public RequestTarget onListOrgMatLinks(RequestCycle cycle, String strOrgId) {
+
+        MiniOrgInfo orgUnit = secureGetMiniOrg(cycle, strOrgId);
 
         String deliveryBase = getDeliveryBase(cycle);
-        long materialId = Long.valueOf(cycle.getRequest().getParameter("orgmatid"));
 
-        final List<OrgMaterialLink> links = getOrgLinksOrCreateLink(cycle, materialId);
+        String materialId = cycle.getRequest().getParameter("orgmatid");
+        String[] matId = MaterialUtils.splitCompositeId(materialId);
 
-        ByteArrayOutputStream baos =
-                toJsonLinks(links, deliveryBase);
+        List<? extends MaterialLink> links;
+        if (matId[0].equals(OrgMaterialConstants.NATIVE_SYSTEM)) {
+            long orgMatId = Long.parseLong(matId[1]);
+
+            links = getOrgLinksOrCreateLink(cycle, orgMatId);
+
+        } else if (matId[1].equals(ProductMaterialConstants.NATIVE_SYSTEM)) {
+            String productId = matId[1];
+
+            links = getProductLinksOrCreateLink(cycle, productId, orgUnit);
+        } else {
+            throw new IllegalStateException("Unknown material type: "+materialId);
+        }
+
+        ByteArrayOutputStream baos = toJsonLinks(links, deliveryBase);
 
         return jsonTarget(baos);
     }
@@ -300,7 +317,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return CdsUtil.getDeliveryBase(cycle);
     }
 
-    public static ByteArrayOutputStream toJsonLinks(final List<OrgMaterialLink> links,
+    public static ByteArrayOutputStream toJsonLinks(final List<? extends MaterialLink> links,
             final String deliveryBase) {
         ByteArrayOutputStream baos =
                 new JsonEncoding() {
@@ -309,14 +326,22 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         generator.writeStartObject();
                         generator.writeArrayFieldStart("aaData");
 
-                        for (OrgMaterialLink orgMaterialLink : links) {
+                        for (MaterialLink link : links) {
                             generator.writeStartObject();
 
-                            generator.writeNumberField("linkid", orgMaterialLink.getId());
-                            generator.writeBooleanField("active", orgMaterialLink.isActive());
+                            if (link instanceof OrgMaterialLink) {
+                                OrgMaterialLink oml = (OrgMaterialLink) link;
+                                generator.writeStringField("linkid", "O-"+oml.getId());
+                            } else if (link instanceof OrgProductLink) {
+                                OrgProductLink opl = (OrgProductLink) link;
+                                generator.writeStringField("linkid", "P-"+opl.getLinkId());
+                            } else {
+                                throw new IllegalStateException("Unknown link type: "+link.getClass().getName());
+                            }
+                            generator.writeBooleanField("active", link.isActive());
                             generator.writeStringField("deeplink",
-                                    deliveryBase + orgMaterialLink.getCdLinkId());
-                            generator.writeStringField("activeto", formatDate(orgMaterialLink.
+                                    deliveryBase + link.getCdLinkId());
+                            generator.writeStringField("activeto", formatDate(link.
                                     getActiveTo()));
 
                             generator.writeEndObject();
@@ -378,19 +403,16 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 CocositeUserHelper.getUserLocale(cycle));
         collator.setStrength(Collator.SECONDARY);
 
-        Collections.sort(materials, new Comparator<OrgMaterial>() {
-            @Override
-            public int compare(OrgMaterial o1, OrgMaterial o2) {
-                int diff = collator.compare(o1.getTitle(), o2.getTitle());
-                if (diff != 0) {
-                    return diff;
-                }
-
-                if (o1.getOrgMaterialId() < o2.getOrgMaterialId()) {
-                    return -1;
-                }
-                return 1;
+        Collections.sort(materials, (OrgMaterial o1, OrgMaterial o2) -> {
+            int diff = collator.compare(o1.getTitle(), o2.getTitle());
+            if (diff != 0) {
+                return diff;
             }
+
+            if (o1.getOrgMaterialId() < o2.getOrgMaterialId()) {
+                return -1;
+            }
+            return 1;
         });
     }
 
@@ -411,27 +433,30 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
                 OrgMaterialConverter converter = new OrgMaterialConverter(cycle);
 
-                for (OrgMaterial material : materials) {
+                for (OrgMaterial orgMat : materials) {
                     generator.writeStartObject();
-                    generator.writeNumberField("materialId", material.getOrgMaterialId());
-                    generator.writeNumberField("id", material.getOrgMaterialId());
-                    generator.writeStringField("title", material.getTitle());
-                    generator.writeStringField("type", material.getType());
-                    generator.writeStringField("desc", material.getDescription());
-                    generator.writeStringField("crlink", material.getCrlink());
-                    generator.writeStringField("weblink", material.getWeblink());
-                    generator.writeNumberField("createdBy", material.getCreatedBy());
-                    generator.writeNumberField("created", material.getCreatedBy());
+
+                    final Material material = converter.convert(orgMat);
+
+                    generator.writeStringField("materialId", material.getCompositeId());
+                    generator.writeNumberField("id", orgMat.getOrgMaterialId());
+                    generator.writeStringField("title", orgMat.getTitle());
+                    generator.writeStringField("type", orgMat.getType());
+                    generator.writeStringField("desc", orgMat.getDescription());
+                    generator.writeStringField("crlink", orgMat.getCrlink());
+                    generator.writeStringField("weblink", orgMat.getWeblink());
+                    generator.writeNumberField("createdBy", orgMat.getCreatedBy());
+                    generator.writeNumberField("created", orgMat.getCreatedBy());
                     writeLongNullField(generator, "updatedBy",
-                            material.getUpdatedBy());
-                    generator.writeNumberField("updated", material.getUpdatedBy());
+                            orgMat.getUpdatedBy());
+                    generator.writeNumberField("updated", orgMat.getUpdatedBy());
                     generator.writeStringField("viewLink",
                             cycle.urlFor(CpMainModule.class.getName(),
                             "viewOrgMaterial",
-                            orgId, Long.toString(material.getOrgMaterialId())));
-                    generator.writeNumberField("activeLinks", material.getActiveLinks());
-                    generator.writeNumberField("inactiveLinks", material.getInactiveLinks());
-                    generator.writeStringField("thumbnail", converter.convert(material).getThumbnail(64));
+                            orgId, Long.toString(orgMat.getOrgMaterialId())));
+                    generator.writeNumberField("activeLinks", orgMat.getActiveLinks());
+                    generator.writeNumberField("inactiveLinks", orgMat.getInactiveLinks());
+                    generator.writeStringField("thumbnail", material.getThumbnail(64));
                     generator.writeEndObject();
                 }
 
@@ -674,6 +699,22 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return cocoboxCordinatorClient.listOrgMaterialLinks(materialId);
     }
 
+    private List<OrgProductLink> getProductLinksOrCreateLink(RequestCycle cycle, String productId, MiniOrgInfo orgUnit) {
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+        long orgProdId = getOrgProdId(ccbc, orgUnit, productId);
+
+        List<OrgProductLink> links = ccbc.getOrgProductLinks(orgProdId);
+
+        if (links.isEmpty()) {
+            long userId = LoginUserAccountHelper.getCurrentCaller(cycle);
+            ccbc.addOrgProductLink(new AddOrgProductLinkRequest(userId, orgProdId));
+            links = ccbc.getOrgProductLinks(orgProdId);
+        }
+
+        return links;
+    }
+
     private OrgMaterialLink getLink(CocoboxCoordinatorClient client, long materialId, long linkId) {
         List<OrgMaterialLink> links = client.listOrgMaterialLinks(materialId);
 
@@ -712,12 +753,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     private List<String> getLinkedProjectNames(CocoboxCoordinatorClient ccbc, OrgMaterial orgMat) {
         List<OrgProject> projects = ccbc.listOrgProjectsUsingOrgMat(orgMat.getOrgMaterialId());
 
-        return CollectionsUtil.transformList(projects, new Transformer<OrgProject, String>() {
-            @Override
-            public String transform(OrgProject obj) {
-                return obj.getName();
-            }
-        });
+        return CollectionsUtil.transformList(projects, OrgProject::getName);
     }
 
     private Map<String, AccountBalance> getAccountBalanceMap(RequestCycle cycle, long orgId,
@@ -756,12 +792,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     private static int getActiveCount(List<OrgProductLink> links) {
-        return CollectionsUtil.countMatching(links, new Predicate<OrgProductLink>() {
-            @Override
-            public boolean evalute(OrgProductLink obj) {
-                return obj.isActive();
-            }
-        });
+        return CollectionsUtil.countMatching(links, OrgProductLink::isActive);
     }
 
     private static long calculateLinkCredits(List<OrgProductLink> links) {
@@ -801,12 +832,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final Set<String> grantedIds = CollectionsUtil.transform(orgProds, OrgProductTransformers.
                 getProductIdTransformer());
 
-        return CollectionsUtil.sublist(matchingProducts, new Predicate<Product>() {
-            @Override
-            public boolean evalute(Product item) {
-                return grantedIds.contains(item.getId().getId());
-            }
-        });
+        return CollectionsUtil.sublist(matchingProducts, (Product item) ->
+                grantedIds.contains(item.getId().getId()));
     }
 
     private Map<Long, List<OrgProductLink>> getProductLinkMap(RequestCycle cycle,
@@ -815,12 +842,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         List<OrgProductLink> links =
                 getCocoboxCordinatorClient(cycle).getOrgProductsLinks(orgProductIds);
 
-        return CollectionsUtil.createMapList(links, new Transformer<OrgProductLink, Long>() {
-            @Override
-            public Long transform(OrgProductLink item) {
-                return item.getOrgProductId();
-            }
-        });
+        return CollectionsUtil.createMapList(links, OrgProductLink::getOrgProductId);
 
     }
 
@@ -883,18 +905,14 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         col.setStrength(Collator.PRIMARY);
 
         List<Product> sortedList = new ArrayList<>(products);
-        Collections.sort(sortedList, new Comparator<Product>() {
-
-            @Override
-            public int compare(Product o1, Product o2) {
-                int diff = col.compare(o1.getTitle(), o2.getTitle());
-
-                if (diff == 0) {
-                    diff = o1.getId().compareTo(o2.getId());
-                }
-
-                return diff;
+        Collections.sort(sortedList, (Product o1, Product o2) -> {
+            int diff = col.compare(o1.getTitle(), o2.getTitle());
+            
+            if (diff == 0) {
+                diff = o1.getId().compareTo(o2.getId());
             }
+
+            return diff;
         });
 
         return sortedList;
@@ -939,6 +957,19 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }
 
         return excludes;
+    }
+
+    private long getOrgProdId(CocoboxCoordinatorClient cocoboxCordinatorClient, MiniOrgInfo orgUnit,
+            String productId) {
+        List<OrgProduct> orgProducts = cocoboxCordinatorClient.listOrgProducts(orgUnit.getId());
+
+        for (OrgProduct orgProduct : orgProducts) {
+            if (orgProduct.getProdId().equals(productId)) {
+                return orgProduct.getOrgProductId();
+            }
+        }
+
+        throw new IllegalStateException("Unable to find orgprodid for "+productId+" in "+orgUnit.getId());
     }
 
     private static class CrispAdminLinkInfo {
