@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
@@ -53,6 +54,7 @@ import se.dabox.service.common.ccbc.org.AddOrgProductLinkRequest;
 import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
+import se.dabox.service.common.ccbc.org.UpdateOrgProductLinkRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
@@ -82,7 +84,6 @@ import se.dabox.util.collections.NotPredicate;
 import se.dabox.util.collections.OrListPredicate;
 import se.dabox.util.collections.Predicate;
 import se.dabox.util.converter.ConversionContext;
-import sun.security.util.KeyUtil;
 
 /**
  *
@@ -394,13 +395,35 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onChangeLinkStatus(RequestCycle cycle) {
-        Long linkid = Long.valueOf(cycle.getRequest().getParameter("linkid"));
+    public RequestTarget onChangeLinkStatus(RequestCycle cycle, String strOrgId) {
+
+        MiniOrgInfo orgUnit = secureGetMiniOrg(cycle, strOrgId);
+
+        String strLinkId = cycle.getRequest().getParameter("linkid");
+        String[] split = strLinkId.split("-");
+
+        Long linkid = Long.valueOf(split[1]);
         boolean active = Boolean.valueOf(cycle.getRequest().getParameter("active"));
 
-        UpdateOrgMaterialLink update = new UpdateOrgMaterialLink(linkid, getCurrentUser(cycle));
-        update.setActive(active);
-        getCocoboxCordinatorClient(cycle).updateOrgMaterialLink(update);
+        switch (split[0]) {
+            case "O":
+                {
+                    UpdateOrgMaterialLink update = new UpdateOrgMaterialLink(linkid, getCurrentUser(cycle));
+                    update.setActive(active);
+                    getCocoboxCordinatorClient(cycle).updateOrgMaterialLink(update);
+                    break;
+                }
+            case "P":
+                {
+                    long userId = getCurrentUser(cycle);
+                    UpdateOrgProductLinkRequest update = new UpdateOrgProductLinkRequest(userId, linkid);
+                    update.setActive(active);
+                    getCocoboxCordinatorClient(cycle).updateOrgProductLink(update);
+                    break;
+                }
+            default:
+                throw new IllegalStateException("Invalid link id: "+strLinkId);
+        }
 
         Map<String, Object> map = createMap();
         map.put("status", "OK");

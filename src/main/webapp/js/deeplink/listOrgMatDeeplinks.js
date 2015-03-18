@@ -1,4 +1,4 @@
-define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bindings', 'bootstrap/toggle'], function (ko,datepicker) {
+define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bindings', 'bootstrap/toggle', 'dabox-common'], function (ko,datepicker) {
     "use strict";
 
     var DeepLinkModel = function () {
@@ -18,11 +18,12 @@ define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bin
         self.status = ko.observable(false);
         self.activeUntil = ko.observable();
         self.url = ko.observable();
+        self.linkId = ko.observable();
         self.linkSectionVisible = ko.observable(false);
            
 
         self.toggleLinkSection = function () {
-            if (self.linkSectionVisible() == true) {
+            if (self.linkSectionVisible() === true) {
                 self.linkSectionVisible(false);
             } else {
                 $.post(listDeeplinksOrgMats.listOrgMatLinksUrl, {orgmatid: self.id()}, function (data) {
@@ -31,6 +32,7 @@ define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bin
                     self.status(data.aaData[0].active);
 
                     self.linkSectionVisible(true);
+                    self.linkId(data.aaData[0].linkid);
                 }).fail(function () {
                     alert('failed to post data');
                 });
@@ -40,6 +42,26 @@ define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bin
        
         self.changeActiveUntil = function(){
             alert(self.activeUntil());
+        };
+
+        self.toggleStatus = function(element, ev) {
+            var newStatus = !self.status();
+
+            $(element).bootstrapToggle('disable');
+
+            $.post(listDeeplinksOrgMats.toggleActiveUrl, {
+                active: newStatus,
+                linkid: self.linkId()
+            }).always(function() {
+                $(element).bootstrapToggle('enable');
+            }).fail(cocobox.internal.ajaxErrorHandler)
+            .success(function(data) {
+                //Nothing to process
+                $(element).bootstrapToggle(newStatus ? 'on' : 'off');
+            });
+
+            
+            return false;
         };
 
         self.changed = function(val) {

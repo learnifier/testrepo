@@ -9,18 +9,11 @@ ${cpweb_foot}
     var listDeeplinksOrgMats = {};
     
     listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listDeeplinkOrgMats',[org.id])}";
-    listDeeplinksOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
     listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks',[org.id])}";
-    listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus')}";
-    listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo')}";
-    listDeeplinksOrgMats.newOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','newOrgMatLink')}";
-    listDeeplinksOrgMats.createOrgMatUrl =  "${helper.urlFor('CpMainModule','newMaterial',[org.id])}";
-    listDeeplinksOrgMats.editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
-    listDeeplinksOrgMats.deleteOrgMatLinkUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMatLink')}";
-    listDeeplinksOrgMats.deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}"
+    listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus',[org.id])}";
+    listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo',[org.id])}";
     listDeeplinksOrgMats.contextPath = "${contextPath}";
-    listDeeplinksOrgMats.sLang = "Search uploaded materials";
-
+    
    require(['${contextPath}/js/deeplink/listOrgMatDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
        
    });
@@ -50,7 +43,7 @@ ${cpweb_foot}
     <div class="list-group-item" style="min-height: 124px; background-color: #f5f5f5; border:1px solid #e3e3e3;" data-bind="visible: linkSectionVisible">
         
             <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Access Link</h4>
-            <p class="list-group-item-text pull-left" style="margin-right: 100px;"><input type="checkbox" data-bind="ccbBootstrapToggle: status" />Active</p>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;"><input type="checkbox" data-bind="ccbBootstrapToggle: status, ccbBootstrapToggleClick: toggleStatus" />Active</p>
             <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active Until <span data-bind="ccbEditable: activeUntil, ccbEditableChange: changed" data-type="ccbdatetime" data-placement="bottom" data-showbuttons="bottom" data-container="body"/></p>
             <p class="list-group-item-text pull-left">URL</p>
             <input type="text" class="form-control" style="width: 40%;" data-bind="value: url">

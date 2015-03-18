@@ -130,7 +130,7 @@ public abstract class AbstractAuthModule extends AbstractModule {
 
 
     protected long getCurrentUser(RequestCycle cycle) {
-        return LoginUserAccountHelper.getUserId(cycle);
+        return LoginUserAccountHelper.getCurrentCaller(cycle);
     }
 
     protected Locale getUserLocale(RequestCycle cycle) {
