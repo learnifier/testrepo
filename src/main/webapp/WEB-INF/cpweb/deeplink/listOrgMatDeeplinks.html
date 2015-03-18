@@ -10,7 +10,7 @@ ${cpweb_foot}
     
     listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listDeeplinkOrgMats',[org.id])}";
     listDeeplinksOrgMats.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
-    listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks')}";
+    listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks',[org.id])}";
     listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus')}";
     listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo')}";
     listDeeplinksOrgMats.newOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','newOrgMatLink')}";

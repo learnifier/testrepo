@@ -82,6 +82,7 @@ import se.dabox.util.collections.NotPredicate;
 import se.dabox.util.collections.OrListPredicate;
 import se.dabox.util.collections.Predicate;
 import se.dabox.util.converter.ConversionContext;
+import sun.security.util.KeyUtil;
 
 /**
  *
@@ -117,6 +118,43 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         sortOrgMats(cycle, materials);
 
         ByteArrayOutputStream baos = toJsonObject(cycle, materials);
+
+        return jsonTarget(baos);
+    }
+
+    /**
+     * Returns all orgmats that can be deeplinked. This includes anonymous products which
+     * are added to client level (new-style orgmats).
+     *
+     *
+     * @param cycle param strOrgId
+     * @param strOrgId
+     *
+     * @return
+     *
+     * @throws Exception
+     */
+    @WebAction
+    public RequestTarget onListDeeplinkOrgMats(RequestCycle cycle, String strOrgId)
+            throws Exception {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+
+        List<OrgMaterial> materials =
+                getCocoboxCordinatorClient(cycle).listOrgMaterial(orgId);
+
+        List<OrgProduct> orgProds =
+                getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
+
+        List<Product> products = getOrgMatProducts(cycle, orgProds);
+
+
+        Locale sortLocale = CocositeUserHelper.getUserLocale(cycle);
+        MaterialListFactory mlf = new MaterialListFactory(cycle, sortLocale);
+        mlf.addOrgMaterials(materials);
+        mlf.addProducts(products);
+
+        ByteArrayOutputStream baos = new DeeplinkMaterialJsonEncoder(cycle, orgId).encode(mlf.getList());
 
         return jsonTarget(baos);
     }
@@ -300,7 +338,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
             links = getOrgLinksOrCreateLink(cycle, orgMatId);
 
-        } else if (matId[1].equals(ProductMaterialConstants.NATIVE_SYSTEM)) {
+        } else if (matId[0].equals(ProductMaterialConstants.NATIVE_SYSTEM)) {
             String productId = matId[1];
 
             links = getProductLinksOrCreateLink(cycle, productId, orgUnit);
@@ -970,6 +1008,12 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }
 
         throw new IllegalStateException("Unable to find orgprodid for "+productId+" in "+orgUnit.getId());
+    }
+
+    private List<Product> getOrgMatProducts(RequestCycle cycle, List<OrgProduct> orgProds) {
+        List<Product> products = getGrantedProducts(cycle, orgProds);
+
+        return CollectionsUtil.sublist(products, p -> p.isOrgUnitProduct());
     }
 
     private static class CrispAdminLinkInfo {
