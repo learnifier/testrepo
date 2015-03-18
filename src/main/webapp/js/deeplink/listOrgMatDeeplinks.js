@@ -1,4 +1,4 @@
-define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bindings', 'bootstrap/toggle', 'dabox-common'], function (ko,datepicker) {
+define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-bindings', 'bootstrap/toggle', 'dabox-common'], function (ko,datepicker) {
     "use strict";
 
     var DeepLinkModel = function () {
@@ -17,6 +17,7 @@ define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bin
         self.description = ko.observable();
         self.status = ko.observable(false);
         self.activeUntil = ko.observable();
+        self.activeUntilString = ko.observable();
         self.url = ko.observable();
         self.linkId = ko.observable();
         self.linkSectionVisible = ko.observable(false);
@@ -28,11 +29,14 @@ define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bin
             } else {
                 $.post(listDeeplinksOrgMats.listOrgMatLinksUrl, {orgmatid: self.id()}, function (data) {
                     self.activeUntil(data.aaData[0].activeto);
+                    self.activeUntilString(data.aaData[0].activetoStr);
                     self.url(data.aaData[0].deeplink);
                     self.status(data.aaData[0].active);
 
-                    self.linkSectionVisible(true);
                     self.linkId(data.aaData[0].linkid);
+
+                    //Important to have this last!
+                    self.linkSectionVisible(true);                    
                 }).fail(function () {
                     alert('failed to post data');
                 });
@@ -64,31 +68,14 @@ define(['knockout', 'bootstrap/cocobox-editable-datetime', 'cocobox-knockout-bin
             return false;
         };
 
-        self.changed = function(val) {
-            alert('It has been changed to '+ko.unwrap(val));
+        self.dateDisplay = function(data, text) {
+            if (!text) {
+                return null;
+            }
+
+            $(this).text(text);
         };
     };
-
-        ko.bindingHandlers.ccbEditable = {
-            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var rawParam = valueAccessor();
-                var param = ko.unwrap(rawParam);
-
-                $(element).editable({
-                    success: function(response, newValue) {
-                        if (ko.isObservable(rawParam)) {
-                            rawParam(newValue);
-                        }
-
-                        if (allBindings.has("ccbEditableChange")) {
-                            return allBindings.get("ccbEditableChange")(rawParam);
-                        }
-                    }
-                });
-            }
-        };
-
-
 
     $.get(listDeeplinksOrgMats.listOrgMatsUrl, function (data) {
         var rootModel = new DeepLinkModel();

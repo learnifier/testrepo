@@ -11,10 +11,9 @@ ${cpweb_foot}
     listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listDeeplinkOrgMats',[org.id])}";
     listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks',[org.id])}";
     listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus',[org.id])}";
-    listDeeplinksOrgMats.toggleActiveToUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo',[org.id])}";
     listDeeplinksOrgMats.contextPath = "${contextPath}";
-    
-   require(['${contextPath}/js/deeplink/listOrgMatDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
+
+    require(['${contextPath}/js/deeplink/listOrgMatDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
        
    });
     </script>
@@ -39,15 +38,25 @@ ${cpweb_foot}
     <p class="list-group-item-text" data-bind="text: description" style="max-width: 52%; display: flex;"></p>
     <p data-bind="text: status"></p>
     </div>
-    
-    <div class="list-group-item" style="min-height: 124px; background-color: #f5f5f5; border:1px solid #e3e3e3;" data-bind="visible: linkSectionVisible">
+
+    <!-- ko if: linkSectionVisible -->
+    <div class="list-group-item" style="min-height: 124px; background-color: #f5f5f5; border:1px solid #e3e3e3;">
         
             <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Access Link</h4>
-            <p class="list-group-item-text pull-left" style="margin-right: 100px;"><input type="checkbox" data-bind="ccbBootstrapToggle: status, ccbBootstrapToggleClick: toggleStatus" />Active</p>
-            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active Until <span data-bind="ccbEditable: activeUntil, ccbEditableChange: changed" data-type="ccbdatetime" data-placement="bottom" data-showbuttons="bottom" data-container="body"/></p>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">
+                <input type="checkbox" data-bind="ccbBootstrapToggle: status, ccbBootstrapToggleClick: toggleStatus" />Active</p>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active Until 
+                <span data-bind="text: activeUntilString, attr: {'data-pk': linkId, 'data-value': activeUntil}, ccbEditable: activeUntil, ccbEditableOpts: {display: dateDisplay}"
+                      data-type="ccbdate"
+                      data-placement="bottom"
+                      data-showbuttons="bottom"
+                      data-container="body"
+                      data-url="${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo',[org.id])}"
+                      /></p>
             <p class="list-group-item-text pull-left">URL</p>
             <input type="text" class="form-control" style="width: 40%;" data-bind="value: url">
     </div>
+    <!-- /ko -->
 
 </div>
          

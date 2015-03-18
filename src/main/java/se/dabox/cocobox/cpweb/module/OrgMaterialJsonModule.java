@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.Collator;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -18,10 +19,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -263,7 +267,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         OrgMaterialLink link = getLink(client, materialId, linkId);
 
         String deliveryBase = getDeliveryBase(cycle);
-        return jsonTarget(toJsonLinks(Collections.singletonList(link), deliveryBase));
+        return jsonTarget(toJsonLinks(cycle, Collections.singletonList(link), deliveryBase));
     }
 
     @WebAction
@@ -347,7 +351,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             throw new IllegalStateException("Unknown material type: "+materialId);
         }
 
-        ByteArrayOutputStream baos = toJsonLinks(links, deliveryBase);
+        ByteArrayOutputStream baos = toJsonLinks(cycle, links, deliveryBase);
 
         return jsonTarget(baos);
     }
@@ -356,10 +360,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return CdsUtil.getDeliveryBase(cycle);
     }
 
-    public static ByteArrayOutputStream toJsonLinks(final List<? extends MaterialLink> links,
+    public static ByteArrayOutputStream toJsonLinks(RequestCycle cycle,
+            final List<? extends MaterialLink> links,
             final String deliveryBase) {
+
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
+
         ByteArrayOutputStream baos =
-                new JsonEncoding() {
+                new JsonEncoding(df) {
                     @Override
                     protected void encodeData(JsonGenerator generator) throws IOException {
                         generator.writeStartObject();
@@ -382,6 +391,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                                     deliveryBase + link.getCdLinkId());
                             generator.writeStringField("activeto", formatDate(link.
                                     getActiveTo()));
+
+                            if (link.getActiveTo() != null) {
+                                String activeToStr = df.format(link.getActiveTo());
+                                generator.writeStringField("activetoStr", activeToStr);
+                            } else {
+                                generator.writeNullField("activetoStr");
+                            }
 
                             generator.writeEndObject();
 
@@ -432,14 +448,20 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onChangeLinkActiveTo(RequestCycle cycle) {
-        Long linkid = Long.valueOf(cycle.getRequest().getParameter("linkid"));
+    public RequestTarget onChangeLinkActiveTo(RequestCycle cycle, String strOrgId) {
+        
+        secureGetMiniOrg(cycle, strOrgId);
+        
+        
+        String strLinkId = cycle.getRequest().getParameter("pk");
+        String[] split = strLinkId.split("-");
+        Long linkid = Long.valueOf(split[1]);
+
         Date activeTo = getActiveTo(cycle);
 
         if (activeTo == null) {
-            Map<String, Object> map = createMap();
-            map.put("status", "ERROR_INPUT");
-            return jsonTarget(map);
+            cycle.getResponse().setStatus(400);
+            return new StringRequestTarget("Date not specified");
         }
 
         Calendar cal = Calendar.getInstance();
@@ -448,15 +470,29 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
 
+        switch (split[0]) {
+            case "O": {
+                UpdateOrgMaterialLink update = new UpdateOrgMaterialLink(linkid,
+                        getCurrentUser(cycle));
+                update.setActiveTo(cal.getTime());
+                getCocoboxCordinatorClient(cycle).updateOrgMaterialLink(update);
+            }
+            break;
+            case "P": {
+                UpdateOrgProductLinkRequest update = new UpdateOrgProductLinkRequest(getCurrentUser(cycle),
+                        linkid);
+                update.setActiveTo(cal.getTime());
+                getCocoboxCordinatorClient(cycle).updateOrgProductLink(update);
+            }
+            break;
+            default:
+                throw new IllegalStateException("Unknown linkid: " + strLinkId);
+        }
 
-        UpdateOrgMaterialLink update = new UpdateOrgMaterialLink(linkid, getCurrentUser(cycle));
-        update.setActiveTo(cal.getTime());
-        getCocoboxCordinatorClient(cycle).updateOrgMaterialLink(update);
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
 
-        Map<String, Object> map = createMap();
-        map.put("status", "OK");
-
-        return jsonTarget(map);
+        return new StringRequestTarget(df.format(activeTo));
     }
 
     private static void sortOrgMats(RequestCycle cycle, List<OrgMaterial> materials) {
@@ -791,7 +827,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     public static Date getActiveTo(RequestCycle cycle) {
         String strActiveTo = cycle.getRequest().getParameter("activeTo");
         if (strActiveTo == null) {
-            return null;
+            strActiveTo = cycle.getRequest().getParameter("value");
+            if (strActiveTo == null) {
+                return null;
+            }
         }
 
         ConversionContext cc = new ConversionContext(CocositeUserHelper.getUserLocale(cycle));
