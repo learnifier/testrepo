@@ -31,7 +31,7 @@ ${cpweb_foot}
 
 <div class="container-fluid">
  
-<div class="list-group" data-bind="foreach: materials">
+<div class="list-group" data-bind="foreach: materials" style="height: auto;">
 
     <div class="list-group-item" style="min-height: 130px;">
 
@@ -46,15 +46,70 @@ ${cpweb_foot}
     <h4 class="list-group-item-heading" data-bind="text: title" style="color:#5AB9D2;"></h4>
     <p class="list-group-item-text" data-bind="text: description" style="max-width: 52%; display: flex;"></p>
     </div>
-    
-    <div class="list-group-item" style="min-height: 124px; background-color: #f5f5f5; border:1px solid #e3e3e3;" data-bind="visible: linkSectionVisible">
+    <!-- ko if: linkSectionVisible -->
+    <div data-bind="foreach: links" style="height: auto;">
+    <div class="list-group-item" style="overflow-y: hidden; background-color: #f5f5f5; border:1px solid #e3e3e3;">
         
-            <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Access Link</h4>
-            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active</p>
-            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active Until</p>
-            <p class="list-group-item-text pull-left">URL</p>
-            <input type="text" class="form-control" style="width: 40%;" data-bind="value: url">
+        <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Default Link <span style="color:black; font-size:58%;">&nbsp; Edit link title</span></h4>
+            
+        <div class="pull-left" style="margin-right: 100px;">
+            <p class="list-group-item-text" style="color:#666;">Active</p>
+            <p style="margin-top: 6px;">ON / OFF</p>
+        </div>
+        <div class="pull-left" style="margin-right: 100px;">
+            <p class="list-group-item-text" style="color:#666;">Assigned Credits</p>
+            <p data-bind="text: balance" class="pull-left" style="margin-right: 23px; margin-top: 6px; margin-bottom: 0px;"></p>
+            <button type="button" class="btn btn-default btn-xs pull-left" style="margin-top: 5px;">Add Credits</button>
+            <small class="pull-left" style="clear: left; margin-right: 10px; color: #5AB9D2; margin-top: 5px;" data-bind="click: toggleCreditHistorySection">Credit history</small>
+        </div>
+        <div class="pull-left">
+            <p class="list-group-item-text" style="color:#666;">Active Until</p>
+            <p data-bind="text: activeto" style="margin-top: 6px;"></p>
+        </div>
+        
+        <!-- ko if: creditSectionVisible -->
+        <div class="pull-left" style="clear:left; margin-bottom: 10px;">
+            <p class="list-group-item-text" style="color:#666;">Credit history</p>
+            <div style="padding:5px; background: white;">
+            <p class="list-group-item-text pull-left">Quantity</p>
+            <p class="list-group-item-text pull-left" style="margin-left: 97px;">Added By</p>
+            <p class="list-group-item-text pull-left" style="margin-left: 149px; margin-right: 180px;">Added Date</p>
+            <hr style="margin-bottom: 0px !important;">
+            
+            <div data-bind="foreach: credits">
+            <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left" data-bind="text: amount"></p>
+            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdBy">Some Name</p>
+            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdStr">March 16, 2015</p>
+            <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
+            <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
+            </div>
+            <!--
+            <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left">2</p>
+            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left">Some Name</p>
+            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px;" class="pull-left">March 16, 2015</p>
+            <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
+            <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
+            
+            <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left">2</p>
+            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left">Some Name</p>
+            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px;" class="pull-left">March 16, 2015</p>
+            <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
+            <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
+            
+             <p style="margin-bottom: 0px; text-align: center; margin-top: 5px;">- This link has no credit history -</p> -->
+            </div>
+        </div>
+        <!-- /ko -->
+      
+        
+        <div class="pull-left" style="clear:left; width: 100%;">
+            <p class="list-group-item-text" style="color:#666;">URL</p>
+            <input type="text" class="form-control" style="max-width: 40%;" data-bind="value: url">
+        </div>
     </div>
+    </div>
+     <!-- /ko -->
+    
 </div>
          
 </div>
