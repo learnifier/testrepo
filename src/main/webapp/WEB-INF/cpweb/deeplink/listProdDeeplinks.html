@@ -79,24 +79,14 @@ ${cpweb_foot}
             <div data-bind="foreach: credits">
             <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left" data-bind="text: amount"></p>
             <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdBy">Some Name</p>
-            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdStr">March 16, 2015</p>
+            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px; min-width: 110px;" class="pull-left" data-bind="text: createdStr">March 16, 2015</p>
             <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
             <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
             </div>
-            <!--
-            <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left">2</p>
-            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left">Some Name</p>
-            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px;" class="pull-left">March 16, 2015</p>
-            <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
-            <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
             
-            <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left">2</p>
-            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left">Some Name</p>
-            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px;" class="pull-left">March 16, 2015</p>
-            <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
-            <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
-            
-             <p style="margin-bottom: 0px; text-align: center; margin-top: 5px;">- This link has no credit history -</p> -->
+            <div data-bind="if: credits() == 0">
+             <p style="margin-bottom: 0px; text-align: center; margin-top: 5px;">- This link has no credit history -</p>
+            </div>
             </div>
         </div>
         <!-- /ko -->
@@ -107,8 +97,14 @@ ${cpweb_foot}
             <input type="text" class="form-control" style="max-width: 40%;" data-bind="value: url">
         </div>
     </div>
+         
     </div>
+    
+    <div style="width: 100%; overflow-y: hidden; border: 1px solid #e3e3e3; padding:10px;">
+        <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Add Link</button>
+     </div>
      <!-- /ko -->
+     
     
 </div>
          
