@@ -1,7 +1,7 @@
 define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
     "use strict";
 
-    var DeepLinkModel = function () {
+    var PageModel = function () {
         var self = this;
 
         self.materials = ko.observableArray();
@@ -9,12 +9,52 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
     
     var CreditHistoryModel = function() {
         var self = this;
+      
         
-        self.credits = ko.observableArray();
+        self.amount = ko.observable();
+        self.createdStr = ko.observable();
+        self.createdBy = ko.observable();
     };
     
+    var DeepLinkModel = function () {
+        var self = this;
+       
+        self.activeto = ko.observable();
+        self.defaultLink = ko.observable();
+        self.url = ko.observable();
+        self.balance = ko.observable();
+        self.linkid = ko.observable();
+        self.creditSectionVisible = ko.observable(false);
+        self.credits = ko.observableArray();
+        
+        self.toggleCreditHistorySection = function () {
+            if (self.creditSectionVisible() == true) {
+                self.creditSectionVisible(false);
+            } else {
+                $.post(listDeeplinksProducts.listLinksHistoryUrl+'/'+self.linkid(), function (data) {
+                   
+                    self.credits.removeAll();
+                    self.creditSectionVisible(true);
+                    
+                    $.each(data.aaData,function(){
+                       var credit = new CreditHistoryModel();
+                       
+                       credit.amount(this.amount);
+                       credit.createdBy(this.createdBy);
+                       credit.createdStr(this.createdStr);
 
-    var PageModel = function () {
+                       self.credits.push(credit);
+                    });
+                       
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            }
+        };
+           
+    };
+
+    var ProductModel = function () {
         var self = this;
 
         self.id = ko.observable();
@@ -23,28 +63,40 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.description = ko.observable();
         self.activeLinks = ko.observable();
         self.activeUntil = ko.observable();
-        self.url = ko.observable();
+       
         self.linkCredits = ko.observable();
         self.inactiveLinks = ko.observable();
+        self.status = ko.observable();
         self.linkSectionVisible = ko.observable(false);
-           
+        self.links = ko.observableArray();
+        
 
         self.toggleLinkSection = function () {
             if (self.linkSectionVisible() == true) {
                 self.linkSectionVisible(false);
             } else {
                 $.post(listDeeplinksProducts.listLinksUrl, {opid: self.id()}, function (data) {
-                    self.activeUntil(data.aaData[0].activeto);
-                    self.url(data.aaData[0].deeplink);
-                    self.activeLinks(data.aaData[0].active);
-                        
+                   
+                    self.links.removeAll();
                     self.linkSectionVisible(true);
+                    
+                    $.each(data.aaData,function(){
+                       var link = new DeepLinkModel();
+                       
+                       link.activeto(this.activeto);
+                       link.defaultLink(this.defaultLink);
+                       link.url(this.link);
+                       link.balance(this.balance);
+                       link.linkid(this.linkid);
+                       self.links.push(link);
+                    });
+                       
                 }).fail(function () {
                     alert('failed to post data');
                 });
             }
-
         };
+       
        
         self.changeActiveUntil = function(){
             alert(self.activeUntil());
@@ -65,10 +117,10 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
     
 
     $.get(listDeeplinksProducts.listPurchasedMatsUrl, function (data) {
-        var ProductModel = new DeepLinkModel();
+        var mo = new PageModel();
 
         $.each(data.aaData, function () {
-            var mm = new PageModel();
+            var mm = new ProductModel();
 
             mm.id(this.opid);
             mm.thumbnail(this.thumbnail);
@@ -77,10 +129,10 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
             mm.activeLinks(this.activeLinks);
             mm.inactiveLinks(this.inactiveLinks);
             mm.linkCredits(this.linkCredits);
-            ProductModel.materials.push(mm);
+            mo.materials.push(mm);
         });
 
-        ko.applyBindings(ProductModel);
+        ko.applyBindings(mo);
 
     }).fail(function () {
         alert('failed to load data');
