@@ -43,14 +43,12 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
             
         };
         
-        self.addNewCredits = function(productModel, rootModel){
-
+        self.addNewCredits = function(){
             
             $.post(listDeeplinksProducts.updateCredits, {credits: $('#creditsVal').val(),orgId: listDeeplinksProducts.orgId ,oplid: self.linkid()}, function (data) {
                     
                   if(data.valid == false)
                   {
-                     console.log(data.fielderror[0].message);
                      $('#cand').html('* '+data.fielderror[0].message);
                   }
                   
