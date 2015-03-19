@@ -3,7 +3,9 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
 
     var PageModel = function () {
         var self = this;
-
+        
+        self.addLinkModel = ko.observable();
+        self.creditsLeft = ko.observable();
         self.materials = ko.observableArray();
     };
     
@@ -27,6 +29,37 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.linkid = ko.observable();
         self.creditSectionVisible = ko.observable(false);
         self.credits = ko.observableArray();
+        
+        
+        self.showAddCreditsModel = function(productModel, rootModel){
+            rootModel.addLinkModel(self);
+            
+            $.post(listDeeplinksProducts.creditBalance+'/'+productModel.id(), function (data) {
+                   
+                       
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            
+        };
+        
+        self.addNewCredits = function(productModel, rootModel){
+
+            
+            $.post(listDeeplinksProducts.updateCredits, {credits: $('#creditsVal').val(),orgId: listDeeplinksProducts.orgId ,oplid: self.linkid()}, function (data) {
+                    
+                  if(data.valid == false)
+                  {
+                     console.log(data.fielderror[0].message);
+                     $('#cand').html('* '+data.fielderror[0].message);
+                  }
+                  
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            
+        };
+        
         
         self.toggleCreditHistorySection = function () {
             if (self.creditSectionVisible() == true) {
