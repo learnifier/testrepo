@@ -4,12 +4,14 @@
 <#import "/se/dabox/services/dwsfu/commonCss.ftl" as commonCss />
 <#import "/se/dabox/services/dwsfu/bsform.ftl" as bsform />
 <#import "/se/dabox/services/dwsfu/modal.ftl" as modal />
+<#import "/se/dabox/services/dwsfu/respondjs.ftl" as respondJs />
 
 
 <#assign cpweb_head>
     <@learnifierBootstrap />
     <link rel="stylesheet" href="${cocoboxCdn}/cocobox/ccss/clientportalweb/clientportal.css" />
-    <@branding />    
+    <@branding />
+    <@respondJs.respondJsWithCdnSupport />
 </#assign>
 
 
