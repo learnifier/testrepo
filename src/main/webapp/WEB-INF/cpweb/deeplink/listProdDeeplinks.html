@@ -18,6 +18,9 @@ ${cpweb_foot}
     listDeeplinksProducts.deleteOrgMatLinkUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','deleteLink',[org.id])}";
     listDeeplinksProducts.contextPath = "${contextPath}";
     listDeeplinksProducts.sLang = "Search purchased materials";
+    listDeeplinksProducts.creditBalance = "${helper.urlFor('deeplink.ProductMaterialJsonModule','productBalance',[org.id])}";
+    listDeeplinksProducts.updateCredits = "${addLinkCreditsFormLink}";
+    listDeeplinksProducts.orgId = "${org.id?c}";
 
    require(['${contextPath}/js/deeplink/listProdDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
        
@@ -59,7 +62,7 @@ ${cpweb_foot}
         <div class="pull-left" style="margin-right: 100px;">
             <p class="list-group-item-text" style="color:#666;">Assigned Credits</p>
             <p data-bind="text: balance" class="pull-left" style="margin-right: 23px; margin-top: 6px; margin-bottom: 0px;"></p>
-            <button type="button" class="btn btn-default btn-xs pull-left" style="margin-top: 5px;">Add Credits</button>
+            <button type="button" class="btn btn-default btn-xs pull-left" style="margin-top: 5px;" data-toggle="modal" data-target="#myModal" data-bind="click: showAddCreditsModel.bind($data, $parent, $root)">Add Credits</button>
             <small class="pull-left" style="clear: left; margin-right: 10px; color: #5AB9D2; margin-top: 5px;" data-bind="click: toggleCreditHistorySection">Credit history</small>
         </div>
         <div class="pull-left">
@@ -111,6 +114,28 @@ ${cpweb_foot}
     
 </div>
          
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-bind="with: addLinkModel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel" style="color: #5AB9D2;">ADD CREDITS TO LINK</h4>
+        <p>Type the number of credits that you would like to add to this link.</p>
+      </div>
+      <div class="modal-body">
+          <p>Available credits: <span data-bind="text: $root.creditsLeft"></span></p>
+          <p>Number of credits to add</p>
+          <input type="number" id="creditsVal" tabindex="1" required="required" autofocus="autofocus">
+          <p id="cand" class="text-danger"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-bind="click: addNewCredits">Add credits to Link</button>
+      </div>
+    </div>
+  </div>
 </div>
  
 [/@dws.skin]
