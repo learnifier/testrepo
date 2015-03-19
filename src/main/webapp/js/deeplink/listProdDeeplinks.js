@@ -68,17 +68,20 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.inactiveLinks = ko.observable();
         self.status = ko.observable();
         self.linkSectionVisible = ko.observable(false);
+        self.buttonStatus = ko.observable('Get Link');
         self.links = ko.observableArray();
         
 
         self.toggleLinkSection = function () {
             if (self.linkSectionVisible() == true) {
                 self.linkSectionVisible(false);
+                self.buttonStatus('Get Link');
             } else {
                 $.post(listDeeplinksProducts.listLinksUrl, {opid: self.id()}, function (data) {
                    
                     self.links.removeAll();
                     self.linkSectionVisible(true);
+                    self.buttonStatus('Hide');
                     
                     $.each(data.aaData,function(){
                        var link = new DeepLinkModel();
@@ -95,6 +98,28 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                     alert('failed to post data');
                 });
             }
+        };
+        
+        self.addLink = function () {
+
+                $.post(listDeeplinksProducts.newOrgMatUrl, {orgmatid: self.id()}, function (data) {
+                   
+                  $.each(data.aaData,function(){
+                       var link = new DeepLinkModel();
+                       
+                       link.activeto(this.activeto);
+                       link.defaultLink(this.defaultLink);
+                       link.url(this.link);
+                       link.balance(this.balance);
+                       link.linkid(this.linkid);
+                       self.links.push(link);
+                    });
+                  
+                       
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            
         };
        
        
