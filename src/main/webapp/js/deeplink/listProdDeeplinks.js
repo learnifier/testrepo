@@ -33,7 +33,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         
         self.showAddCreditsModel = function(productModel, rootModel){
             rootModel.addLinkModel(self);
-            
+            self.creditSectionVisible(false);
             $.post(listDeeplinksProducts.creditBalance+'/'+productModel.id(), function (data) {
                    
                        
