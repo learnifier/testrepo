@@ -23,6 +23,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.defaultLink = ko.observable();
         self.url = ko.observable();
         self.balance = ko.observable();
+        self.defaultLink = ko.observable();
         self.linkid = ko.observable();
         self.creditSectionVisible = ko.observable(false);
         self.credits = ko.observableArray();
@@ -51,6 +52,18 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                 });
             }
         };
+        
+        self.deleteLink = function (parent) {
+
+                $.post(listDeeplinksProducts.deleteOrgMatLinkUrl, {prodlink: self.linkid()}, function (data) {
+                   
+                 parent.links.remove(self);
+                       
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            
+        };
            
     };
 
@@ -69,7 +82,9 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.status = ko.observable();
         self.linkSectionVisible = ko.observable(false);
         self.buttonStatus = ko.observable('Get Link');
+        self.linkName = ko.observable('Default Link');
         self.links = ko.observableArray();
+        
         
 
         self.toggleLinkSection = function () {
@@ -90,6 +105,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                        link.defaultLink(this.defaultLink);
                        link.url(this.link);
                        link.balance(this.balance);
+                       link.defaultLink(this.defaultLink);
                        link.linkid(this.linkid);
                        self.links.push(link);
                     });
@@ -111,6 +127,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                        link.defaultLink(this.defaultLink);
                        link.url(this.link);
                        link.balance(this.balance);
+                       link.defaultLink(this.defaultLink);
                        link.linkid(this.linkid);
                        self.links.push(link);
                     });
@@ -121,8 +138,7 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                 });
             
         };
-       
-       
+           
         self.changeActiveUntil = function(){
             alert(self.activeUntil());
         };
