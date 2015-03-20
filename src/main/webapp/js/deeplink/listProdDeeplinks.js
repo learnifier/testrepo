@@ -1,4 +1,4 @@
-define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
+define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-bindings', 'bootstrap/toggle', 'dabox-common'], function (ko,datepicker) {
     "use strict";
 
     var PageModel = function () {
@@ -29,6 +29,37 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.linkid = ko.observable();
         self.creditSectionVisible = ko.observable(false);
         self.credits = ko.observableArray();
+        self.active = ko.observable();
+        self.activeUntilString = ko.observable();
+        
+        
+        self.dateDisplay = function(data, text) {
+            if (!text) {
+                return null;
+            }
+
+            $(this).text(text);
+        };
+        
+         self.toggleStatus = function(element, ev) {
+            var newStatus = !self.active();
+
+            $(element).bootstrapToggle('disable');
+
+            $.post(listDeeplinksProducts.toggleActiveUrl, {
+                active: newStatus,
+                linkid: self.linkid()
+            }).always(function() {
+                $(element).bootstrapToggle('enable');
+            }).fail(cocobox.internal.ajaxErrorHandler)
+            .success(function(data) {
+                //Nothing to process
+                $(element).bootstrapToggle(newStatus ? 'on' : 'off');
+            });
+
+            
+            return false;
+        };
         
         
         self.showAddCreditsModel = function(productModel, rootModel){
@@ -107,7 +138,8 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.description = ko.observable();
         self.activeLinks = ko.observable();
         self.activeUntil = ko.observable();
-       
+        self.activeUntilString = ko.observable();
+        
         self.linkCredits = ko.observable();
         self.inactiveLinks = ko.observable();
         self.status = ko.observable();
@@ -115,6 +147,9 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.buttonStatus = ko.observable('Get Link');
         self.linkName = ko.observable('Default Link');
         self.links = ko.observableArray();
+        
+        
+      
         
         
 
@@ -132,7 +167,9 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
                     $.each(data.aaData,function(){
                        var link = new DeepLinkModel();
                        
+                       link.active(this.active);
                        link.activeto(this.activeto);
+                       link.activeUntilString(this.activeToStr);
                        link.defaultLink(this.defaultLink);
                        link.url(this.link);
                        link.balance(this.balance);
@@ -173,6 +210,8 @@ define(['knockout', 'bootstrap/datepicker'], function (ko,datepicker) {
         self.changeActiveUntil = function(){
             alert(self.activeUntil());
         };
+        
+        
     };
     
     
