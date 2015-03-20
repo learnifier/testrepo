@@ -36,52 +36,49 @@ ${cpweb_foot}
 <div class="container-fluid">
     
     <div class="PageLoader list-group">
-        <div class="loaderPosition" style="margin-left: 450px; margin-top: 100px;">
+        <div class="loaderPosition">
         [@common.spinner /]
         </div>
     </div>
  
-    <div id="koFix" style="display: none;">    
+    <div id="koFix">    
     
-<div class="list-group" data-bind="foreach: materials" style="height: auto;">
+<div class="list-group" data-bind="foreach: materials">
 
-    <div class="list-group-item" style="min-height: 130px;">
+    <div class="list-group-item deepLheight">
 
-        <img class="img-thumbnail pull-left" data-bind="attr:{src: thumbnail}" style="height: 100px; width: 100px; margin-right: 25px;">
+        <img class="img-thumbnail pull-left deepImgStyle" data-bind="attr:{src: thumbnail}">
         
         <button type="button" class="btn btn-primary-outlined pull-right" data-bind="click: toggleLinkSection, text: buttonStatus"></button>
-        <small class="pull-right" style="clear:right; margin-right:6px; margin-top:3px; color:#999;">Active Links</small>
-        <p class="pull-right" style="clear:right; margin-right:19px; margin-top:3px; margin-bottom:0px; font-weight: bold;"><span data-bind="text: activeLinks"></span> of <span data-bind="text: inactiveLinks"></span></p>
-        <small class="pull-right" style="clear:right; margin-right:-4px; color:#999;">Assigned credits</small>
-        <p class="pull-right" style="clear:right; margin-right:34px; margin-top:3px; margin-bottom:0px; font-weight: bold;"><span data-bind="text: linkCredits"></span></p>
+        <small class="pull-right activeLinks">Active Links</small>
+        <p class="pull-right linkStatus"><span data-bind="text: activeLinks"></span> of <span data-bind="text: inactiveLinks"></span></p>
+        <small class="pull-right assignCredits">Assigned credits</small>
+        <p class="pull-right creditStats"><span data-bind="text: linkCredits"></span></p>
         
-    <h4 class="list-group-item-heading" data-bind="text: title" style="color:#5AB9D2;"></h4>
-    <p class="list-group-item-text" data-bind="text: description" style="max-width: 52%; display: flex;"></p>
+    <h4 class="list-group-item-heading hColor" data-bind="text: title"></h4>
+    <p class="list-group-item-text descStyle" data-bind="text: description"></p>
     </div>
     <!-- ko if: linkSectionVisible -->
     <div class="linksLoader">
         [@common.spinner /]
     </div>
-    <div data-bind="foreach: links" style="height: auto;">
-    <div class="list-group-item" style="overflow-y: hidden; background-color: #f5f5f5; border:1px solid #e3e3e3;">
+    <div data-bind="foreach: links">
+    <div class="list-group-item deepLinkItem">
         
-        <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Link <span style="color:black; font-size:58%;">&nbsp; Edit link title</span></h4>
+        <h4 class="list-group-item-heading mb25">Link <span class="spanStyle">&nbsp; Edit link title</span></h4>
 
-        <div class="pull-left" style="margin-right: 100px;">
-            <!--<p class="list-group-item-text" style="color:#666;">Active</p>
-            <p style="margin-top: 6px;">ON / OFF</p>-->
-            <p class="list-group-item-text pull-left" style="margin-right: 100px;">
+        <div class="pull-left mr100">
+            <p class="list-group-item-text pull-left mr100">
                 <input type="checkbox" data-bind="ccbBootstrapToggle: active, ccbBootstrapToggleClick: toggleStatus" />Active</p>
         </div>
-        <div class="pull-left" style="margin-right: 100px;">
-            <p class="list-group-item-text" style="color:#666;">Assigned Credits</p>
-            <p data-bind="text: balance" class="pull-left" style="margin-right: 23px; margin-top: 6px; margin-bottom: 0px;"></p>
-            <button type="button" class="btn btn-default btn-xs pull-left" style="margin-top: 5px;" data-toggle="modal" data-target="#myModal" data-bind="click: showAddCreditsModel.bind($data, $parent, $root)">Add Credits</button>
-            <small class="pull-left" style="clear: left; margin-right: 10px; color: #5AB9D2; margin-top: 5px;" data-bind="click: toggleCreditHistorySection">Credit history</small>
+        <div class="pull-left mr100">
+            <p class="list-group-item-text greyColor">Assigned Credits</p>
+            <p data-bind="text: balance" class="pull-left deepLinkBalance"></p>
+            <button type="button" class="btn btn-default btn-xs pull-left mt5" data-toggle="modal" data-target="#myModal" data-bind="click: showAddCreditsModel.bind($data, $parent, $root)">Add Credits</button>
+            <p class="pull-left cHistory"><small data-bind="click: toggleCreditHistorySection">Credit history</small></p>
         </div>
         <div class="pull-left">
-            <p class="list-group-item-text" style="color:#666;">Active Until</p>
-            <!--<p data-bind="text: activeto" style="margin-top: 6px;"></p>-->
+            <p class="list-group-item-text greyColor">Active Until</p>
             <span data-bind="text: activeUntilString, attr: {'data-pk': linkid, 'data-value': activeto}, ccbEditable: activeto, ccbEditableOpts: {display: dateDisplay}"
                       data-type="ccbdate"
                       data-placement="bottom"
@@ -93,43 +90,43 @@ ${cpweb_foot}
        
         
         <!-- ko if: creditSectionVisible -->
-        <div class="pull-left" style="clear:left; margin-bottom: 10px;">
-            <p class="list-group-item-text" style="color:#666;">Credit history</p>
-            <div style="padding:5px; background: white;">
+        <div class="pull-left cSection">
+            <p class="list-group-item-text greyColor">Credit history</p>
+            <div class="creditContainer">
             <p class="list-group-item-text pull-left">Quantity</p>
-            <p class="list-group-item-text pull-left" style="margin-left: 97px;">Added By</p>
-            <p class="list-group-item-text pull-left" style="margin-left: 149px; margin-right: 180px;">Added Date</p>
-            <hr style="margin-bottom: 0px !important;">
+            <p class="list-group-item-text pull-left ml97">Added By</p>
+            <p class="list-group-item-text pull-left addedDate">Added Date</p>
+            <hr class="creditHrFix">
             
             <div data-bind="foreach: credits">
-            <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left" data-bind="text: amount"></p>
-            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdBy"></p>
-            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px; min-width: 110px;" class="pull-left" data-bind="text: createdStr"></p>
-            <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;" data-bind="click: deleteCreditHistory">Delete</button>
-            <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
+            <p class="pull-left cAmount" data-bind="text: amount"></p>
+            <p class="pull-left cCby" data-bind="text: createdBy"></p>
+            <p class="pull-left cCdate" data-bind="text: createdStr"></p>
+            <button type="button" class="btn btn-default btn-xs mt5" data-bind="click: deleteCreditHistory">Delete</button>
+            <hr class="creditHrFixBottom">
             </div>
             
             <div data-bind="if: credits() == 0">
-             <p style="margin-bottom: 0px; text-align: center; margin-top: 5px;">- This link has no credit history -</p>
+             <p class="cHmessage">- This link has no credit history -</p>
             </div>
             </div>
         </div>
         <!-- /ko -->
       
         
-        <div class="pull-left" style="clear:left; width: 100%;">
-            <p class="list-group-item-text" style="color:#666;">URL</p>
-            <input type="text" class="form-control" style="max-width: 40%;" data-bind="value: url">
+        <div class="pull-left urlContainer">
+            <p class="list-group-item-text greyColor">URL</p>
+            <input type="text" class="form-control urlWidth" data-bind="value: url">
             <div data-bind="if: defaultLink() == false">
-                <button type="button" class="btn btn-default btn-xs pull-left" style="margin-top: 5px;" data-bind="click: deleteLink.bind($data, $parent)">Delete Link</button>
+                <button type="button" class="btn btn-default btn-xs pull-left mt5" data-bind="click: deleteLink.bind($data, $parent)">Delete Link</button>
             </div>
         </div>
     </div>
          
     </div>
     
-    <div style="width: 100%; overflow-y: hidden; border-left: 1px solid #e3e3e3; border-right: 1px solid #e3e3e3; padding:10px; background-color: #f5f5f5;">
-        <button type="button" class="btn btn-default btn-sm" style="margin-top: 5px;" data-bind="click: addLink">Add Link</button>
+    <div class="addLinkContainer">
+        <button type="button" class="btn btn-default btn-sm mt5" data-bind="click: addLink">Add Link</button>
     </div>
      <!-- /ko -->
      
@@ -143,7 +140,7 @@ ${cpweb_foot}
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel" style="color: #5AB9D2;">ADD CREDITS TO LINK</h4>
+        <h4 class="modal-title modalHeaderc" id="myModalLabel">ADD CREDITS TO LINK</h4>
         <p>Type the number of credits that you would like to add to this link.</p>
       </div>
       <div class="modal-body">
