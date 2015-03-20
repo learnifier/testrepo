@@ -16,6 +16,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         self.amount = ko.observable();
         self.createdStr = ko.observable();
         self.createdBy = ko.observable();
+        self.linkTokenId = ko.observable();
     };
     
     var DeepLinkModel = function () {
@@ -105,6 +106,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                        credit.amount(this.amount);
                        credit.createdBy(this.createdBy);
                        credit.createdStr(this.createdStr);
+                       credit.linkTokenId(this.linkTokenId);
 
                        self.credits.push(credit);
                     });
@@ -113,6 +115,18 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                     alert('failed to post data');
                 });
             }
+        };
+        
+        self.deleteCreditHistory = function () {
+
+                $.post(listDeeplinksProducts.deleteCredit+'/'+self.linkTokenId(), function (data) {
+                   
+          
+                       
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            
         };
         
         self.deleteLink = function (parent) {
@@ -177,7 +191,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                        link.linkid(this.linkid);
                        self.links.push(link);
                     });
-                       
+                       $('.linksLoader').hide();
                 }).fail(function () {
                     alert('failed to post data');
                 });
@@ -244,7 +258,10 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         });
 
         ko.applyBindings(mo);
-
+        
+       
+        $('#koFix').show();
+        $('.PageLoader').hide();
     }).fail(function () {
         alert('failed to load data');
     });
