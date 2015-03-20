@@ -365,7 +365,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             final String deliveryBase) {
 
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, userLocale);
 
         ByteArrayOutputStream baos =
                 new JsonEncoding(df) {
@@ -490,7 +490,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }
 
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, userLocale);
 
         return new StringRequestTarget(df.format(activeTo));
     }

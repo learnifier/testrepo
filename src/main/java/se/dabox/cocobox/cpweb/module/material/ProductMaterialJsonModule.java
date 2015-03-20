@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.material;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -19,6 +20,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
+import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocobox.cpweb.formdata.material.AddLinkCreditsForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
@@ -199,9 +201,11 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onChangeLinkActiveTo(RequestCycle cycle) {
+    public RequestTarget onChangeLinkActiveTo(RequestCycle cycle, String strOrgId) {
+        secureGetMiniOrg(cycle, strOrgId);
+
         //There's an action like this for orgmats too
-        Long linkid = Long.valueOf(cycle.getRequest().getParameter("linkid"));
+        Long linkid = Long.valueOf(cycle.getRequest().getParameter("pk"));
         Date activeTo = OrgMaterialJsonModule.getActiveTo(cycle);
 
         if (activeTo == null) {
@@ -222,10 +226,10 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
         update.setActiveTo(cal.getTime());
         getCocoboxCordinatorClient(cycle).updateOrgProductLink(update);
 
-        Map<String, Object> map = createMap();
-        map.put("status", "OK");
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, userLocale);
 
-        return jsonTarget(map);
+        return new StringRequestTarget(df.format(activeTo));
     }
 
     @WebAction

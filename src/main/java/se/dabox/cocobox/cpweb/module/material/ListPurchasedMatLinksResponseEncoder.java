@@ -26,7 +26,7 @@ class ListPurchasedMatLinksResponseEncoder {
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
         DateFormat dateFormat =
                 DateFormat.getDateInstance(DateFormat.FULL, userLocale);
-
+        
         return new DataTablesJson<OrgProductLink>(dateFormat) {
             @Override
             protected void encodeItem(OrgProductLink item) throws IOException {
