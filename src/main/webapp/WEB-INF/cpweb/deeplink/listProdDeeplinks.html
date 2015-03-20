@@ -56,8 +56,10 @@ ${cpweb_foot}
         <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Link <span style="color:black; font-size:58%;">&nbsp; Edit link title</span></h4>
 
         <div class="pull-left" style="margin-right: 100px;">
-            <p class="list-group-item-text" style="color:#666;">Active</p>
-            <p style="margin-top: 6px;">ON / OFF</p>
+            <!--<p class="list-group-item-text" style="color:#666;">Active</p>
+            <p style="margin-top: 6px;">ON / OFF</p>-->
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">
+                <input type="checkbox" data-bind="ccbBootstrapToggle: active, ccbBootstrapToggleClick: toggleStatus" />Active</p>
         </div>
         <div class="pull-left" style="margin-right: 100px;">
             <p class="list-group-item-text" style="color:#666;">Assigned Credits</p>
@@ -67,7 +69,14 @@ ${cpweb_foot}
         </div>
         <div class="pull-left">
             <p class="list-group-item-text" style="color:#666;">Active Until</p>
-            <p data-bind="text: activeto" style="margin-top: 6px;"></p>
+            <!--<p data-bind="text: activeto" style="margin-top: 6px;"></p>-->
+            <span data-bind="text: activeUntilString, attr: {'data-pk': linkid, 'data-value': activeto}, ccbEditable: activeto, ccbEditableOpts: {display: dateDisplay}"
+                      data-type="ccbdate"
+                      data-placement="bottom"
+                      data-showbuttons="bottom"
+                      data-container="body"
+                      data-url="${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkActiveTo')}"
+                      />
         </div>
         
         <!-- ko if: creditSectionVisible -->
@@ -81,8 +90,8 @@ ${cpweb_foot}
             
             <div data-bind="foreach: credits">
             <p style="margin-top: 5px; width: 60px; margin-bottom: 0px;" class="pull-left" data-bind="text: amount"></p>
-            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdBy">Some Name</p>
-            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px; min-width: 110px;" class="pull-left" data-bind="text: createdStr">March 16, 2015</p>
+            <p style="margin-top: 5px; margin-left: 92px; width: 170px; margin-bottom: 0px;" class="pull-left" data-bind="text: createdBy"></p>
+            <p style="margin-top: 5px; margin-left: 40px; margin-right: 75px; margin-bottom: 0px; min-width: 110px;" class="pull-left" data-bind="text: createdStr"></p>
             <button type="button" class="btn btn-default btn-xs" style="margin-top: 5px;">Delete</button>
             <hr style="margin-top: 5px !important; margin-bottom: 0px !important;">
             </div>
