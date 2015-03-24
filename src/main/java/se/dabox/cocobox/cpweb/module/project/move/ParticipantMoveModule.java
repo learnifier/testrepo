@@ -137,7 +137,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         map.put("result", result);
         map.put("targetProjectId", targetProjectId);
         map.put("participation", part);
-        map.put("targetProjectUrl", NavigationUtil.toProjectPageUrl(cycle, targetProjectId));
+        map.put("targetProjectUrl", NavigationUtil.toProjectRosterPageUrl(cycle, targetProjectId));
 
         if (result.getMoveError().equals(MoveError.OK)) {
             return new FreemarkerRequestTarget("/project/move/moveSuccessful.html", map);
