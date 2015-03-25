@@ -11,29 +11,32 @@ ${cpweb_foot}
 <script>
 
     function fetchTemplate(id) {
-    $.post("${helper.urlFor('MailJsonModule','getTemplate')}", {"templateId": id}, function(response) {
-    $("#subject").val(response.subject);
-            $("#mtype").val(response.mtype);
-            $("#body").val(response.body);
-    });
+        $.post("${helper.urlFor('MailJsonModule','getTemplate')}", {"templateId": id}, function(response) {
+            $("#subject").val(response.subject);
+                $("#mtype").val(response.mtype);
+                $("#body").val(response.body);
+            }).fail(function() {
+                alert("Failed to get email template");
+            });
     }
 
     $('#templates').on('change', function() {
-    if (this.value == '') {
-    $("#subject").val("");
-            $("#mtype").val("");
-            $("#body").val(response.body)
+        if (this.value == '') {
+        $("#subject").val("");
+                $("#mtype").val("");
+                $("#body").val(response.body)
 
-            return;
-    }
+                return;
+        }
 
-    fetchTemplate(this.value);
+        fetchTemplate(this.value);
     });
-            //[#if stickyTemplateId??]
-            $(function() {
-            fetchTemplate(${stickyTemplateId?c});
-            });
-            //[/#if]
+    
+    //[#if stickyTemplateId??]
+    $(function() {
+        fetchTemplate(${stickyTemplateId?c});
+    });
+    //[/#if]
 
 </script>
 
