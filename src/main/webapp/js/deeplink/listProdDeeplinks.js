@@ -156,6 +156,12 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         
         self.linkCredits = ko.observable();
         self.inactiveLinks = ko.observable();
+      
+       
+        self.totalLinks = ko.computed(function() {
+            return self.activeLinks() + self.inactiveLinks();
+        }, self);
+        
         self.status = ko.observable();
         self.linkSectionVisible = ko.observable(false);
         self.buttonStatus = ko.observable('Get Link');
@@ -201,7 +207,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         self.addLink = function () {
 
                 $.post(listDeeplinksProducts.newOrgMatUrl, {orgmatid: self.id()}, function (data) {
-                   
+                 
                   $.each(data.aaData,function(){
                        var link = new DeepLinkModel();
                        
@@ -253,6 +259,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
             mm.description(this.desc);
             mm.activeLinks(this.activeLinks);
             mm.inactiveLinks(this.inactiveLinks);
+            mm.totalLinks();
             mm.linkCredits(this.linkCredits);
             mo.materials.push(mm);
         });
