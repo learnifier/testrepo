@@ -119,6 +119,16 @@ ${cpweb_foot}
                 $("button",this).cocobox('inputBlock');
             });
         });
+        $('#myAffix').affix({
+  offset: {
+    top: 394,
+    bottom: function () {
+      return (this.bottom = $('.footer').outerHeight(true))
+    }
+  }
+})
+        
+        
     } );
 
     function onDelete(form) {
