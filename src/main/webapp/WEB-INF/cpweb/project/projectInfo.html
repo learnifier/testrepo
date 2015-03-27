@@ -129,7 +129,44 @@
             [/@]
         </ul>
     </nav>
+    <script>
+           
+     $(function() { 
+         
+        $(".header-icon-button").click(function(){
+            
+        if($('#pagewrapper').hasClass("sidebar-maximized"))
+        {
+            $("#myAffix").removeClass("moveAffix");
+        }
+        else
+        {
+            $("#myAffix").addClass("moveAffix");
+            
+        }
+        
+          });
+           $( window ).scroll(function() {
+        if($('#pagewrapper').hasClass("sidebar-maximized"))
+        {
+            $("#myAffix").addClass("moveAffix");
+        }
+        else
+        {
+            
+            $("#myAffix").removeClass("moveAffix");
+        }
+        
+});
+        
 
+    
+    });
+    
+
+
+        
+    </script>
 [/#macro]
 
 [#function isIdproject project=prj ]
