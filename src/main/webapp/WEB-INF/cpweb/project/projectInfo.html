@@ -95,7 +95,7 @@
             </div>
         [/@]
     [/#if]
-    <nav>
+    <nav data-spy="affix" data-offset-top="0" data-offset-bottom="10" id="myAffix">
         <ul class="nav nav-underline">
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
