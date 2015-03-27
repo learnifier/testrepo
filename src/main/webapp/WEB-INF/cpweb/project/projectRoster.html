@@ -140,7 +140,7 @@ ${cpweb_foot}
                     },
                     {
                         "targets": [2],
-                        "width": "250px",
+                        "width": "17%",
                         "data" : function(row, type, set) {
                             if (!row.displayNameDisplay) {
                                 var data = '<a class="name" href="' + row.link + '" title="' + row.email + '">' + row.displayName + '</a> ';
@@ -161,6 +161,7 @@ ${cpweb_foot}
                     },
                     {
                         "targets": [3],
+                        "width": "15%",
                         "data" : function(row, type, set) {
                             if (!row.firstEmailDisplay) {
                                 if (row.firstEmailStr) {
@@ -186,6 +187,7 @@ ${cpweb_foot}
                     },
                     {
                         "targets": [4],
+                        "width": "15%",
                         "data" : function(row, type, set) {
                             if (!row.lastEmailDisplay) {
                                 if (row.sending) {
