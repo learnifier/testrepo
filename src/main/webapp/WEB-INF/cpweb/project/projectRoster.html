@@ -60,7 +60,7 @@ ${cpweb_foot}
         
      
     $(document).ready(function() {
-        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck'], function(hb) {
+        require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function(hb) {
 
             var source = $("#roster-cell-action-template").html();
             var rosterCellActionTemplate = hb.compile(source);
