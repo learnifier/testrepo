@@ -33,10 +33,24 @@ define([], function () {
 
                 $("#myAffix").removeClass("moveAffix");
             }
+            
+            //Remove affix if tablet/phone on page load
+        if ($(window).width() < 768) {
+            $('#myAffix').removeClass('affix-top');
+            $('#myAffix').removeClass('affix');
+            $('#myAffix').removeClass('moveAffix');
+        }
 
         });
 
-
+        $( window ).resize(function() {
+         //Remove affix if tablet/phone
+            if ($(window).width() < 768) {
+                $('#myAffix').removeClass('affix-top');
+                $('#myAffix').removeClass('affix');
+                $('#myAffix').removeClass('moveAffix');
+            }
+        });
 
     });
 
