@@ -15,7 +15,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery'], function() {
+        require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function() {
             var oTable = $('#projectmaterials').dataTable({
                 "dom": '<"row"<"col-sm-6"><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "paging": false,
@@ -118,49 +118,7 @@ ${cpweb_foot}
                 cocobox.longOp();
                 $("button",this).cocobox('inputBlock');
             });
-        });
-        $('#myAffix').affix({
-  offset: {
-    top: 394,
-    bottom: function () {
-      return (this.bottom = $('.footer').outerHeight(true));
-    }
-  }
-});
-
-     $(function() { 
-         
-        $(".header-icon-button").click(function(){
-            
-        if($('#pagewrapper').hasClass("sidebar-maximized"))
-        {
-            $("#myAffix").removeClass("moveAffix");
-        }
-        else
-        {
-            $("#myAffix").addClass("moveAffix");
-            
-        }
-        
-          });
-           $( window ).scroll(function() {
-        if($('#pagewrapper').hasClass("sidebar-maximized"))
-        {
-            $("#myAffix").addClass("moveAffix");
-        }
-        else
-        {
-            
-            $("#myAffix").removeClass("moveAffix");
-        }
-        
-});
-        
-
-    
-    });
-        
-        
+        });        
     } );
 
     function onDelete(form) {
