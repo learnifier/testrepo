@@ -42,7 +42,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
             $(this).text(text);
         };
         
-         self.toggleStatus = function(element, ev) {
+         self.toggleStatus = function(element, parent) {
             var newStatus = !self.active();
 
             $(element).bootstrapToggle('disable');
@@ -56,6 +56,16 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
             .success(function(data) {
                 //Nothing to process
                 $(element).bootstrapToggle(newStatus ? 'on' : 'off');
+                if(newStatus == true)
+                {
+                 parent.activeLinks(parent.activeLinks() + 1);
+                 parent.inactiveLinks(parent.inactiveLinks() - 1);
+                }
+                else
+                {
+                  parent.activeLinks(parent.activeLinks() - 1);
+                  parent.inactiveLinks(parent.inactiveLinks() + 1);
+                }
             });
 
             
@@ -134,6 +144,14 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                 $.post(listDeeplinksProducts.deleteOrgMatLinkUrl, {prodlink: self.linkid()}, function (data) {
                    
                  parent.links.remove(self);
+                 if(self.active() == false)
+                 {
+                     parent.inactiveLinks(parent.inactiveLinks() - 1);
+                 }
+                 else
+                 {
+                     parent.activeLinks(parent.activeLinks() - 1);
+                 }
                        
                 }).fail(function () {
                     alert('failed to post data');
@@ -220,7 +238,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                        self.links.push(link);
                     });
                   
-                       
+                  self.inactiveLinks(self.inactiveLinks() +1);     
                 }).fail(function () {
                     alert('failed to post data');
                 });
