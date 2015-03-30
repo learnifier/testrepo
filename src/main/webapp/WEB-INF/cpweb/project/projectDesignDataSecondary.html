@@ -80,7 +80,7 @@ ${cpweb_foot}
                 } );
 	});
 	
-	requirejs(['bootstrap/editable','bootstrap/cocobox-editable-datetime'], function() {
+	requirejs(['bootstrap/editable','bootstrap/cocobox-editable-datetime', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function() {
 		$('.editable').editable({
 			title: '',
                         container: 'body'
