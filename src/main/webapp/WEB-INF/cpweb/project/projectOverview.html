@@ -99,7 +99,7 @@ ${cpweb_foot}
 </form>
 [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
 <script>
-    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
+    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
         f.startSingleFlirt('${prj.newsFlirtId}', {
             templates: {
                 emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
