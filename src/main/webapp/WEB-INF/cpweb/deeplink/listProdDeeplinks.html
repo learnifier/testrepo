@@ -69,7 +69,7 @@ ${cpweb_foot}
 
         <div class="pull-left mr100">
             <p class="list-group-item-text pull-left mr100">
-                <input type="checkbox" data-bind="ccbBootstrapToggle: active, ccbBootstrapToggleClick: toggleStatus" />Active</p>
+                <input type="checkbox" data-bind="ccbBootstrapToggle: active, ccbBootstrapToggleClick: function(element){ $data.toggleStatus(element,$parent); }" />Active</p>
         </div>
         <div class="pull-left mr100">
             <p class="list-group-item-text greyColor">Assigned Credits</p>
@@ -126,7 +126,7 @@ ${cpweb_foot}
     </div>
     
     <div class="addLinkContainer">
-        <button type="button" class="btn btn-default btn-sm mt5" data-bind="click: addLink">Add Link</button>
+        <button type="button" class="btn btn-default btn-sm mt5" data-bind="click: addLink.bind($data, $parent)">Add Link</button>
     </div>
      <!-- /ko -->
      
