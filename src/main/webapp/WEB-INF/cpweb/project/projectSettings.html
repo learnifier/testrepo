@@ -78,7 +78,7 @@ ${cpweb_foot}
 
 
     $(function(){
-        require(['dabox-common'], function() {
+        require(['dabox-common', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function() {
             //cocobox.setlist.expandableList('#settingsList');
         });
     });
