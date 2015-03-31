@@ -27,7 +27,7 @@ ${cpweb_foot}
 
 
     $(function(){
-        require(['jsrender'] , function(){
+        require(['handlebars', 'select2.min'] , function(Handlebars){
                     $("#prjtype").val('DESIGNED_PROJECT');
                     jQuery.post(listCourseDesigns, null, function(data) {
                         [#if orgMatListSupport]
@@ -39,10 +39,41 @@ ${cpweb_foot}
                             };
                             data.aaData.push(extra);
                         [/#if]
-                        $("#crprj_designslist ul").html(
-                        $("#courseDesignBox").render(data.aaData)
-                    );
+
+                        $.each(data.aaData, function(){
+                            if(this.type = 'design') {
+                                this.designType = true;
+                            }
+                            else {
+                                this.designType = false;
+                            }
+                        });
+                        
+                        
+                        var source = $('#courseDesignBox').html();
+
+                        var template = Handlebars.compile(source);
+
+                        var context = data.aaData;
+
+                        var output = template(context);
+
+                        $('#crprj_designslist ul').append(output);
+                        
+                    
                     }, "json");
+                    
+                    $('#timezone').select2({
+                    formatResult: function(data) {
+                        return '<span>' + data.text + '</span>';
+                    },
+                    formatSelection: function(data) {
+                        return data.text;
+                    }
+
+                });
+                    
+                    
                 });
 
                 $('#crprj_designslist ul').on('click', 'a.preview', function(e) {
@@ -164,7 +195,6 @@ ${cpweb_head}
     </section>
 
 </form>
-
 </article>
 
 [/@dws.skin]
