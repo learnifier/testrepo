@@ -3,10 +3,8 @@
  */
 package se.dabox.cocobox.cpweb.module;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -19,15 +17,12 @@ import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.OrgBranding;
 import se.dabox.cocosite.branding.GetOrgBrandingCommand;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
-import se.dabox.cocosite.login.LoginHandler;
-import se.dabox.cocosite.security.CocoboxSecurityConstants;
+import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.user.UserAccountTransformers;
 import se.dabox.service.branding.client.Branding;
-import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -40,13 +35,9 @@ public class OrgSelectorModule extends AbstractWebAuthModule {
     @WebAction
     public RequestTarget onSelect(final RequestCycle cycle) {
 
-        @SuppressWarnings("unchecked")
-        Set<String> roles = (Set<String>) cycle.getSession().getAttribute(LoginHandler.USER_ROLES);
-        if (roles == null) {
-            roles = Collections.emptySet();
-        }
+        UserAccount user = LoginUserAccountHelper.getUserAccount(cycle);
 
-        if (roles.contains(CocoboxSecurityConstants.BOADMIN_LOGIN_ROLE)) {
+        if (UserAccountRoleCheck.isBoAdmin(user)) {
             return new WebModuleRedirectRequestTarget(CpMainModule.class, "tobo");
         }
 
@@ -61,15 +52,9 @@ public class OrgSelectorModule extends AbstractWebAuthModule {
                     toString(orgIds.get(0)));
         }
 
-
-        List<OrgBranding> ob = CollectionsUtil.transformList(orgIds,
-                new Transformer<Long, OrgBranding>() {
-                    @Override
-                    public OrgBranding transform(Long item) {
-                        return orgIdToOrgBranding(cycle, item);
-                    }
-                });
-
+        List<OrgBranding> ob = CollectionsUtil.transformList(orgIds, (Long item) ->
+                orgIdToOrgBranding(cycle, item));
+        
         Map<String, Object> map = createMap();
 
         map.put("orgs", ob);
@@ -85,14 +70,14 @@ public class OrgSelectorModule extends AbstractWebAuthModule {
         Branding branding = new GetOrgBrandingCommand(cycle).forOrg(orgId);
 
         String logoRef = branding.getGeneratedData().get("cphalfbanner");
-        String logo = null;
-        if (logoRef != null) {
-            String crpubcdn = DwsRealmHelper.getRealmConfiguration(cycle).getValue(
-                    "contentrepo.cocoboxpub.puburl");
-            logo = crpubcdn + "/branding/" + branding.getBrandingId() + '/' + branding.
-                    getGeneratedData().get("uuid") + logoRef;
+        String logo;
+        if (logoRef == null) {
+            logo = null;
+        } else {
+            logo = branding.toBrandingUrl(logoRef);
         }
 
         return new OrgBranding(orgId, branding, logo);
     }
+
 }
