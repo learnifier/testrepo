@@ -1,7 +1,7 @@
 define([], function () {
     $('#myAffix').affix({
         offset: {
-            top: 341,
+            top: 346,
             bottom: function () {
                 return (this.bottom = $('.footer').outerHeight(true));
             }
