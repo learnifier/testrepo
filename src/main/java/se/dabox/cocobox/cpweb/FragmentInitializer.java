@@ -7,6 +7,7 @@ import java.util.HashMap;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.florida.FloridaFragmentConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.webutils.fragment.FragmentClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -28,13 +29,16 @@ public class FragmentInitializer {
         fragParams.put("orgId", strOrgId);
 
         getFragmentClient().
-                getFragment(cycle, "cpUserInfoFlorida", fragParams);
+                getFragment(cycle, FloridaFragmentConstants.USERINFO, fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpUserInfoMobileFlorida", fragParams);
+                getFragment(cycle, FloridaFragmentConstants.USERINFO_MOBILE, fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpsearch", fragParams);
+                getFragment(cycle, FloridaFragmentConstants.PORTALSWITCH, fragParams);
+
+        getFragmentClient().
+                getFragment(cycle, FloridaFragmentConstants.PORTALSWITCH_MOBILE, fragParams);
 
         getFragmentClient().
                 getFragment(cycle, "cpMenuFlorida", fragParams);
@@ -43,13 +47,8 @@ public class FragmentInitializer {
                 getFragment(cycle, "cpMenuMobileFlorida", fragParams);
 
         getFragmentClient().
-                getFragment(cycle, "cpsearch2", fragParams);
+                getFragment(cycle, "cpsearchFlorida", fragParams);
 
-        getFragmentClient().
-                getFragment(cycle, "portalSwitch", fragParams);
-
-        getFragmentClient().
-                getFragment(cycle, "portalSwitchMobile", fragParams);
 
         setActivatedOrgFragment(cycle, orgId);
     }
@@ -57,7 +56,7 @@ public class FragmentInitializer {
     public static boolean hasOrgFragments(RequestCycle cycle, long orgId) {
         Long fragmentOrgId = (Long) cycle.getSession().getAttribute(NAME);
 
-        return fragmentOrgId != null && fragmentOrgId.longValue() == orgId;
+        return fragmentOrgId != null && fragmentOrgId == orgId;
     }
 
     public static void setActivatedOrgFragment(RequestCycle cycle, Long orgId) {
