@@ -29,10 +29,10 @@ public class FragmentInitializer {
         fragParams.put("orgId", strOrgId);
 
         getFragmentClient().
-                getFragment(cycle, FloridaFragmentConstants.USERINFO, fragParams);
+                getFragment(cycle, "cpUserInfoFlorida", fragParams);
 
         getFragmentClient().
-                getFragment(cycle, FloridaFragmentConstants.USERINFO_MOBILE, fragParams);
+                getFragment(cycle, "cpUserInfoMobileFlorida", fragParams);
 
         getFragmentClient().
                 getFragment(cycle, FloridaFragmentConstants.PORTALSWITCH, fragParams);
