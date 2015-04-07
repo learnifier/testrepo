@@ -12,6 +12,7 @@ import net.unixdeveloper.druwa.request.WebModuleRequestTarget;
 import se.dabox.cocobox.cpweb.module.CpMainModule;
 import se.dabox.cocobox.cpweb.module.OrgSelectorModule;
 import se.dabox.cocobox.cpweb.module.account.AccountSettingsModule;
+import se.dabox.cocobox.cpweb.module.branding.BrandingModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignModule;
 import se.dabox.cocobox.cpweb.module.integration.IntegrationErrorModule;
 import se.dabox.cocobox.cpweb.module.mail.MailModule;
@@ -199,6 +200,10 @@ public final class NavigationUtil {
         return cycle.urlFor(ProjectModule.class,
                 ProjectModule.ROSTER_ACTION,
                 Long.toString(projectId));
+    }
+
+    public static RequestTarget toBrandingPage(String strOrgId) {
+        return new WebModuleRedirectRequestTarget(BrandingModule.class, "logo", strOrgId);
     }
 
     private NavigationUtil() {

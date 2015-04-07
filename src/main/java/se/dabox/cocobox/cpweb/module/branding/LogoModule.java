@@ -33,7 +33,6 @@ import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.cache.GlobalCacheManager;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.imageresizer.ImageHandle;
 import se.dabox.service.common.imageresizer.ImageHandleBuffer;
@@ -139,12 +138,9 @@ public class LogoModule extends AbstractJsonAuthModule {
 
         cycle.getSession().removeAttribute(state.getSessionName());
 
-        GlobalCacheManager.getCache(cycle).removeEntry(BrandingCacheUtil.getBrandingCacheKey(org.
-                getId()));
-
         OrgUnitChangedListenerUtil.triggerEvent(cycle, org.getId());
 
-        return NavigationUtil.toOrgMain(strOrgId);
+        return NavigationUtil.toBrandingPage(strOrgId);
     }
 
     @WebAction
@@ -169,9 +165,6 @@ public class LogoModule extends AbstractJsonAuthModule {
         if (oldImage != null) {
             getContentRepoClient().remove(oldImage);
         }
-
-        GlobalCacheManager.getCache(cycle).removeEntry(BrandingCacheUtil.getBrandingCacheKey(org.
-                getId()));
 
         OrgUnitChangedListenerUtil.triggerEvent(cycle, org.getId());
 

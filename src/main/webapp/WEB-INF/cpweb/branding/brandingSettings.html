@@ -126,7 +126,7 @@ ${cpweb_foot}
 [/#assign]
 
 [#function getLogoURL ]
-    [#if brandingPackage.metadata.cphalfbanner?? ]
+    [#if brandingPackage.generatedData['cphalfbanner']?? ]
         [#return brandingPackage.toBrandingUrl("/img/cpl.png") /]
     [/#if]
     [#return realmBrandingPackage.toBrandingUrl("/img/cpl.png") /]

@@ -26,7 +26,6 @@ import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.branding.client.Branding;
-import se.dabox.service.common.cache.GlobalCacheManager;
 import se.dabox.service.common.context.Configuration;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -87,9 +86,6 @@ public class BrandingModule extends AbstractWebAuthModule {
                 LoginUserAccountHelper.getUserId(cycle), map);
         BrandingChangedListenerUtil.triggerEvent(cycle, branding.getBrandingId());
 
-        GlobalCacheManager.getCache(cycle).removeEntry(BrandingCacheUtil.getBrandingCacheKey(org.
-                getId()));
-
         OrgUnitChangedListenerUtil.triggerEvent(cycle, org.getId());
 
         return new WebModuleRedirectRequestTarget(BrandingModule.class, "logo", strOrgId);
@@ -112,9 +108,6 @@ public class BrandingModule extends AbstractWebAuthModule {
         getBrandingClient(cycle).updateBranding(branding.getBrandingId(),
                 LoginUserAccountHelper.getUserId(cycle), modificationMap, true);
         BrandingChangedListenerUtil.triggerEvent(cycle, branding.getBrandingId());
-
-        GlobalCacheManager.getCache(cycle).removeEntry(BrandingCacheUtil.getBrandingCacheKey(org.
-                getId()));
 
         OrgUnitChangedListenerUtil.triggerEvent(cycle, org.getId());
 
