@@ -220,8 +220,8 @@ public class ProjectModule extends AbstractProjectWebModule {
         
         MultiPageActivityCourse actCourse
                 = new MultiPageCourseCddActivityCourseFactory().
-                        setAllowTemporalProgressTracking(true).
-                        newActivityCourse(project, progress,databankFacade, cdd);
+                setAllowTemporalProgressTracking(true).
+                newActivityCourse(project, progress, databankFacade, cdd);
 
         map.put("actCourse", actCourse);
 
