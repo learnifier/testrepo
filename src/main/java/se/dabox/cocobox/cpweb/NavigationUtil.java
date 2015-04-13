@@ -206,6 +206,17 @@ public final class NavigationUtil {
         return new WebModuleRedirectRequestTarget(BrandingModule.class, "logo", strOrgId);
     }
 
+    /**
+     * Returns a WebModuleRedirectTarget to the project roster page.
+     *
+     * @param projectId The project id
+     * @return
+     */
+    public static RequestTarget toProjectRoster(long projectId) {
+        return new WebModuleRedirectRequestTarget(ProjectModule.class, ProjectModule.ROSTER_ACTION,
+                Long.toString(projectId));
+    }
+
     private NavigationUtil() {
     }
 }

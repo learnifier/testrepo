@@ -33,7 +33,6 @@ import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webutils.listform.ListformContext;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -63,19 +62,16 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
         if (!failures.isEmpty()) {
             context.getCycle().getSession().setFlashAttribute(CpwebConstants.CREDIT_ALLOC_FLASH,
                     failures);
-            return NavigationUtil.toProjectPage(projectId);
+            return NavigationUtil.toProjectRoster(projectId);
         }
 
-        RequestTargetGenerator target = new RequestTargetGenerator() {
-            @Override
-            public RequestTarget generateTarget(RequestCycle cycle) {
-                Set<Long> valueSet = new HashSet<>(values);
+        RequestTargetGenerator target = (RequestCycle cycle) -> {
+            Set<Long> valueSet = new HashSet<>(values);
 
-                cycle.getSession().setFlashAttribute(
-                        CpwebConstants.SEND_PARTICIPATIONS_FLASH, valueSet);
+            cycle.getSession().setFlashAttribute(
+                    CpwebConstants.SEND_PARTICIPATIONS_FLASH, valueSet);
 
-                return NavigationUtil.toProjectPage(projectId);
-            }
+            return NavigationUtil.toProjectPage(projectId);
         };
 
         UrlRequestTargetGenerator cancelTarget = new UrlRequestTargetGenerator(NavigationUtil.
@@ -92,13 +88,8 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
         OrgProject prj = context.getAttribute("project", OrgProject.class);
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(context);
         List<ProjectParticipation> parts = ccbc.listProjectParticipations(prj.getProjectId());
-        Map<Long, ProjectParticipation> map = CollectionsUtil.createMap(parts,
-                new Transformer<ProjectParticipation, Long>() {
-                    @Override
-                    public Long transform(ProjectParticipation obj) {
-                        return obj.getParticipationId();
-                    }
-                });
+        Map<Long, ProjectParticipation> map = CollectionsUtil.createMap(parts, 
+                ProjectParticipation::getParticipationId);
 
         return map;
     }
