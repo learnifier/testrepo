@@ -481,21 +481,25 @@ ${cpweb_foot}
     };
 
 
+   
+   function showBounceDialog(data) {
+       require(['dabox-common'], function() {
+        var bDialog = $("#bounceinfo").render(data);
+        cocobox.infoDialog('Bounce back message',bDialog);
+            });
+    }
+    
 
+    
     function showBounceInfo(strPartId) {
         cocobox.ajaxPost("${helper.urlFor('ProjectJsonModule','participationBounceInfo')}/" + strPartId, {
             success: showBounceDialog
         });
     }
-    function showBounceDialog(data) {
-        var bDialog = $("#bounceinfo").render(data);
-        $(bDialog).dialog({
-            width: 800,
-            height: 600,
-            modal: true,
-            resizable: true
-        });
-    }
+    
+
+
+
 
     function addMemberListener() {
         require(['dabox-common', 'dabox-jquery'], function() {
