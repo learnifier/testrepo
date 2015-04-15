@@ -27,5 +27,24 @@
         });
 
     });
+    
+    function editItem(row){
+      
+    productId = $(row).data("id");
+
+     CcbAnonymousProductUpload.open(function(pid,productId) {
+            if (pid) {
+                //everything fine, reload page to make product show up in the list
+                window.location.href=window.location.href;
+            } else {
+                //do nothing
+            }
+        }, {
+            scope: "O${org.id?c}",
+            productId: productId
+        });
+
+    }
+
 </script>
 [/#macro]
