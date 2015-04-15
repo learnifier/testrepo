@@ -67,41 +67,22 @@ ${cpweb_foot}
                     "targets": [ 3 ],
                     "className": "row-actions",
                     "data" : function(row, type, set) {
-                        if (!row.actionsDisplay) {
-                            if(row.system == 'orgmat') {
+                        if (row.anonymous == true) {
+                            
                                 var html = "<div class='btn-group'>";
                                     html+= "<button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>";
                                     html+= "<ul class='dropdown-menu dropdown-menu-right' role='menu'>";
-                                var actions = 0;
-                                [@portalSecurity.permissionBlock permission="CP_EDIT_ORGMAT"]
-                                    html+= "<li><a href='#' data-trigger='click' data-action='edit' data-id='" + row.id + "'>Edit</a></li>";
-                                    actions++;
-                                [/@]
-                                [@portalSecurity.permissionBlock permission="CP_DELETE_ORGMAT"]
-                                    html+= "<li><a href='#' data-trigger='click' data-action='delete' data-id='" + row.id + "'>Delete</a></li>";
-                                    actions++;
-                                [/@]
-                                if (actions === 0) {
-                                    row.actionsDisplay = '';
-                                }
-                                html+= "</ul></div>";
-
+                                    html+= "<li><a href='#' data-trigger='click' data-action='edit' data-id='" + row.id + "' onlick=''>Edit</a></li>";
+                                    //html+= "<li><a href='#' data-trigger='click' data-action='delete' data-id='" + row.id + "'>Delete</a></li>";
+                                    html+= "</ul></div>";
+                                    
                                 row.actionsDisplay = html;
-                            } else {
-                                row.actionsDisplay = '';
-                            }
-                        }
-
-                        if (type === 'display') {
-                            return row.actionsDisplay;
-                        } else if (type === 'filter') {
-                            return row.actionsDisplay;
-                        } else if (type === 'sort') {
-                            return row.actionsDisplay;
+                           
                         } else {
-                            //Anything else and raw row
-                            return row.actionsDisplay;
+                            row.actionsDisplay = '';
                         }
+                        
+                        return row.actionsDisplay; 
                     }
                 }
             ],
