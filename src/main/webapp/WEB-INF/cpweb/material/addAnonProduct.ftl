@@ -32,7 +32,7 @@
       
     productId = $(row).data("id");
 
-     CcbAnonymousProductUpload.open(function(pid,productId) {
+     CcbAnonymousProductUpload.open(function(pid) {
             if (pid) {
                 //everything fine, reload page to make product show up in the list
                 window.location.href=window.location.href;
@@ -43,7 +43,7 @@
             scope: "O${org.id?c}",
             productId: productId
         });
-
+        return false;
     }
 
 </script>

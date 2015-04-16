@@ -72,7 +72,7 @@ ${cpweb_foot}
                                 var html = "<div class='btn-group'>";
                                     html+= "<button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>";
                                     html+= "<ul class='dropdown-menu dropdown-menu-right' role='menu'>";
-                                    html+= "<li><a href='#' data-id='" + row.id + "' onclick='editItem(this)'>Edit</a></li>";
+                                    html+= "<li><a href='#' data-id='" + row.id + "' onclick='return editItem(this)'>Edit</a></li>";
                                     //html+= "<li><a href='#' data-trigger='click' data-action='delete' data-id='" + row.id + "'>Delete</a></li>";
                                     html+= "</ul></div>";
                                     
