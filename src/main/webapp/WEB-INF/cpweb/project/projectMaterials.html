@@ -10,8 +10,22 @@
 ${cpweb_foot}
 <script>
     $('#menu-projects').addClass('active');
-                 
+    
+    
+    $( "#page-content-wrapper" ).on('click','.DeleteItemClick',function(e) {
+        e.preventDefault();
+        var form = $(this).parents('form:first');
+        form.submit();
+    });
+    
+    
+    
 </script>
+<style>
+    .customHover :hover {
+         background-color: #f5f5f5;
+    }
+</style>
 <script>
 
     $(document).ready(function() {
@@ -90,9 +104,28 @@ ${cpweb_foot}
                     {
                         "targets": [ 3 ],
                         "data": function(row, type, set) {
+                            
+                            var html = '';
+                            
+                            var html = "<div class='btn-group'>";
+                                    html+= "<button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>";
+                                    html+= "<ul class='dropdown-menu dropdown-menu-right' role='menu'>";
+                                    
+                               
+                            
+                            
                             if (!row.deleteLinkDisplay) {
-                                row.deleteLinkDisplay = '<form method="post" action="${removeLink}" onsubmit="return onDelete(this)"><input type="hidden" name="materialId" value="'+row.system+'|'+row.id+'" /><button type="submit" class="btn btn-primary btn-sm pull-right">Remove</button></form>';
+                                html+= '<li class="customHover"><form method="post" action="${removeLink}" onsubmit="return onDelete(this)" style="padding: 3px 20px;" class="DeleteItem"><a href="#" style="color: #333333;" class="DeleteItemClick"><input type="hidden" name="materialId" value="'+row.system+'|'+row.id+'" />Delete</a></form></li>';
                             }
+                            
+                            if(row.anonymous == true) {
+                                html+= "<li><a href='#' data-id='" + row.id + "' onclick='editItem(this)' >Edit</a></li>";
+                            }
+                            
+                            html+= "</ul></div>";
+                            
+                            row.deleteLinkDisplay = html;
+                            
                             if (type === 'display') {
                                 return row.deleteLinkDisplay;
                             } else if (type === 'filter') {
@@ -103,6 +136,7 @@ ${cpweb_foot}
                                 //Anything else and raw row
                                 return row.deleteLinkDisplay;
                             }
+                            
                         }
                     }
                 ],
@@ -118,7 +152,8 @@ ${cpweb_foot}
                 cocobox.longOp();
                 $("button",this).cocobox('inputBlock');
             });
-        });        
+        });
+ 
     } );
 
     function onDelete(form) {
@@ -177,6 +212,24 @@ ${cpweb_foot}
     require(["select2.min"], function() {
         $("#materialId").select2();
     });
+    
+    function editItem(row){
+      
+    productId = $(row).data("id");
+
+     CcbAnonymousProductUpload.open(function(pid,productId) {
+            if (pid) {
+                //everything fine, reload page to make product show up in the list
+                window.location.href=window.location.href;
+            } else {
+                //do nothing
+            }
+        }, {
+            scope: "O${org.id?c}",
+            productId: productId
+        });
+
+    }
 </script>
 
 
