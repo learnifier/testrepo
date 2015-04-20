@@ -24,7 +24,6 @@ import se.dabox.service.tokenmanager.client.TokenStatus;
 import se.dabox.service.webutils.listform.ListformContext;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -118,14 +117,9 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
 
         final UserIdentifierHelper helper = new UserIdentifierHelper(context.getCycle());
 
-        List<DeleteFailure> failures = CollectionsUtil.transformList(undeletable,
-                new Transformer<ProjectParticipation, DeleteFailure>() {
-                    @Override
-                    public DeleteFailure transform(ProjectParticipation item) {
-                        return new DeleteFailure(item.getParticipationId(), helper.getName(item.
-                                getUserId()), "Unable to delete participation");
-                    }
-                });
+        List<DeleteFailure> failures = CollectionsUtil.transformList(undeletable, (ProjectParticipation item) ->
+                new DeleteFailure(item.getParticipationId(), helper.getName(item.
+                        getUserId()), "Unable to delete participation"));
 
         setDeleteFailures(context, failures);
 

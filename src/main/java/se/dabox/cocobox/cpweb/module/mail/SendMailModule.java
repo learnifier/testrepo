@@ -199,13 +199,7 @@ public class SendMailModule extends AbstractWebAuthModule {
     private List<UserAccount> getReceivers(RequestCycle cycle, SendMailSession sms) {
         final UserAccountService uaClient = Clients.getClient(cycle, UserAccountService.class);
 
-        return CollectionsUtil.transformListNotNull(sms.getReceivers(),
-                new Transformer<Long, UserAccount>() {
-                    @Override
-                    public UserAccount transform(Long obj) {
-                        return uaClient.getUserAccount(obj);
-                    }
-                });
+        return CollectionsUtil.transformListNotNull(sms.getReceivers(), uaClient::getUserAccount);
     }
 
     private void addOldValueIfMissing(DruwaFormValidationSession<SendEmailForm> formsess,
