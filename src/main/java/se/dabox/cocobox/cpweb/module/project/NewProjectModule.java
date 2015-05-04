@@ -488,13 +488,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
     private Locale getDefaultCountryLocale(RequestCycle cycle) {
         return new LazyCacheConfigurationValueCmd<Locale>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.countrylocale.default",
-                        new Transformer<String, Locale>() {
-                            @Override
-                            public Locale transform(String value) {
-                                return HybridLocaleUtils.toLocale(value);
-                            }
-                        });
+                getRealmConfiguration(cycle)).get("cocobox.project.countrylocale.default", 
+                        HybridLocaleUtils::toLocale);
     }
 
     private TimeZone getDefaultTimezone(RequestCycle cycle) {
@@ -508,13 +503,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
 //            return null;
 //        }
         return new LazyCacheConfigurationValueCmd<TimeZone>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.timezone.default",
-                        new Transformer<String, TimeZone>() {
-                            @Override
-                            public TimeZone transform(String value) {
-                                return TimeZone.getTimeZone(value);
-                            }
-                        });
+                getRealmConfiguration(cycle)).get("cocobox.project.timezone.default", TimeZone::getTimeZone);
     }
 
     private DruwaFormValidationSession<MatListProjectDetailsForm> getFormsess(RequestCycle cycle) {
