@@ -177,7 +177,7 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
             return formbeanResp.getRequestTarget(formsess);
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         OrgProductLink mainLink = ccbc.getOrgProductLink(linkId);
 
@@ -338,8 +338,8 @@ public class ProductMaterialJsonModule extends AbstractJsonAuthModule {
         }
 
         AccountBalance balance =
-                CacheClients.getClient(cycle, TokenManagerClient.class).getAccountBalance(orgProd.
-                getTokenManagerAccountId());
+                CacheClients.getClient(cycle, TokenManagerClient.class).getAccountBalance(
+                        orgProd.getTokenManagerAccountId());
 
         Map<String, Object> responseMap = createMap();
         responseMap.put("available", balance.getAvailable());
