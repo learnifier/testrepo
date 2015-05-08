@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.converter.ColorPickerConverter;
 import se.dabox.cocobox.cpweb.converter.SimpleEmailConverter;
-import se.dabox.cocobox.cpweb.druwa.AlternativeCpwebListener;
 import se.dabox.cocobox.cpweb.freemarker.CpwebModifyViewHandler;
 import se.dabox.cocobox.cpweb.freemarker.LearnifierBootstrap;
 import se.dabox.cocobox.cpweb.module.OrgSelectorModule;
@@ -41,8 +40,6 @@ public class CustomerPortalApplication extends DruwaApplication {
         DwsWebsiteHelper.registerDefaultServices(this, CocoSiteConstants.DEFAULT_LANG_BUNDLE).
                 freemarkerDirectives("cocosite").register();
         DefaultCocositeInitialization.init(this);
-
-        addRequestBeginEventListener(new AlternativeCpwebListener());
 
         setAttribute(LoginHandler.ATTRIBUTE_NAME, new LoginHandler());
 
