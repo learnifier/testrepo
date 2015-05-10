@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
+import static se.dabox.cocosite.module.core.AbstractCocositeJsModule.jsonTarget;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.papi.client.NotFoundException;
 import se.dabox.service.papi.client.PapiScope;
@@ -149,7 +150,25 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(Collections.singletonMap("success", true));
     }
 
-    
+    @WebAction
+    public RequestTarget onGetApiKeyPairSecret(final RequestCycle cycle, final String strOrgId) {
+        checkOrgPermission(cycle, strOrgId);
+        WebRequest webReq = cycle.getRequest();
+        
+        final long userId = LoginUserAccountHelper.getUserId(cycle);
+                
+        String publicKey = DruwaParamHelper.getMandatoryParam(LOGGER, webReq, "publicKey");
+
+        
+        PublicApiKeyAdminClient pc = CacheClients.getClient(cycle, PublicApiKeyAdminClient.class);
+
+        PublicApiKeyPair keyPair = pc.getPartnerKeyPair(publicKey);
+
+        // Verify partnerId from userId <-> keyPair.getPartner()
+        // verify strOrgId
+        return jsonTarget(Collections.singletonMap("secretKey", keyPair.getSecretKey()));
+    }
+
     
     private PartnerId getOrCreatePartnerId(RequestCycle cycle, long userId, long orgId, final PublicApiKeyAdminClient pc) {
         PapiScope papiScope = PapiScope.newOrgUnitScope(orgId);
