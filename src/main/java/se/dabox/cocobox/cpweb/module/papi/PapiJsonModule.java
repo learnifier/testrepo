@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
+import static se.dabox.cocosite.module.core.AbstractCocositeJsModule.jsonTarget;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.papi.client.NotFoundException;
@@ -56,7 +57,7 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         final long userId = LoginUserAccountHelper.getUserId(cycle);
         
         PublicApiKeyAdminClient pc = CacheClients.getClient(cycle, PublicApiKeyAdminClient.class);
-        PartnerId pid = getOrCreatePartnerId(cycle, userId, orgId, pc);
+        PartnerId pid = getOrCreatePartnerId(userId, orgId, pc);
         List<PublicApiKeyPair> partnerKeyPairs = pc.getPartnerKeyPairs(pid);
         
         return jsonTarget(toJsonPublicApiKeyPairs(cycle, partnerKeyPairs));
@@ -80,7 +81,7 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         String name = webReq.getParameter("name");
         
         PublicApiKeyAdminClient pc = CacheClients.getClient(cycle, PublicApiKeyAdminClient.class);
-        PartnerId pid = getOrCreatePartnerId(cycle, userId, orgId, pc);
+        PartnerId pid = getOrCreatePartnerId(userId, orgId, pc);
 
         PublicApiKeyPair keyPair = pc.createApiKeyPair(userId, pid, name);
 
@@ -97,10 +98,6 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         } catch (NumberFormatException ex) {
             return new ErrorCodeRequestTarget(400); // Bad request
         }
-       // TODO: Check that the ID we are trying to manipulate belongs to orgId 
-
- 
-
         
         WebRequest webReq = cycle.getRequest();
         final long userId = LoginUserAccountHelper.getUserId(cycle);
@@ -117,10 +114,14 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
       
         PublicApiKeyAdminClient pc = CacheClients.getClient(cycle, PublicApiKeyAdminClient.class);
 
-        UpdatePublicApiKeyPairRequest papiRequest = new UpdatePublicApiKeyPairRequest(EnumSet.of(PublicApiKeyPairField.NAME), userId, apiKeyPairIdLong, name);
-        pc.updateApiKeyPair(papiRequest);
-
-        return jsonTarget(Collections.singletonMap("success", true));
+        // Check that key beloongs to orgId/userId's partner.
+        if(verifyPartner(userId, orgId, apiKeyPairIdLong, pc)) {
+            UpdatePublicApiKeyPairRequest papiRequest = new UpdatePublicApiKeyPairRequest(EnumSet.of(PublicApiKeyPairField.NAME), userId, apiKeyPairIdLong, name);
+            pc.updateApiKeyPair(papiRequest);
+            return jsonTarget(Collections.singletonMap("success", true));
+        } else {
+            return new ErrorCodeRequestTarget(404); // Not found
+        }
     }
 
     @WebAction
@@ -133,7 +134,6 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         } catch (NumberFormatException ex) {
             return new ErrorCodeRequestTarget(400); // Bad request
         }
-       // TODO: Check that the ID we are trying to manipulate belongs to orgId 
 
         final long userId = LoginUserAccountHelper.getUserId(cycle);
         Long apiKeyPairIdLong;
@@ -143,31 +143,47 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
             return new ErrorCodeRequestTarget(400); // Bad request
         }
         PublicApiKeyAdminClient pc = CacheClients.getClient(cycle, PublicApiKeyAdminClient.class);
-        pc.deleteApiKeyPair(userId, apiKeyPairIdLong);
-
-        return jsonTarget(Collections.singletonMap("success", true));
+        
+        // Check that key beloongs to orgId/userId's partner.
+        if(verifyPartner(userId, orgId, apiKeyPairIdLong, pc)) {
+            pc.deleteApiKeyPair(userId, apiKeyPairIdLong);
+            return jsonTarget(Collections.singletonMap("success", true));
+        } else {
+            return new ErrorCodeRequestTarget(404); // Not found
+        }
     }
 
     @WebAction
     public RequestTarget onGetApiKeyPairSecret(final RequestCycle cycle, final String strOrgId) {
         checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_VIEW_APIKEY_SECRET);
-        WebRequest webReq = cycle.getRequest();
-        final long userId = LoginUserAccountHelper.getUserId(cycle);
+        
+        Long orgId;
+        try {
+             orgId = Long.parseLong(strOrgId);
+        } catch (NumberFormatException ex) {
+            return new ErrorCodeRequestTarget(400); // Bad request
+        }
+
+        final WebRequest webReq = cycle.getRequest();
                 
-        String publicKey = DruwaParamHelper.getMandatoryParam(LOGGER, webReq, "publicKey");
+        final String publicKey = DruwaParamHelper.getMandatoryParam(LOGGER, webReq, "publicKey");
 
         
         PublicApiKeyAdminClient pc = CacheClients.getClient(cycle, PublicApiKeyAdminClient.class);
 
         PublicApiKeyPair keyPair = pc.getPartnerKeyPair(publicKey);
 
-        // Verify partnerId from userId <-> keyPair.getPartner()
-        // verify strOrgId
-        return jsonTarget(Collections.singletonMap("secretKey", keyPair.getSecretKey()));
+        // Before returning, verify that the key belongs to userId/orgId's partner.
+        PapiScope papiScope = PapiScope.newOrgUnitScope(orgId);
+        PublicApiPartner partnerInfo = pc.getPartnerInfo(papiScope);
+        if(partnerInfo.getId() == keyPair.getPartner().getId()) {
+            return jsonTarget(Collections.singletonMap("secretKey", keyPair.getSecretKey()));
+        } else {
+            return new ErrorCodeRequestTarget(404); // Not found
+        }
     }
-
     
-    private PartnerId getOrCreatePartnerId(RequestCycle cycle, long userId, long orgId, final PublicApiKeyAdminClient pc) {
+    private PartnerId getOrCreatePartnerId(long userId, long orgId, final PublicApiKeyAdminClient pc) {
         PapiScope papiScope = PapiScope.newOrgUnitScope(orgId);
         PublicApiPartner partnerInfo;
         try {
@@ -178,6 +194,12 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         return PartnerId.valueOf(partnerInfo.getId());
     }
  
+    private boolean verifyPartner(final long userId, long orgId, final long keyId, final PublicApiKeyAdminClient pc) {
+        // Instead of reading all keys for a partner, I could read only the interesting id if we had a pc.getPartnerKeyPair(keyId).
+        PartnerId pid = getOrCreatePartnerId(userId, orgId, pc);
+        List<PublicApiKeyPair> partnerKeyPairs = pc.getPartnerKeyPairs(pid);
+        return partnerKeyPairs.stream().anyMatch((keyPair) -> (keyPair.getId() == keyId));
+    }
     
     private byte[] toJsonPublicApiKeyPairs(final RequestCycle cycle,
             final List<PublicApiKeyPair> entries) {
