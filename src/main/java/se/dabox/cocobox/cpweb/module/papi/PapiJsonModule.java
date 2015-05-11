@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
-import static se.dabox.cocosite.module.core.AbstractCocositeJsModule.jsonTarget;
+import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.papi.client.NotFoundException;
 import se.dabox.service.papi.client.PapiScope;
@@ -43,8 +43,8 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         
     @WebAction
     public RequestTarget onListApiKeys(final RequestCycle cycle, final String strOrgId) {
-        
-        checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_VIEW_APIKEY);
+//        checkOrgPermission(cycle, strOrgId);
 
         Long orgId;
         try {
@@ -65,8 +65,8 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
     
     @WebAction
     public RequestTarget onCreateApiKeyPair(final RequestCycle cycle, final String strOrgId) {
-        
-        checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_CREATE_APIKEY);
+//        checkOrgPermission(cycle, strOrgId);
 
         Long orgId;
         try {
@@ -91,7 +91,8 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
 
         @WebAction
     public RequestTarget onUpdateApiKeyPairName(final RequestCycle cycle, final String strOrgId, final String apiKeyPairId) {
-        checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_CREATE_APIKEY); // EDIT?
+//        checkOrgPermission(cycle, strOrgId);
 
         Long orgId;
         try {
@@ -127,7 +128,8 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
 
     @WebAction
     public RequestTarget onDeleteApiKeyPair(final RequestCycle cycle, final String strOrgId, final String apiKeyPairId) {
-        checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_DELETE_APIKEY);
+//        checkOrgPermission(cycle, strOrgId);
         
         Long orgId;
         try {
@@ -152,9 +154,9 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
 
     @WebAction
     public RequestTarget onGetApiKeyPairSecret(final RequestCycle cycle, final String strOrgId) {
-        checkOrgPermission(cycle, strOrgId);
+        //checkOrgPermission(cycle, strOrgId);
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_VIEW_APIKEY_SECRET);
         WebRequest webReq = cycle.getRequest();
-        
         final long userId = LoginUserAccountHelper.getUserId(cycle);
                 
         String publicKey = DruwaParamHelper.getMandatoryParam(LOGGER, webReq, "publicKey");
@@ -222,7 +224,4 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
             }
         }.encode();
     }
-    
-    
-    
 }
