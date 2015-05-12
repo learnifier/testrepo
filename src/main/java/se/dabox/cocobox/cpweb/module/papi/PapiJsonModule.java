@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
-import static se.dabox.cocosite.module.core.AbstractCocositeJsModule.jsonTarget;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.papi.client.NotFoundException;
@@ -29,6 +28,7 @@ import se.dabox.service.papi.client.PublicApiKeyPair;
 import se.dabox.service.papi.client.PublicApiKeyPairField;
 import se.dabox.service.papi.client.PublicApiPartner;
 import se.dabox.service.papi.client.UpdatePublicApiKeyPairRequest;
+import se.dabox.service.papi.client.UpdatePublicApiKeyPairRequestBuilder;
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
@@ -116,7 +116,8 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
 
         // Check that key beloongs to orgId/userId's partner.
         if(verifyPartner(userId, orgId, apiKeyPairIdLong, pc)) {
-            UpdatePublicApiKeyPairRequest papiRequest = new UpdatePublicApiKeyPairRequest(EnumSet.of(PublicApiKeyPairField.NAME), userId, apiKeyPairIdLong, name);
+            UpdatePublicApiKeyPairRequestBuilder b = UpdatePublicApiKeyPairRequestBuilder.newBuilder(userId, apiKeyPairIdLong);
+            UpdatePublicApiKeyPairRequest papiRequest = b.withName(name).build();
             pc.updateApiKeyPair(papiRequest);
             return jsonTarget(Collections.singletonMap("success", true));
         } else {
@@ -176,7 +177,12 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         // Before returning, verify that the key belongs to userId/orgId's partner.
         PapiScope papiScope = PapiScope.newOrgUnitScope(orgId);
         PublicApiPartner partnerInfo = pc.getPartnerInfo(papiScope);
-        if(partnerInfo.getId() == keyPair.getPartner().getId()) {
+//        PartnerId partnerId1 = partnerInfo.getId();
+//        long id1 = partnerId1.getId();
+//        PartnerId partnerId2 = keyPair.getPartner().getId();
+//        long id2 = partnerId2.getId();
+        // Not sure how to compare partner/partnerId:s - check with jk
+        if(partnerInfo.getId().getId() == keyPair.getPartner().getId().getId()) {
             return jsonTarget(Collections.singletonMap("secretKey", keyPair.getSecretKey()));
         } else {
             return new ErrorCodeRequestTarget(404); // Not found
