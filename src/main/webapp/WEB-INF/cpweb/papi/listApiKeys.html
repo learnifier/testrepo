@@ -3,12 +3,11 @@
 [#assign foot]
 ${cpweb_foot}
 <script>
-    var apiWebUrl = "${helper.urlFor('papi.PapiJsonModule','listApiKeys')}";
-    var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair')}";
-    var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret')}";
-    var createKeyUrl = "${helper.urlFor('papi.PapiJsonModule','createApiKeyPair')}";
-
-
+    var apiWebUrl = "${helper.urlFor('papi.PapiJsonModule','listApiKeys',[org.id])}";
+    var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair',[org.id])}";
+    var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret',[org.id])}";
+    var createKeyUrl = "${helper.urlFor('papi.PapiJsonModule','createApiKeyPair',[org.id])}";
+    
 
     require(['handlebars', 'dabox-common'], function (Handlebars) {
 
@@ -143,11 +142,11 @@ ${cpweb_foot}
     <p class="keyPos">{{publicKey}}</p>
     <p class="namePos">{{name}}</p>
 
-    [#if security.hasPermission("BO_VIEW_APIKEY_SECRET")]
+    [#if security.hasPermission("CP_VIEW_APIKEY_SECRET")]
     <button class="showBtnPos" data-id="{{publicKey}}">Show</button>
     [/#if]
 
-    [#if security.hasPermission("BO_DELETE_APIKEY")]
+    [#if security.hasPermission("CP_DELETE_APIKEY")]
     <button class="delBtnPos" data-id="{{id}}">Delete</button>
     [/#if]
     </div>
@@ -174,7 +173,7 @@ ${cpweb_foot}
     <br>
 
     <div class="clearALl">
-        [#if security.hasPermission("BO_CREATE_APIKEY")]
+        [#if security.hasPermission("CP_CREATE_APIKEY")]
         <button class="fl addBtn">Add Key</button>
         [/#if]
     </div>
