@@ -191,7 +191,7 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
         } catch(NotFoundException e) {
             partnerInfo = pc.createApiPartner(userId, papiScope);
         }
-        return PartnerId.valueOf(partnerInfo.getId());
+        return PartnerId.valueOf(partnerInfo.getId().getId());
     }
  
     private boolean verifyPartner(final long userId, long orgId, final long keyId, final PublicApiKeyAdminClient pc) {
