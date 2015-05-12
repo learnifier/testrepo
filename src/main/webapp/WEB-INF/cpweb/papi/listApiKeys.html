@@ -3,7 +3,7 @@
 [#assign foot]
 ${cpweb_foot}
 <script>
-    var apiWebUrl = "${helper.urlFor('papi.PapiJsonModule','listApiKeys',[org.id])}";
+    var apiWebUrlSource = "${helper.urlFor('papi.PapiJsonModule','listApiKeys',[org.id])}";
     var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair',[org.id])}";
     var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret',[org.id])}";
     var createKeyUrl = "${helper.urlFor('papi.PapiJsonModule','createApiKeyPair',[org.id])}";
@@ -11,7 +11,8 @@ ${cpweb_foot}
 
     require(['handlebars', 'dabox-common'], function (Handlebars) {
 
-        $.getJSON(apiWebUrl).done(function (data) {
+        $.getJSON(apiWebUrlSource).done(function (data) {
+            
             var source = $('#settings-template').html();
             var template = Handlebars.compile(source);
             var context = data;
