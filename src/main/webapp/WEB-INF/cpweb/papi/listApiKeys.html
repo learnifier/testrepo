@@ -1,1 +1,186 @@
-Json-urlen är (1000=orgno) : ${helper.urlFor('papi.PapiJsonModule','listApiKeys', [ "1000" ] )}
+[#ftl strip_text="true" /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    var apiWebUrl = "${helper.urlFor('papi.PapiJsonModule','listApiKeys')}";
+    var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair')}";
+    var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret')}";
+    var createKeyUrl = "${helper.urlFor('papi.PapiJsonModule','createApiKeyPair')}";
+
+
+
+    require(['handlebars', 'dabox-common'], function (Handlebars) {
+
+        $.getJSON(apiWebUrl).done(function (data) {
+            var source = $('#settings-template').html();
+            var template = Handlebars.compile(source);
+            var context = data;
+
+            $('#list-settings').html(template(context));
+        }).fail(cocobox.internal.ajaxErrorHandler);
+
+
+        $("#list-settings").on('click', '.delBtnPos', function () {
+
+            var element = $(this).data('id');
+
+            cocobox.confirmationDialog("Delete material",
+                    "Do you want to permanently delete this key?",
+                    function () {
+                        cocobox.ajaxPost(deleteKeyUrl + '/' + element);
+                    }
+            );
+        });
+
+        $("#list-settings").on('click', '.showBtnPos', function () {
+
+            var element = $(this).data('id');
+
+            $.getJSON(showKeyUrl + '?publicKey=' + element).done(function (data) {
+
+                var secretApiKey = data.secretKey;
+
+                cocobox.infoDialog("Secret API KEY",
+                        "Your secret key is: " + secretApiKey
+                        );
+
+            }).fail(cocobox.internal.ajaxErrorHandler);
+
+        });
+
+        $(".clearALl").on('click', '.addBtn', function () {
+
+            $.getJSON(createKeyUrl).done(function (data) {
+
+                var secretApiKey = data.secretKey;
+
+                cocobox.infoDialog("API KEY added",
+                        "Your new API KEY is now added.");
+
+            }).fail(cocobox.internal.ajaxErrorHandler);
+
+        });
+
+
+    });
+
+
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
+<style>
+
+    .nameCont {
+        width: 100%;
+        min-height: 40px;
+        width: 100%;
+        position: relative;
+    }
+
+    .valCont {
+        clear: both;
+        border-bottom: 1px solid #f5f5f5;
+        min-height: 40px;
+        width: 100%;
+        position: relative;
+    }
+
+    .clearALl {
+        clear: both;
+    }
+
+    .fl {
+        float: left;
+    }
+
+    .ml40 {
+        margin-left: 40px;
+    }
+
+    .ml130 {
+        margin-left: 130px;
+    }
+
+    .mt {
+        margin-top: 11px;
+    }
+
+    .keyPos {
+        position: absolute;
+        left: 0px;
+        top:10px;
+    }
+
+    .namePos {
+        position: absolute;
+        left: 248px;
+        top:10px;
+    }
+
+    .showBtnPos {
+        position: absolute;
+        left: 450px;
+        top:10px;
+    }
+
+    .delBtnPos {
+        position: absolute;
+        left: 515px;
+        top:10px;
+    }
+
+
+</style>
+
+
+<script id="settings-template" type="text/x-handlebars-template"> 
+
+
+    {{#each data}}
+    <div class="valCont">
+    <p class="keyPos">{{publicKey}}</p>
+    <p class="namePos">{{name}}</p>
+
+    [#if security.hasPermission("BO_VIEW_APIKEY_SECRET")]
+    <button class="showBtnPos" data-id="{{publicKey}}">Show</button>
+    [/#if]
+
+    [#if security.hasPermission("BO_DELETE_APIKEY")]
+    <button class="delBtnPos" data-id="{{id}}">Delete</button>
+    [/#if]
+    </div>
+    {{/each}}
+
+
+</script>
+
+
+<div id="settingsList">
+    <h2>API Keys</h2>
+
+    <div class="nameCont">
+        <p class="keyPos">Key</p>
+        <p class="namePos">Name</p>
+    </div>
+
+    <div id="list-settings">
+
+
+
+    </div>
+
+    <br>
+
+    <div class="clearALl">
+        [#if security.hasPermission("BO_CREATE_APIKEY")]
+        <button class="fl addBtn">Add Key</button>
+        [/#if]
+    </div>
+
+
+
+</div>
+
+[/@dws.skin]
