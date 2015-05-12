@@ -215,7 +215,7 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
                     generator.writeNumberField("id", e.getId());
                     generator.writeStringField("name", e.getName());
                     generator.writeStringField("publicKey", e.getPublicKey());
-                    generator.writeNumberField("partnerId", e.getPartner().getId());
+                    generator.writeNumberField("partnerId", e.getPartner().getId().getId());
                     generator.writeEndObject();
                 }
                 generator.writeEndArray();
@@ -236,7 +236,7 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
                     generator.writeNumberField("id", keyPair.getId());
                     generator.writeStringField("name", keyPair.getName());
                     generator.writeStringField("publicKey", keyPair.getPublicKey());
-                    generator.writeNumberField("partnerId", keyPair.getPartner().getId());
+                    generator.writeNumberField("partnerId", keyPair.getPartner().getId().getId());
                     generator.writeEndObject();
             }
         }.encode();
