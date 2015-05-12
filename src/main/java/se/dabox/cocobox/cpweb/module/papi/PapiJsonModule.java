@@ -174,15 +174,10 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
 
         PublicApiKeyPair keyPair = pc.getPartnerKeyPair(publicKey);
 
-        // Before returning, verify that the key belongs to userId/orgId's partner.
+        // Before returning the key, verify that the key belongs to userId/orgId's partner.
         PapiScope papiScope = PapiScope.newOrgUnitScope(orgId);
         PublicApiPartner partnerInfo = pc.getPartnerInfo(papiScope);
-//        PartnerId partnerId1 = partnerInfo.getId();
-//        long id1 = partnerId1.getId();
-//        PartnerId partnerId2 = keyPair.getPartner().getId();
-//        long id2 = partnerId2.getId();
-        // Not sure how to compare partner/partnerId:s - check with jk
-        if(partnerInfo.getId().getId() == keyPair.getPartner().getId().getId()) {
+        if(partnerInfo.getId().equals(keyPair.getPartner().getId())) {
             return jsonTarget(Collections.singletonMap("secretKey", keyPair.getSecretKey()));
         } else {
             return new ErrorCodeRequestTarget(404); // Not found
