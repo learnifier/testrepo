@@ -7,12 +7,12 @@ ${cpweb_foot}
     var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair',[org.id])}";
     var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret',[org.id])}";
     var createKeyUrl = "${helper.urlFor('papi.PapiJsonModule','createApiKeyPair',[org.id])}";
-    
+
 
     require(['handlebars', 'dabox-common'], function (Handlebars) {
 
         $.getJSON(apiWebUrlSource).done(function (data) {
-            
+
             var source = $('#settings-template').html();
             var template = Handlebars.compile(source);
             var context = data;
@@ -23,12 +23,14 @@ ${cpweb_foot}
 
         $("#list-settings").on('click', '.delBtnPos', function () {
 
+            var clickedElement = $(this);
             var element = $(this).data('id');
 
             cocobox.confirmationDialog("Delete material",
                     "Do you want to permanently delete this key?",
                     function () {
                         cocobox.ajaxPost(deleteKeyUrl + '/' + element);
+                        $(clickedElement).parent().remove();
                     }
             );
         });
@@ -53,10 +55,19 @@ ${cpweb_foot}
 
             $.getJSON(createKeyUrl).done(function (data) {
 
-                var secretApiKey = data.secretKey;
+                cocobox.infoDialog("A new key has been created",
+                                        "Your PUBLIC key is: " + data.publicKey + "<br/>" + "Your SECRET key is: " + data.secretKey);
 
-                cocobox.infoDialog("API KEY added",
-                        "Your new API KEY is now added.");
+
+                $.getJSON(apiWebUrlSource).done(function (data) {
+
+                    var source = $('#settings-template').html();
+                    var template = Handlebars.compile(source);
+                    var context = data;
+
+                    $('#list-settings').html(template(context));
+                }).fail(cocobox.internal.ajaxErrorHandler);
+
 
             }).fail(cocobox.internal.ajaxErrorHandler);
 
@@ -122,13 +133,13 @@ ${cpweb_foot}
     .showBtnPos {
         position: absolute;
         left: 450px;
-        top:10px;
+        top:5px;
     }
 
     .delBtnPos {
         position: absolute;
         left: 515px;
-        top:10px;
+        top:5px;
     }
 
 
@@ -144,11 +155,11 @@ ${cpweb_foot}
     <p class="namePos">{{name}}</p>
 
     [#if security.hasPermission("CP_VIEW_APIKEY_SECRET")]
-    <button class="showBtnPos" data-id="{{publicKey}}">Show</button>
+    <button type="button" class="showBtnPos btn btn-primary btn-sm" data-id="{{publicKey}}">Show</button>
     [/#if]
 
     [#if security.hasPermission("CP_DELETE_APIKEY")]
-    <button class="delBtnPos" data-id="{{id}}">Delete</button>
+    <button type="button" class="delBtnPos btn btn-primary btn-sm" data-id="{{id}}">Delete</button>
     [/#if]
     </div>
     {{/each}}
@@ -175,7 +186,7 @@ ${cpweb_foot}
 
     <div class="clearALl">
         [#if security.hasPermission("CP_CREATE_APIKEY")]
-        <button class="fl addBtn">Add Key</button>
+        <button type="button" class="fl addBtn btn btn-primary btn-sm">Add Key</button>
         [/#if]
     </div>
 
