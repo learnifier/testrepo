@@ -6,7 +6,6 @@ package se.dabox.cocobox.cpweb.module.papi;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -25,7 +24,6 @@ import se.dabox.service.papi.client.PapiScope;
 import se.dabox.service.papi.client.PartnerId;
 import se.dabox.service.papi.client.PublicApiKeyAdminClient;
 import se.dabox.service.papi.client.PublicApiKeyPair;
-import se.dabox.service.papi.client.PublicApiKeyPairField;
 import se.dabox.service.papi.client.PublicApiPartner;
 import se.dabox.service.papi.client.UpdatePublicApiKeyPairRequest;
 import se.dabox.service.papi.client.UpdatePublicApiKeyPairRequestBuilder;
@@ -85,7 +83,7 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
 
         PublicApiKeyPair keyPair = pc.createApiKeyPair(userId, pid, name);
 
-        return jsonTarget(toJsonPublicApiKeyPair(cycle, keyPair));
+        return jsonTarget(toJsonPublicApiKeyPair(cycle, keyPair, true));
     }
 
         @WebAction
@@ -227,16 +225,18 @@ public class PapiJsonModule extends AbstractJsonAuthModule {
     
 
     private byte[] toJsonPublicApiKeyPair(final RequestCycle cycle,
-            final PublicApiKeyPair keyPair) {
+            final PublicApiKeyPair keyPair, boolean includeSecret) {
         
         return new JsonEncoding() {
             @Override
             protected void encodeData(JsonGenerator generator) throws IOException {
-                    // Note: Do NOT include secretKey here.
                     generator.writeStartObject();
                     generator.writeNumberField("id", keyPair.getId());
                     generator.writeStringField("name", keyPair.getName());
                     generator.writeStringField("publicKey", keyPair.getPublicKey());
+                    if(includeSecret) {
+                        generator.writeStringField("secretKey", keyPair.getSecretKey());
+                    }
                     generator.writeNumberField("partnerId", keyPair.getPartner().getId().getId());
                     generator.writeEndObject();
             }
