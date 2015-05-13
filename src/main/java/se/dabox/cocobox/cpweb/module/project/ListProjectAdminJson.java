@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import se.dabox.service.common.ccbc.project.role.ProjectUserRole;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleSearch;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -55,7 +53,7 @@ public class ListProjectAdminJson {
     }
 
     private void prepareData() {
-        getCpRoles();
+        getProjectRoles();
         createUserRolesMap();
         getUsers();
         sortUsers();
@@ -65,24 +63,15 @@ public class ListProjectAdminJson {
         ProjectUserRoleSearch search = ProjectUserRoleSearch.forProjectId(prj.getProjectId());
         List<ProjectUserRole> roles = ccbc.searchProjectUserRoles(search);
 
-        userRolesMap = CollectionsUtil.createMapSetNotNull(roles,
-                new Transformer<ProjectUserRole, Long>() {
-
-                    @Override
-                    public Long transform(ProjectUserRole item) {
-                        return item.getUserId();
+        userRolesMap = CollectionsUtil.createMapSetNotNull(roles, 
+                ProjectUserRole::getUserId,
+                (ProjectUserRole item) -> {
+                    if (projectRolesMap.containsKey(item.getRole())) {
+                        return item.getRole();
                     }
-                }, new Transformer<ProjectUserRole, String>() {
 
-                    @Override
-                    public String transform(ProjectUserRole item) {
-                        if (projectRolesMap.containsKey(item.getRole())) {
-                            return item.getRole();
-                        }
-
-                        return null;
-                    }
-                });
+                    return null;
+        });
     }
 
     private void getUsers() {
@@ -102,16 +91,11 @@ public class ListProjectAdminJson {
     }
 
     private void sortUsers() {
-        Collections.sort(users, new Comparator<MiniUserInfo>() {
-
-            @Override
-            public int compare(MiniUserInfo o1, MiniUserInfo o2) {
-                return new CompareToBuilder().
+        Collections.sort(users, (MiniUserInfo o1, MiniUserInfo o2) ->
+                new CompareToBuilder().
                         append(o1.getDisplayName(), o2.getDisplayName()).
                         append(o1.getEmail(), o2.getEmail()).
-                        build();
-            }
-        });
+                        build());
     }
 
     private ByteArrayOutputStream generateJson() {
@@ -145,7 +129,7 @@ public class ListProjectAdminJson {
         }.encodeToStream(users);
     }
 
-    private void getCpRoles() {
+    private void getProjectRoles() {
         final CocoboxRoleUtil cru = new CocoboxRoleUtil();
         projectRolesMap = cru.getProjectRoles(cycle);
         projectRoles = cru.toSortedRoleUuidNamePairList(cycle, projectRolesMap);
