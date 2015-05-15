@@ -27,10 +27,11 @@ public class PapiModule extends AbstractWebAuthModule {
     public RequestTarget onListApiKeys(RequestCycle cycle, String strOrgId) {
         checkOrgPermission(cycle, strOrgId, CocoboxPermissions.BO_VIEW_APIKEY);
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-        
+
         Map<String, Object> map = createMap();
         map.put("org", org);
         map.put("apiEndpoint", getEndpoint(cycle));
+        map.put("orgUnitEndpoint", getOrgunitEndpoint(cycle, strOrgId));
 
         return new FreemarkerRequestTarget("papi/listApiKeys.html", map);
     }
@@ -40,6 +41,14 @@ public class PapiModule extends AbstractWebAuthModule {
 
         String apiweb = config.getValue(CocoSiteConfKey.APIWEB_BASEURL);
 
-        return apiweb+"v1/";
+        return apiweb + "v1/";
+    }
+
+    private String getOrgunitEndpoint(RequestCycle cycle, String strOrgId) {
+        Configuration config = DwsRealmHelper.getRealmConfiguration(cycle);
+
+        String apiweb = config.getValue(CocoSiteConfKey.APIWEB_BASEURL);
+
+        return apiweb + "v1/orgunits/" + strOrgId;
     }
 }
