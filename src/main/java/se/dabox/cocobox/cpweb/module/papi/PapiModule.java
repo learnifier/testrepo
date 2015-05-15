@@ -10,8 +10,11 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.service.common.context.Configuration;
+import se.dabox.service.common.context.DwsRealmHelper;
 
 /**
  *
@@ -27,7 +30,16 @@ public class PapiModule extends AbstractWebAuthModule {
         
         Map<String, Object> map = createMap();
         map.put("org", org);
+        map.put("apiEndpoint", getEndpoint(cycle));
+
         return new FreemarkerRequestTarget("papi/listApiKeys.html", map);
     }
 
+    private String getEndpoint(RequestCycle cycle) {
+        Configuration config = DwsRealmHelper.getRealmConfiguration(cycle);
+
+        String apiweb = config.getValue(CocoSiteConfKey.APIWEB_BASEURL);
+
+        return apiweb+"v1/";
+    }
 }

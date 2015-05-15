@@ -13,11 +13,8 @@ ${cpweb_foot}
     });
    
 </script>
-[/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
-
-<script id="settings-template" type="text/x-handlebars-template"> 
+<script id="settings-template" type="text/x-handlebars-template">
 
 
     {{#each data}}
@@ -37,7 +34,16 @@ ${cpweb_foot}
 
 
 </script>
+[/#assign]
 
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
+
+<div>
+    <h2>API Keys</h2>
+    
+    The API endpoint is: <code>${apiEndpoint?xml}</code>
+    
+</div>
 
 <div id="settingsList">
     <h2>API Keys</h2>
