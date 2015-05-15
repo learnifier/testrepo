@@ -4,6 +4,7 @@
  */
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import java.util.List;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaService;
@@ -340,7 +341,7 @@ public class DesignModule extends AbstractWebAuthModule {
         updateReq.setName(form.getName());
         updateReq.setDescription(StringUtils.trimToEmpty(form.getDescription()));
 
-        String techInfo = DesignTechInfo.createOrgTechInfo(orgId);
+        String techInfo = CpDesignTechInfo.createOrgTechInfo(orgId);
 
         CopyDesignRequest copyRequest = new CopyDesignRequest(info.getDesignId(), caller, techInfo);
         final CourseDesignClient cdClient = getCourseDesignClient(cycle);

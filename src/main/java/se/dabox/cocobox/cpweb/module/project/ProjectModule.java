@@ -30,7 +30,7 @@ import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
-import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
 import se.dabox.cocobox.cpweb.state.ErrorState;
@@ -524,7 +524,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         CourseDesignClient cdClient =
                 Clients.getClient(cycle, CourseDesignClient.class);
 
-        String techInfo = DesignTechInfo.createStageTechInfo(project.getProjectId());
+        String techInfo = CpDesignTechInfo.createStageTechInfo(project.getProjectId());
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         long stageId = cdClient.copyDesign(project.getDesignId(), userId, techInfo);

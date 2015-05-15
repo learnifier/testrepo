@@ -15,7 +15,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
-import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
@@ -39,6 +39,7 @@ import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
+import se.dabox.service.common.coursedesign.expiration.GetCourseDefaultExpiration;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -205,7 +206,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        String techInfo = DesignTechInfo.createStageTechInfo(project.getProjectId());
+        String techInfo = CpDesignTechInfo.createStageTechInfo(project.getProjectId());
 
         long newDesignId = cdClient.copyDesign(nps.getDesignId(), userId, techInfo);
         long newDatabank = getCocoboxCordinatorClient(cycle).createDatabank(userId, project.
@@ -275,19 +276,6 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private Long getDefaultExpiration(RequestCycle cycle, long newDesignId) {
-        CourseDesignClient cdClient =
-                Clients.getClient(cycle, CourseDesignClient.class);
-
-        CourseDesign design = cdClient.getDesign(newDesignId);
-        if (design == null) {
-            return null;
-        }
-
-        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-        if (cdd.getInfo() == null || cdd.getInfo().getDefaultParticipationExpiration() == null) {
-            return null;
-        }
-
-        return cdd.getInfo().getDefaultParticipationExpiration().getOffset();
+        return new GetCourseDefaultExpiration().getDefaultExpiration(cycle, newDesignId);
     }
 }

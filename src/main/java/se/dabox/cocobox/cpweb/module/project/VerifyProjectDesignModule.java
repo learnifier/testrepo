@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.Blank;
-import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.details.DateTimeFormatter;
 import se.dabox.cocobox.cpweb.module.project.details.ExtendedComponentFieldName;
 import se.dabox.cocobox.cpweb.module.project.details.FieldSetCreator;
@@ -357,7 +357,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         boolean newDesign = false;
         if (project.getStageDesignId() != null) {
-            String techInfo = DesignTechInfo.createLiveTechInfo(project.getProjectId());
+            String techInfo = CpDesignTechInfo.createLiveTechInfo(project.getProjectId());
             designId = cdc.copyDesign(project.getStageDesignId(), userId, techInfo);
             newDesign = true;
         }
