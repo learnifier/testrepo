@@ -26,6 +26,11 @@ ${cpweb_foot}
          background-color: #f5f5f5;
     }
 </style>
+
+<script id="anonProductMenuTemplate" type="text/x-handlebars-template">
+    
+</script>
+
 <script>
 
     $(document).ready(function() {
@@ -118,8 +123,12 @@ ${cpweb_foot}
                                 html+= '<li class="customHover"><form method="post" action="${removeLink}" onsubmit="return onDelete(this)" style="padding: 3px 20px;" class="DeleteItem"><a href="#" style="color: #333333;" class="DeleteItemClick"><input type="hidden" name="materialId" value="'+row.system+'|'+row.id+'" />Delete</a></form></li>';
                             }
                             
-                            if(row.anonymous == true) {
-                                html+= "<li><a href='#' data-id='" + row.id + "' onclick='editItem(this)' >Edit</a></li>";
+                            if(row.anonymous === true) {
+                                if(row.editorUrl) {
+                                    html+= "<li><a href='"+row.editorUrl+"' target='_blank'>Edit</a></li>";
+                                } else {
+                                    html+= "<li><a href='#' data-id='" + row.id + "' onclick='editItem(this)' >Edit</a></li>";
+                                }
                             }
                             
                             html+= "</ul></div>";
@@ -225,7 +234,7 @@ ${cpweb_foot}
                 //do nothing
             }
         }, {
-            scope: "O${org.id?c}",
+            scope: "P${prj.projectId?c}",
             productId: productId
         });
 
