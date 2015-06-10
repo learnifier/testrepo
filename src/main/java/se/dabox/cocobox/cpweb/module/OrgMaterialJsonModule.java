@@ -19,10 +19,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
@@ -40,6 +38,7 @@ import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
+import se.dabox.cocosite.pdweb.PdwebProductEditorUrlFactory;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.dws.client.langservice.LangBundle;
@@ -65,6 +64,7 @@ import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.material.MaterialUtils;
+import se.dabox.service.common.proddir.CocoboxProductUtil;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
@@ -711,6 +711,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final LangBundle bundle = getLangBundle(cycle);
 
+        PdwebProductEditorUrlFactory pdwebEditorFactory = new PdwebProductEditorUrlFactory(cycle);
+
         return new DataTablesJson<Material>() {
             @Override
             protected void encodeItem(Material material) throws IOException {
@@ -737,6 +739,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                     generator.writeBooleanField("projectProduct", product.isProjectProduct());
                     generator.writeBooleanField("ouProduct", product.isOrgUnitProduct());
                     generator.writeBooleanField("realmProduct", product.isRealmProduct());
+                    if (CocoboxProductUtil.hasPdwebEditor(product)) {
+                        String editorUrl = pdwebEditorFactory.forProduct(product);
+                        generator.writeStringField("editorUrl", editorUrl);
+                    }
                 }
             }
 

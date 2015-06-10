@@ -11,6 +11,24 @@
 [#assign foot]
 ${cpweb_foot}
 
+<script id="anonProductMenuTemplate" type="text/x-handlebars-template">
+<div class='btn-group'>
+    <button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>
+    <ul class='dropdown-menu dropdown-menu-right' role='menu'>
+        {{#if editorUrl}}
+            <li><a href='{{editorUrl}}' target="_blank">Edit</a></li>
+        {{/if}}
+        {{#unless editorUrl}}
+            <li><a href='#' data-id='{{row.id}}' onclick='return editItem(this)'>Edit</a></li>
+        {{/unless}}
+        {{!--
+            <li><a href='#' data-trigger='click' data-action='delete' data-id='{{row.id}}'>Delete</a></li>
+        --}}
+    </ul>
+</div>
+</script>
+
+
 <script>
     $('#menu-library').addClass('subMenuExpanded');
     $('#menu-library-materials').addClass('active');
@@ -19,11 +37,13 @@ ${cpweb_foot}
        //No initialization needed
     });
 
-    require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
+    require(['handlebars', 'dataTables-bootstrap', 'dataTables-responsive'], function(Handlebars) {
         var pub = {
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
             spinnerUrl: "[@common.spinnerUrl /]"
         };
+
+        var anonProductMenu = Handlebars.compile($("#anonProductMenuTemplate").html());
             
         var pTable = $('#materialstable').dataTable({
             "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
@@ -69,12 +89,7 @@ ${cpweb_foot}
                     "data" : function(row, type, set) {
                         if (row.anonymous == true) {
                             
-                                var html = "<div class='btn-group'>";
-                                    html+= "<button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>";
-                                    html+= "<ul class='dropdown-menu dropdown-menu-right' role='menu'>";
-                                    html+= "<li><a href='#' data-id='" + row.id + "' onclick='return editItem(this)'>Edit</a></li>";
-                                    //html+= "<li><a href='#' data-trigger='click' data-action='delete' data-id='" + row.id + "'>Delete</a></li>";
-                                    html+= "</ul></div>";
+                                var html = anonProductMenu(row);
                                     
                                 row.actionsDisplay = html;
                            
