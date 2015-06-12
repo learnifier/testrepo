@@ -102,4 +102,17 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
 
     validator.element("input[type=locUrlExtra]");
 
+    $(function () {
+        require(['cocobox-datetime'], function(dt) {
+            $("input[data-ccbfieldname=starts]").each(function() {
+                var name = $(this).attr("id");
+                var newName = name.replace(/starts$/, "ends");
+                
+                dt.linkToField("#"+name, "#"+newName);
+            });
+
+        });
+    }
+    );
+
 });
