@@ -63,13 +63,13 @@
             <ul class="page-created-updated__wrapper list-inline">
                 <li>
                     <p class="page-updated-label">Learner Portal Name</p>
-                    <p class="page-updated"><span id="project-usertitle" data-url="${projectSettingUrl}" data-pk="usertitle">${prj.userTitle?xml}</span></p>
+                    <p class="page-updated"><span id="project-usertitle" data-url="${projectSettingUrl}" data-pk="usertitle">${(prj.userTitle?xml)!''}</span></p>
                 </li>                
             </ul>
             <ul class="page-created-updated__wrapper list-inline">
                 <li>
                     <p class="page-updated-label">Learner Portal Description</p>
-                    <p class="page-updated"><span id="project-userdesc" data-url="${projectSettingUrl}" data-pk="userdesc">${prj.userDescription?xml}</span></p>
+                    <p class="page-updated"><span id="project-userdesc" data-url="${projectSettingUrl}" data-pk="userdesc">${(prj.userDescription?xml)!''}</span></p>
                 </li>
             </ul>
             [/#if]
