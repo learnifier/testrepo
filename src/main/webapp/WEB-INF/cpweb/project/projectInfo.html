@@ -59,7 +59,7 @@
                     <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
                 </li>
             </ul>
-            [#if project.type.ptype == 2 || project.type.ptype == 3]
+            [#if project.type.ptype == 1 || project.type.ptype == 3]
             <ul class="page-created-updated__wrapper list-inline">
                 <li>
                     <p class="page-updated-label">Learner Portal Name</p>
