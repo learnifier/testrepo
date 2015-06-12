@@ -17,6 +17,8 @@
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
     cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
+    cpweb.editable($('#project-usertitle'), $('#project-usertitle x'), function(value){}, {});
+    cpweb.editable($('#project-userdesc'), $('#project-userdesc x'), function(value){}, {});
 
     [/@]
 
@@ -57,6 +59,20 @@
                     <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail prj.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(prj.updated?datetime?string.full)!''}">${(prj.updated?date?string.full)!''}</span></p>
                 </li>
             </ul>
+            [#if project.type.ptype == 2 || project.type.ptype == 3]
+            <ul class="page-created-updated__wrapper list-inline">
+                <li>
+                    <p class="page-updated-label">Learner Portal Name</p>
+                    <p class="page-updated"><span id="project-usertitle" data-url="${projectSettingUrl}" data-pk="usertitle">${prj.userTitle?xml}</span></p>
+                </li>                
+            </ul>
+            <ul class="page-created-updated__wrapper list-inline">
+                <li>
+                    <p class="page-updated-label">Learner Portal Description</p>
+                    <p class="page-updated"><span id="project-userdesc" data-url="${projectSettingUrl}" data-pk="userdesc">${prj.userDescription?xml}</span></p>
+                </li>
+            </ul>
+            [/#if]
         [/#if]
         <div class="ccb-page-header__actions">
             [#if isIdproject() ]
