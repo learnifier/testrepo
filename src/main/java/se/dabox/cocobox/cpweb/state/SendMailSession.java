@@ -45,6 +45,7 @@ public class SendMailSession implements Serializable {
     private boolean stickyHidesDropdown = true;
     private PortableMailTemplate portableMailTemplate;
     private String skin;
+    private String sendButtonText;
 
     public SendMailSession(SendMailProcessor processor,
             RequestTargetGenerator completedTargetGenerator,
@@ -338,6 +339,26 @@ public class SendMailSession implements Serializable {
     public void setSkin(String skin) {
         this.skin = skin;
     }
+
+    /**
+     * Gets the overriden send button text.
+     *
+     * @return The overriden send button text or {@code null} if the default should be used.
+     */
+    public String getSendButtonText() {
+        return sendButtonText;
+    }
+
+    /**
+     * Overrides the text to show on the send button.
+     *
+     * @param sendButtonText The button text or {@code null} to override.
+     */
+    public void setSendButtonText(String sendButtonText) {
+        this.sendButtonText = sendButtonText;
+    }
+
+
 
     /**
      * Returns a SendMailSession from a WebSession that match the specified uuid.

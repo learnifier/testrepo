@@ -34,7 +34,6 @@ import se.dabox.service.common.mailsender.mailtemplate.MissingStickyMailTemplate
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *

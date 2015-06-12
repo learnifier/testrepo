@@ -296,11 +296,18 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                 decorateUrl(cycle, rawUrl));
 
         SendMailSession session = new SendMailSession(processor, taskPage, taskPage);
+        setSendButtonText(session, cycle);
         session.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
 
         session.storeInSession(cycle);
 
         return session.getPreSendTarget(prj.getOrgId());
+    }
+
+    private void setSendButtonText(SendMailSession session, RequestCycle cycle) {
+        final LangBundle bundle = getLangBundle(cycle, CocoSiteConstants.DEFAULT_LANG_BUNDLE);
+        final String buttonText = bundle.getKey("form.action.addtask");
+        session.setSendButtonText(buttonText);
     }
 
     @WebAction

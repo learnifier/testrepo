@@ -4,7 +4,7 @@
 ${cpweb_foot}
 <script>
 
-    require(["[@modal.clientJavascript /]"], function (modalClient) {
+    require(["[@modal.clientJavascript /]", "dabox-common"], function (modalClient) {
 
         modalClient.setButtons(
                 [
@@ -12,6 +12,12 @@ ${cpweb_foot}
                         content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.next')?js_string}",
                         cssClass: "btn-primary",
                         action: function (dlg) {
+                            if (!$("#taskdate").val()) {
+                                cocobox.infoDialog("Date", "Please select a date");
+
+                                return;
+                            }
+
                             $("#addTaskForm").submit();
                         }
                     },
