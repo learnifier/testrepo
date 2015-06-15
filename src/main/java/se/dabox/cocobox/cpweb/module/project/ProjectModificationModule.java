@@ -55,6 +55,7 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocosite.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.Permission;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
@@ -621,6 +622,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                         }
                     }
 
+                    uaClient.addUserRole(ua.getUserId(), CocoboxSecurityConstants.USER_ROLE);
                     
                     uaClient.updateUserProfileValue(ua.getUserId(),
                             CocoboxUserAccount.PROFILE_COCOBOX, 
