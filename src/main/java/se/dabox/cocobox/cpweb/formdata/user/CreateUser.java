@@ -18,6 +18,7 @@ public class CreateUser implements Serializable {
     private String email;
     private Locale lang;
     private String role;
+    private Long organization;
 
     @FormField(type = "simpleEmail")
     public String getEmail() {
@@ -63,4 +64,14 @@ public class CreateUser implements Serializable {
     public void setRole(String role) {
         this.role = role;
     }
+
+    @FormField
+    public Long getOrganizationId() {
+        return organization;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organization = organizationId;
+    }
+    
 }

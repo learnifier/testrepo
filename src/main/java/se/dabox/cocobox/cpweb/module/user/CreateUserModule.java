@@ -3,9 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -40,6 +43,7 @@ import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.security.role.RoleUuidNamePair;
+import se.dabox.cocosite.user.sort.UserListSortComparator;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
@@ -48,6 +52,9 @@ import se.dabox.service.common.tx.VerificationStatus;
 import se.dabox.service.login.client.SetUserAccountNameRequest;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.orgdir.client.OrgUnitInfo;
+import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
@@ -72,7 +79,9 @@ public class CreateUserModule extends AbstractWebAuthModule {
         DruwaFormValidationSession<CreateUser> formsess =
                 getValidationSession(CreateUser.class, cycle);
 
-        return genericCreateEditView(cycle, org, ModalParamsHelper.decorateUrl(cycle, formLink),
+        List<OrgUnitInfo> orgList = getOrgList(cycle, org, null);
+
+        return genericCreateEditView(cycle, org, orgList, ModalParamsHelper.decorateUrl(cycle, formLink),
                 formsess, false);
     }
 
@@ -94,6 +103,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
         form.setFirstname(userAccount.getGivenName());
         form.setLastname(userAccount.getSurname());
         form.setLang(CocositeUserHelper.getUserAccountUserLocale(userAccount));
+        form.setOrganizationId(userAccount.getOrganizationId());
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
 
@@ -111,7 +121,9 @@ public class CreateUserModule extends AbstractWebAuthModule {
                 getValidationSession(CreateUser.class, cycle);
         formsess.populateFromObject(form);
 
-        return genericCreateEditView(cycle, org, formLink, formsess, true);
+        List<OrgUnitInfo> orgList = getOrgList(cycle, org, userAccount);
+
+        return genericCreateEditView(cycle, org, orgList, formLink, formsess, true);
     }
 
     @WebAction(methods = HttpMethod.POST)
@@ -170,7 +182,27 @@ public class CreateUserModule extends AbstractWebAuthModule {
             uaService.updateUserProfileValue(userAccount.getUserId(), "email", "email", form.
                     getEmail());
         }
-
+        
+        final Long formOrgId = form.getOrganizationId();
+        if(formOrgId == 0) {
+            // We are trying to set organization to null.
+            if(userAccount.getOrganizationId() != null) { 
+                if(UserAccountRoleCheck.isBoAdmin(LoginUserAccountHelper.getUserAccount(cycle)) || (org.getId() == userAccount.getOrganizationId())) {
+                    // We are boAdmin, always ok to set to null || Only allow to change to null if home org is set to the users own org
+                    uaService.setOrganization(userAccount.getUserId(), null);
+                } 
+                // Else silently do nothing; operation not permitted
+            }
+        } else {
+            // We are trying to change to a new non-null organization
+            if(!Objects.equals(userAccount.getOrganizationId(), formOrgId)) {
+                if(UserAccountRoleCheck.isBoAdmin(LoginUserAccountHelper.getUserAccount(cycle)) || (org.getId() == formOrgId)) {
+                    // Always ok for boAdmin || Allow to change to home org only
+                    uaService.setOrganization(userAccount.getUserId(), formOrgId);
+                } 
+                // Else silently do nothing; operation is not permitted.
+            }
+        }
         UserAccountChangedListenerUtil.triggerEvent(cycle, userAccount.getUserId());
 
         //No need to decorate modal params here
@@ -194,13 +226,13 @@ public class CreateUserModule extends AbstractWebAuthModule {
         return sendAdminInvitationWithMailPage(cycle, org.getId(), userAccount.getUserId());
     }
 
-    private RequestTarget genericCreateEditView(RequestCycle cycle, MiniOrgInfo org, String formLink,
+    private RequestTarget genericCreateEditView(RequestCycle cycle, MiniOrgInfo org, List<OrgUnitInfo> orgList, String formLink,
             DruwaFormValidationSession<CreateUser> formsess, boolean editMode) {
 
         Map<String, Object> map = createMap();
-
         map.put("formsess", formsess);
         map.put("org", org);
+        map.put("orgList", orgList);
         map.put("formLink", formLink);
         map.put("userLocales", getUserLocales(cycle));
         map.put("defaultUserLocale", getDefaultUserLocale(cycle));
@@ -322,6 +354,36 @@ public class CreateUserModule extends AbstractWebAuthModule {
     private Locale getDefaultUserLocale(RequestCycle cycle) {
         return new GetUserDefaultLocaleCommand().getLocale(cycle);
     }
+    
+    private List<OrgUnitInfo> getOrgList(RequestCycle cycle, MiniOrgInfo org, UserAccount userAccount) {
+        OrganizationDirectoryClient odc = getOrganizationDirectoryClient(cycle);
+        
+        OrgUnitInfo nullOrg = new OrgUnitInfo();
+        nullOrg.setId(0);
+        nullOrg.setDisplayName("");
+            
+        // Return all organizations if we have are BO-admin
+        if(UserAccountRoleCheck.isBoAdmin(LoginUserAccountHelper.getUserAccount(cycle))) {
+            List<OrgUnitInfo> orgUnits = odc.listOrgUnits(CocoSiteConstants.OUTYPE_CLIENT);
+            orgUnits.add(nullOrg);
+            Collections.sort(orgUnits, new UserListSortComparator<OrgUnitInfo>(){
+                @Override
+                public int compare(OrgUnitInfo p1, OrgUnitInfo p2){
+                    return collator.compare(p1.getDisplayName(), p2.getDisplayName());
+                }
+            });
+            return orgUnits;
+        }
+        
+        // New user, null org or org = home org -> allow null or home org
+        if(userAccount == null || userAccount.getOrganizationId() == null || org.getId() == userAccount.getOrganizationId()) {
+            return Arrays.asList(nullOrg, odc.getOrgUnitInfo(org.getId()));
+        }
+        
+        // Org is set to something that is not null or the users home org -> do not allow change.
+        return Collections.singletonList(odc.getOrgUnitInfo(org.getId()));
+    }
+        
 
     private boolean userExistsWithEmail(RequestCycle cycle, String email) {
         List<UserAccount> users =
@@ -333,6 +395,10 @@ public class CreateUserModule extends AbstractWebAuthModule {
 
     private UserAccountService getUserAccountService(final RequestCycle cycle) {
         return CacheClients.getClient(cycle, UserAccountService.class);
+    }
+
+    private OrganizationDirectoryClient getOrganizationDirectoryClient(final RequestCycle cycle) {
+        return CacheClients.getClient(cycle, OrganizationDirectoryClient.class);
     }
 
     private RequestTarget toEditUserPage(RequestCycle cycle, String strOrgId, String strUserId) {

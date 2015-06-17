@@ -36,6 +36,8 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.orgdir.client.OrgUnitInfo;
+import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 
 /**
  *
@@ -66,9 +68,19 @@ public class UserModule extends AbstractWebAuthModule {
 
         boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
 
+        OrganizationDirectoryClient odc = getOrganizationDirectoryClient(cycle);
+        OrgUnitInfo organization;
+        if(user.getOrganizationId() != null) {
+            organization = odc.getOrgUnitInfo(user.getOrganizationId());
+        } else {
+            organization = null;
+        }
+        
         Map<String, Object> map = createMap();
 
+        
         map.put("user", user);
+        map.put("organization", organization);
         map.put("locale", userLocale);
         map.put("role", userRole);
         map.put("isAdmin", isAdmin);
@@ -146,6 +158,11 @@ public class UserModule extends AbstractWebAuthModule {
     private UserAccountService getUserAccountService(RequestCycle cycle) {
         return CacheClients.getClient(cycle, UserAccountService.class);
     }
+
+    private OrganizationDirectoryClient getOrganizationDirectoryClient(final RequestCycle cycle) {
+        return CacheClients.getClient(cycle, OrganizationDirectoryClient.class);
+    }
+
 
     private List<RoleInfo> getRoles(RequestCycle cycle) {
         Map<String, String> roleMap = new CocoboxRoleUtil().getCpRoles(cycle);

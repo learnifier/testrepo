@@ -46,8 +46,16 @@ ${cpweb_foot}
     </div>
     [@bsform.inputEmail name="email" tabindex="3" maxlength="96" /]
 
+    [@bsform.select name="organization" tabindex="4"]
+    [#list orgList as o]
+    [@bsform.option value=o.id?c defaultValue=formsess.getDefaultValue('organization')!"0"]${o.displayName?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
+
+    
     [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
-    [@bsform.select name="lang" tabindex="4"]
+    [@bsform.select name="lang" tabindex="5"]
+    [@bsform.option value=""]xxx[/@bsform.option]
     [#list userLocales as uLocale]
     [@bsform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@bsform.option]
     [/#list]
@@ -58,7 +66,7 @@ ${cpweb_foot}
     [#else]
 
     [#assign defaultValue = formsess.getDefaultValue('role')!'clientadmin' /]
-    [@bsform.select name="role" class="input_full" tabindex="5"]
+    [@bsform.select name="role" class="input_full" tabindex="6"]
     [@bsform.option value="" selected="selected" disabled="disabled"][/@bsform.option]
     [@bsform.option value="none"]None[/@bsform.option]
     [#list roles as role]
