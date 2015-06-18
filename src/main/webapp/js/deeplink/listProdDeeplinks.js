@@ -17,20 +17,22 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         self.createdStr = ko.observable();
         self.createdBy = ko.observable();
         self.linkTokenId = ko.observable();
+        self.deleteLink = ko.observable();
         
         
         self.deleteCreditHistory = function () {
             
-            //console.log(self.linkTokenId());
-            //console.log(self);
-                $.post(listDeeplinksProducts.deleteCredit+'/'+self.linkTokenId(), function (data) {
-                   
-          
-                       
-                }).fail(function () {
-                    alert('failed to post data');
-                });
             
+            cocobox.confirmationDialog("Delete credits",
+                    "Do you want to delete these credits for this link?",
+                    function () {
+                        cocobox.ajaxPost(self.deleteLink());
+                        console.log(parent.credits);
+                        console.log(parent.credit);
+                        //parent.credits.remove();
+                    }
+            );
+
         };
         
     };
@@ -132,6 +134,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                        credit.amount(this.amount);
                        credit.createdBy(this.createdBy);
                        credit.createdStr(this.createdStr);
+                       credit.deleteLink(this.deleteLink);
                        credit.linkTokenId(this.linkTokenId);
 
                        self.credits.push(credit);
