@@ -20,16 +20,14 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         self.deleteLink = ko.observable();
         
         
-        self.deleteCreditHistory = function () {
+        self.deleteCreditHistory = function (element, parent) {
             
             
             cocobox.confirmationDialog("Delete credits",
                     "Do you want to delete these credits for this link?",
                     function () {
                         cocobox.ajaxPost(self.deleteLink());
-                        console.log(parent.credits);
-                        console.log(parent.credit);
-                        //parent.credits.remove();
+                        //parent.remove(parent);
                     }
             );
 
