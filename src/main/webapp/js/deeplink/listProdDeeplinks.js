@@ -17,6 +17,22 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         self.createdStr = ko.observable();
         self.createdBy = ko.observable();
         self.linkTokenId = ko.observable();
+        
+        
+        self.deleteCreditHistory = function () {
+            
+            //console.log(self.linkTokenId());
+            //console.log(self);
+                $.post(listDeeplinksProducts.deleteCredit+'/'+self.linkTokenId(), function (data) {
+                   
+          
+                       
+                }).fail(function () {
+                    alert('failed to post data');
+                });
+            
+        };
+        
     };
     
     var DeepLinkModel = function () {
@@ -127,17 +143,6 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
             }
         };
         
-        self.deleteCreditHistory = function () {
-
-                $.post(listDeeplinksProducts.deleteCredit+'/'+self.linkTokenId(), function (data) {
-                   
-          
-                       
-                }).fail(function () {
-                    alert('failed to post data');
-                });
-            
-        };
         
         self.deleteLink = function (parent) {
 
