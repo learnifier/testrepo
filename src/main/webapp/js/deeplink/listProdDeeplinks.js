@@ -27,8 +27,8 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                     "Do you want to delete these credits for this link?",
                     function () {
                         cocobox.ajaxPost(self.deleteLink());
-                        parent.credits(parent.credits() - 1);
-                        parent.balance(parent.balance() - 1);
+                        parent.credits.remove(self); 
+                        parent.balance(parent.balance() - self.amount());
                     }
             );
 
