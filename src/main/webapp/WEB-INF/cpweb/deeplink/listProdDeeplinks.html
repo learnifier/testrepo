@@ -21,6 +21,7 @@ ${cpweb_foot}
     listDeeplinksProducts.creditBalance = "${helper.urlFor('deeplink.ProductMaterialJsonModule','productBalance',[org.id])}";
     listDeeplinksProducts.updateCredits = "${addLinkCreditsFormLink}";
     listDeeplinksProducts.orgId = "${org.id?c}";
+    
     listDeeplinksProducts.deleteCredit = "${helper.urlFor('deeplink.ProductMaterialJsonModule', 'removeLinkToken', [org.id])}";
 
    require(['${contextPath}/js/deeplink/listProdDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
