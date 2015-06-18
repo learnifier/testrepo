@@ -103,7 +103,7 @@ ${cpweb_foot}
             <p class="pull-left cAmount" data-bind="text: amount"></p>
             <p class="pull-left cCby" data-bind="text: createdBy"></p>
             <p class="pull-left cCdate" data-bind="text: createdStr"></p>
-            <button type="button" class="btn btn-default btn-xs mt5" data-bind="click: deleteCreditHistory">Delete</button>
+            <button type="button" class="btn btn-default btn-xs mt5" data-bind="click: deleteCreditHistory.bind($data, $parent)">Delete</button>
             <hr class="creditHrFixBottom">
             </div>
             
