@@ -56,9 +56,10 @@ public class UserJsonModule extends AbstractJsonAuthModule {
         CocoboxCoordinatorClient ccc = getCocoboxCordinatorClient(cycle);
         List<ProjectParticipation> participations =
                 ccc.listProjectParticipationsForUserId(userId);
+        UserAccount account = getUserAccount(cycle, userId);
 
-        List<OrgProject> listOrgProjects = ccc.listOrgProjects(orgId);
-        return jsonTarget(toJsonResponse(cycle, participations));
+        // Note: toJsonResponse does some filtering and hide/show links depending on browsed organization / home org.
+        return jsonTarget(toJsonResponse(cycle, participations, account.getOrganizationId() == orgId, orgId));
     }
 
     @WebAction
@@ -126,29 +127,53 @@ public class UserJsonModule extends AbstractJsonAuthModule {
 
     private ByteArrayOutputStream toJsonResponse(
             RequestCycle cycle,
-            List<ProjectParticipation> participations) {
+            List<ProjectParticipation> participations,
+            boolean inHomeOrg,
+            long browsingOrgId) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(
                 CpJsonModule.DEFAULT_BYTE_SIZE);
 
         LazyProjectName projName = new LazyProjectName(getCocoboxCordinatorClient(cycle));
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         try {
             try (JsonGenerator generator
                     = CpJsonModule.FACTORY.createJsonGenerator(
                             baos)) {
-                generator.writeStartObject();
-                
+                generator.writeStartObject();                
                 generator.writeArrayFieldStart("aaData");
                 
                 for (ProjectParticipation ppart : participations) {
-                    generator.writeStartObject();
-                    generator.writeNumberField("id", ppart.getParticipationId());
-                    generator.writeStringField("projectname", projName.forProject(ppart.getProjectId()));
-                    generator.writeStringField("projectlink", NavigationUtil.toProjectPageUrl(cycle,
-                            ppart.getProjectId()));
+                    if(inHomeOrg) {
+                        // show everything but selective links
+                        long projId = ppart.getProjectId();
+                        OrgProject project = ccbc.getProject(projId);
+                        generator.writeStartObject();
+                        generator.writeNumberField("id", ppart.getParticipationId());
+                        generator.writeStringField("projectname", projName.forProject(ppart.getProjectId()));
 
-                    generator.writeEndObject();
+
+                        if(browsingOrgId == project.getOrgId()) {
+                            generator.writeStringField("projectlink", NavigationUtil.toProjectPageUrl(cycle,
+                                    ppart.getProjectId()));
+                        }
+                        generator.writeEndObject();
+                    } else {
+                        // not in home org, show only projs that belong to orgId
+                            long projId = ppart.getProjectId();
+                            OrgProject project = ccbc.getProject(projId);
+                            if(browsingOrgId == project.getOrgId()) {
+                                generator.writeStartObject();
+                                generator.writeNumberField("id", ppart.getParticipationId());
+                                generator.writeStringField("projectname", projName.forProject(ppart.getProjectId()));
+                                generator.writeStringField("projectlink", NavigationUtil.toProjectPageUrl(cycle,
+                                        ppart.getProjectId()));
+                                
+                                generator.writeEndObject();
+                            }
+                        }
+                        
                 }
 
                 generator.writeEndArray();
@@ -171,5 +196,6 @@ public class UserJsonModule extends AbstractJsonAuthModule {
 
         return uaClient;
     }
+
 
 }

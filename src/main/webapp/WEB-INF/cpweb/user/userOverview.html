@@ -21,7 +21,12 @@ ${cpweb_foot}
                     "className": "block-link",
                     "data" : function(row, type, set) {
                           if (!row.projectnameDisplay) {
-                            row.projectnameDisplay = '<a href="'+ row.projectlink + '" style="display:block;">' + row.projectname +'</a> ';
+                            if(row.projectlink) {
+                                row.projectnameDisplay = '<a href="'+ row.projectlink + '" style="display:block;">' + row.projectname +'</a> ';
+                            } else {
+                                row.projectnameDisplay = row.projectname;
+                                
+                            }
                           } 
 
                           if (type === 'display') {
