@@ -58,8 +58,11 @@ public class UserJsonModule extends AbstractJsonAuthModule {
                 ccc.listProjectParticipationsForUserId(userId);
         UserAccount account = getUserAccount(cycle, userId);
 
+        final boolean inHomeOrg = account.getOrganizationId() != null && account.getOrganizationId()
+                == orgId;
+
         // Note: toJsonResponse does some filtering and hide/show links depending on browsed organization / home org.
-        return jsonTarget(toJsonResponse(cycle, participations, account.getOrganizationId() == orgId, orgId));
+        return jsonTarget(toJsonResponse(cycle, participations, inHomeOrg, orgId));
     }
 
     @WebAction
