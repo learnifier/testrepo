@@ -103,7 +103,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
         form.setFirstname(userAccount.getGivenName());
         form.setLastname(userAccount.getSurname());
         form.setLang(CocositeUserHelper.getUserAccountUserLocale(userAccount));
-        form.setOrganizationId(userAccount.getOrganizationId());
+        form.setOrganization(userAccount.getOrganizationId());
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
 
@@ -183,7 +183,7 @@ public class CreateUserModule extends AbstractWebAuthModule {
                     getEmail());
         }
         
-        final Long formOrgId = form.getOrganizationId();
+        final Long formOrgId = form.getOrganization();
         if(formOrgId == 0) {
             // We are trying to set organization to null.
             if(userAccount.getOrganizationId() != null) { 

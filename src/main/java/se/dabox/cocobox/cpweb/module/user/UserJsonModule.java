@@ -28,7 +28,9 @@ import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
 import se.dabox.cocosite.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
+import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.io.RuntimeIOException;
 import se.dabox.service.login.client.UserAccount;
@@ -51,10 +53,11 @@ public class UserJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_USER);
 
         long userId = Long.valueOf(strUserId);
-
+        CocoboxCoordinatorClient ccc = getCocoboxCordinatorClient(cycle);
         List<ProjectParticipation> participations =
-                getCocoboxCordinatorClient(cycle).listProjectParticipationsForUserId(userId);
+                ccc.listProjectParticipationsForUserId(userId);
 
+        List<OrgProject> listOrgProjects = ccc.listOrgProjects(orgId);
         return jsonTarget(toJsonResponse(cycle, participations));
     }
 

@@ -66,12 +66,17 @@ public class CreateUser implements Serializable {
     }
 
     @FormField
-    public Long getOrganizationId() {
+    public Long getOrganization() {
         return organization;
     }
 
-    public void setOrganizationId(Long organizationId) {
-        this.organization = organizationId;
+    public void setOrganization(Long organization) {
+        this.organization = organization;
+    }
+
+    @Override
+    public String toString() {
+        return "CreateUser{" + "firstname=" + firstname + ", lastname=" + lastname + ", email=" + email + ", lang=" + lang + ", role=" + role + ", organization=" + organization + '}';
     }
     
 }
