@@ -34,27 +34,29 @@ ${cpweb_foot}
    
     function toggleFavorite(target) {
         require(['dataTables-bootstrap'], function() {
-        log('Toggle ', target);
+        //log('Toggle ', target);
 
         var div = target;
         var tr = $(target).parent().parent().get()[0]
-        var rowData = $('#tw_favorites').dataTable().fnGetData(tr);
+        var rowData = $('#tw-favorites').dataTable().fnGetData(tr);
 
         var prjId = rowData.id;
-        log('Rowdata', rowData, prjId);
+        //log('Rowdata', rowData, prjId);
 
         var ajax = {};
         var ajaxData = {projectId: prjId};
         ajax.data = ajaxData;
-
-        if ($(target).hasClass("isfav")) {
+        
+        var span = $("span", target);
+        
+        if (span.hasClass("fav-star")) {
             ajax.success = function () {
-                $(div).removeClass("isfav").addClass("isnotfav");
+                span.removeClass("fav-star").addClass("glyphicon-star-empty");
             }
             cocobox.ajaxPost(deleteFavorite, ajax);
         } else {
             ajax.success = function () {
-                $(div).removeClass("isnotfav").addClass("isfav");
+                span.removeClass("glyphicon-star-empty").addClass("fav-star");
             }
             cocobox.ajaxPost(addFavorite, ajax);
         }
