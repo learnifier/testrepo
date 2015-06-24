@@ -140,7 +140,7 @@ define([], function() {
                         "width": "5%",
                         "data": function(row, type, set) {
                             if (row.favorite) {
-                                row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star favorite-star" ></span></a>';
+                                row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star favorite-star fav-star" ></span></a>';
                             } else {
                                 row.favoriteDisplay = '<a onclick="toggleFavorite(this)"><span class="glyphicon glyphicon-star-empty favorite-star"></span></a>';
                             }
