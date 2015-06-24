@@ -68,7 +68,7 @@ ${cpweb_foot}
             window.oTable = $('#projectroster').dataTable({
                 "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>><"row"<"col-sm-12"l>>',
                 "lengthMenu": [ [20, 50, 100, 1000, -1], [20, 50, 100, 1000, "All"] ],
-                "pageLength": 100,
+                "pageLength": 5,
                 "order": [[2, 'asc']],
                 "createdRow": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
                     if (oObj.inError) {
@@ -88,10 +88,7 @@ ${cpweb_foot}
                 },
                 "initComplete": function() {
                     log('DataTables has finished its initialisation.');
-                    showRow();
-                    $('.timeago').timeago();
-                    $('[data-toggle="tooltip"]').tooltip()                    
-                    runiCheck();
+                    toggleAllCheck();
                 },
                 "columnDefs": [
                     {
@@ -101,7 +98,10 @@ ${cpweb_foot}
                         "width": "24px",
                         "render": function(data) {
                             return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + data + '"/>';
-                        }
+                        },
+                        "createdCell": function (td, cellData, rowData, row, col) {
+                            runiCheck(td);
+                      }
                     },
 
                     {
@@ -137,7 +137,10 @@ ${cpweb_foot}
                                 //Anything else and raw row
                                 return row.iconDisplay;
                             }
-                        }
+                        },
+                        "createdCell": function (td, cellData, rowData, row, col) {
+                            showRow(td);
+                      }
                     },
                     {
                         "targets": [2],
@@ -233,7 +236,11 @@ ${cpweb_foot}
                                 //Anything else and raw row
                                 return row.lastAccess;
                             }
-                        }
+                        },
+                        "createdCell": function (td, cellData, rowData, row, col) {
+                            $('.timeago', td).timeago();
+                            $('[data-toggle="tooltip"]', td).tooltip()
+                      }
                     },
                     {
                         "targets": [6],
@@ -350,13 +357,19 @@ ${cpweb_foot}
             }
         });
 
-    function runiCheck() {
-      $('#projectroster input').icheck({
+    function runiCheck(cell) {
+      $('input', cell).icheck({
         checkboxClass: 'icheckbox_square-red',
         radioClass: 'iradio_square-red'
       });
     };
-
+    
+  function toggleAllCheck() {
+      $('#cball').icheck({
+        checkboxClass: 'icheckbox_square-red',
+        radioClass: 'iradio_square-red'
+      });
+    };
 
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
@@ -425,12 +438,12 @@ ${cpweb_foot}
         });
     };
 
-    var showRow = function() {
+    var showRow = function(cell) {
         require(['dataTables-bootstrap', 'jsrender'], function() {
             var oTable = $('#projectroster').dataTable();
             var detailsData = {};
 
-            $('.expand').click(function() {
+            $('.expand', cell).click(function() {
 
                 var parentTd = $(this).parent()[0];
                 var clickedRow = $(parentTd).parent()[0];
