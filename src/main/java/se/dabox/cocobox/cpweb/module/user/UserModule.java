@@ -27,6 +27,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import static se.dabox.cocosite.login.CocositeUserHelper.getUserAccountUserLocale;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.cocosite.security.UserAccountRoleCheck;
@@ -61,7 +62,7 @@ public class UserModule extends AbstractWebAuthModule {
 
         checkOrgUserAccess(cycle, org, user);
 
-        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
         String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
@@ -98,7 +99,7 @@ public class UserModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
 
-        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
 
         List<RoleInfo> roles = getRoles(cycle);
 
