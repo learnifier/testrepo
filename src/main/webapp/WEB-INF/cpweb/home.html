@@ -30,8 +30,10 @@ ${cpweb_foot}
     require(["${contextPath}/js/home.js?${cycle.application.formattedStartTime.base36String}"], function (s) {
         //No initialization needed
     });
-
+   
+   
     function toggleFavorite(target) {
+        require(['dataTables-bootstrap'], function() {
         log('Toggle ', target);
 
         var div = target;
@@ -56,7 +58,9 @@ ${cpweb_foot}
             }
             cocobox.ajaxPost(addFavorite, ajax);
         }
+        });
     }
+    
 
 </script>
 
