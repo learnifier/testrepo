@@ -49,8 +49,9 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
         self.credits = ko.observableArray();
         self.active = ko.observable();
         self.activeUntilString = ko.observable();
+        self.parent = ko.observable();
         
-        
+        console.log(self.balance);
         self.dateDisplay = function(data, text) {
             if (!text) {
                 return null;
@@ -102,14 +103,18 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
             
         };
         
-        self.addNewCredits = function(){
-            
-            $.post(listDeeplinksProducts.updateCredits, {credits: $('#creditsVal').val(),orgId: listDeeplinksProducts.orgId ,oplid: self.linkid()}, function (data) {
+        self.addNewCredits = function(productModel){
+           
+           var insertedCredits = $('#creditsVal').val();
+           
+            $.post(listDeeplinksProducts.updateCredits, {credits: insertedCredits,orgId: listDeeplinksProducts.orgId ,oplid: self.linkid()}, function (data) {
                     
                   if(data.valid == false)
                   {
                      $('#cand').html('* '+data.fielderror[0].message);
                   }
+                  self.parent().linkCredits(self.parent().linkCredits() + parseInt(insertedCredits));
+                  self.balance(self.balance() + parseInt(insertedCredits));
                   
                 }).fail(function () {
                     alert('failed to post data');
@@ -212,6 +217,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                     $.each(data.aaData,function(){
                        var link = new DeepLinkModel();
                        
+                       link.parent(self); 
                        link.active(this.active);
                        link.activeto(this.activeto);
                        link.activeUntilString(this.activeToStr);
@@ -236,6 +242,7 @@ define(['knockout', 'bootstrap/cocobox-editable-date', 'cocobox-knockout-binding
                   $.each(data.aaData,function(){
                        var link = new DeepLinkModel();
                        
+                       link.parent(self); 
                        link.activeto(this.activeto);
                        link.defaultLink(this.defaultLink);
                        link.url(this.link);
