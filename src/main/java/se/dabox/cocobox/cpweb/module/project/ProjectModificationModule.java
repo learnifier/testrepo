@@ -297,7 +297,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                 decorateUrl(cycle, rawUrl));
 
         SendMailSession session = new SendMailSession(processor, taskPage, taskPage);
-        setSendButtonText(session, cycle);
+        setSendButtonTextToAddTask(session, cycle);
         session.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
 
         session.storeInSession(cycle);
@@ -305,9 +305,15 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         return session.getPreSendTarget(prj.getOrgId());
     }
 
-    private void setSendButtonText(SendMailSession session, RequestCycle cycle) {
+    private void setSendButtonTextToAddTask(SendMailSession session, RequestCycle cycle) {
         final LangBundle bundle = getLangBundle(cycle, CocoSiteConstants.DEFAULT_LANG_BUNDLE);
         final String buttonText = bundle.getKey("form.action.addtask");
+        session.setSendButtonText(buttonText);
+    }
+
+    private void setSendButtonTextToEditTask(SendMailSession session, RequestCycle cycle) {
+        final LangBundle bundle = getLangBundle(cycle, CocoSiteConstants.DEFAULT_LANG_BUNDLE);
+        final String buttonText = bundle.getKey("cpweb.project.schedule.edit");
         session.setSendButtonText(buttonText);
     }
 
@@ -365,6 +371,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         PortableMailTemplate pmt = PortableMailTemplateCodec.decode(task.getPortableMailTemplate());
         session.setPortableMailTemplate(pmt);
         session.setSkin(CpwebConstants.SKIN_MODAL_MAIL);
+        setSendButtonTextToEditTask(session, cycle);
 
         session.storeInSession(cycle);
 
