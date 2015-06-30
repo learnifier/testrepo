@@ -435,7 +435,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         }
 
         //Skip the errors, there might be a partial update
-        String url = NavigationUtil.toProjectPageUrl(cycle, projectId);
+        String url = NavigationUtil.toProjectRosterPageUrl(cycle, projectId);
         return jsResponse.getSuccessfulRedirect(url);
     }
 
