@@ -240,7 +240,7 @@ public class CpMainModule extends AbstractWebAuthModule {
 
         return new FreemarkerRequestTarget("/cug/listClientUserGroups.html", map);
     }
-
+    
     @WebAction
     public RequestTarget onListReports(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);

@@ -221,6 +221,27 @@ public class CpJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
+    public RequestTarget onListClientUserGroupChildren(RequestCycle cycle, String strOrgId, String strCugId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        List<ClientUserGroup> cugs = getClientUserGroupService(cycle).listChildren(Long.parseLong(strCugId));
+
+        return jsonTarget(toJsonUserClientUserGroups(cycle, cugs));
+    }
+    
+    
+    @WebAction
+    public RequestTarget onListClientUserGroupMembers(RequestCycle cycle, String strOrgId, String strCugId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        ClientUserGroupClient cugService = getClientUserGroupService(cycle);
+        List<UserAccount> members = cugService.listGroupMembers(Long.valueOf(strCugId));
+
+        return jsonTarget(toJsonUserAccounts(cycle, members, org.getId()));
+    }
+    
+    
+    @WebAction
     public RequestTarget onSearchUsers(RequestCycle cycle, String strOrgId, String query) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 

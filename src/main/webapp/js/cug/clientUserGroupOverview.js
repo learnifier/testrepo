@@ -37,7 +37,7 @@ define([], function() {
                     }
                 }
             ],
-            "ajax": listCUGAjaxSource,
+            "ajax": listMembersAjaxSource,
             "pageLength": 25,
             "pagingType": "full_numbers",
             "deferRender": true,
