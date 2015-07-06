@@ -231,6 +231,17 @@ public class CpMainModule extends AbstractWebAuthModule {
     }
 
     @WebAction
+    public RequestTarget onClientUserGroups(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        Map<String, Object> map = createMap();
+
+        map.put("org", org);
+
+        return new FreemarkerRequestTarget("/cug/listClientUserGroups.html", map);
+    }
+
+    @WebAction
     public RequestTarget onListReports(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 

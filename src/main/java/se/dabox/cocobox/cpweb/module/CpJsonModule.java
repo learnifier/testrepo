@@ -54,6 +54,8 @@ import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.io.RuntimeIOException;
+import se.dabox.service.cug.client.ClientUserGroup;
+import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -210,6 +212,15 @@ public class CpJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
+    public RequestTarget onListClientUserGroups(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        List<ClientUserGroup> cugs = getClientUserGroupService(cycle).listGroups(org.getId());
+
+        return jsonTarget(toJsonUserClientUserGroups(cycle, cugs));
+    }
+
+    @WebAction
     public RequestTarget onSearchUsers(RequestCycle cycle, String strOrgId, String query) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
@@ -268,6 +279,37 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         }.encode();
     }
 
+    
+    private byte[] toJsonUserClientUserGroups(final RequestCycle cycle,
+            final List<ClientUserGroup> cugs) {
+
+        return new JsonEncoding() {
+            @Override
+            protected void encodeData(JsonGenerator generator) throws IOException {
+                generator.writeStartObject();
+                generator.writeArrayFieldStart("aaData");
+
+                for (ClientUserGroup cug : cugs) {
+                    generator.writeStartObject();
+
+                    generator.writeNumberField("groupId", cug.getGroupId());
+                    generator.writeStringField("name", StringUtils.trimToEmpty(cug.getName()));
+                    generator.writeNumberField("orgId", cug.getOrgId());
+                    writeLongNullField(generator, "parent", cug.getParent());
+                    writeDateField(generator, "created", cug.getCreated());
+                    generator.writeNumberField("createdBy", cug.getCreatedBy());
+                    writeDateField(generator, "updated", cug.getUpdated());                    
+                    writeLongNullField(generator, "updatedBy", cug.getUpdatedBy());
+                    
+                    generator.writeEndObject();
+                }
+
+                generator.writeEndArray();
+                generator.writeEndObject();
+            }
+        }.encode();
+    }
+    
     private ByteArrayOutputStream toJsonObjectProjects(RequestCycle cycle, List<OrgProject> projects,
             List<Long> favoriteIds) {
         ByteArrayOutputStream baos =
@@ -387,6 +429,10 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
     private UserAccountService getUserAccountService(RequestCycle cycle) {
         return CacheClients.getClient(cycle, UserAccountService.class);
+    }
+
+    private ClientUserGroupClient getClientUserGroupService(RequestCycle cycle) {
+        return CacheClients.getClient(cycle, ClientUserGroupClient.class);
     }
 
     private List<UserAccount> getCompleteOrgUserAccountList(MiniOrgInfo org, RequestCycle cycle) {
