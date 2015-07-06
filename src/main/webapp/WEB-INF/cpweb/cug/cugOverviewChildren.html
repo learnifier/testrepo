@@ -1,0 +1,73 @@
+[#ftl strip_text="true" /]
+
+[#import "cugOverviewMenu.html" as cugMenu]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#menu-cugs').addClass('active');
+
+    var spinnerUrl = "[@common.spinnerUrl /]";
+    var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
+    var cugOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
+
+    var listChildrenAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupChildren',[org.id, cug.groupId])}";
+
+    require(["${contextPath}/js/cug/cugChildrenOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+        //No initialization needed
+    });
+
+</script>
+
+[@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+<script>
+    $("#addUserBtn").click(function () {
+        require(["[@modal.javascript /]"], function(modal) {
+            modal.open({               
+                src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}",
+                height: "450px",
+                cssClass: "modal-lg",
+                cancel: function () { /* Do nothing*/
+                },
+                cancelUrl: window.location.href,
+                proceedUrl: "{helper.urlFor('CpMainModule','listClientUserGroups',[org.id])}"
+            });
+        });
+
+        return false;
+    });
+</script>
+[/@]
+[/#assign]
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<section class="ccb-page-header margin-bottom">
+    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+    <div class="ccb-page-header__actions--right">
+        <button id="addClientUserGroupBtn" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Client User Group</a>
+    </div>
+    [/@]
+    <h1 class="page-title">Client User Groups</h1>
+</section>
+
+<section id="cugoverview">
+    [#include "cugInfo.html" /]
+    
+    
+    [@cugMenu.cugOverviewMenu selected="children"][/@cugMenu.cugOverviewMenu]
+    
+    <span>Subgroups</span>
+    <table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listcugs">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+[/@dws.skin]
+

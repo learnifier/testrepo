@@ -1,0 +1,15 @@
+[#ftl /]
+<section class="ccb-page-header">
+    <div class="ccb-page-header__info--thumbnail">
+        <p class="page-title-label">Group</p>
+        <h1 class="page-title">${cug.name?xhtml}</h1>
+        <div class="ccb-page-header__actions">
+            [#include "cugActions.html" /]
+        </div>
+    </div>
+    <div class="ccb-page-header__details">
+        <ul>
+            <li><span class="row-label">Parent</span><span class="row-setting clearfix">${cug.parent!"Not set"}</span></li>
+        </ul>
+    </div>
+</section>

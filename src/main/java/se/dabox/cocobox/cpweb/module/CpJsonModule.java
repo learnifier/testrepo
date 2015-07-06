@@ -210,36 +210,6 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(toJsonUserAccounts(cycle, uas, org.getId()));
     }
-
-    @WebAction
-    public RequestTarget onListClientUserGroups(RequestCycle cycle, String strOrgId) {
-        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-
-        List<ClientUserGroup> cugs = getClientUserGroupService(cycle).listGroups(org.getId());
-
-        return jsonTarget(toJsonUserClientUserGroups(cycle, cugs));
-    }
-
-    @WebAction
-    public RequestTarget onListClientUserGroupChildren(RequestCycle cycle, String strOrgId, String strCugId) {
-        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-
-        List<ClientUserGroup> cugs = getClientUserGroupService(cycle).listChildren(Long.parseLong(strCugId));
-
-        return jsonTarget(toJsonUserClientUserGroups(cycle, cugs));
-    }
-    
-    
-    @WebAction
-    public RequestTarget onListClientUserGroupMembers(RequestCycle cycle, String strOrgId, String strCugId) {
-        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-
-        ClientUserGroupClient cugService = getClientUserGroupService(cycle);
-        List<UserAccount> members = cugService.listGroupMembers(Long.valueOf(strCugId));
-
-        return jsonTarget(toJsonUserAccounts(cycle, members, org.getId()));
-    }
-    
     
     @WebAction
     public RequestTarget onSearchUsers(RequestCycle cycle, String strOrgId, String query) {
@@ -300,36 +270,6 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         }.encode();
     }
 
-    
-    private byte[] toJsonUserClientUserGroups(final RequestCycle cycle,
-            final List<ClientUserGroup> cugs) {
-
-        return new JsonEncoding() {
-            @Override
-            protected void encodeData(JsonGenerator generator) throws IOException {
-                generator.writeStartObject();
-                generator.writeArrayFieldStart("aaData");
-
-                for (ClientUserGroup cug : cugs) {
-                    generator.writeStartObject();
-
-                    generator.writeNumberField("groupId", cug.getGroupId());
-                    generator.writeStringField("name", StringUtils.trimToEmpty(cug.getName()));
-                    generator.writeNumberField("orgId", cug.getOrgId());
-                    writeLongNullField(generator, "parent", cug.getParent());
-                    writeDateField(generator, "created", cug.getCreated());
-                    generator.writeNumberField("createdBy", cug.getCreatedBy());
-                    writeDateField(generator, "updated", cug.getUpdated());                    
-                    writeLongNullField(generator, "updatedBy", cug.getUpdatedBy());
-                    
-                    generator.writeEndObject();
-                }
-
-                generator.writeEndArray();
-                generator.writeEndObject();
-            }
-        }.encode();
-    }
     
     private ByteArrayOutputStream toJsonObjectProjects(RequestCycle cycle, List<OrgProject> projects,
             List<Long> favoriteIds) {
@@ -450,10 +390,6 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
     private UserAccountService getUserAccountService(RequestCycle cycle) {
         return CacheClients.getClient(cycle, UserAccountService.class);
-    }
-
-    private ClientUserGroupClient getClientUserGroupService(RequestCycle cycle) {
-        return CacheClients.getClient(cycle, ClientUserGroupClient.class);
     }
 
     private List<UserAccount> getCompleteOrgUserAccountList(MiniOrgInfo org, RequestCycle cycle) {

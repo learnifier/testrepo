@@ -9,7 +9,7 @@
         var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
         var cugOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
 
-        var listCUGAjaxSource =  "${helper.urlFor('CpJsonModule','listClientUserGroups',[org.id])}";
+        var listCUGAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroups',[org.id])}";
 
         require(["${contextPath}/js/cug/listClientUserGroups.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
            //No initialization needed

@@ -79,9 +79,40 @@ public class ClientUserGroupModule extends AbstractWebAuthModule {
 
         map.put("org", org);
 
-        return new FreemarkerRequestTarget("/cug/clientUserGroupOverview.html", map);
+        return new FreemarkerRequestTarget("/cug/cugOverviewMembers.html", map);
     }
 
+    @WebAction
+    public RequestTarget onChildren(RequestCycle cycle, String strOrgId, String strCugId) {
+
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
+        ClientUserGroupClient cugService = getClientUserGroupService(cycle);
+        ClientUserGroup cug = cugService.getGroup(Long.valueOf(strCugId));
+
+//        checkOrgUserAccess(cycle, org, user);
+
+//        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
+
+//        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
+          boolean isAdmin = true;
+//        OrganizationDirectoryClient odc = getOrganizationDirectoryClient(cycle);
+//        OrgUnitInfo organization;
+//        if(user.getOrganizationId() != null) {
+//            organization = odc.getOrgUnitInfo(user.getOrganizationId());
+//        } else {
+//            organization = null;
+//        }
+        
+        Map<String, Object> map = createMap();
+        map.put("cug", cug);
+        map.put("isAdmin", isAdmin);
+        map.put("org", org);
+
+        return new FreemarkerRequestTarget("/cug/cugOverviewChildren.html", map);
+    }
+
+    
     private UserAccountService getUserAccountService(RequestCycle cycle) {
         return CacheClients.getClient(cycle, UserAccountService.class);
     }

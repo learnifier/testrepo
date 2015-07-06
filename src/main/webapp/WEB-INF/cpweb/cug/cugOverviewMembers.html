@@ -1,5 +1,7 @@
 [#ftl strip_text="true" /]
 
+[#import "cugOverviewMenu.html" as cugMenu]
+
 [#assign cpweb_foot ]
     ${cpweb_foot}
     <script>
@@ -9,10 +11,9 @@
         var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
         var cugOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
 
-        var listMembersAjaxSource =  "${helper.urlFor('CpJsonModule','listClientUserGroupMembers',[org.id, cug.groupId])}";
-        var listChildrenGroupsAjaxSource =  "${helper.urlFor('CpJsonModule','listClientUserGroupChildren',[org.id, cug.groupId])}";
+        var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[org.id, cug.groupId])}";
 
-        require(["${contextPath}/js/cug/clientUserGroupOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+        require(["${contextPath}/js/cug/cugMembersOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
            //No initialization needed
         });
 
@@ -51,7 +52,12 @@
     <h1 class="page-title">Client User Groups</h1>
 </section>
 
-<div>
+<section id="cugoverview">
+    [#include "cugInfo.html" /]
+    
+    
+    [@cugMenu.cugOverviewMenu selected="members"][/@cugMenu.cugOverviewMenu]
+    
     <span>Members</span>
     <table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listcugs">
         <thead>
@@ -62,6 +68,6 @@
         <tbody>
         </tbody>
     </table>
-</div>
+</section>
 [/@dws.skin]
 
