@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,6 +65,7 @@ import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductTransformers;
 import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.HybridLocaleUtils;
 import se.dabox.util.collections.CollectionsUtil;
@@ -569,9 +571,20 @@ public class NewProjectModule extends AbstractWebAuthModule {
         if (missing.isEmpty()) {
             return;
         }
+
+        final ProductDirectoryClient pdClient
+                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
         //We have missing products
-        List<Product> missingProducts = CacheClients.getClient(cycle, ProductDirectoryClient.class).
-                getProducts(missing);
+        List<Product> missingProducts = pdClient.getProducts(missing);
+        //Create a writable copy
+        missingProducts = new ArrayList<>(missingProducts);
+
+        removeMissingRealmAnonProd(missingProducts);
+
+        if (missingProducts.isEmpty()) {
+            return;
+        }
 
         StringBuilder sb = new StringBuilder(512);
         sb.append(
@@ -591,6 +604,20 @@ public class NewProjectModule extends AbstractWebAuthModule {
         throw new RetargetException(NavigationUtil.
                 toCreateProject(cycle, Long.toString(org.getId())));
 
+    }
+
+    private void removeMissingRealmAnonProd(List<Product> missingProducts) {
+        Map<String, Product> productMap = CollectionsUtil.createMap(missingProducts,
+                ProductTransformers.getIdStringTransformer());
+
+        for (Iterator<Product> iterator = missingProducts.iterator(); iterator.hasNext();) {
+            Product prod = iterator.next();
+            
+             if (prod.isAnonymous() && prod.isRealmProduct()) {
+                iterator.remove();
+            }
+        }
+        
     }
 
     /**

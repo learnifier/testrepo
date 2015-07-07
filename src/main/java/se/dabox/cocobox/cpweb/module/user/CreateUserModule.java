@@ -20,7 +20,6 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
-import net.unixdeveloper.druwa.util.UrlBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -449,10 +448,6 @@ public class CreateUserModule extends AbstractWebAuthModule {
     }
 
     private String createTopRedirectUrl(RequestCycle cycle, String url) {
-        String target = cycle.getRequest().getContextPath()+"/_fr.html";
-        UrlBuilder builder = new UrlBuilder(target);
-        builder.addParameter("t", url);
-
-        return builder.toString();
+        return ModalParamsHelper.createTopRedirectUrl(cycle, url);
     }
 }

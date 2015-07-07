@@ -27,6 +27,7 @@ import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
+import se.dabox.service.common.ccbc.project.MissingProjectProductException;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectProductException;
@@ -42,8 +43,11 @@ import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.expiration.GetCourseDefaultExpiration;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.proddir.data.Product;
 import se.dabox.util.ParamUtil;
 
 /**
@@ -166,7 +170,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         if (nps.getProds() != null) {
             for (String prodId : nps.getProds()) {
-                addProjectProduct(cycle, pmcClient, project, prodId);
+                addProjectProduct(cycle, pmcClient, project, prodId, false);
             }
         }
 
@@ -239,21 +243,40 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void addProjectProduct(RequestCycle cycle, ProjectMaterialCoordinatorClient pmcClient,
-            OrgProject project, String prodId)
+            OrgProject project, String prodId, boolean retryAttempt)
             throws DeniedException, ProjectProductException {
 
         try {
             pmcClient.addProjectProduct(project.getProjectId(), prodId);
-        } catch (Exception ex) {
-            LOGGER.warn("Unable to add product {} to project {}",
-                    prodId, project.getProjectId(), ex);
-            if (failures == null) {
-                failures = new ArrayList<>();
+        } catch(MissingProjectProductException ex) {
+            ProductDirectoryClient pdClient
+                    = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+            Product product = ProductFetchUtil.getProduct(pdClient, prodId);
+            if (!retryAttempt && product != null && product.isAnonymous() && product.
+                    isRealmProduct()) {
+
+                long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+                getCocoboxCordinatorClient(cycle).addOrgProduct(caller, orgId, prodId);
+                addProjectProduct(cycle, pmcClient, project, prodId, true);
+            } else {
+                addProjectProductError(prodId, project, ex, cycle);
             }
-            ProjectProductFailure failure
-                    = new ProjectProductFailureFactory(cycle).newFailure(prodId, ex);
-            failures.add(failure);
+        } catch (Exception ex) {
+            addProjectProductError(prodId, project, ex, cycle);
         }
+    }
+
+    private void addProjectProductError(String prodId, OrgProject project, Exception ex,
+            RequestCycle cycle) {
+        LOGGER.warn("Unable to add product {} to project {}",
+                prodId, project.getProjectId(), ex);
+        if (failures == null) {
+            failures = new ArrayList<>();
+        }
+        ProjectProductFailure failure
+                = new ProjectProductFailureFactory(cycle).newFailure(prodId, ex);
+        failures.add(failure);
     }
 
     private void addProjectOrgMat(ProjectMaterialCoordinatorClient pmcClient, OrgProject project,
