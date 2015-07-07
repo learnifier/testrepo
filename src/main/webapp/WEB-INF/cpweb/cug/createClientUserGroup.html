@@ -1,0 +1,62 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script>
+    require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+        modalClient.setButtons(
+                [
+                    {
+                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.saveuser')?js_string}",
+                        cssClass: "btn-primary",
+                        action: function (dlg) {
+                            $("#createCug").submit();
+                        }
+                    },
+                    {
+                        text: "Cancel",
+                        cssClass: "btn-cancel",
+                        action: function (dlg) {
+                            dlg.cancel();
+                        }
+                    }
+                ]
+                );
+    });
+</script>
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.createCug.title" /]</h1>
+
+[#global formPrefix="cpweb.createCug" /]
+<form action="${formLink}" name="createCug" id="createCug" class="fullpage" method="post">
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
+    <div class="row">
+        <div class="col-sm-6">
+            [@bsform.inputText name="name" tabindex="1" maxlength="64" /]
+        </div>
+    </div>
+    [#if (parentCug.groupId)??]
+    <input type="hidden" name="parent" value='${(parentCug.groupId)?c}'>
+    [#else]
+    <input type="hidden" name="parent" value='0'>
+    [/#if]
+
+    [#if editMode]
+    <input type="hidden" name="role" value="edit" />
+    [#else]
+
+    <input type="hidden" name="orgId" value="${org.id?c}" />
+
+    <input type="submit" id="hiddensubmit" style="display: none" />
+    [/#if]
+    [@modal.formParams /]
+</form>
+
+[/@dws.skin]
+

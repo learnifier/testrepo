@@ -21,10 +21,10 @@ ${cpweb_foot}
 
 [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
 <script>
-    $("#addUserBtn").click(function () {
+    $("#addClientUserGroupBtn").click(function () {
         require(["[@modal.javascript /]"], function(modal) {
             modal.open({               
-                src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}",
+                src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id,cug.groupId])}",
                 height: "450px",
                 cssClass: "modal-lg",
                 cancel: function () { /* Do nothing*/

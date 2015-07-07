@@ -7,7 +7,18 @@
         </div>
     <div class="ccb-page-header__details">
         <ul>
-            <li><span class="row-label">Parent</span><span class="row-setting clearfix">${cug.parent!"Not set"}</span></li>
+            <li>
+                <span class="row-label">Parent group</span>
+                <span class="row-setting clearfix">
+                    [#if (parentCug.name)??]
+                    <a href="${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id,parentCug.groupId])}">
+                        ${parentCug.name}
+                    </a>
+                    [#else]
+                        Not set
+                    [/#if]
+                </span>
+            </li>
         </ul>
     </div>
 </section>

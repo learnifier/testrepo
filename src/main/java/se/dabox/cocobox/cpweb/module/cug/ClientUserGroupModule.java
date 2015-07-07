@@ -48,6 +48,13 @@ public class ClientUserGroupModule extends AbstractWebAuthModule {
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
         ClientUserGroup cug = cugService.getGroup(Long.valueOf(strCugId));
+        Long parentId = cug.getParent();
+        
+        ClientUserGroup parentCug = null;
+        
+        if(parentId != null && parentId != 0) {
+            parentCug = cugService.getGroup(parentId);
+        }
 
 //        checkOrgUserAccess(cycle, org, user);
 
@@ -70,6 +77,7 @@ public class ClientUserGroupModule extends AbstractWebAuthModule {
 
         
         map.put("cug", cug);
+        map.put("parentCug", parentCug);
 //        map.put("subGroups", null);
 //        map.put("members", cugService.listGroupMembers(cug.getGroupId()));
         
@@ -89,6 +97,13 @@ public class ClientUserGroupModule extends AbstractWebAuthModule {
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
         ClientUserGroup cug = cugService.getGroup(Long.valueOf(strCugId));
+        Long parentId = cug.getParent();
+        
+        ClientUserGroup parentCug = null;
+        
+        if(parentId != null && parentId != 0) {
+            parentCug = cugService.getGroup(parentId);
+        }
 
 //        checkOrgUserAccess(cycle, org, user);
 
@@ -106,6 +121,7 @@ public class ClientUserGroupModule extends AbstractWebAuthModule {
         
         Map<String, Object> map = createMap();
         map.put("cug", cug);
+        map.put("parentCug", parentCug);
         map.put("isAdmin", isAdmin);
         map.put("org", org);
 

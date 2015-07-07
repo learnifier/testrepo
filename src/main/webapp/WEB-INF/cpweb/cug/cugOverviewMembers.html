@@ -9,7 +9,7 @@
 
         var spinnerUrl = "[@common.spinnerUrl /]";
         var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
-        var cugOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
+        var userOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
 
         var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[org.id, cug.groupId])}";
 
@@ -19,36 +19,12 @@
 
     </script>
 
-    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-    <script>
-        $("#addUserBtn").click(function () {
-            require(["[@modal.javascript /]"], function(modal) {
-                modal.open({               
-                    src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}",
-                    height: "450px",
-                    cssClass: "modal-lg",
-                    cancel: function () { /* Do nothing*/
-                    },
-                    cancelUrl: window.location.href,
-                    proceedUrl: "{helper.urlFor('CpMainModule','listClientUserGroups',[org.id])}"
-                });
-            });
-
-            return false;
-        });
-    </script>
-    [/@]
 [/#assign]
 
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <section class="ccb-page-header margin-bottom">
-    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-        <div class="ccb-page-header__actions--right">
-            <button id="addClientUserGroupBtn" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Client User Group</a>
-        </div>
-    [/@]
     <h1 class="page-title">Client User Groups</h1>
 </section>
 
