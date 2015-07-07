@@ -103,15 +103,17 @@ public class CreateClientUserGroupModule extends AbstractWebAuthModule {
                 getValidationSession(CreateClientUserGroup.class, cycle);
 
         if (!formsess.process()) {
-            return toEditUserPage(cycle, strOrgId, strGroupId);
+            return toEditClientUserGroupPage(cycle, strOrgId, strGroupId);
         }
 
         CreateClientUserGroup form = formsess.getObject();
 
         cugClient.updateGroupName(org.getId(), groupId, form.getName());
 
-        String url = NavigationUtil.toClientUserGroupOverviewUrl(cycle, org.getId(), groupId);
-        return topRedirect(cycle, url);
+        //No need to decorate modal params here
+        String directUrl = ModalParamsHelper.getProceedUrl(cycle);
+        String redirectUrl = ModalParamsHelper.createTopRedirectUrl(cycle, directUrl);
+        return new RedirectUrlRequestTarget(redirectUrl);
     }
 
     @WebAction(methods = HttpMethod.POST)
@@ -132,8 +134,10 @@ public class CreateClientUserGroupModule extends AbstractWebAuthModule {
 
         long groupId = cugClient.createGroup(0L, org.getId(), form.getName(), form.getParent());
         
-        String url = NavigationUtil.toClientUserGroupOverviewUrl(cycle, org.getId(), groupId);
-        return topRedirect(cycle, url);
+        //No need to decorate modal params here
+        String directUrl = ModalParamsHelper.getProceedUrl(cycle);
+        String redirectUrl = ModalParamsHelper.createTopRedirectUrl(cycle, directUrl);
+        return new RedirectUrlRequestTarget(redirectUrl);
     }
 
     private RequestTarget genericCreateEditView(RequestCycle cycle, MiniOrgInfo org, String formLink,
@@ -162,7 +166,7 @@ public class CreateClientUserGroupModule extends AbstractWebAuthModule {
         return CacheClients.getClient(cycle, ClientUserGroupClient.class);
     }
 
-    private RequestTarget toEditUserPage(RequestCycle cycle, String strOrgId, String strUserId) {
+    private RequestTarget toEditClientUserGroupPage(RequestCycle cycle, String strOrgId, String strUserId) {
         WebModuleRedirectRequestTarget target
                 = new WebModuleRedirectRequestTarget(CreateClientUserGroupModule.class,
                         ACTION_VIEW_EDIT, strOrgId, strUserId);
@@ -180,16 +184,9 @@ public class CreateClientUserGroupModule extends AbstractWebAuthModule {
     }
         
     private RedirectUrlRequestTarget topRedirect(RequestCycle cycle, String url) {
-        return new RedirectUrlRequestTarget(createTopRedirectUrl(cycle, url));
+        return new RedirectUrlRequestTarget(ModalParamsHelper.createTopRedirectUrl(cycle, url));
     }
 
-    private String createTopRedirectUrl(RequestCycle cycle, String url) {
-        String target = cycle.getRequest().getContextPath()+"/_fr.html";
-        UrlBuilder builder = new UrlBuilder(target);
-        builder.addParameter("t", url);
-
-        return builder.toString();
-    }
 
 
 }
