@@ -110,9 +110,6 @@ public class CreateClientUserGroupModule extends AbstractWebAuthModule {
 
         cugClient.updateGroupName(org.getId(), groupId, form.getName());
 
-//        TODO: ???
-//        UserAccountChangedListenerUtil.triggerEvent(cycle, userAccount.getUserId());
-
         String url = NavigationUtil.toClientUserGroupOverviewUrl(cycle, org.getId(), groupId);
         return topRedirect(cycle, url);
     }
