@@ -35,7 +35,6 @@ public class ClientUserGroupJsonModule extends AbstractJsonAuthModule {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ClientUserGroupJsonModule.class);
     
-    
     @WebAction
     public RequestTarget onListClientUserGroups(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -54,7 +53,6 @@ public class ClientUserGroupJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(toJsonUserClientUserGroups(cycle, cugs));
     }
     
-    
     @WebAction
     public RequestTarget onListClientUserGroupMembers(RequestCycle cycle, String strOrgId, String strCugId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -65,23 +63,10 @@ public class ClientUserGroupJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(toJsonUserAccounts(cycle, members, org.getId()));
     }
     
-    
-    private UserAccount getUserAccount(RequestCycle cycle, long userId) {
-        return getUserAccountService(cycle).getUserAccount(userId);
-    }
-    
-    private UserAccountService getUserAccountService(RequestCycle cycle) {
-        UserAccountService uaClient = CacheClients.getClient(cycle, UserAccountService.class);
-        
-        return uaClient;
-    }
-    
     private ClientUserGroupClient getClientUserGroupService(RequestCycle cycle) {
         return CacheClients.getClient(cycle, ClientUserGroupClient.class);
     }
 
-
-    
     private byte[] toJsonUserClientUserGroups(final RequestCycle cycle,
             final List<ClientUserGroup> cugs) {
         
@@ -154,7 +139,4 @@ public class ClientUserGroupJsonModule extends AbstractJsonAuthModule {
             }
         }.encode();
     }
-    
-    
-    
 }

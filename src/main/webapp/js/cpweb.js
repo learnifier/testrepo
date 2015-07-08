@@ -52,6 +52,7 @@ cpweb.rosterDelete = function (button, listform, cmd, title, text) {
     return false;
 };
 
+
 cpweb.adjustExpiration = function(button, listform, cmd) {
     log('show some dialog to adjust the expirationoffset');
     

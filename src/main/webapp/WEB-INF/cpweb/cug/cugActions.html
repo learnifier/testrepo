@@ -1,15 +1,20 @@
 [#ftl /]
 [#if portalSecurity.hasPermission("CP_EDIT_USER")]
-    <button class="btn btn-primary-outlined btn-sm" type="button" id="edituser"><span class="glyphicon glyphicon-pencil"></span> Edit Client User Group</button>
+    <button class="btn btn-primary-outlined btn-sm" type="button" id="editcug"><span class="glyphicon glyphicon-pencil"></span> Edit Group</button>
+    [#if portalSecurity.hasPermission("CP_DELETE_PROJECT")]
+    <form id="deletegroupform" action="${helper.urlFor('cug.ClientUserGroupModule','delete',[org.id, cug.groupId])}" method="post">
+    <button class="btn btn-primary-outlined btn-sm" type="submit"><span class="glyphicon glyphicon-pencil"></span> Delete Group</button>
+    </form>
+    [/#if]
     [@bsform._onreadyJavascript]
-       $("#edituser").click(function() {
+       $("#editcug").click(function() {
             require(["[@modal.javascript /]"], function(modal) {
 
                     modal.open({
                         src: "${helper.urlFor('cug.CreateClientUserGroupModule','edit',[org.id, cug.groupId])}",
                         height: "450px",
                         cssClass: "modal-lg",
-                        title: "Edit user",
+                        title: "Edit Client User Group",
                         cancel: function () { /* Do nothing*/
                         },
                         cancelUrl: window.location.href,
@@ -17,5 +22,17 @@
                     });
             });
        });
+       
+       require(['dabox-common'], function() {
+         cocobox.ajaxForm("#deletegroupform", function(data) {
+           console.log("#deletegroupform: ", data.location);
+           if (data.location) {
+             window.location = data.location;
+           } else {
+             cocobox.infoDialog('Delete group','You need to delete all subgroups to be able to delete the group.');
+           }
+         });
+       });
+
     [/@]
 [/#if]

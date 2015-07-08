@@ -15,7 +15,6 @@ import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
-import net.unixdeveloper.druwa.util.UrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
@@ -174,13 +173,6 @@ public class CreateClientUserGroupModule extends AbstractWebAuthModule {
         target.setExtraTargetParameterString(ModalParamsHelper.getParameterString(cycle));
 
         return target;
-    }
-
-    private List<ClientUserGroup> getCugList(RequestCycle cycle, long orgId, Long selfGroupId) {
-        List<ClientUserGroup> cugs =  getClientUserGroupClient(cycle).listGroups(orgId);
-        if(selfGroupId != null) // Filter out self
-            return cugs.stream().filter(cug -> cug.getGroupId() != selfGroupId).collect(Collectors.toList());
-        return cugs;
     }
         
     private RedirectUrlRequestTarget topRedirect(RequestCycle cycle, String url) {

@@ -5,6 +5,7 @@ define([], function() {
     "use strict";
     var exports = {};
 
+
    $(document).ready(function() {
         require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
         var oTable = $('#listcugs').dataTable({
@@ -51,6 +52,9 @@ define([], function() {
         });
                 
     } );
+
+
+
 
     return exports;
 });

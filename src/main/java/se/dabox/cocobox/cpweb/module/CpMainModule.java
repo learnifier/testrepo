@@ -51,6 +51,8 @@ public class CpMainModule extends AbstractWebAuthModule {
     public static final String LIST_EMAILS = "listEmails";
     public static final String LIST_DESIGNS = "listDesigns";
     public static final String ACCOUNT_SETTINGS = "accountSettings";
+    public static final String LIST_CLIENT_USER_GROUPS = "listClientUserGroups";
+    
 
     public CpMainModule() {
         super();
@@ -231,7 +233,7 @@ public class CpMainModule extends AbstractWebAuthModule {
     }
 
     @WebAction
-    public RequestTarget onClientUserGroups(RequestCycle cycle, String strOrgId) {
+    public RequestTarget onListClientUserGroups(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         Map<String, Object> map = createMap();

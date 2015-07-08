@@ -218,6 +218,16 @@ public final class NavigationUtil {
                 Long.toString(projectId));
     }
     
+    public static RequestTarget toClientUserGroupList(RequestCycle cycle, long orgId) {
+        return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class,
+                CpMainModule.LIST_CLIENT_USER_GROUPS, Long.toString(orgId));
+    }
+
+    public static String toClientUserGroupListUrl(RequestCycle cycle, long orgId) {
+        return cycle.urlFor(ClientUserGroupModule.class,
+                CpMainModule.LIST_CLIENT_USER_GROUPS, Long.toString(orgId));
+    }
+
     public static RequestTarget toClientUserGroupOverview(RequestCycle cycle, long orgId, long groupId) {
         return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class,
                 ClientUserGroupModule.OVERVIEW_ACTION, Long.toString(orgId), Long.toString(groupId));

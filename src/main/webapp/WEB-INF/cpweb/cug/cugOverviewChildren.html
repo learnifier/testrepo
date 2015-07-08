@@ -44,11 +44,6 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <section class="ccb-page-header margin-bottom">
-    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-    <div class="ccb-page-header__actions--right">
-        <button id="addClientUserGroupBtn" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Client User Group</a>
-    </div>
-    [/@]
     <h1 class="page-title">Client User Groups</h1>
 </section>
 
@@ -57,7 +52,13 @@ ${cpweb_foot}
     
     
     [@cugMenu.cugOverviewMenu selected="children"][/@cugMenu.cugOverviewMenu]
-    
+    <section class="ccb-table-list-actions">
+        [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+        <div class="ccb-page-header__actions--right">
+            <button id="addClientUserGroupBtn" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Client User Group</a>
+        </div>
+        [/@]
+    </section>
     <span>Subgroups</span>
     <table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listcugs">
         <thead>
