@@ -1,9 +1,17 @@
 /* 
  * (c) Dabox AB 2015 All Rights Reserved
  */
-define([], function() {
+define(['cocobox-icheck'], function() {
     "use strict";
     var exports = {};
+
+
+    function runiCheck(cell) {
+      $('input', cell).icheck({
+        checkboxClass: 'icheckbox_square-red',
+        radioClass: 'iradio_square-red'
+      });
+    };
 
    $(document).ready(function() {
         require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
@@ -15,7 +23,19 @@ define([], function() {
             },
             "columnDefs": [ 
                 {
-                    "targets": [ 0 ],
+                    "targets": [0],
+                    "data": "uid",
+                    "orderable": false,
+                    "width": "24px",
+                    "render": function(data) {
+                        return  '<input type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + data + '"/>';
+                    },
+                    "createdCell": function (td, cellData, rowData, row, col) {
+                        runiCheck(td);
+                    }
+                },
+                {
+                    "targets": [ 1 ],
                     "className": "block-link",
                     "data" : function(row, type, set) {
                         console.log("---", row, type, set);
@@ -35,6 +55,10 @@ define([], function() {
                             return row.name;
                         }
                     }
+                },
+                {
+                    "targets": [ 2 ],
+                    "data": "email"
                 }
             ],
             "ajax": listMembersAjaxSource,

@@ -3,9 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.cug;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -19,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.cug.CreateClientUserGroup;
-import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
@@ -32,7 +29,7 @@ import se.dabox.service.cug.client.ClientUserGroupClient;
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
 @WebModuleMountpoint("/cug.create")
-public class CreateClientUserGroupModule extends AbstractWebAuthModule {
+public class CreateClientUserGroupModule extends AbstractUserClientGroupModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(CreateClientUserGroupModule.class);

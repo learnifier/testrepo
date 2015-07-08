@@ -4,10 +4,14 @@
  */
 package se.dabox.cocobox.cpweb.module.cug;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
@@ -15,27 +19,33 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
-import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
-import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
-import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
 @WebModuleMountpoint("/cug")
-public class ClientUserGroupModule extends AbstractWebAuthModule {
+public class ClientUserGroupModule extends AbstractUserClientGroupModule {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ClientUserGroupModule.class);
 
     public static final String OVERVIEW_ACTION = "overview";
 
+    
+//    private final LongListformProcessor memberProcessor;
+//
+//    public ClientUserGroupModule() {
+//        memberProcessor = new LongListformProcessor();
+//        memberProcessor.addCommand("removeMember", new ClientUserGroupRemoveMember());
+//    }
+
+    
+    
     @DefaultWebAction
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String strCugId) {
@@ -113,16 +123,5 @@ public class ClientUserGroupModule extends AbstractWebAuthModule {
         }
 
         return AbstractCocositeJsModule.jsonTarget(map);
-    }
-
-    
-    private ClientUserGroupClient getClientUserGroupService(RequestCycle cycle) {
-        return CacheClients.getClient(cycle, ClientUserGroupClient.class);
-    }
-
-    private void checkOrgCUGAccess(RequestCycle cycle, MiniOrgInfo org, ClientUserGroup cug) {
-        if(cug.getOrgId() != org.getId()) {
-            handleAccessDenied(cycle, "Access denied to client user group from current organization.");
-        }
     }
 }
