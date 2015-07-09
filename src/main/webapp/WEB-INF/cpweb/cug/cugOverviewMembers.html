@@ -16,6 +16,13 @@
         require(["${contextPath}/js/cug/cugMembersOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
            //No initialization needed
         });
+        function addMemberListener() {
+          require(['dabox-common', 'dabox-jquery'], function() {
+            cocobox.longOp();
+            $(".save").cocobox('inputBlock');
+          });
+          return true;
+        }
 
     </script>
 
@@ -33,12 +40,31 @@
     
     
     [@cugMenu.cugOverviewMenu selected="members"][/@cugMenu.cugOverviewMenu]
+    
+    [#if portalSecurity.hasPermission("CP_EDIT_USER")]
+    [#global formPrefix="cpweb" /]
+    <form action="${helper.urlFor('cug.ClientUserGroupModule','addMember',[org.id?c, cug.groupId?c])}" name="addMemberForm" id="addMemberForm" method="post" onsubmit="return addMemberListener()">
+        <div class="row">
+        <div class="col-xs-3">
+            [@bsform.inputEmail name="memberemail" tabindex="4" maxlength="96" /]
+        </div>
+        </div>
+        <div class="row">
+        <div class="col-xs-3">
+            <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmember' /]</button>
+        </div>
+        </div>
+    </form>
+    [/#if]
+
+    
     <section class="ccb-table-list-actions">
         [#if portalSecurity.hasPermission("CP_EDIT_USER")]
         <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#cugmembersform'), 'removeMembers', '${ctext("cpweb.cug.members.remove.title")?js_string}', '${ctext("cpweb.cug.members.remove.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Remove</button>
         [/#if]
     </section>
-    <form method="post" id="cugmembersform" action="${helper.urlFor('cug.MemberOpsModule','memberOps', [org.id, cug.groupId])}">
+
+    <form method="post" id="cugmembersform" action="${helper.urlFor('cug.MemberOpsModule','memberOps', [org.id?c, cug.groupId?c])}">
         [@bsform.listformFields /]
         <span>Members</span>
         

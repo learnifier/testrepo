@@ -5,7 +5,7 @@ define(['cocobox-icheck'], function() {
     "use strict";
     var exports = {};
 
-
+    
     function runiCheck(cell) {
       $('input', cell).icheck({
         checkboxClass: 'icheckbox_square-red',
