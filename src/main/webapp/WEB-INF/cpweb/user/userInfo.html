@@ -17,6 +17,8 @@
             <li><span class="row-label">Email</span><span class="row-setting clearfix">${user.primaryEmail?xhtml}</span></li>
             <li><span class="row-label">Language</span><span class="row-setting clearfix">${(locale.getDisplayName(userLocale)?xhtml)!'Not set'}</span></li>
             <li><span class="row-label">Organization</span><span class="row-setting clearfix">${(organization.displayName?xhtml)!'Not set'}</span></li>
+            <li><span class="row-label">Locked</span><span class="row-setting clearfix">${(user.locked?string('Yes','No'))}</span></li>
+
         </ul>
     </div>
 </section>
