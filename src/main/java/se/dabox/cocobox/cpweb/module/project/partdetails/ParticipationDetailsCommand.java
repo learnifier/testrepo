@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
@@ -21,11 +22,13 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.project.ParticipationModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
+import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.date.DateFormatters;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.participation.crisppart.ParticipationCrispProductReport;
 import se.dabox.service.common.ccbc.product.IdProjectProductUtil;
@@ -39,7 +42,15 @@ import se.dabox.service.common.ccbc.project.material.FetchMode;
 import se.dabox.service.common.ccbc.project.material.GetParticipationCrispProductReportsRequest;
 import se.dabox.service.common.ccbc.project.material.GetParticipationCrispProductStatusRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.coursedesign.DatabankFacade;
+import se.dabox.service.common.coursedesign.activity.Activity;
+import se.dabox.service.common.coursedesign.activity.ActivityComponent;
+import se.dabox.service.common.coursedesign.activity.ActivityPage;
+import se.dabox.service.common.coursedesign.activity.MultiPageActivityCourse;
+import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
+import se.dabox.service.common.coursedesign.project.GetProjectCourseDesignCommand;
 import se.dabox.service.common.coursedesign.v1.Component;
+import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
@@ -49,7 +60,7 @@ import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Predicate;
+import se.dabox.util.collections.ValueUtils;
 
 /**
  *
@@ -67,6 +78,8 @@ public class ParticipationDetailsCommand {
     private List<ProgressComponentInfo> progressInfos;
     private boolean refreshCrispInformation = false;
     private List<IdProjectModel> idProjects;
+    private MultiPageActivityCourse course;
+    private Map<UUID, ProgressComponentInfo> progressInfoMap;
 
     public ParticipationDetailsCommand(RequestCycle cycle) {
         this.cycle = cycle;
@@ -102,10 +115,15 @@ public class ParticipationDetailsCommand {
         if (refreshCrispInformation) {
             doRefreshCrispInformation();
         }
+
+        course = createActivityCourseModel();
+
         getIdProjects();
         getReports();
         getAdminLinkProducts();
         progressInfos = new ProgressComponentResolver(cycle, project, participation).resolve();
+
+        progressInfoMap = CollectionsUtil.createMap(progressInfos, ProgressComponentInfo::getCid);
 
         return createJsonResponse();
     }
@@ -118,8 +136,11 @@ public class ParticipationDetailsCommand {
         format.setTimeZone(project.getTimezone());
 
         byte[] jsonData = new JsonEncoding(format) {
+            private JsonGenerator generator;
+            private String thumbnailUrl;
             @Override
             protected void encodeData(JsonGenerator generator) throws IOException {
+                this.generator = generator;
                 generator.writeStartObject();
 
                 generator.writeArrayFieldStart("reports");
@@ -136,6 +157,7 @@ public class ParticipationDetailsCommand {
 
                 generator.writeArrayFieldStart("progress");
                 for (ProgressComponentInfo pinfo : progressInfos) {
+                    flushProgressComponentInfoCache();
                     encodeProgressComponentInfo(generator, pinfo);
                 }
                 generator.writeEndArray();
@@ -143,6 +165,12 @@ public class ParticipationDetailsCommand {
                 generator.writeArrayFieldStart("idprojects");
                 for (IdProjectModel idProjectModel : idProjects) {
                     encodeIdProjectModel(generator, idProjectModel);
+                }
+                generator.writeEndArray();
+
+                generator.writeArrayFieldStart("pages");
+                for (ActivityPage page : course.getPageList()) {
+                    encodeCoursePage(page);
                 }
                 generator.writeEndArray();
 
@@ -186,7 +214,7 @@ public class ParticipationDetailsCommand {
                         new ProductMaterialConverter(cycle, getProductDirectoryClient());
                 Material material = converter.convert(product);
 
-                String thumbnailUrl = material.getThumbnail(32);
+                thumbnailUrl = material.getThumbnail(32);
 
                 if (thumbnailUrl != null) {
                     generator.writeStringField("productThumbnail", thumbnailUrl);
@@ -245,6 +273,18 @@ public class ParticipationDetailsCommand {
                     encodeOrgMatInformation(generator, pinfo.getOrgMat());
                 }
 
+                writeStringOrNull(generator, "completionStatus", pinfo.getCompletionStatus());
+                writeStringOrNull(generator, "successStatus", pinfo.getSuccessStatus());
+
+                if (pinfo.getScore() == null) {
+                    generator.writeNullField("score");
+                } else {
+                    generator.writeNumberField("score", pinfo.getScore());
+                }
+
+                encodeThumbnail(pinfo);
+
+
                 generator.writeEndObject();
             }
 
@@ -257,6 +297,89 @@ public class ParticipationDetailsCommand {
                 generator.writeNumberField("completed", idProjectModel.getCompleted());
                 generator.writeEndObject();
             }
+
+            private void writeStringOrNull(JsonGenerator generator, String name,
+                    Object obj) throws IOException {
+                if (obj == null) {
+                    generator.writeNullField(name);
+                } else {
+                    generator.writeStringField(name, obj.toString());
+                }
+            }
+
+            private void encodeCoursePage(ActivityPage page) throws IOException {
+                generator.writeStartObject();
+
+                generator.writeStringField("title", page.getTitle());
+                generator.writeStringField("text", page.getText());
+
+                generator.writeArrayFieldStart("activity");
+                for (Activity activity : page.getActivityList()) {
+                    encodeCourseActivity(activity);
+                }
+                generator.writeEndArray();
+
+                generator.writeEndObject();
+            }
+
+            private void encodeCourseActivity(Activity activity) throws IOException {
+                generator.writeStartObject();
+
+                String title = getActivityTitle(activity);
+                generator.writeStringField("title", title);
+                writeStringOrNull(generator, "completionStatus", activity.getCompletionStatus());
+                writeStringOrNull(generator, "successStatus", activity.getSuccessStatus());
+                generator.writeBooleanField("completed", activity.isCompleted());
+                generator.writeBooleanField("enabled", activity.isEnabled());
+                generator.writeBooleanField("overdue", activity.isOverdue());
+                generator.writeBooleanField("visible", activity.isVisible());
+
+                generator.writeArrayFieldStart("component");
+                for (ActivityComponent component : activity.getComponents()) {
+                    flushProgressComponentInfoCache();
+                    encodeActivityComponent(component);
+                }
+                generator.writeEndArray();
+
+                generator.writeEndObject();
+            }
+
+            private void encodeActivityComponent(ActivityComponent component) throws IOException {
+                ProgressComponentInfo info = progressInfoMap.get(component.getCid());
+                if (info == null) {
+                    return;
+                }
+
+                encodeProgressComponentInfo(generator, info);
+            }
+
+            private String getActivityTitle(Activity activity) {
+                String title = activity.getActivityContainer().getProperties().get("title");
+                if (title == null) {
+                    ActivityComponent pc = activity.getPrimaryComponent();
+                    if (pc != null) {
+                        title = pc.getProperties().get("title");
+                    }
+                }
+
+                return ValueUtils.coalesce(title, "");
+            }
+
+            private void encodeThumbnail(ProgressComponentInfo pinfo) throws IOException {
+                String tn = thumbnailUrl;
+
+                if (tn == null) {
+                    tn = "http://png-4.findicons.com/files/icons/1690/developpers/32/smiley.png";
+                }
+
+                generator.writeStringField("thumbnail", tn);
+            }
+
+            private void flushProgressComponentInfoCache() {
+                thumbnailUrl = null;
+            }
+
+
         }.encode();
 
         return new JsonRequestTarget(jsonData, JsonRequestTarget.DEFAULT_ENCODING);
@@ -390,22 +513,19 @@ public class ParticipationDetailsCommand {
         List<Product> products = getProductDirectoryClient().getProducts(true, productIds);
         ProductTypeUtil.setTypes(getProductDirectoryClient(), products);
 
-        Set<Product> set = CollectionsUtil.subset(products, new Predicate<Product>() {
-            @Override
-            public boolean evalute(Product product) {
-                if (!ProductUtils.isCrispProduct(product)) {
-                    return false;
-                }
-
-                CrispContext ctx =
-                        DwsCrispContextHelper.getCrispContext(cycle, product);
-
-                if (ctx == null) {
-                    return false;
-                }
-
-                return ctx.getDescription().getMethods().getReportUserParticipation() != null;
+        Set<Product> set = CollectionsUtil.subset(products, (Product product) -> {
+            if (!ProductUtils.isCrispProduct(product)) {
+                return false;
             }
+
+            CrispContext ctx =
+                    DwsCrispContextHelper.getCrispContext(cycle, product);
+
+            if (ctx == null) {
+                return false;
+            }
+
+            return ctx.getDescription().getMethods().getReportUserParticipation() != null;
         });
 
         adminLinkProducts = set;
@@ -432,5 +552,25 @@ public class ParticipationDetailsCommand {
         }
 
         return list.get(0).getMap();
+    }
+
+    private MultiPageActivityCourse createActivityCourseModel() {
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        CourseDesignDefinition cdd
+                = new GetProjectCourseDesignCommand(cycle, userLocale).
+                setFallbackToStageDesign(true).
+                forProject(project);
+
+        List<ParticipationProgress> progress
+                = getCocoboxCordinatorClient().getParticipationProgress(participation.
+                        getParticipationId());
+
+        DatabankFacade databankFacade
+                = new GetDatabankFacadeCommand(cycle).setFallbackToStageDatabank(true).get(project);
+
+        return new MultiPageCourseCddActivityCourseFactory().
+                newActivityCourse(project, progress,
+                databankFacade, cdd);
     }
 }

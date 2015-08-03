@@ -150,7 +150,12 @@ class ProgressComponentResolver {
             if (progress != null && progress.isCompleted()) {
                 info.setCompleted(progress.getCompletionDate());
             }
-
+            
+            if (progress != null) {
+                info.setSuccessStatus(progress.getSuccess());
+                info.setCompletionStatus(progress.getCompletionStatus());
+                info.setScore(progress.getScore());
+            }
 
             infos.add(info);
         }
