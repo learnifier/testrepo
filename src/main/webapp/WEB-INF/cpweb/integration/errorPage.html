@@ -26,7 +26,7 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-[@dws.skin skin="CPMultiOrg" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot]
 
 
 <div class="grid_16">
@@ -61,11 +61,11 @@ ${cpweb_foot}
             <h2>Details for support team</h2>
             <p>Please make sure that this information is included as you take a screen shot and forward it to tech support.</p>
             <table class="errordetails">
-                <tr><td class="label">User:</td><td>${security.userAccount.displayName!"No name available"} &lt;${security.userAccount.primaryEmail!"No email address available"}&gt;</td></tr>
-                <tr><td class="label">Project:</td><td>${project.name!"No project name available"} (${project.projectId?c!"No project ID available"})</td></tr>
-                <tr><td class="label">Product:</td><td>${(product.title)!"No product name available"} &lt;${(product.productType.title)!"No product type available"}&gt; (${(product.id)!"No product ID available"})</td></tr>
-                <tr><td class="label">Date:</td><td>${now?datetime}</td></tr>
-                <tr><td class="label">Error message:</td><td>${exception.message!"No error message available"}</td></tr>
+                <tr><td class="xlabel">User:</td><td>${security.userAccount.displayName!"No name available"} &lt;${security.userAccount.primaryEmail!"No email address available"}&gt;</td></tr>
+                <tr><td class="xlabel">Project:</td><td>${(project.name)!"No project name available"} (${(project.projectId?c)!"No project ID available"})</td></tr>
+                <tr><td class="xlabel">Product:</td><td>${(product.title)!"No product name available"} &lt;${(product.productType.title)!"No product type available"}&gt; (${(product.id)!"No product ID available"})</td></tr>
+                <tr><td class="xlabel">Date:</td><td>${now?datetime}</td></tr>
+                <tr><td class="xlabel">Error message:</td><td>${exception.message!"No error message available"}</td></tr>
             </table>
         </section>
     </div>
