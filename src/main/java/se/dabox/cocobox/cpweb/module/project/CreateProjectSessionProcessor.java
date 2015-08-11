@@ -6,8 +6,13 @@ package se.dabox.cocobox.cpweb.module.project;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +23,19 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
+import se.dabox.cocobox.crisp.datasource.OrgUnitSource;
+import se.dabox.cocobox.crisp.datasource.PdProductInfoSource;
+import se.dabox.cocobox.crisp.datasource.ProductInfoSource;
+import se.dabox.cocobox.crisp.datasource.ProjectInfoSource;
+import se.dabox.cocobox.crisp.datasource.StandardOrgUnitInfoSource;
+import se.dabox.cocobox.crisp.method.GetProjectConfiguration;
+import se.dabox.cocobox.crisp.runtime.CrispContext;
+import se.dabox.cocobox.crisp.runtime.CrispException;
+import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
+import se.dabox.cocobox.crisp.runtime.DwsCrispExecutionHelper;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -47,8 +63,14 @@ import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.orgdir.client.OrgUnitInfo;
+import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
+import se.dabox.service.proddir.data.ProductTypes;
+import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.ParamUtil;
+import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -76,10 +98,14 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         ProjectType ptype = ProjectType.valueOf(nps.getType());
 
+
         NewProjectRequest npr = ProjectTypeUtil.call(ptype,
                 new ProjectTypeCallable<NewProjectRequest>() {
                     @Override
                     public NewProjectRequest callDesignedProject() {
+
+                        crispFullhack();
+
                         boolean autoIcal = getAutoIcalSetting();
 
                         return NewProjectRequest.newDesignedProject(
@@ -132,6 +158,117 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                                         input.getTimezone(), null, matListDetails.getUserTitle(),
                                         matListDetails.getUserDescription(), nps.getProductId()
                                 );
+                    }
+
+                    private void crispFullhack() {
+                        LOGGER.warn(
+                                "!!!! Doing a crisp fulhack here. Remove this when real LAP implementation is done !!!!");
+
+                        CourseDesignClient cdClient
+                                = CacheClients.getClient(cycle, CourseDesignClient.class);
+
+                        CourseDesign design = cdClient.getDesign(nps.getDesignId());
+
+                        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+
+                        Set<ProductId> productIds = cdd.getAllProductIdSet();
+
+                        ProductDirectoryClient pdClient
+                                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+                        List<Product> products = pdClient.getProductsByIds(productIds);
+                        ProductTypes types = pdClient.listTypes();
+                        types.populateProductType(products);
+                        
+                        List<Product> crispProducts
+                                = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
+
+
+                        for (Product product : crispProducts) {
+                            CrispContext ctx = DwsCrispContextHelper.getCrispContext(cycle, product);
+
+                            if (ctx.getDescription().getMethods().getGetProjectConfiguration() == null) {
+                                continue;
+                            }
+
+                            OrgUnitInfo ou = CacheClients.getClient(cycle,
+                                    OrganizationDirectoryClient.class).getOrgUnitInfo(orgId);
+                            OrgUnitSource orgUnit = new StandardOrgUnitInfoSource(ou);
+
+                            ProductInfoSource productInfo = new PdProductInfoSource(product);
+
+                            ProjectInfoSource pinfo = new ProjectInfoSource() {
+
+                                @Override
+                                public long getId() {
+                                    return 0;
+                                }
+
+                                @Override
+                                public String getName() {
+                                    return "Project name";
+                                }
+
+                                @Override
+                                public String getType() {
+                                    return nps.getType();
+                                }
+
+                                @Override
+                                public String getCountry() {
+                                    return input.getCountry().toLanguageTag();
+                                }
+
+                                @Override
+                                public TimeZone getTimeZone() {
+                                    return input.getTimezone();
+                                }
+
+                                @Override
+                                public boolean isSelfRegistrationEnabled() {
+                                    return false;
+                                }
+
+                                @Override
+                                public String getUserTitle() {
+                                    return "User title";
+                                }
+
+                                @Override
+                                public String getUserDescription() {
+                                    return "";
+                                }
+
+                                @Override
+                                public String getCourseType() {
+                                    return "";
+                                }
+
+                                @Override
+                                public Long getOwner() {
+                                    return null;
+                                }
+                            };
+
+                            GetProjectConfiguration config = new GetProjectConfiguration(orgUnit,
+                                    productInfo, pinfo);
+
+                            DwsCrispExecutionHelper execHelper = new DwsCrispExecutionHelper(cycle, ctx);
+
+                            Map<String, ?> response = null;
+                            try {
+                                response = execHelper.executeJson(Locale.ENGLISH, config);
+                            } catch (CrispException crispException){
+                                ErrorState state = new ErrorState(orgId, product, crispException, null);
+                                throw new RetargetException(NavigationUtil.getIntegrationErrorPage(
+                                        cycle, state));
+                            }
+
+                            LOGGER.debug("Response from getProjectConfig for product {}: {}",
+                                    product.getId(), response);
+
+                        }
+
                     }
                 });
 
