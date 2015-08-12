@@ -54,6 +54,8 @@ import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.io.RuntimeIOException;
+import se.dabox.service.cug.client.ClientUserGroup;
+import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -208,7 +210,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(toJsonUserAccounts(cycle, uas, org.getId()));
     }
-
+    
     @WebAction
     public RequestTarget onSearchUsers(RequestCycle cycle, String strOrgId, String query) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -268,6 +270,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         }.encode();
     }
 
+    
     private ByteArrayOutputStream toJsonObjectProjects(RequestCycle cycle, List<OrgProject> projects,
             List<Long> favoriteIds) {
         ByteArrayOutputStream baos =

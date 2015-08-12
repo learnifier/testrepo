@@ -14,6 +14,7 @@ import se.dabox.cocobox.cpweb.module.OrgSelectorModule;
 import se.dabox.cocobox.cpweb.module.account.AccountSettingsModule;
 import se.dabox.cocobox.cpweb.module.branding.BrandingModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignModule;
+import se.dabox.cocobox.cpweb.module.cug.ClientUserGroupModule;
 import se.dabox.cocobox.cpweb.module.integration.IntegrationErrorModule;
 import se.dabox.cocobox.cpweb.module.mail.MailModule;
 import se.dabox.cocobox.cpweb.module.project.NewProjectModule;
@@ -215,6 +216,26 @@ public final class NavigationUtil {
     public static RequestTarget toProjectRoster(long projectId) {
         return new WebModuleRedirectRequestTarget(ProjectModule.class, ProjectModule.ROSTER_ACTION,
                 Long.toString(projectId));
+    }
+    
+    public static RequestTarget toClientUserGroupList(RequestCycle cycle, long orgId) {
+        return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class,
+                CpMainModule.LIST_CLIENT_USER_GROUPS, Long.toString(orgId));
+    }
+
+    public static String toClientUserGroupListUrl(RequestCycle cycle, long orgId) {
+        return cycle.urlFor(ClientUserGroupModule.class,
+                CpMainModule.LIST_CLIENT_USER_GROUPS, Long.toString(orgId));
+    }
+
+    public static RequestTarget toClientUserGroupOverview(RequestCycle cycle, long orgId, long groupId) {
+        return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class,
+                ClientUserGroupModule.OVERVIEW_ACTION, Long.toString(orgId), Long.toString(groupId));
+    }
+
+    public static String toClientUserGroupOverviewUrl(RequestCycle cycle, long orgId, long groupId) {
+        return cycle.urlFor(ClientUserGroupModule.class,
+                ClientUserGroupModule.OVERVIEW_ACTION, Long.toString(orgId), Long.toString(groupId));
     }
 
     private NavigationUtil() {

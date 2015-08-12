@@ -51,6 +51,8 @@ public class CpMainModule extends AbstractWebAuthModule {
     public static final String LIST_EMAILS = "listEmails";
     public static final String LIST_DESIGNS = "listDesigns";
     public static final String ACCOUNT_SETTINGS = "accountSettings";
+    public static final String LIST_CLIENT_USER_GROUPS = "listClientUserGroups";
+    
 
     public CpMainModule() {
         super();
@@ -230,6 +232,17 @@ public class CpMainModule extends AbstractWebAuthModule {
         return new FreemarkerRequestTarget("/user/listUsers.html", map);
     }
 
+    @WebAction
+    public RequestTarget onListClientUserGroups(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        Map<String, Object> map = createMap();
+
+        map.put("org", org);
+
+        return new FreemarkerRequestTarget("/cug/listClientUserGroups.html", map);
+    }
+    
     @WebAction
     public RequestTarget onListReports(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
