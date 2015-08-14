@@ -1,8 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* (c) Dabox AB 2015 All Rights Reserved
+*/
 package se.dabox.cocobox.cpweb.module.cug;
 
 import net.unixdeveloper.druwa.RequestCycle;

@@ -1,7 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+* (c) Dabox AB 2015 All Rights Reserved
+*/
 package se.dabox.cocobox.cpweb.module.cug;
 
 import java.util.List;
@@ -31,6 +30,7 @@ import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.MultipleResponseException;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.email.SimpleEmailValidator;
 
 /**
@@ -41,14 +41,14 @@ import se.dabox.util.email.SimpleEmailValidator;
 public class ClientUserGroupModule extends AbstractUserClientGroupModule {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ClientUserGroupModule.class);
-
+    
     public static final String OVERVIEW_ACTION = "overview";
     public static final String CHILDREN_ACTION = "children";
     
     @DefaultWebAction
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String strCugId) {
-
+        
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
@@ -62,19 +62,19 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
             parentCug = cugService.getGroup(parentId);
         }
         Map<String, Object> map = createMap();
-
+        
         map.put("formsess", getValidationSession(AddMemberForm.class, cycle));
-
+        
         map.put("cug", cug);
         map.put("parentCug", parentCug);
         map.put("org", org);
-
+        
         return new FreemarkerRequestTarget("/cug/cugOverviewMembers.html", map);
     }
-
+    
     @WebAction
     public RequestTarget onChildren(RequestCycle cycle, String strOrgId, String strCugId) {
-
+        
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
@@ -91,13 +91,14 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
         map.put("cug", cug);
         map.put("parentCug", parentCug);
         map.put("org", org);
-
+        
         return new FreemarkerRequestTarget("/cug/cugOverviewChildren.html", map);
     }
-
+    
     @WebAction
     public RequestTarget onDelete(RequestCycle cycle, String strOrgId, String strCugId) {
         long groupId = Long.valueOf(strCugId);
+        long caller = LoginUserAccountHelper.getUserId(cycle);
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
@@ -106,14 +107,14 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
         
         Long parentId = cug.getParent();
         checkOrgCUGAccess(cycle, org, cug);
-
+        
         Map<String, Object> map = createMap();
-
+        
         if (!children.isEmpty()) {
             map.put("children", children.size());
         } else {
             //Delete the group
-            cugService.deleteGroup(0L, groupId);
+            cugService.deleteGroup(caller, groupId);
             if(parentId != null && parentId != 0) {
                 // Go to parent overview
                 map.put("location", NavigationUtil.toClientUserGroupChildrenUrl(cycle, org.getId(), parentId));
@@ -122,62 +123,63 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
                 map.put("location", NavigationUtil.toClientUserGroupListUrl(cycle, org.getId()));
             }
         }
-
+        
         return AbstractCocositeJsModule.jsonTarget(map);
     }
     
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onAddMember(RequestCycle cycle, String strOrgId, String strCugId) {
         long groupId = Long.valueOf(strCugId);
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+        
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
         ClientUserGroup cug = cugService.getGroup(groupId);
         
         checkOrgCUGAccess(cycle, org, cug);
-
+        
         DruwaFormValidationSession<AddCugMemberForm> sess = getValidationSession(AddCugMemberForm.class,
                 cycle);
-
+        
         sess.setTransferToViewSession(true);
-
+        
         if (!sess.process()) {
             return toMemberOverview(strOrgId, strCugId);
         }
-
+        
         AddCugMemberForm form = sess.getObject();
-
+        
         if (!SimpleEmailValidator.getInstance().isValidEmail(form.getMemberemail())) {
             sess.addError(new ValidationError(ValidationConstraint.EMAIL_FORMAT, "memberemail", "email.invalid.input"));
         }
-
+        
         if (!sess.process()) {
             LOGGER.info("Invalid email: {}", form.getMemberemail());
             return toMemberOverview(strOrgId, strCugId);
         }
-
+        
         try {
             UserAccount ua = Clients.getClient(cycle, UserAccountService.class).
-                            getSingleUserAccountByEmail(form.getMemberemail());
+                    getSingleUserAccountByEmail(form.getMemberemail());
             List<UserAccount> uas = cugService.listGroupMembers(groupId);
             if(uas.stream().anyMatch(u -> u.hasEmailAddress(form.getMemberemail()))) {
                 LOGGER.info("Account with email already present in group: {}", form.getMemberemail());
             } else {
-                cugService.addGroupMember(0L, groupId, ua.getUserId());
+                cugService.addGroupMember(caller, groupId, ua.getUserId());
             }
         } catch(IllegalArgumentException e) {
             LOGGER.info("Invalid email: {}", form.getMemberemail());
         } catch (MultipleResponseException e) {
             LOGGER.info("Multiple user accounts with same email found: {}", form.getMemberemail());
-        }           
+        }
         return toMemberOverview(strOrgId, strCugId);
     }
     
-        private WebModuleRedirectRequestTarget toMemberOverview(String orgId, String groupId) {
+    private WebModuleRedirectRequestTarget toMemberOverview(String orgId, String groupId) {
         return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class, OVERVIEW_ACTION,
                 orgId, groupId);
     }
-
 }
 
 
