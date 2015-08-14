@@ -104,9 +104,9 @@ public class CreateClientUserGroupModule extends AbstractUserClientGroupModule {
 
         CreateClientUserGroup form = formsess.getObject();
         
-        LOGGER.debug("XXX Calling updateGroupName" + org.getId() + "|"+groupId+"|"+form.getName());
+        LOGGER.error("XXX Calling updateGroupName" + org.getId() + "|"+groupId+"|"+form.getName());
         cugClient.updateGroupName(org.getId(), groupId, form.getName());
-        LOGGER.debug("XXX done with updateGroupName");
+        LOGGER.error("XXX done with updateGroupName");
 
         //No need to decorate modal params here
         String directUrl = ModalParamsHelper.getProceedUrl(cycle);
