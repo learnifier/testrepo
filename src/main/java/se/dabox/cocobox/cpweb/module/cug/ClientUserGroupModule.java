@@ -162,6 +162,10 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
         try {
             UserAccount ua = Clients.getClient(cycle, UserAccountService.class).
                     getSingleUserAccountByEmail(form.getMemberemail());
+            if(ua == null) {
+                LOGGER.info("Email not found: {}", form.getMemberemail());
+                return toMemberOverview(strOrgId, strCugId);
+            }
             List<UserAccount> uas = cugService.listGroupMembers(groupId);
             if(uas.stream().anyMatch(u -> u.hasEmailAddress(form.getMemberemail()))) {
                 LOGGER.info("Account with email already present in group: {}", form.getMemberemail());
@@ -170,6 +174,7 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
             }
         } catch(IllegalArgumentException e) {
             LOGGER.info("Invalid email: {}", form.getMemberemail());
+            return toMemberOverview(strOrgId, strCugId);
         } catch (MultipleResponseException e) {
             LOGGER.info("Multiple user accounts with same email found: {}", form.getMemberemail());
         }
