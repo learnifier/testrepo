@@ -113,12 +113,12 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
         } else {
             //Delete the group
             cugService.deleteGroup(0L, groupId);
-            if(parentId != null) {
+            if(parentId != null && parentId != 0) {
                 // Go to parent overview
                 map.put("location", NavigationUtil.toClientUserGroupOverviewUrl(cycle, org.getId(), parentId));
             } else {
                 // Go to org group list
-                map.put("location", NavigationUtil.toOrgProjectsUrl(cycle, strOrgId));
+                map.put("location", NavigationUtil.toClientUserGroupListUrl(cycle, org.getId()));
             }
         }
 
