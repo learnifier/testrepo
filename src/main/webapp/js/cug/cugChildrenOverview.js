@@ -22,7 +22,7 @@ define([], function() {
                         console.log("---", row, type, set);
                         if (!row.nameDisplay) {
                             var name = (row.name && row.name.length > 0) ? row.name : "(Name not set yet)";
-                            row.nameDisplay = '<a href="' + cugOverviewUrl + "/" + row.groupId + '">' +  name +'</a> ';
+                            row.nameDisplay = '<a href="' + partialCugOverviewUrl + "/" + row.groupId + '">' +  name +'</a> ';
                         }
 
                         if (type === 'display') {

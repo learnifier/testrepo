@@ -41,18 +41,12 @@ ${cpweb_foot}
             [@bsform.inputText name="name" tabindex="1" maxlength="64" /]
         </div>
     </div>
-    [#if (parentCug.groupId)??]
-    <input type="hidden" name="parent" value='${(parentCug.groupId)?c}'>
-    [#else]
-    <input type="hidden" name="parent" value='0'>
-    [/#if]
-
+    [@bsform.inputHidden name="parent"/]
+    
     [#if editMode]
     <input type="hidden" name="role" value="edit" />
     [#else]
-
     <input type="hidden" name="orgId" value="${org.id?c}" />
-
     <input type="submit" id="hiddensubmit" style="display: none" />
     [/#if]
     [@modal.formParams /]
