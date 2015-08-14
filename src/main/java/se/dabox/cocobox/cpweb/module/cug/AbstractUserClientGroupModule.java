@@ -22,7 +22,7 @@ public class AbstractUserClientGroupModule extends AbstractWebAuthModule {
 
     protected void checkOrgCUGAccess(RequestCycle cycle, MiniOrgInfo org, ClientUserGroup cug) {
         if(cug.getOrgId() != org.getId()) {
-            handleAccessDenied(cycle, "Access denied to client user group from current organization.");
+            handleAccessDenied(cycle, "Access denied to group from current organization.");
         }
     }
 
