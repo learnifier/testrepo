@@ -11,7 +11,8 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
-import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
+import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
+import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.cug.client.ClientUserGroup;
@@ -28,7 +29,6 @@ public class MemberOpsModule extends AbstractUserClientGroupModule {
     public MemberOpsModule() {
         MemberOpsModule self = this; 
         commands = new HashMap<String, MemberOpsInterface>() {{
-//            put("removeMembersxx", (cycle, org, cug, idarr) -> { return removeMember(cycle, org,cug, idarr); });
             put("removeMembers", self::removeMember); // Why can't I use this::removeMember
         }};
     }
@@ -60,12 +60,13 @@ public class MemberOpsModule extends AbstractUserClientGroupModule {
     
     public RequestTarget removeMember(RequestCycle cycle, MiniOrgInfo org, ClientUserGroup cug, int[] ids) {
         Map<String, Object> map = createMap();
-
+        long groupId = cug.getGroupId();
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
         for(long id: ids) {
-            cugService.removeGroupMember(0L, cug.getGroupId(), id);
+            cugService.removeGroupMember(0L, groupId, id);
         }
-        return AbstractCocositeJsModule.jsonTarget(map);
+        
+        return new RedirectUrlRequestTarget(NavigationUtil.toClientUserGroupOverviewUrl(cycle, org.getId(), groupId));
     }
 
 }
