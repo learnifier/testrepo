@@ -3,7 +3,7 @@
     <button class="btn btn-primary-outlined btn-sm" type="button" id="editcug"><span class="glyphicon glyphicon-pencil"></span> Edit Group</button>
     [#if portalSecurity.hasPermission("CP_DELETE_PROJECT")]
     <form id="deletegroupform" action="${helper.urlFor('cug.ClientUserGroupModule','delete',[org.id, cug.groupId])}" method="post">
-    <button  id="deletegroupbutton" class="btn btn-primary-outlined btn-sm" type="button"><span class="glyphicon glyphicon-pencil"></span>Delete Group</button>
+    <button  id="deletegroupbutton" class="btn btn-primary-outlined btn-sm" type="button"><span class="glyphicon glyphicon-trash"></span>Delete Group</button>
     </form>
     [/#if]
     [@bsform._onreadyJavascript]
@@ -13,7 +13,7 @@
                     modal.open({
                         src: "${helper.urlFor('cug.CreateClientUserGroupModule','edit',[org.id, cug.groupId])}",
                         height: "450px",
-                        cssClass: "modal-lg",
+                        cssClass: "",
                         title: "Edit Group",
                         cancel: function () { /* Do nothing*/
                         },
