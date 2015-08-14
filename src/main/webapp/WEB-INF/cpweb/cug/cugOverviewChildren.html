@@ -10,6 +10,7 @@ ${cpweb_foot}
     var spinnerUrl = "[@common.spinnerUrl /]";
     var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
     var cugChildrenUrl = "${helper.urlFor('cug.ClientUserGroupModule','children',[org.id,cug.groupId])}";
+    var cugOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id,cug.groupId])}";
 
     var listChildrenAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupChildren',[org.id, cug.groupId])}";
 
