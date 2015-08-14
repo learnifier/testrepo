@@ -23,6 +23,7 @@ import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
@@ -104,9 +105,10 @@ public class CreateClientUserGroupModule extends AbstractUserClientGroupModule {
 
         CreateClientUserGroup form = formsess.getObject();
         
-        LOGGER.error("XXX Calling updateGroupName" + org.getId() + "|"+groupId+"|"+form.getName());
-        cugClient.updateGroupName(org.getId(), groupId, form.getName());
-        LOGGER.error("XXX done with updateGroupName");
+        LOGGER.info("XXX Calling updateGroupName" + org.getId() + "|"+groupId+"|"+form.getName());
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+        cugClient.updateGroupName(caller, groupId, form.getName());
+        LOGGER.info("XXX done with updateGroupName");
 
         //No need to decorate modal params here
         String directUrl = ModalParamsHelper.getProceedUrl(cycle);
