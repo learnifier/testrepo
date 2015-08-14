@@ -11,7 +11,7 @@ define([], function() {
             "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "order": [[0,'asc']],
             "initComplete": function() {
-                $('#listcugs_filter input').attr('placeholder', 'Search Client User Groups');
+                $('#listcugs_filter input').attr('placeholder', 'Search groups');
             },
             "columnDefs": [ 
                 {
@@ -43,9 +43,9 @@ define([], function() {
             "deferRender": true,
             "language": {
                 "search": "",
-                "zeroRecords": "No client user group matches your query",
-                "emptyTable": "<span class='emptytable'>Start now by creating your <a href='" + newUserUrl + "'>first client user group</a></span>",
-                "loadingRecords": "<p>Loading client user groups...</p><img src='" + spinnerUrl + "' />"
+                "zeroRecords": "No group matches your query",
+                "emptyTable": "<span class='emptytable'>Start now by creating your <a href='" + newUserUrl + "'>first group</a></span>",
+                "loadingRecords": "<p>Loading groups...</p><img src='" + spinnerUrl + "' />"
             }
         });
         });
