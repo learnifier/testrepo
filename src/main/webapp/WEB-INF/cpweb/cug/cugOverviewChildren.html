@@ -25,7 +25,7 @@ ${cpweb_foot}
     $("#addClientUserGroupBtn").click(function () {
         require(["[@modal.javascript /]"], function(modal) {
             modal.open({               
-                title: "Create Client User Group",
+                title: "Create Group",
                 src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id,cug.groupId])}",
                 height: "450px",
                 cssClass: "modal-lg",
@@ -46,7 +46,7 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
 
 <section class="ccb-page-header margin-bottom">
-    <h1 class="page-title">Client User Groups</h1>
+    <h1 class="page-title">Groups</h1>
 </section>
 
 <section id="cugoverview">
@@ -57,7 +57,7 @@ ${cpweb_foot}
     <section class="ccb-table-list-actions">
         [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
         <div class="ccb-page-header__actions--right">
-            <button id="addClientUserGroupBtn" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Client User Group</a>
+            <button id="addClientUserGroupBtn" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Group</a>
         </div>
         [/@]
     </section>
