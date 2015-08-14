@@ -43,6 +43,7 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
             LoggerFactory.getLogger(ClientUserGroupModule.class);
 
     public static final String OVERVIEW_ACTION = "overview";
+    public static final String CHILDREN_ACTION = "children";
     
     @DefaultWebAction
     @WebAction
@@ -115,7 +116,7 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
             cugService.deleteGroup(0L, groupId);
             if(parentId != null && parentId != 0) {
                 // Go to parent overview
-                map.put("location", NavigationUtil.toClientUserGroupOverviewUrl(cycle, org.getId(), parentId));
+                map.put("location", NavigationUtil.toClientUserGroupChildrenUrl(cycle, org.getId(), parentId));
             } else {
                 // Go to org group list
                 map.put("location", NavigationUtil.toClientUserGroupListUrl(cycle, org.getId()));

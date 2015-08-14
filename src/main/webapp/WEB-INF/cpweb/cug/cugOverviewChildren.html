@@ -25,6 +25,7 @@ ${cpweb_foot}
     $("#addClientUserGroupBtn").click(function () {
         require(["[@modal.javascript /]"], function(modal) {
             modal.open({               
+                title: "Create Client User Group",
                 src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id,cug.groupId])}",
                 height: "450px",
                 cssClass: "modal-lg",

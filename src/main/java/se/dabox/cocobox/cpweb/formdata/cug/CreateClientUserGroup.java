@@ -24,7 +24,7 @@ public class CreateClientUserGroup implements Serializable {
         this.name = name;
     }
 
-    @FormField
+    @FormField(required = false)
     public Long getParent() {
         return parent;
     }

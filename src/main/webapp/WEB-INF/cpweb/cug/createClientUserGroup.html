@@ -9,7 +9,7 @@ ${cpweb_foot}
         modalClient.setButtons(
                 [
                     {
-                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.savecug')?js_string}",
+                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.save')?js_string}",
                         cssClass: "btn-primary",
                         action: function (dlg) {
                             $("#createCug").submit();
@@ -29,8 +29,7 @@ ${cpweb_foot}
 [/#assign]
 
 [@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot orgName=orgName]
-
-<h1>[@dws.txt key="cpweb.createCug.title" /]</h1>
+<h1>[@dws.txt key="${editMode?string('cpweb.editCug.title','cpweb.createCug.title')}" /]</h1>
 
 [#global formPrefix="cpweb.createCug" /]
 <form action="${formLink}" name="createCug" id="createCug" class="fullpage" method="post">
