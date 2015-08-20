@@ -35,7 +35,7 @@ define([], function() {
                             return row.name;
                         }
                     }
-                }
+                    }
             ],
             "ajax": listCUGAjaxSource,
             "pageLength": 25,

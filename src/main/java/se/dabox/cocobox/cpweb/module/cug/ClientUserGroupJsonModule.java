@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.cug;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -23,7 +24,6 @@ import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
-import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.JsonEncoding;
 
 /**
@@ -39,7 +39,10 @@ public class ClientUserGroupJsonModule extends AbstractJsonAuthModule {
     public RequestTarget onListClientUserGroups(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         
-        List<ClientUserGroup> cugs = getClientUserGroupService(cycle).listGroups(org.getId());
+        List<ClientUserGroup> cugs = getClientUserGroupService(cycle).listGroups(org.getId())
+                .stream().filter(
+                        m -> m.getParent() == null
+                ).collect(Collectors.toList());
         
         return jsonTarget(toJsonUserClientUserGroups(cycle, cugs));
     }
