@@ -40,7 +40,6 @@ import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.model.project.task.CreateMailTaskSendMailProcessor;
 import se.dabox.cocobox.cpweb.model.project.task.EditMailTaskSendMailProcessor;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
-import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.UrlRequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.project.role.AssignRoleCommand;
