@@ -38,6 +38,9 @@ ${cpweb_foot}
         {{#if moveAllowed}}
         <li><a href='#' data-trigger='roster-row-action' data-action='move'><span class="glyphicon glyphicon-log-out"></span>  Move</a></li>
         {{/if}}
+        [#if security.userAccount.superUser]
+        <li><a href='#' data-trigger='roster-row-action' data-action='raps'><span class="glyphicon glyphicon-list-alt"></span>  Technical info</a></li>
+        [/#if]
     </ul>
 </div>   
 </script>
@@ -304,7 +307,13 @@ ${cpweb_foot}
                 rowImpersonateAction(row);                
             } else if (action==='move') {
                 rowMoveAction(row);                
-            } else {
+            } 
+            [#if security.userAccount.superUser]
+            else if (action==="raps") {
+                window.location = "${helper.urlFor('project.ProjectModule','raps',[prj.projectId])}/"+row.id;
+            }
+            [/#if]
+            else {
                 alert('Undefined row action: ' + action);
             }
             

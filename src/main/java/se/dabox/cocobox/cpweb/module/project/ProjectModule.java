@@ -56,6 +56,7 @@ import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
+import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
@@ -218,12 +219,16 @@ public class ProjectModule extends AbstractProjectWebModule {
         DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
         CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
         
+        ProjectParticipationState state
+                = getCocoboxCordinatorClient(cycle).getParticipationState(participationId);
+
         MultiPageActivityCourse actCourse
                 = new MultiPageCourseCddActivityCourseFactory().
                 setAllowTemporalProgressTracking(true).
                 newActivityCourse(project, progress, databankFacade, cdd);
 
         map.put("actCourse", actCourse);
+        map.put("participantState", state);
 
         return new FreemarkerRequestTarget("/project/participationStatusRaw.html", map);
     }

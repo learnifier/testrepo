@@ -51,6 +51,30 @@ ${cpweb_foot}
 
 [/#list]
 
+
+<h2>Raw state</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th  style="padding-left: 20px">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            [#list participantState.map?keys as key]
+            <tr>
+                <td>
+                    ${key?xml}
+                </td>
+                <td style="padding-left: 20px">
+                    ${(participantState.map[key]?xml)!'(No value set)'}
+                </td>
+            </tr>
+            [/#list]
+        </tbody>
+    </table>
+
+
 [/@dws.skin]
 
 [#macro dumpComponent comp]
