@@ -185,6 +185,10 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/projectMaterials.html", map);
     }
 
+    /**
+     * Shows technical information about the user
+     *
+     */
     @WebAction
     public RequestTarget onRaps(RequestCycle cycle, String projectId, String strParticipationId) {
 

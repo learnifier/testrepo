@@ -61,7 +61,7 @@ ${cpweb_foot}
             </tr>
         </thead>
         <tbody>
-            [#list participantState.map?keys as key]
+            [#list participantState.map?keys?sort as key]
             <tr>
                 <td>
                     ${key?xml}
