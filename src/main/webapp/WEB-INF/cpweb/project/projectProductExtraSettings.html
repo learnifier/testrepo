@@ -9,7 +9,11 @@
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
+<form method="POST" action="${helper.urlFor('project.NewProjectModule','processProductExtraSettings',[org.id, npsId])}">
     [@crispSettings.settingsList extraConfig /]
+    
+     <button type="submit" class="btn btn-default">Create</button>
+</form>
 
 [/@dws.skin]
 

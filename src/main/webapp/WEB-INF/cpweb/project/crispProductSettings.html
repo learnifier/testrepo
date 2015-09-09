@@ -1,24 +1,24 @@
 [#ftl strip_text="true" /]
 
 [#macro settingsList config]
-    [#list config as productConfig]
-        [@productSettings productConfig /]
-    [/#list]
+        [#list config as productConfig]
+            [@productSettings productConfig /]
+        [/#list]
 [/#macro]
 
 [#macro productSettings productConfig]
     <h1>${productConfig.productId}</h1>
 
-    [@listSettings productConfig.projectConfig.items /]
+    [@listSettings productConfig.projectConfig.items productConfig.productId /]
 
     [#if productConfig.projectConfig.advancedItems?size > 0]
         <h2>Advanced settings</h2>
-        [@listSettings settings=productConfig.projectConfig.advancedItems prefix="adv"/]
+        [@listSettings settings=productConfig.projectConfig.advancedItems productId=productConfig.productId prefix="adv"/]
     [/#if]
 
 [/#macro]
 
-[#macro listSettings settings prefix="p"]
+[#macro listSettings settings productId prefix="p"]
 
    [#list settings as setting]
     <div class="form-group">
@@ -30,6 +30,7 @@
                data-crisptype="${setting.type}"
                class="form-control"
                id="${prefix}${setting?index}"
+               name="${productId?xml}-${setting.id?xml}"
                placeholder="${(setting.description?xml)!''}"
                aria-describedby="${prefix}${setting?index}HelpBlock"
                [#if !setting.optional]required="required"[/#if]

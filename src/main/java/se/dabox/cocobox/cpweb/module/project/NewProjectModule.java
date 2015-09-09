@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +22,7 @@ import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.RetargetException;
+import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
@@ -28,6 +30,7 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpwebConstants;
@@ -36,6 +39,7 @@ import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
+import se.dabox.cocobox.crisp.response.ProjectConfigItem;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
@@ -275,11 +279,56 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         Map<String, Object> map = createMap();
+
+        map.put("org", org);
+
         map.put("nps", nps);
+        map.put("npsId", strNpsId);
         map.put("extraConfig", nps.getExtraConfig());
 
         return new FreemarkerRequestTarget(
                 "/project/projectProductExtraSettings.html", map);
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onProcessProductExtraSettings(RequestCycle cycle,
+            String strOrgId, String strNpsId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
+
+        NewProjectSession nps = (NewProjectSession) cycle.getSession().
+                getAttribute(NewProjectSession.getSessionName(strNpsId));
+
+        if (nps == null) {
+            LOGGER.warn("Invalid NPS id specified: {}", strNpsId);
+            return NavigationUtil.toCreateProject(cycle, strOrgId);
+        }
+
+        WebRequest req = cycle.getRequest();
+        
+        Map<String,Map<String,String>> productsMap = new HashMap<>();
+
+        for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
+            String prefix = extraConfig.getFormPrefix();
+            
+            Map<String,String> map = new HashMap<>();
+            
+            addExtraSettingsValues(req, map, prefix,
+                    extraConfig.getProjectConfig().getItems());
+            addExtraSettingsValues(req, map, prefix,
+                    extraConfig.getProjectConfig().getAdvancedItems());
+
+            productsMap.put(extraConfig.getProductId(), map);
+        }
+
+        //Everything is valid(!)
+
+        for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
+            final Map<String, String> settingsMap = productsMap.get(extraConfig.getProductId());
+            extraConfig.setSettings(settingsMap);
+        }
+
+        return nps.process(cycle, null);
     }
 
     /**
@@ -770,5 +819,20 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         return false;
+    }
+
+    private void addExtraSettingsValues(WebRequest req, Map<String, String> map, String prefix, List<ProjectConfigItem> items) {
+        for (ProjectConfigItem item : items) {
+            String val = req.getParameter(prefix + item.getId());
+
+            if (StringUtils.isBlank(val) && !item.isOptional()) {
+                //TODO: Create custom exception
+                throw new IllegalArgumentException();
+            }
+
+            //TODO: Validate the input
+
+            map.put(item.getId(), StringUtils.trimToNull(val));
+        }
     }
 }

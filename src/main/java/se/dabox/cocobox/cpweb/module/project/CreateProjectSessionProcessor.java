@@ -395,7 +395,13 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             nps.setExtraConfig(items);
         }
 
-        return true;
+        for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
+            if (extraConfig.getProjectConfig() != null && extraConfig.getSettings() == null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private RequestTarget toNewProductExtraSettingsPage(String npsId) {
