@@ -1,0 +1,108 @@
+[#ftl strip_text="true" /]
+
+[#macro settingsList config]
+    [#list config as productConfig]
+        [@productSettings productConfig /]
+    [/#list]
+[/#macro]
+
+[#macro productSettings productConfig]
+    <h1>${productConfig.productId}</h1>
+
+    [@listSettings productConfig.projectConfig.items /]
+
+    [#if productConfig.projectConfig.advancedItems?size > 0]
+        <h2>Advanced settings</h2>
+        [@listSettings settings=productConfig.projectConfig.advancedItems prefix="adv"/]
+    [/#if]
+
+[/#macro]
+
+[#macro listSettings settings prefix="p"]
+
+   [#list settings as setting]
+    <div class="form-group">
+      <label for="${prefix}${setting?index}">${setting.title?xml}</label>
+
+      [@settingBox setting]
+
+        <input type="${crispTypeMapping[setting.type]}"
+               data-crisptype="${setting.type}"
+               class="form-control"
+               id="${prefix}${setting?index}"
+               placeholder="${(setting.description?xml)!''}"
+               aria-describedby="${prefix}${setting?index}HelpBlock"
+               [#if !setting.optional]required="required"[/#if]
+               />
+
+      [/@]
+
+      <span id="${prefix}${setting?index}HelpBlock" class="help-block">${(setting.description?xml)!''}</span>
+    </div>
+   [/#list]
+[/#macro]
+
+[#macro javascriptFootContribution ]
+    <script>
+        require(['cocobox-date', 'cocobox-datetime', 'cocobox-togglebutton'], function(d, dt, tb) {
+            $("input[data-crisptype=date]").each(function() {
+                d.dateTime(this);
+            });
+
+            $("input[data-crisptype=datetime]").each(function() {
+                dt.dateTime(this);
+            });
+
+            $("input[data-crisptype=toggle]").each(function() {
+                tb.initToggle(this);
+            });
+        });
+
+        var crispProductSettings = crispProductSettings || {};
+
+        crispProductSettings.isAllValid = function() {
+            var fields = $("input[data-crisptype");
+
+            var valid = 0;
+            fields.each(function() {
+                var required = $(this).prop("required");
+                if (!required) {
+                    valid++;
+                    return;
+                }
+
+                if ($(this).attr("data-crisptype") === "toggle") {
+                    valid++;
+                } else {
+                    if ($(this).val()) {
+                        valid++;
+                    }
+                }
+            });
+
+            return fields.length === valid;
+        };
+
+    </script>
+[/#macro]
+
+[#macro settingBox setting]
+    [#if setting.type == "toggle"]
+        <p class="form-control-static">
+    [/#if]
+    [#nested /]
+    [#if setting.type == "toggle"]
+        </p>
+    [/#if]
+[/#macro]
+
+
+[#assign crispTypeMapping = {   "string": "text",
+                                "integer": "number",
+                                "date": "hidden",
+                                "datetime": "hidden",
+                                "toggle": "checkbox",
+                                "email": "email",
+                                "url": "url"
+                            } /]
+

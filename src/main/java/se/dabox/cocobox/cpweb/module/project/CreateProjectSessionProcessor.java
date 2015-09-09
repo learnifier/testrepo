@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.RetargetException;
@@ -29,9 +27,10 @@ import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
 import se.dabox.cocobox.crisp.datasource.OrgUnitSource;
 import se.dabox.cocobox.crisp.datasource.PdProductInfoSource;
 import se.dabox.cocobox.crisp.datasource.ProductInfoSource;
-import se.dabox.cocobox.crisp.datasource.ProjectInfoSource;
 import se.dabox.cocobox.crisp.datasource.StandardOrgUnitInfoSource;
 import se.dabox.cocobox.crisp.method.GetProjectConfiguration;
+import se.dabox.cocobox.crisp.response.ProjectConfigResponse;
+import se.dabox.cocobox.crisp.response.json.ProjectConfigResponseJson;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
@@ -78,8 +77,8 @@ import se.dabox.util.collections.CollectionsUtil;
  */
 public class CreateProjectSessionProcessor implements NewProjectSessionProcessor {
 
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(CreateProjectSessionProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.
+            getLogger(CreateProjectSessionProcessor.class);
     private static final long serialVersionUID = 1L;
     private final long orgId;
 
@@ -94,17 +93,20 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             final MatListProjectDetailsForm matListDetails) {
 
         String strNpsId = nps.getUuid().toString();
+
+        if (missingExtraParameters(cycle, nps)) {
+            //TODO: Redirect to settings page
+            return toNewProductExtraSettingsPage(strNpsId);
+        }
+
         final CreateProjectGeneral input = nps.getCreateProjectGeneral();
 
         ProjectType ptype = ProjectType.valueOf(nps.getType());
-
 
         NewProjectRequest npr = ProjectTypeUtil.call(ptype,
                 new ProjectTypeCallable<NewProjectRequest>() {
                     @Override
                     public NewProjectRequest callDesignedProject() {
-
-                        crispFullhack();
 
                         boolean autoIcal = getAutoIcalSetting();
 
@@ -123,13 +125,13 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
                     @Override
                     public NewProjectRequest callMaterialListProject() {
-                        ParamUtil.required(matListDetails,"matListDetails");
+                        ParamUtil.required(matListDetails, "matListDetails");
                         return NewProjectRequest.
-                                newMaterialListProject(
+                        newMaterialListProject(
                                 input.getProjectname(),
                                 orgId,
                                 input.getProjectlang(),
-                                LoginUserAccountHelper.getUserId(cycle), 
+                                LoginUserAccountHelper.getUserId(cycle),
                                 input.getCountry(),
                                 input.getTimezone(),
                                 null,
@@ -152,124 +154,14 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                     public NewProjectRequest callSingleProductProject() {
                         nps.setProds(Collections.singletonList(nps.getProductId()));
                         return NewProjectRequest.
-                                newSingleProductProject(
-                                        input.getProjectname(), orgId, input.getProjectlang(),
-                                        LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
-                                        input.getTimezone(), null, matListDetails.getUserTitle(),
-                                        matListDetails.getUserDescription(), nps.getProductId()
-                                );
+                        newSingleProductProject(
+                                input.getProjectname(), orgId, input.getProjectlang(),
+                                LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
+                                input.getTimezone(), null, matListDetails.getUserTitle(),
+                                matListDetails.getUserDescription(), nps.getProductId()
+                        );
                     }
 
-                    private void crispFullhack() {
-                        LOGGER.warn(
-                                "!!!! Doing a crisp fulhack here. Remove this when real LAP implementation is done !!!!");
-
-                        CourseDesignClient cdClient
-                                = CacheClients.getClient(cycle, CourseDesignClient.class);
-
-                        CourseDesign design = cdClient.getDesign(nps.getDesignId());
-
-                        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-
-                        Set<ProductId> productIds = cdd.getAllProductIdSet();
-
-                        ProductDirectoryClient pdClient
-                                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
-
-                        List<Product> products = pdClient.getProductsByIds(productIds);
-                        ProductTypes types = pdClient.listTypes();
-                        types.populateProductType(products);
-                        
-                        List<Product> crispProducts
-                                = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
-
-
-                        for (Product product : crispProducts) {
-                            CrispContext ctx = DwsCrispContextHelper.getCrispContext(cycle, product);
-
-                            if (ctx.getDescription().getMethods().getGetProjectConfiguration() == null) {
-                                continue;
-                            }
-
-                            OrgUnitInfo ou = CacheClients.getClient(cycle,
-                                    OrganizationDirectoryClient.class).getOrgUnitInfo(orgId);
-                            OrgUnitSource orgUnit = new StandardOrgUnitInfoSource(ou);
-
-                            ProductInfoSource productInfo = new PdProductInfoSource(product);
-
-                            ProjectInfoSource pinfo = new ProjectInfoSource() {
-
-                                @Override
-                                public long getId() {
-                                    return 0;
-                                }
-
-                                @Override
-                                public String getName() {
-                                    return "Project name";
-                                }
-
-                                @Override
-                                public String getType() {
-                                    return nps.getType();
-                                }
-
-                                @Override
-                                public String getCountry() {
-                                    return input.getCountry().toLanguageTag();
-                                }
-
-                                @Override
-                                public TimeZone getTimeZone() {
-                                    return input.getTimezone();
-                                }
-
-                                @Override
-                                public boolean isSelfRegistrationEnabled() {
-                                    return false;
-                                }
-
-                                @Override
-                                public String getUserTitle() {
-                                    return "User title";
-                                }
-
-                                @Override
-                                public String getUserDescription() {
-                                    return "";
-                                }
-
-                                @Override
-                                public String getCourseType() {
-                                    return "";
-                                }
-
-                                @Override
-                                public Long getOwner() {
-                                    return null;
-                                }
-                            };
-
-                            GetProjectConfiguration config = new GetProjectConfiguration(orgUnit,
-                                    productInfo, pinfo);
-
-                            DwsCrispExecutionHelper execHelper = new DwsCrispExecutionHelper(cycle, ctx);
-
-                            Map<String, ?> response = null;
-                            try {
-                                response = execHelper.executeJson(Locale.ENGLISH, config);
-                            } catch (CrispException crispException){
-                                ErrorState state = new ErrorState(orgId, product, crispException, null);
-                                throw new RetargetException(NavigationUtil.getIntegrationErrorPage(
-                                        cycle, state));
-                            }
-
-                            LOGGER.debug("Response from getProjectConfig for product {}: {}",
-                                    product.getId(), response);
-
-                        }
-
-                    }
                 });
 
         OrgProject project = null;
@@ -295,9 +187,8 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         if (aex != null || project == null) {
             throw new IllegalStateException("Unable to create new project. Name already exists",
-                        aex);
+                    aex);
         }
-
 
         if (nps.getOrgmats() != null) {
             for (Long orgMatId : nps.getOrgmats()) {
@@ -342,8 +233,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void activateProjectDesign(RequestCycle cycle, OrgProject project, NewProjectSession nps) {
-        CourseDesignClient cdClient =
-                Clients.getClient(cycle, CourseDesignClient.class);
+        CourseDesignClient cdClient = Clients.getClient(cycle, CourseDesignClient.class);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
@@ -357,8 +247,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         project.setStageDatabank(newDatabank);
 
         CourseDesign design = cdClient.getDesign(newDesignId);
-        CourseDesignDefinition cdd =
-                CddCodec.decode(cycle, design.getDesign());
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
 
         String userTitle = cdd.getInfo().getUserTitle();
         String userDesc = cdd.getInfo().getUserDescription();
@@ -373,7 +262,6 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                 setUserDescription(userDesc).
                 setDefaultExpiration(getDefaultExpiration(cycle, newDesignId));
 
-
         UpdateProjectRequest upr = updateBuilder.createUpdateProjectRequest();
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
@@ -385,7 +273,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         try {
             pmcClient.addProjectProduct(project.getProjectId(), prodId);
-        } catch(MissingProjectProductException ex) {
+        } catch (MissingProjectProductException ex) {
             ProductDirectoryClient pdClient
                     = CacheClients.getClient(cycle, ProductDirectoryClient.class);
 
@@ -437,5 +325,80 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
     private Long getDefaultExpiration(RequestCycle cycle, long newDesignId) {
         return new GetCourseDefaultExpiration().getDefaultExpiration(cycle, newDesignId);
+    }
+
+    private List<ExtraProductConfig> getExtraConfigItems(RequestCycle cycle, NewProjectSession nps) {
+
+        final List<ExtraProductConfig> configList = new ArrayList<>();
+
+        CourseDesignClient cdClient
+                = CacheClients.getClient(cycle, CourseDesignClient.class);
+
+        CourseDesign design = cdClient.getDesign(nps.getDesignId());
+
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+
+        Set<ProductId> productIds = cdd.getAllProductIdSet();
+
+        ProductDirectoryClient pdClient
+                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+        List<Product> products = pdClient.getProductsByIds(productIds);
+        ProductTypes types = pdClient.listTypes();
+        types.populateProductType(products);
+
+        List<Product> crispProducts
+                = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
+
+        for (Product product : crispProducts) {
+            CrispContext ctx = DwsCrispContextHelper.getCrispContext(cycle, product);
+
+            if (ctx.getDescription().getMethods().getGetProjectConfiguration() == null) {
+                continue;
+            }
+
+            OrgUnitInfo ou = CacheClients.getClient(cycle,
+                    OrganizationDirectoryClient.class).getOrgUnitInfo(orgId);
+            OrgUnitSource orgUnit = new StandardOrgUnitInfoSource(ou);
+
+            ProductInfoSource productInfo = new PdProductInfoSource(product);
+
+            GetProjectConfiguration config = GetProjectConfiguration.
+                    newCreateGetProjectConfiguration(orgUnit, productInfo);
+
+            DwsCrispExecutionHelper execHelper = new DwsCrispExecutionHelper(cycle, ctx);
+
+            ProjectConfigResponse response = null;
+            try {
+                response = execHelper.executeRequest(Locale.ENGLISH, config,
+                        new ProjectConfigResponseJson());
+            } catch (CrispException crispException) {
+                ErrorState state = new ErrorState(orgId, product, crispException, null);
+                throw new RetargetException(NavigationUtil.getIntegrationErrorPage(
+                        cycle, state));
+            }
+
+            if (response.isEmpty()) {
+                continue;
+            }
+
+            configList.add(new ExtraProductConfig(product.getId().getId(), response));
+        }
+
+        return configList;
+    }
+
+    private boolean missingExtraParameters(RequestCycle cycle, NewProjectSession nps) {
+
+        if (nps.getExtraConfig() == null) {
+            List<ExtraProductConfig> items = getExtraConfigItems(cycle, nps);
+            nps.setExtraConfig(items);
+        }
+
+        return true;
+    }
+
+    private RequestTarget toNewProductExtraSettingsPage(String npsId) {
+        return new WebModuleRedirectRequestTarget(NewProjectModule.class, "productExtraSettings", Long.toString(orgId), npsId);
     }
 }

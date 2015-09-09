@@ -260,6 +260,28 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 "/project/projectDesignData.html", map);
     }
 
+    @WebAction
+    public RequestTarget onProductExtraSettings(RequestCycle cycle,
+            String strOrgId, String strNpsId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
+
+        NewProjectSession nps = (NewProjectSession) cycle.getSession().
+                getAttribute(NewProjectSession.getSessionName(strNpsId));
+
+        if (nps == null) {
+            LOGGER.warn("Invalid NPS id specified: {}", strNpsId);
+            return NavigationUtil.toCreateProject(cycle, strOrgId);
+        }
+
+        Map<String, Object> map = createMap();
+        map.put("nps", nps);
+        map.put("extraConfig", nps.getExtraConfig());
+
+        return new FreemarkerRequestTarget(
+                "/project/projectProductExtraSettings.html", map);
+    }
+
     /**
      * Processes the options from the setup page. If design project then create the project and
      * redirect to the configure data details page. If matlist project then redirect to the

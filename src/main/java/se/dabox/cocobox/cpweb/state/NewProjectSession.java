@@ -12,6 +12,7 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebSession;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
+import se.dabox.cocobox.cpweb.module.project.ExtraProductConfig;
 import se.dabox.util.ParamUtil;
 
 /**
@@ -36,7 +37,10 @@ public class NewProjectSession implements Serializable {
     private final Long designId;
     private boolean editMode;
     private CreateProjectGeneral createProjectGeneral;
-    private String productId;
+    private final String productId;
+    private List<ExtraProductConfig> extraConfig;
+
+
 
     public NewProjectSession(String type,
             List<Long> orgmats,
@@ -117,6 +121,14 @@ public class NewProjectSession implements Serializable {
         return productId;
     }
 
+    public List<ExtraProductConfig> getExtraConfig() {
+        return extraConfig;
+    }
+
+    public void setExtraConfig(List<ExtraProductConfig> extraConfig) {
+        this.extraConfig = extraConfig;
+    }
+    
     @Override
     public String toString() {
         return "NewProjectSession{" + "uuid=" + uuid + ", created=" + created + ", type=" + type +
