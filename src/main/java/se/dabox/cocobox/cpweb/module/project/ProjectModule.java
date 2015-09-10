@@ -33,6 +33,7 @@ import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
+import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
@@ -206,10 +207,15 @@ public class ProjectModule extends AbstractProjectWebModule {
         GetCrispProjectProductConfig response
                 = new GetCrispProjectProductConfig(cycle, prj.getOrgId(), strProductId);
 
-        map.put("productConfig", new ExtraProductConfig(strProductId, response.get()));
+        final ExtraProductConfig extraProductConfig
+                = new ExtraProductConfig(strProductId, response.get());
+
+        map.put("productConfig", extraProductConfig);
 
         map.put("project", prj);
         map.put("productId", strProductId);
+        map.put("productNameMap", new ProductNameMapFactory().
+                create(Collections.singletonList(extraProductConfig)));
 
         return new FreemarkerRequestTarget("/project/addProjectProductWithSettings.html", map);
     }

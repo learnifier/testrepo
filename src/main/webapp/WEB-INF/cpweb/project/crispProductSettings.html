@@ -6,8 +6,8 @@
         [/#list]
 [/#macro]
 
-[#macro productSettings productConfig]
-    <h1>${productConfig.productId}</h1>
+[#macro productSettings productConfig productNameMap=productNameMap]
+    <h1>${productNameMap[productConfig.productId]?xml}</h1>
 
     [@listSettings productConfig.projectConfig.items productConfig.productId /]
 

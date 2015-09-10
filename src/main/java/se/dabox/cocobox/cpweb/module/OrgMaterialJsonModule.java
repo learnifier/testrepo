@@ -743,6 +743,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         String editorUrl = pdwebEditorFactory.forProduct(product);
                         generator.writeStringField("editorUrl", editorUrl);
                     }
+                    generator.writeBooleanField("crispConfigAvailable", hasCrispConfig(cycle, product));
                 }
             }
 
@@ -778,6 +779,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         getId());
 
                 return new CrispAdminLinkInfo(link, ctx.getDescription().getInfo().getName());
+            }
+
+            private boolean hasCrispConfig(RequestCycle cycle, Product product) {
+                CrispContext ctx = DwsCrispContextHelper.getCrispContext(cycle, product);
+
+                return ctx != null &&
+                        ctx.getDescription().getMethods().getGetProjectConfiguration() != null;
             }
 
         }.encodeToStream(materials);

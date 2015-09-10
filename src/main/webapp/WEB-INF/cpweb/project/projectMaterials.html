@@ -118,16 +118,20 @@ ${cpweb_foot}
 
 
 
-                            if (!row.deleteLinkDisplay) {
-                                html += '<li class="customHover"><form method="post" action="${removeLink}" onsubmit="return onDelete(this)" style="padding: 3px 20px;" class="DeleteItem"><a href="#" style="color: #333333;" class="DeleteItemClick"><input type="hidden" name="materialId" value="' + row.system + '|' + row.id + '" />Remove</a></form></li>';
-                            }
-
                             if (row.anonymous === true) {
                                 if (row.editorUrl) {
                                     html += "<li><a href='" + row.editorUrl + "' target='_blank'>Edit</a></li>";
                                 } else {
                                     html += "<li><a href='#' data-id='" + row.id + "' onclick='editItem(this)' >Edit</a></li>";
                                 }
+                            }
+
+                            if (row.crispConfigAvailable) {
+                                html += "<li><a href='#' data-id='" + row.id + "' onclick='configItem(this)' >Settings</a></li>";
+                            }
+
+                            if (!row.deleteLinkDisplay) {
+                                html += '<li class="customHover"><form method="post" action="${removeLink}" onsubmit="return onDelete(this)" style="padding: 3px 20px;" class="DeleteItem"><a href="#" style="color: #333333;" class="DeleteItemClick"><input type="hidden" name="materialId" value="' + row.system + '|' + row.id + '" />Remove</a></form></li>';
                             }
 
                             html += "</ul></div>";

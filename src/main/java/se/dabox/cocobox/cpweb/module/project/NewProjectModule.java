@@ -37,6 +37,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.crisp.response.ProjectConfigItem;
 import se.dabox.cocobox.crisp.response.ProjectConfigType;
@@ -73,7 +74,6 @@ import se.dabox.service.proddir.data.ProductTransformers;
 import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.HybridLocaleUtils;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -285,6 +285,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
         map.put("nps", nps);
         map.put("npsId", strNpsId);
         map.put("extraConfig", nps.getExtraConfig());
+        map.put("productNameMap", new ProductNameMapFactory().create(nps.getExtraConfig()));
 
         return new FreemarkerRequestTarget(
                 "/project/projectProductExtraSettings.html", map);
