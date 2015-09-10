@@ -35,6 +35,7 @@ ${cpweb_foot}
 
     $(document).ready(function () {
         require(['cocobox-modal','dataTables-bootstrap', 'dabox-common', 'dabox-jquery', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function (cocoboxModal) {
+
             var oTable = $('#projectmaterials').dataTable({
                 "dom": '<"row"<"col-sm-6"><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "paging": false,
@@ -269,7 +270,7 @@ ${cpweb_foot}
 
     function editItem(row) {
 
-        productId = $(row).data("id");
+        var productId = $(row).data("id");
 
         CcbAnonymousProductUpload.open(function (pid, productId) {
             if (pid) {
@@ -281,6 +282,26 @@ ${cpweb_foot}
         }, {
             scope: "P${prj.projectId?c}",
             productId: productId
+        });
+
+    }
+
+    function configItem(row) {
+        var productId = $(row).data("id");
+
+        require(['cocobox-modal'], function(cocoboxModal) {
+            var editCrispMaterialUrl = "${helper.urlFor('project.ProjectModule','editProjectProductSettings', [prj.projectId])}";
+
+            cocoboxModal.open({
+                src: editCrispMaterialUrl + '/' + encodeURIComponent(productId),
+                title: "Settings",
+                cancel: function () { /* Do nothing*/
+                },
+                cancelUrl: window.location.href,
+                proceedUrl: window.location.href,
+                cssClass: "modal-lg",
+                height: "500px"
+            });
         });
 
     }

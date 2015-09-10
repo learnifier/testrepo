@@ -220,6 +220,39 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/addProjectProductWithSettings.html", map);
     }
 
+    @WebAction
+    public RequestTarget onEditProjectProductSettings(final RequestCycle cycle,
+            String strProjectId, String strProductId) {
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+
+        checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Map<String, Object> map = createMap();
+
+        map.put("formsess", getValidationSession(AddMaterialForm.class, cycle));
+        addCommonMapValues(map, prj, cycle);
+
+        GetCrispProjectProductConfig response
+                = new GetCrispProjectProductConfig(cycle, prj.getOrgId(), strProductId);
+
+        final ExtraProductConfig extraProductConfig
+                = new ExtraProductConfig(strProductId, response.get());
+
+        map.put("productConfig", extraProductConfig);
+
+        map.put("project", prj);
+        map.put("productId", strProductId);
+        map.put("productNameMap", new ProductNameMapFactory().
+                create(Collections.singletonList(extraProductConfig)));
+
+        return new FreemarkerRequestTarget("/project/editProjectProductSettings.html", map);
+    }
+
     /**
      * Shows technical information about the user
      *

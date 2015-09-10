@@ -1,0 +1,38 @@
+[#ftl strip_text="true" /]
+
+[#import "crispProductSettings.html" as crispSettings /]
+[#assign editMode = true in crispSettings /]
+
+[#assign foot]
+    ${cpweb_foot}
+    [@crispSettings.javascriptFootContribution /]
+
+    <script>
+        var addUrl = "${helper.urlFor('project.ProjectMaterialModule', 'doAddProductWithSettings', [project.projectId, productId])}";
+    </script>
+
+    <script>
+        require(["[@modal.clientJavascript /]", "dabox-common"], function (modalClient) {
+
+            modalClient.setButtons(
+                    [
+                        {
+                            text: "Close",
+                            cssClass: "btn-cancel",
+                            action: function (dlg) {
+                                dlg.cancel();
+                            }
+                        }
+                    ]
+            );
+        });
+    </script>
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=foot orgName=orgName]
+
+    <form action="${helper.urlFor('project.ProjectMaterialModule','doAddProductWithSettings',[project.projectId?c, productId])}" method="POST" id="settingsForm">
+            [@crispSettings.productSettings productConfig /]
+    </form>
+
+[/@dws.skin]
