@@ -33,7 +33,7 @@
                name="${productId?xml}-${setting.id?xml}"
                placeholder="${(setting.description?xml)!''}"
                aria-describedby="${prefix}${setting?index}HelpBlock"
-               [#if !setting.optional]required="required"[/#if]
+               [#if !setting.optional && setting.type != "toggle"]required="required"[/#if]
                />
 
       [/@]

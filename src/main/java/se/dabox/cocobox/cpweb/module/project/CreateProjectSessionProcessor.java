@@ -6,7 +6,7 @@ package se.dabox.cocobox.cpweb.module.project;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -24,17 +24,8 @@ import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
-import se.dabox.cocobox.crisp.datasource.OrgUnitSource;
-import se.dabox.cocobox.crisp.datasource.PdProductInfoSource;
-import se.dabox.cocobox.crisp.datasource.ProductInfoSource;
-import se.dabox.cocobox.crisp.datasource.StandardOrgUnitInfoSource;
-import se.dabox.cocobox.crisp.method.GetProjectConfiguration;
 import se.dabox.cocobox.crisp.response.ProjectConfigResponse;
-import se.dabox.cocobox.crisp.response.json.ProjectConfigResponseJson;
-import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.CrispException;
-import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
-import se.dabox.cocobox.crisp.runtime.DwsCrispExecutionHelper;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -62,8 +53,6 @@ import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
-import se.dabox.service.orgdir.client.OrgUnitInfo;
-import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductTypes;
@@ -198,11 +187,16 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         if (nps.getProds() != null) {
             for (String prodId : nps.getProds()) {
-                addProjectProduct(cycle, pmcClient, project, prodId, false);
+                addProjectProduct(cycle,
+                        pmcClient,
+                        project,
+                        prodId,
+                        false,
+                        nps.getProductExtraConfig(prodId));
             }
         }
 
-        if (nps.getDesignId() != null && nps.getDesignId().longValue() != 0) {
+        if (nps.getDesignId() != null && nps.getDesignId() != 0L) {
             activateProjectDesign(cycle, project, nps);
         }
 
@@ -268,11 +262,12 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void addProjectProduct(RequestCycle cycle, ProjectMaterialCoordinatorClient pmcClient,
-            OrgProject project, String prodId, boolean retryAttempt)
+            OrgProject project, String prodId, boolean retryAttempt,
+            Map<String, String> productExtraSettings)
             throws DeniedException, ProjectProductException {
 
         try {
-            pmcClient.addProjectProduct(project.getProjectId(), prodId);
+            pmcClient.addProjectProduct(project.getProjectId(), prodId, productExtraSettings);
         } catch (MissingProjectProductException ex) {
             ProductDirectoryClient pdClient
                     = CacheClients.getClient(cycle, ProductDirectoryClient.class);
@@ -283,7 +278,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
                 long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
                 getCocoboxCordinatorClient(cycle).addOrgProduct(caller, orgId, prodId);
-                addProjectProduct(cycle, pmcClient, project, prodId, true);
+                addProjectProduct(cycle, pmcClient, project, prodId, true, productExtraSettings);
             } else {
                 addProjectProductError(prodId, project, ex, cycle);
             }
@@ -351,27 +346,11 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                 = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
 
         for (Product product : crispProducts) {
-            CrispContext ctx = DwsCrispContextHelper.getCrispContext(cycle, product);
-
-            if (ctx.getDescription().getMethods().getGetProjectConfiguration() == null) {
-                continue;
-            }
-
-            OrgUnitInfo ou = CacheClients.getClient(cycle,
-                    OrganizationDirectoryClient.class).getOrgUnitInfo(orgId);
-            OrgUnitSource orgUnit = new StandardOrgUnitInfoSource(ou);
-
-            ProductInfoSource productInfo = new PdProductInfoSource(product);
-
-            GetProjectConfiguration config = GetProjectConfiguration.
-                    newCreateGetProjectConfiguration(orgUnit, productInfo);
-
-            DwsCrispExecutionHelper execHelper = new DwsCrispExecutionHelper(cycle, ctx);
-
+            
             ProjectConfigResponse response = null;
             try {
-                response = execHelper.executeRequest(Locale.ENGLISH, config,
-                        new ProjectConfigResponseJson());
+                response = new GetCrispProjectProductConfig(cycle, orgId,
+                        product.getId().getId()).get();
             } catch (CrispException crispException) {
                 ErrorState state = new ErrorState(orgId, product, crispException, null);
                 throw new RetargetException(NavigationUtil.getIntegrationErrorPage(

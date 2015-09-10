@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +39,7 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.crisp.response.ProjectConfigItem;
+import se.dabox.cocobox.crisp.response.ProjectConfigType;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
@@ -305,14 +305,14 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         WebRequest req = cycle.getRequest();
-        
-        Map<String,Map<String,String>> productsMap = new HashMap<>();
+
+        Map<String, Map<String, String>> productsMap = new HashMap<>();
 
         for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
             String prefix = extraConfig.getFormPrefix();
-            
-            Map<String,String> map = new HashMap<>();
-            
+
+            Map<String, String> map = new HashMap<>();
+
             addExtraSettingsValues(req, map, prefix,
                     extraConfig.getProjectConfig().getItems());
             addExtraSettingsValues(req, map, prefix,
@@ -322,7 +322,6 @@ public class NewProjectModule extends AbstractWebAuthModule {
         }
 
         //Everything is valid(!)
-
         for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
             final Map<String, String> settingsMap = productsMap.get(extraConfig.getProductId());
             extraConfig.setSettings(settingsMap);
@@ -524,32 +523,23 @@ public class NewProjectModule extends AbstractWebAuthModule {
         String[] countries = Locale.getISOCountries();
 
         List<Locale> list
-                = CollectionsUtil.transformList(Arrays.asList(countries), new Transformer<String, Locale>() {
-                    
-                    @Override
-                    public Locale transform(String item) {
-                        return new Locale("",item);
-                    }
-                });
+                = CollectionsUtil.transformList(Arrays.asList(countries), (String item) ->
+                        new Locale("", item));
 
         final Locale sortLocale = CocositeUserHelper.getUserLocale(cycle);
 
         final Collator collator = Collator.getInstance(sortLocale);
 
-        Collections.sort(list, new Comparator<Locale>() {
+        Collections.sort(list, (Locale o1, Locale o2) -> {
+            String o1Country = o1.getDisplayCountry(sortLocale);
+            String o2Country = o2.getDisplayCountry(sortLocale);
+            int res = collator.compare(o1Country, o2Country);
 
-            @Override
-            public int compare(Locale o1, Locale o2) {
-                String o1Country = o1.getDisplayCountry(sortLocale);
-                String o2Country = o2.getDisplayCountry(sortLocale);
-                int res = collator.compare(o1Country, o2Country);
-
-                if (res != 0) {
-                    return res;
-                }
-
-                return o1.toLanguageTag().compareTo(o2.toLanguageTag());
+            if (res != 0) {
+                return res;
             }
+
+            return o1.toLanguageTag().compareTo(o2.toLanguageTag());
         });
 
         return list;
@@ -561,7 +551,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
     private Locale getDefaultCountryLocale(RequestCycle cycle) {
         return new LazyCacheConfigurationValueCmd<Locale>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.countrylocale.default", 
+                getRealmConfiguration(cycle)).get("cocobox.project.countrylocale.default",
                         HybridLocaleUtils::toLocale);
     }
 
@@ -576,7 +566,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
 //            return null;
 //        }
         return new LazyCacheConfigurationValueCmd<TimeZone>(DwsRealmHelper.
-                getRealmConfiguration(cycle)).get("cocobox.project.timezone.default", TimeZone::getTimeZone);
+                getRealmConfiguration(cycle)).get("cocobox.project.timezone.default",
+                        TimeZone::getTimeZone);
     }
 
     private DruwaFormValidationSession<MatListProjectDetailsForm> getFormsess(RequestCycle cycle) {
@@ -596,12 +587,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
     public static List<TimeZone> getTimezones(RequestCycle cycle) {
         List<String> ids = Arrays.asList(TimeZone.getAvailableIDs());
 
-        return CollectionsUtil.transformList(ids, new Transformer<String, TimeZone>() {
-            @Override
-            public TimeZone transform(String tzid) {
-                return TimeZone.getTimeZone(tzid);
-            }
-        });
+        return CollectionsUtil.transformList(ids, TimeZone::getTimeZone);
     }
 
     private List<String> getDesignProducts(RequestCycle cycle, Long designId, MiniOrgInfo org) {
@@ -683,12 +669,12 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         for (Iterator<Product> iterator = missingProducts.iterator(); iterator.hasNext();) {
             Product prod = iterator.next();
-            
-             if (prod.isAnonymous() && prod.isRealmProduct()) {
+
+            if (prod.isAnonymous() && prod.isRealmProduct()) {
                 iterator.remove();
             }
         }
-        
+
     }
 
     /**
@@ -735,20 +721,17 @@ public class NewProjectModule extends AbstractWebAuthModule {
     private List<Long> getOrgMatIdList(String[] matIds) {
         List<String> list = matIds == null ? Collections.<String>emptyList() : Arrays.asList(matIds);
 
-        return CollectionsUtil.transformListNotNull(list, new Transformer<String, Long>() {
-            @Override
-            public Long transform(String item) {
-                try {
-                    String[] split = MaterialUtils.splitCompositeId(item);
-
-                    if (split[0].equals(OrgMaterialConstants.NATIVE_SYSTEM)) {
-                        return Long.parseLong(split[1]);
-                    }
-
-                    return null;
-                } catch (IllegalArgumentException ex) {
-                    return null;
+        return CollectionsUtil.transformListNotNull(list, (String item) -> {
+            try {
+                String[] split = MaterialUtils.splitCompositeId(item);
+                
+                if (split[0].equals(OrgMaterialConstants.NATIVE_SYSTEM)) {
+                    return Long.parseLong(split[1]);
                 }
+
+                return null;
+            } catch (IllegalArgumentException ex) {
+                return null;
             }
         });
     }
@@ -757,20 +740,17 @@ public class NewProjectModule extends AbstractWebAuthModule {
         List<String> list = prodIds == null ? Collections.<String>emptyList() : Arrays.asList(
                 prodIds);
 
-        return CollectionsUtil.transformListNotNull(list, new Transformer<String, String>() {
-            @Override
-            public String transform(String item) {
-                try {
-                    String[] split = MaterialUtils.splitCompositeId(item);
-
-                    if (split[0].equals(ProductMaterialConstants.NATIVE_SYSTEM)) {
-                        return split[1];
-                    }
-
-                    return null;
-                } catch (IllegalArgumentException ex) {
-                    return null;
+        return CollectionsUtil.transformListNotNull(list, (String item) -> {
+            try {
+                String[] split = MaterialUtils.splitCompositeId(item);
+                
+                if (split[0].equals(ProductMaterialConstants.NATIVE_SYSTEM)) {
+                    return split[1];
                 }
+
+                return null;
+            } catch (IllegalArgumentException ex) {
+                return null;
             }
         });
     }
@@ -796,7 +776,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         OrganizationDirectoryClient odClient
                 = CacheClients.getClient(cycle, OrganizationDirectoryClient.class);
-        
+
         OrgUnitInfo org = odClient.getOrgUnitInfo(miniOrg.getId());
 
         String strValue = org.getProfileValue(CocoSiteConstants.ORG_PROFILE,
@@ -821,9 +801,14 @@ public class NewProjectModule extends AbstractWebAuthModule {
         return false;
     }
 
-    private void addExtraSettingsValues(WebRequest req, Map<String, String> map, String prefix, List<ProjectConfigItem> items) {
+    private void addExtraSettingsValues(WebRequest req, Map<String, String> map, String prefix,
+            List<ProjectConfigItem> items) {
         for (ProjectConfigItem item : items) {
             String val = req.getParameter(prefix + item.getId());
+
+            if (StringUtils.isBlank(val) && item.getType() == ProjectConfigType.toggle) {
+                val = "false";
+            }
 
             if (StringUtils.isBlank(val) && !item.isOptional()) {
                 //TODO: Create custom exception
@@ -831,7 +816,6 @@ public class NewProjectModule extends AbstractWebAuthModule {
             }
 
             //TODO: Validate the input
-
             map.put(item.getId(), StringUtils.trimToNull(val));
         }
     }

@@ -34,7 +34,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function () {
-        require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function () {
+        require(['cocobox-modal','dataTables-bootstrap', 'dabox-common', 'dabox-jquery', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function (cocoboxModal) {
             var oTable = $('#projectmaterials').dataTable({
                 "dom": '<"row"<"col-sm-6"><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "paging": false,
@@ -119,7 +119,7 @@ ${cpweb_foot}
 
 
                             if (!row.deleteLinkDisplay) {
-                                html += '<li class="customHover"><form method="post" action="${removeLink}" onsubmit="return onDelete(this)" style="padding: 3px 20px;" class="DeleteItem"><a href="#" style="color: #333333;" class="DeleteItemClick"><input type="hidden" name="materialId" value="' + row.system + '|' + row.id + '" />Delete</a></form></li>';
+                                html += '<li class="customHover"><form method="post" action="${removeLink}" onsubmit="return onDelete(this)" style="padding: 3px 20px;" class="DeleteItem"><a href="#" style="color: #333333;" class="DeleteItemClick"><input type="hidden" name="materialId" value="' + row.system + '|' + row.id + '" />Remove</a></form></li>';
                             }
 
                             if (row.anonymous === true) {
@@ -157,8 +157,44 @@ ${cpweb_foot}
             });
 
             $("#addMaterial").submit(function () {
-                cocobox.longOp();
+                var form = $(this);
+
+                //Disable button and activate longop dialog
+                var longOpDlg = cocobox.longOp("Adding product", "Adding product");
                 $("button", this).cocobox('inputBlock');
+
+                var url = form.attr("action");
+
+                var hideLoadingIndicators = function() {
+                    longOpDlg.abort();
+                    $("button", this).attr("disabled");
+                }
+
+                cocobox.ajaxPost(url, {
+                    data: {materialId: $("#materialId").val()}
+                }).fail(function() {
+                    hideLoadingIndicators();
+                }).done(function(data) {
+                    if (data.modal) {
+
+                        hideLoadingIndicators();
+                        cocoboxModal.open({
+                            src: data.url,
+                            title: "Add product",
+                            cancel: function () { /* Do nothing*/
+                            },
+                            cancelUrl: window.location.href,
+                            proceedUrl: window.location.href,
+                            cssClass: "modal-lg",
+                            height: "500px"
+                        });
+
+                    } else {
+                        window.location.href = data.url;
+                    }
+                });
+
+                return false;
             });
         });
 

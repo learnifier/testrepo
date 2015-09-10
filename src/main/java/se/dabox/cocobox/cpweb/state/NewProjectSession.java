@@ -4,8 +4,10 @@
 package se.dabox.cocobox.cpweb.state;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -127,6 +129,16 @@ public class NewProjectSession implements Serializable {
 
     public void setExtraConfig(List<ExtraProductConfig> extraConfig) {
         this.extraConfig = extraConfig;
+    }
+
+    public Map<String, String> getProductExtraConfig(String productId) {
+        for (ExtraProductConfig config : extraConfig) {
+            if (config.getProductId().equals(productId)) {
+                return config.getSettings();
+            }
+        }
+
+        return Collections.emptyMap();
     }
     
     @Override
