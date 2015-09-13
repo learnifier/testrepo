@@ -22,6 +22,7 @@ import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
 import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
@@ -170,6 +171,17 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
             String productId) {
 
         final long prjId = prj.getProjectId();
+
+        ProjectConfigResponse config
+                = new GetCrispProjectProductConfig(cycle, prj.getOrgId(), productId).get();
+
+        if (config != null && !config.isEmpty()) {
+            String msg = String.format(
+                    "Integrated product (%s) with properties not supported. Upgrade to florida edition.",
+                    productId);
+            throw new IllegalStateException(msg);
+        }
+
 
         try {
             getProjectMaterialCoordinatorClient(cycle).addProjectProduct(prjId, productId, null);
