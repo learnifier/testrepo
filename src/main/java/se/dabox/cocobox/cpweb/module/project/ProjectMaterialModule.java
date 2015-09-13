@@ -172,7 +172,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
         final long prjId = prj.getProjectId();
 
         try {
-            getProjectMaterialCoordinatorClient(cycle).addProjectProduct(prjId, productId);
+            getProjectMaterialCoordinatorClient(cycle).addProjectProduct(prjId, productId, null);
         } catch (AllocatedCreditsProjectProductException ex) {
             formsess.addError(new ValidationError(ValidationConstraint.CONSISTENCY,
                     "materialId",

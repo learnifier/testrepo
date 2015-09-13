@@ -6,8 +6,10 @@ package se.dabox.cocobox.cpweb.module.project;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +20,11 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
+import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -41,9 +46,15 @@ import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
+import se.dabox.service.proddir.data.ProductTypes;
+import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.ParamUtil;
+import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -68,6 +79,10 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         String strNpsId = nps.getUuid().toString();
         final CreateProjectGeneral input = nps.getCreateProjectGeneral();
+
+        if (hasCrispProperties(cycle, nps)) {
+            throw new IllegalStateException("Integrated products with properties not supported. Upgrade to florida edition.");
+        }
 
         ProjectType ptype = ProjectType.valueOf(nps.getType());
 
@@ -242,7 +257,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             throws DeniedException, ProjectProductException {
 
         try {
-            pmcClient.addProjectProduct(project.getProjectId(), prodId);
+            pmcClient.addProjectProduct(project.getProjectId(), prodId, null);
         } catch (Exception ex) {
             LOGGER.warn("Unable to add product {} to project {}",
                     prodId, project.getProjectId(), ex);
@@ -289,5 +304,47 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         }
 
         return cdd.getInfo().getDefaultParticipationExpiration().getOffset();
+    }
+
+    private boolean hasCrispProperties(RequestCycle cycle, NewProjectSession nps) {
+        CourseDesignClient cdClient
+                = CacheClients.getClient(cycle, CourseDesignClient.class);
+
+        CourseDesign design = cdClient.getDesign(nps.getDesignId());
+
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+
+        Set<ProductId> productIds = cdd.getAllProductIdSet();
+
+        ProductDirectoryClient pdClient
+                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+        List<Product> products = pdClient.getProductsByIds(productIds);
+        ProductTypes types = pdClient.listTypes();
+        types.populateProductType(products);
+
+        List<Product> crispProducts
+                = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
+
+        for (Product product : crispProducts) {
+
+            ProjectConfigResponse response = null;
+            try {
+                response = new GetCrispProjectProductConfig(cycle, orgId,
+                        product.getId().getId()).get();
+            } catch (CrispException crispException) {
+                ErrorState state = new ErrorState(orgId, product, crispException, null);
+                throw new RetargetException(NavigationUtil.getIntegrationErrorPage(
+                        cycle, state));
+            }
+
+            if (response.isEmpty()) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
