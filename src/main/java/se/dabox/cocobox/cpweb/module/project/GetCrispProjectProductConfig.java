@@ -9,16 +9,20 @@ import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirect
 import se.dabox.cocobox.crisp.datasource.OrgUnitSource;
 import se.dabox.cocobox.crisp.datasource.PdProductInfoSource;
 import se.dabox.cocobox.crisp.datasource.ProductInfoSource;
+import se.dabox.cocobox.crisp.datasource.ProjectInfoSource;
 import se.dabox.cocobox.crisp.datasource.StandardOrgUnitInfoSource;
 import se.dabox.cocobox.crisp.desc.EventMethod;
 import se.dabox.cocobox.crisp.method.GetProjectConfiguration;
-import se.dabox.cocobox.crisp.response.ProjectConfigResponse;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
 import se.dabox.cocobox.crisp.response.json.ProjectConfigResponseJson;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
 import se.dabox.cocobox.crisp.runtime.DwsCrispExecutionHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.crisp.OrgProjectInfoSource;
+import se.dabox.service.common.ccbc.project.ProjectDetails;
+import se.dabox.service.common.ccbc.project.crisp.GetCrispProjectProductCollaborationId;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
@@ -33,10 +37,19 @@ public class GetCrispProjectProductConfig {
     private final RequestCycle cycle;
     private final long orgId;
     private final String productId;
+    private final ProjectDetails project;
 
     GetCrispProjectProductConfig(RequestCycle cycle, long orgId, String productId) {
         this.cycle = cycle;
         this.orgId = orgId;
+        this.productId = productId;
+        this.project = null;
+    }
+
+    GetCrispProjectProductConfig(RequestCycle cycle, ProjectDetails project, String productId) {
+        this.cycle = cycle;
+        this.project = project;
+        this.orgId = project.getOrgId();
         this.productId = productId;
     }
 
@@ -63,8 +76,22 @@ public class GetCrispProjectProductConfig {
         OrgUnitSource ouSource = new StandardOrgUnitInfoSource(ou);
         ProductInfoSource prodSource = new PdProductInfoSource(product);
 
-        GetProjectConfiguration request
-                = GetProjectConfiguration.newCreateGetProjectConfiguration(ouSource, prodSource);
+        GetProjectConfiguration request;
+
+        if (project == null) {
+            request = GetProjectConfiguration.newCreateGetProjectConfiguration(ouSource, prodSource);
+        } else {
+
+            ProjectInfoSource projectSource = new OrgProjectInfoSource(project);
+            String projectCollaborationId = new GetCrispProjectProductCollaborationId(cycle).
+                    getCollaborationId(
+                            project.getProjectId(),
+                            product.getId());
+
+            request
+                    = GetProjectConfiguration.newUpdateGetProjectConfiguration(ouSource, prodSource,
+                            projectSource, projectCollaborationId);
+        }
 
         DwsCrispExecutionHelper execHelper = new DwsCrispExecutionHelper(cycle, ctx);
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);

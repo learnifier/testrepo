@@ -24,7 +24,7 @@ import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
-import se.dabox.cocobox.crisp.response.ProjectConfigResponse;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
 import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;

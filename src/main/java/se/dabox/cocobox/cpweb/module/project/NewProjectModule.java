@@ -39,8 +39,8 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
-import se.dabox.cocobox.crisp.response.ProjectConfigItem;
-import se.dabox.cocobox.crisp.response.ProjectConfigType;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigItem;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigType;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
@@ -278,6 +278,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
             return NavigationUtil.toCreateProject(cycle, strOrgId);
         }
 
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
         Map<String, Object> map = createMap();
 
         map.put("org", org);
@@ -285,7 +287,10 @@ public class NewProjectModule extends AbstractWebAuthModule {
         map.put("nps", nps);
         map.put("npsId", strNpsId);
         map.put("extraConfig", nps.getExtraConfig());
+
         map.put("productNameMap", new ProductNameMapFactory().create(nps.getExtraConfig()));
+        map.put("productValueSource",
+                new ProductsValueSource(userLocale, nps.getExtraConfig()));
 
         return new FreemarkerRequestTarget(
                 "/project/projectProductExtraSettings.html", map);

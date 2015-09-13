@@ -5,7 +5,7 @@ package se.dabox.cocobox.cpweb.module.project;
 
 import java.io.Serializable;
 import java.util.Map;
-import se.dabox.cocobox.crisp.response.ProjectConfigResponse;
+import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
 
 /**
  *

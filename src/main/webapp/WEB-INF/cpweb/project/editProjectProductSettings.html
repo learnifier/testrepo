@@ -2,6 +2,7 @@
 
 [#import "crispProductSettings.html" as crispSettings /]
 [#assign editMode = true in crispSettings /]
+[#assign editUrl = helper.urlFor('project.ProjectProductCrispSettingsModule','setSetting',[project.projectId]) in crispSettings /]
 
 [#assign foot]
     ${cpweb_foot}

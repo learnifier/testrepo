@@ -128,7 +128,7 @@ ${cpweb_foot}
                             }
 
                             if (row.crispConfigAvailable) {
-                                html += "<li><a href='#' data-id='" + row.id + "' onclick='configItem(this)' >Settings</a></li>";
+                                html += "<li><a href='#' data-id='" + row.id + "' onclick='return configItem(this)' >Settings</a></li>";
                             }
 
                             if (!row.deleteLinkDisplay) {
@@ -304,6 +304,7 @@ ${cpweb_foot}
             });
         });
 
+        return false;
     }
 </script>
 

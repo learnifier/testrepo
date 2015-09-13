@@ -210,7 +210,11 @@ public class ProjectModule extends AbstractProjectWebModule {
         final ExtraProductConfig extraProductConfig
                 = new ExtraProductConfig(strProductId, response.get());
 
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
         map.put("productConfig", extraProductConfig);
+        map.put("productValueSource",
+                new ProductsValueSource(userLocale, Collections.singletonList(extraProductConfig)));
 
         map.put("project", prj);
         map.put("productId", strProductId);
@@ -237,13 +241,17 @@ public class ProjectModule extends AbstractProjectWebModule {
         map.put("formsess", getValidationSession(AddMaterialForm.class, cycle));
         addCommonMapValues(map, prj, cycle);
 
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
         GetCrispProjectProductConfig response
-                = new GetCrispProjectProductConfig(cycle, prj.getOrgId(), strProductId);
+                = new GetCrispProjectProductConfig(cycle, prj, strProductId);
 
         final ExtraProductConfig extraProductConfig
                 = new ExtraProductConfig(strProductId, response.get());
 
         map.put("productConfig", extraProductConfig);
+        map.put("productValueSource",
+                new ProductsValueSource(userLocale, Collections.singletonList(extraProductConfig)));
 
         map.put("project", prj);
         map.put("productId", strProductId);
