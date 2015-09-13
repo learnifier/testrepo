@@ -1,0 +1,19 @@
+[#ftl strip_text="true" /]
+
+[#import "crispProductSettings.html" as crispSettings /]
+
+[#assign foot]
+    ${cpweb_foot}
+    [@crispSettings.javascriptFootContribution /]
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
+
+<form method="POST" action="${helper.urlFor('project.NewProjectModule','processProductExtraSettings',[org.id, npsId])}">
+    [@crispSettings.settingsList extraConfig /]
+    
+     <button type="submit" class="btn btn-default">Create</button>
+</form>
+
+[/@dws.skin]
+

@@ -4,14 +4,17 @@
 package se.dabox.cocobox.cpweb.state;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebSession;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
+import se.dabox.cocobox.cpweb.module.project.ExtraProductConfig;
 import se.dabox.util.ParamUtil;
 
 /**
@@ -36,7 +39,10 @@ public class NewProjectSession implements Serializable {
     private final Long designId;
     private boolean editMode;
     private CreateProjectGeneral createProjectGeneral;
-    private String productId;
+    private final String productId;
+    private List<ExtraProductConfig> extraConfig;
+
+
 
     public NewProjectSession(String type,
             List<Long> orgmats,
@@ -117,6 +123,24 @@ public class NewProjectSession implements Serializable {
         return productId;
     }
 
+    public List<ExtraProductConfig> getExtraConfig() {
+        return extraConfig;
+    }
+
+    public void setExtraConfig(List<ExtraProductConfig> extraConfig) {
+        this.extraConfig = extraConfig;
+    }
+
+    public Map<String, String> getProductExtraConfig(String productId) {
+        for (ExtraProductConfig config : extraConfig) {
+            if (config.getProductId().equals(productId)) {
+                return config.getSettings();
+            }
+        }
+
+        return Collections.emptyMap();
+    }
+    
     @Override
     public String toString() {
         return "NewProjectSession{" + "uuid=" + uuid + ", created=" + created + ", type=" + type +

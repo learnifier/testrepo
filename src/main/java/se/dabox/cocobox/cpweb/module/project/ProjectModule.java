@@ -33,6 +33,7 @@ import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
+import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
@@ -183,6 +184,81 @@ public class ProjectModule extends AbstractProjectWebModule {
                                 projectId));
 
         return new FreemarkerRequestTarget("/project/projectMaterials.html", map);
+    }
+
+
+    @WebAction
+    public RequestTarget onAddProjectProductWithSettings(final RequestCycle cycle,
+            String strProjectId, String strProductId) {
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+
+        checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_CREATE_PROJECT_MATERIAL);
+
+        Map<String, Object> map = createMap();
+
+        map.put("formsess", getValidationSession(AddMaterialForm.class, cycle));
+        addCommonMapValues(map, prj, cycle);
+
+        GetCrispProjectProductConfig response
+                = new GetCrispProjectProductConfig(cycle, prj.getOrgId(), strProductId);
+
+        final ExtraProductConfig extraProductConfig
+                = new ExtraProductConfig(strProductId, response.get());
+
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        map.put("productConfig", extraProductConfig);
+        map.put("productValueSource",
+                new ProductsValueSource(userLocale, Collections.singletonList(extraProductConfig)));
+
+        map.put("project", prj);
+        map.put("productId", strProductId);
+        map.put("productNameMap", new ProductNameMapFactory().
+                create(Collections.singletonList(extraProductConfig)));
+
+        return new FreemarkerRequestTarget("/project/addProjectProductWithSettings.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onEditProjectProductSettings(final RequestCycle cycle,
+            String strProjectId, String strProductId) {
+
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+
+        checkPermission(cycle, prj);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Map<String, Object> map = createMap();
+
+        map.put("formsess", getValidationSession(AddMaterialForm.class, cycle));
+        addCommonMapValues(map, prj, cycle);
+
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        GetCrispProjectProductConfig response
+                = new GetCrispProjectProductConfig(cycle, prj, strProductId);
+
+        final ExtraProductConfig extraProductConfig
+                = new ExtraProductConfig(strProductId, response.get());
+
+        map.put("productConfig", extraProductConfig);
+        map.put("productValueSource",
+                new ProductsValueSource(userLocale, Collections.singletonList(extraProductConfig)));
+
+        map.put("project", prj);
+        map.put("productId", strProductId);
+        map.put("productNameMap", new ProductNameMapFactory().
+                create(Collections.singletonList(extraProductConfig)));
+
+        return new FreemarkerRequestTarget("/project/editProjectProductSettings.html", map);
     }
 
     /**

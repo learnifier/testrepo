@@ -3,13 +3,15 @@
  */
 package se.dabox.cocobox.cpweb.formdata.project;
 
+import java.io.Serializable;
 import net.unixdeveloper.druwa.formbean.annotation.FormField;
 
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
-public class MatListProjectDetailsForm {
+public class MatListProjectDetailsForm implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String userTitle;
     private String userDescription;
