@@ -17,10 +17,13 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.project.ProjectJsonModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
+import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
@@ -43,6 +46,8 @@ import se.dabox.service.webutils.json.DataTablesJson;
  */
 @WebModuleMountpoint("/project.reportjs")
 public class ProjectReportJsonModule extends AbstractJsonAuthModule {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ProjectReportJsonModule.class);
 
     @WebAction
     public RequestTarget onAvailableReports(final RequestCycle cycle, String strProjectId) {
@@ -75,9 +80,14 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
                 CrispContext crispCtx = DwsCrispContextHelper.getCrispContext(cycle, product);
 
                 if (crispCtx != null) {
-                    List<ReportInfo> productReports = new GetProjectCrispReports(cycle, mat,
-                            project).getReports();
-                    infos.addAll(productReports);
+                    try {
+                        List<ReportInfo> productReports = new GetProjectCrispReports(cycle, mat,
+                                project).getReports();
+                        infos.addAll(productReports);
+                    } catch (CrispException cex) {
+                        LOGGER.warn("Failed to get crisp project reports for {}/{}",
+                                project.getProjectId(), mat.getCompositeId());
+                    }
                 }
             }
         }
