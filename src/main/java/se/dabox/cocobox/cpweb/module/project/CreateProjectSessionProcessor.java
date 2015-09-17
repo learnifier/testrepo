@@ -357,7 +357,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                         cycle, state));
             }
 
-            if (response.isEmpty()) {
+            if (response == null || response.isEmpty()) {
                 continue;
             }
 
