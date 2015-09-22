@@ -49,6 +49,7 @@
                       data-name="${setting.id?xml}"
                       data-value="${settingsValue.value?xml}"
                       data-type="${crispEditableMapping[setting.type]}"
+                      [#if !setting.optional]data-required="required"[/#if]
 
                     >${settingsValue.name?xml}</span>
             [/#if]
@@ -93,9 +94,7 @@
                     url: "${editUrl?xml}",
                     placement: 'bottom',
                     display: function(value, response) {
-                        if (response) {
-                            $(this).text(response);
-                        }
+                        $(this).text(response);
                     }
                 });
 
