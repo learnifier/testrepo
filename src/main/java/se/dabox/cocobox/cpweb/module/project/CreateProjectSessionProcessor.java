@@ -28,6 +28,7 @@ import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -45,6 +46,7 @@ import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
+import se.dabox.service.common.coursedesign.v1.CodecException;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -307,21 +309,8 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private boolean hasCrispProperties(RequestCycle cycle, NewProjectSession nps) {
-        CourseDesignClient cdClient
-                = CacheClients.getClient(cycle, CourseDesignClient.class);
-
-        CourseDesign design = cdClient.getDesign(nps.getDesignId());
-
-        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-
-        Set<ProductId> productIds = cdd.getAllProductIdSet();
-
-        ProductDirectoryClient pdClient
-                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
-
-        List<Product> products = pdClient.getProductsByIds(productIds);
-        ProductTypes types = pdClient.listTypes();
-        types.populateProductType(products);
+        List<Product> products
+                = getProjectProducts(cycle, nps);
 
         List<Product> crispProducts
                 = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
@@ -346,5 +335,45 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         }
 
         return false;
+    }
+
+    private List<Product> getProjectProducts(RequestCycle cycle, NewProjectSession nps) throws CodecException, ClientFactoryException {
+
+        if (nps.getDesignId() == null) {
+            return getOrgMatProjectProducts(cycle, nps);
+        } else {
+            return getDesignProjectProducts(cycle, nps);
+        }
+    }
+
+    private List<Product> getOrgMatProjectProducts(RequestCycle cycle, NewProjectSession nps) {
+        ProductDirectoryClient pdClient
+                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+        List<Product> products = pdClient.getProducts(nps.getProds());
+
+        ProductTypes types = pdClient.listTypes();
+        types.populateProductType(products);
+
+        return products;
+    }
+
+    private List<Product> getDesignProjectProducts(RequestCycle cycle, NewProjectSession nps) {
+        CourseDesignClient cdClient
+                = CacheClients.getClient(cycle, CourseDesignClient.class);
+        CourseDesign design = cdClient.getDesign(nps.getDesignId());
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+
+        Set<ProductId> productIds = cdd.getAllProductIdSet();
+
+        ProductDirectoryClient pdClient
+                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+
+        List<Product> products = pdClient.getProductsByIds(productIds);
+
+        ProductTypes types = pdClient.listTypes();
+        types.populateProductType(products);
+
+        return products;
     }
 }
