@@ -67,6 +67,10 @@ import se.dabox.util.collections.CollectionsUtil;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public class CreateProjectSessionProcessor implements NewProjectSessionProcessor {
+    /**
+     * The design id that indicates that a matlist project should be created instead.
+     */
+    private static final int MATLIST_DESIGNID = 0;
 
     private static final Logger LOGGER = LoggerFactory.
             getLogger(CreateProjectSessionProcessor.class);
@@ -198,7 +202,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             }
         }
 
-        if (nps.getDesignId() != null && nps.getDesignId() != 0L) {
+        if (nps.getDesignId() != null && nps.getDesignId() != MATLIST_DESIGNID) {
             activateProjectDesign(cycle, project, nps);
         }
 
@@ -401,6 +405,12 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         CourseDesignClient cdClient
                 = CacheClients.getClient(cycle, CourseDesignClient.class);
         CourseDesign design = cdClient.getDesign(nps.getDesignId());
+
+        if (design == null) {
+            LOGGER.warn("Unable to find course design {}", nps.getDesignId());
+            return Collections.emptyList();
+        }
+
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
 
         Set<ProductId> productIds = cdd.getAllProductIdSet();
