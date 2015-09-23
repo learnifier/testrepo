@@ -14,7 +14,7 @@
     <artifactId>cpweb</artifactId>
     <packaging>war</packaging>
     <version>1.0-florida-SNAPSHOT</version>
-    <name>Customer Portal web</name>
+    <name>Customer Portal Florida web</name>
     <url>http://dabox.se</url>
 
     <dependencies>
