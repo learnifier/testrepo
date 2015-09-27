@@ -19,7 +19,7 @@ import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.binarysource.ByteArrayBinarySource;
 import net.unixdeveloper.druwa.request.binarysource.ByteArrayOutputStreamBinarySource;
 import se.dabox.cocobox.cpweb.JsonEncodingException;
-import se.dabox.cocosite.security.CocoboxSecurityConstants;
+import se.dabox.cocobox.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserRoleCheckAfterLoginListener;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;

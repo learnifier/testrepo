@@ -13,7 +13,7 @@ import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import se.dabox.cocobox.cpweb.module.branding.BrandingModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 
 /**
  *

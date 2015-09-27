@@ -36,7 +36,7 @@ import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;

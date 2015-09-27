@@ -29,7 +29,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.event.BrandingChangedListenerUtil;
 import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.client.CacheClients;

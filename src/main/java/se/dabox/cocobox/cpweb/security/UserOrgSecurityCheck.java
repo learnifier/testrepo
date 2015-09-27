@@ -4,7 +4,7 @@
 package se.dabox.cocobox.cpweb.security;
 
 import net.unixdeveloper.druwa.RequestCycle;
-import se.dabox.cocosite.security.UserAccountRoleCheck;
+import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;

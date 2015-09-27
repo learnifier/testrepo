@@ -18,7 +18,7 @@ import se.dabox.cocobox.cpweb.formdata.material.EditMaterialForm;
 import se.dabox.cocobox.cpweb.module.CpMainModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.material.MutableOrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterial;

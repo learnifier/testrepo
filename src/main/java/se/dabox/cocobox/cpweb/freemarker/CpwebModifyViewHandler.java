@@ -5,12 +5,12 @@ package se.dabox.cocobox.cpweb.freemarker;
 
 import net.unixdeveloper.druwa.freemarker.ModifyViewDataHandler;
 import net.unixdeveloper.druwa.freemarker.ViewDataEvent;
+import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.druwa.security.ClientPortalSecurityNamespaceFactory;
 import se.dabox.cocosite.druwa.security.ProjectSecurityNamespaceFactory;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.portalswitch.PortalSwitchInfoImpl;
-import se.dabox.cocosite.security.project.ProjectPermissionCheck;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 

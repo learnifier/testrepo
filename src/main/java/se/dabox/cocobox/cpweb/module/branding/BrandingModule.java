@@ -23,7 +23,7 @@ import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.event.BrandingChangedListenerUtil;
 import se.dabox.cocosite.event.OrgUnitChangedListenerUtil;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.cache.GlobalCacheManager;
 import se.dabox.service.common.context.Configuration;

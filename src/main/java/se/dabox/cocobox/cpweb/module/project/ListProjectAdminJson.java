@@ -10,18 +10,21 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import se.dabox.cocobox.security.role.CocoboxRoleUtil;
+import se.dabox.cocobox.security.role.RoleUuidNamePair;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
-import se.dabox.cocosite.security.role.CocoboxRoleUtil;
-import se.dabox.cocosite.security.role.RoleUuidNamePair;
+import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.user.MiniUserInfo;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRole;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleSearch;
+import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
@@ -148,7 +151,10 @@ public class ListProjectAdminJson {
     private void getCpRoles() {
         final CocoboxRoleUtil cru = new CocoboxRoleUtil();
         projectRolesMap = cru.getProjectRoles(cycle);
-        projectRoles = cru.toSortedRoleUuidNamePairList(cycle, projectRolesMap);
+
+        Locale sortLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        projectRoles = cru.toSortedRoleUuidNamePairList(projectRolesMap, sortLocale);
     }
 
 }

@@ -38,7 +38,7 @@ import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;

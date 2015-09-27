@@ -12,7 +12,7 @@ import se.dabox.cocobox.cpweb.module.mail.MailSender;
 import se.dabox.cocobox.cpweb.module.mail.SendMailProcessor;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
-import se.dabox.cocosite.security.role.CocoboxRoleUtil;
+import se.dabox.cocobox.security.role.CocoboxRoleUtil;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.mail.SendMailRequestFactory;

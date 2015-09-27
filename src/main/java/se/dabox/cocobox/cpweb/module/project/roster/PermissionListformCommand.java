@@ -5,7 +5,7 @@
 package se.dabox.cocobox.cpweb.module.project.roster;
 
 import java.util.List;
-import se.dabox.cocosite.security.Permission;
+import se.dabox.cocobox.security.permission.Permission;
 import se.dabox.service.webutils.listform.ListformCommand;
 
 /**

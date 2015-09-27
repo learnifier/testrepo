@@ -34,10 +34,10 @@ import se.dabox.cocosite.locale.FormLocale;
 import se.dabox.cocosite.locale.PlatformFormLocaleFactory;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
-import se.dabox.cocosite.security.UserAccountRoleCheck;
-import se.dabox.cocosite.security.role.CocoboxRoleUtil;
-import se.dabox.cocosite.security.role.RoleUuidNamePair;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocobox.security.role.CocoboxRoleUtil;
+import se.dabox.cocobox.security.role.RoleUuidNamePair;
+import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.org.OrgRoleName;
 import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
@@ -201,9 +201,11 @@ public class CreateUserModule extends AbstractWebAuthModule {
         map.put("defaultUserLocale", getDefaultUserLocale(cycle));
         map.put("editMode", editMode);
         if (!editMode) {
+
+            Locale sortLocale = CocositeUserHelper.getUserLocale(cycle);
             CocoboxRoleUtil cru = new CocoboxRoleUtil();
             List<RoleUuidNamePair> roles
-                    = cru.toSortedRoleUuidNamePairList(cycle, cru.getCpRoles(cycle));
+                    = cru.toSortedRoleUuidNamePairList(cru.getCpRoles(cycle), sortLocale);
             map.put("roles", roles);
         }
 
