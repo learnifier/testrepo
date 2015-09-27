@@ -31,7 +31,7 @@ import se.dabox.cocosite.email.EmailLocaleListFactory;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.user.UserIdentifierHelper;
 import se.dabox.service.common.mailsender.mailtemplate.CreateMailTemplateRequest;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;

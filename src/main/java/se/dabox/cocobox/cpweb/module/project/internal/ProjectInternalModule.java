@@ -3,22 +3,17 @@
  */
 package se.dabox.cocobox.cpweb.module.project.internal;
 
-import java.util.Locale;
-import net.unixdeveloper.druwa.ContentType;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectWebModule;
-import se.dabox.cocosite.login.CocositeUserHelper;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
-import se.dabox.service.common.coursedesign.project.GetProjectCourseDesignCommand;
-import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.util.collections.ValueUtils;
 
 /**

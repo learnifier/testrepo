@@ -27,7 +27,7 @@ import se.dabox.cocobox.cpweb.formdata.material.AddLinkCreditsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.deeplink.ProductMaterialJsonModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.material.OrgMaterial;

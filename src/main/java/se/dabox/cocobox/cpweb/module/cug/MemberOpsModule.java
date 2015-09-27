@@ -13,8 +13,8 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import se.dabox.cocobox.cpweb.NavigationUtil;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 

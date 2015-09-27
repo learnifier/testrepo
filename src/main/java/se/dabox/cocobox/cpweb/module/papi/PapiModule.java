@@ -10,9 +10,9 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
 import se.dabox.service.common.context.Configuration;
 import se.dabox.service.common.context.DwsRealmHelper;
 

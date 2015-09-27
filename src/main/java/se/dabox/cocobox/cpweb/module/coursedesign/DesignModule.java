@@ -30,7 +30,7 @@ import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
 import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocosite.security.CocoboxPermissions;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
 import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
 import se.dabox.cocosite.upweb.linkaction.cpreview.DirectCddSource;
