@@ -259,7 +259,7 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth2" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
 
-[#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT")]
+[#if portalSecurity.hasPermission("PRJ_ACTIVATE_PARTICIPANT") || portalSecurity.hasPermission("CP_SEND_MAIL_PROJECT")]
 <div class="infobox" id="actions" style="display: none;">
     <h1>Action</h1>
     <section id="multiple-actions" style="display: none;">
