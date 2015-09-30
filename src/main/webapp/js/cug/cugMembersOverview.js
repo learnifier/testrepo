@@ -68,7 +68,7 @@ define(['cocobox-icheck'], function() {
             "language": {
                 "search": "",
                 "zeroRecords": "No group matches your query",
-                "emptyTable": "<span class='emptytable'>Start now by creating your <a href='" + newUserUrl + "'>first group</a></span>",
+                "emptyTable": "<span class='emptytable'>No groups have been added.</a></span>",
                 "loadingRecords": "<p>Loading groups...</p><img src='" + spinnerUrl + "' />"
             }
         });
