@@ -44,7 +44,7 @@ import se.dabox.service.common.ccbc.OrgUser;
 import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.alert.ProjectAlertInfo;
 import se.dabox.service.common.ccbc.alert.ProjectAlertRequest;
-import se.dabox.service.common.ccbc.org.OrgRoleName;
+import se.dabox.cocobox.security.user.OrgRoleName;
 import se.dabox.service.common.ccbc.project.MailBounceInfo;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.OrgProjectPredicates;

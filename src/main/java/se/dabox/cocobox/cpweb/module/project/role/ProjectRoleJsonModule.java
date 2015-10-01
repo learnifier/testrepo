@@ -24,7 +24,7 @@ import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.org.OrgRoleName;
+import se.dabox.cocobox.security.user.OrgRoleName;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
