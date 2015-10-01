@@ -10,7 +10,7 @@ import se.dabox.cocobox.security.CocoboxSecurityConstants;
 import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.org.OrgRoleName;
+import se.dabox.cocobox.security.user.OrgRoleName;
 import se.dabox.service.common.tx.UTComplexTxOperation;
 import se.dabox.service.common.tx.VerificationStatus;
 import se.dabox.service.login.client.CreateBasicUserAccountRequest;

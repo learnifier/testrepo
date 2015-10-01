@@ -11,7 +11,7 @@ import se.dabox.cocobox.cpweb.CpAdminRoles;
 import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.org.OrgRoleName;
+import se.dabox.cocobox.security.user.OrgRoleName;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.util.ParamUtil;
