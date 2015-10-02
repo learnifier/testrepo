@@ -121,6 +121,8 @@ public class CreateClientUserGroupModule extends AbstractUserClientGroupModule {
         final MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_USER);
 
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+
         DruwaFormValidationSession<CreateClientUserGroup> formsess =
                 getValidationSession(CreateClientUserGroup.class, cycle);
 
@@ -132,7 +134,7 @@ public class CreateClientUserGroupModule extends AbstractUserClientGroupModule {
 
         ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
 
-        long groupId = cugClient.createGroup(0L, org.getId(), form.getName(), form.getParent());
+        long groupId = cugClient.createGroup(caller, org.getId(), form.getName(), form.getParent());
         
         //No need to decorate modal params here
         String directUrl = ModalParamsHelper.getProceedUrl(cycle);
