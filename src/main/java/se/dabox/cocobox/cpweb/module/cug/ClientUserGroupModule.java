@@ -47,6 +47,17 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
     
     @DefaultWebAction
     @WebAction
+    public RequestTarget onList(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        Map<String, Object> map = createMap();
+
+        map.put("org", org);
+
+        return new FreemarkerRequestTarget("/cug/listClientUserGroups.html", map);
+    }
+    
+    @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String strOrgId, String strCugId) {
         
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
