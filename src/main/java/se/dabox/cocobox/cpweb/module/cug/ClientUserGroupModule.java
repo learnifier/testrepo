@@ -45,7 +45,6 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
     public static final String OVERVIEW_ACTION = "overview";
     public static final String CHILDREN_ACTION = "children";
     
-    @DefaultWebAction
     @WebAction
     public RequestTarget onList(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
