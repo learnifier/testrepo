@@ -21,6 +21,16 @@
                     [/#if]
                 </span>
             </li>
+            <li>
+                <span class="row-label">Type</span>
+                <span class="row-setting clearfix">
+                    [#if (cug.globalId)??]
+                        Automatically added global group.
+                    [#else]
+                        User added group.
+                    [/#if]
+                </span>
+            </li>
         </ul>
     </div>
 </section>

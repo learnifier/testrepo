@@ -52,11 +52,13 @@ ${cpweb_foot}
     
     [@cugMenu.cugOverviewMenu selected="children"][/@cugMenu.cugOverviewMenu]
     <section class="ccb-table-list-actions">
+        [#if !(cug.globalId)??]
         [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
         <div class="ccb-page-header__actions--right">
             <button id="addClientUserGroupBtn" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Group</a>
         </div>
         [/@]
+        [/#if]
     </section>
     <span>Subgroups</span>
     <table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listcugs">
