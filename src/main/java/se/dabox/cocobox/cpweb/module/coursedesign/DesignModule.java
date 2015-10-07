@@ -48,6 +48,7 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
+import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
 import se.dabox.service.common.duration.DurationString;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
@@ -383,9 +384,9 @@ public class DesignModule extends AbstractWebAuthModule {
         DurationString newExpiration = formToDurationString(form);
 
         CourseDesignInfo oldInfo = cdd.getInfo();
-        CourseDesignInfo newInfo = new CourseDesignInfo(oldInfo.getUserTitle(), oldInfo.
+        MutableCourseDesignInfo newInfo = new MutableCourseDesignInfo(oldInfo.getUserTitle(), oldInfo.
                 getUserDescription(), oldInfo.getThumbnailCrl(), newExpiration);
-        mutator.setInfo(newInfo);
+        mutator.setInfo(newInfo.toCourseDesignInfo());
 
         return mutator.toXmlString();
     }

@@ -73,6 +73,7 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
+import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
@@ -687,11 +688,14 @@ public class ProjectModule extends AbstractProjectWebModule {
         CourseDesignInfo newInfo = info;
 
         if (cdd.getInfo().getUserTitle() == null) {
-            newInfo = newInfo.withUserTitle(project.getDisplayUserTitle());
+            newInfo
+                    = new MutableCourseDesignInfo(newInfo).withUserTitle(project.getDisplayUserTitle()).
+                    toCourseDesignInfo();
         }
 
         if (cdd.getInfo().getUserDescription() == null) {
-            newInfo = newInfo.withUserDescription(project.getDisplayUserDescription());
+            newInfo = new MutableCourseDesignInfo(newInfo).withUserDescription(project.
+                    getDisplayUserDescription()).toCourseDesignInfo();
         }
 
         //No change
