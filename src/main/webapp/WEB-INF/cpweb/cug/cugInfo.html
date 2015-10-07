@@ -13,7 +13,7 @@
                 <span class="row-label">Parent group</span>
                 <span class="row-setting clearfix">
                     [#if (parentCug.name)??]
-                    <a href="${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id,parentCug.groupId])}">
+                    <a href="${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id,parentCug.id])}">
                         ${parentCug.name}
                     </a>
                     [#else]

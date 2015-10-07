@@ -6,8 +6,8 @@
 
 <nav>
     <ul class="nav nav-underline">
-        <li [#if selected == 'members']class="active"[/#if]><a href="${helper.urlFor('cug.ClientUserGroupModule','overview', [org.id, cug.groupId])}">Members</a></li>
-        <li [#if selected == 'children']class="active"[/#if]><a href="${helper.urlFor('cug.ClientUserGroupModule','children', [org.id, cug.groupId])}">Subgroups</a></li>
+        <li [#if selected == 'members']class="active"[/#if]><a href="${helper.urlFor('cug.ClientUserGroupModule','overview', [org.id, cug.id])}">Members</a></li>
+        <li [#if selected == 'children']class="active"[/#if]><a href="${helper.urlFor('cug.ClientUserGroupModule','children', [org.id, cug.id])}">Subgroups</a></li>
     </ul>    
 </nav>
 
