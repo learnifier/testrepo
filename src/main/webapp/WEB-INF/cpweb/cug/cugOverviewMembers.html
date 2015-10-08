@@ -11,7 +11,7 @@
         var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
         var userOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
 
-        var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[org.id, cug.id])}";
+        var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[org.id, cug.groupId])}";
 
         require(["${contextPath}/js/cug/cugMembersOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
            //No initialization needed
@@ -39,7 +39,7 @@
     
     [#if portalSecurity.hasPermission("CP_EDIT_USER")]
     [#global formPrefix="cpweb" /]
-    <form action="${helper.urlFor('cug.ClientUserGroupModule','addMember',[org.id?c, cug.id?c])}" name="addMemberForm" id="addMemberForm" method="post" onsubmit="return addMemberListener()">
+    <form action="${helper.urlFor('cug.ClientUserGroupModule','addMember',[org.id?c, cug.groupId?c])}" name="addMemberForm" id="addMemberForm" method="post" onsubmit="return addMemberListener()">
         <div class="row">
         <div class="col-xs-3">
             [@bsform.inputEmail name="memberemail" tabindex="4" maxlength="96" /]
@@ -60,7 +60,7 @@
         [/#if]
     </section>
 
-    <form method="post" id="cugmembersform" action="${helper.urlFor('cug.MemberOpsModule','memberOps', [org.id?c, cug.id?c])}">
+    <form method="post" id="cugmembersform" action="${helper.urlFor('cug.MemberOpsModule','memberOps', [org.id?c, cug.groupId?c])}">
         [@bsform.listformFields /]
         <span>Members</span>
         
