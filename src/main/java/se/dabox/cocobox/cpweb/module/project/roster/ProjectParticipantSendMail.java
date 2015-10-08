@@ -163,6 +163,11 @@ public class ProjectParticipantSendMail extends AbstractRosterListCommand implem
                     public List<CreditAllocationFailure> callIdProjectProject() {
                         return Collections.emptyList();
                     }
+
+                    @Override
+                    public List<CreditAllocationFailure> callChallengeProject() {
+                        return Collections.emptyList();
+                    }
                 });
     }
 

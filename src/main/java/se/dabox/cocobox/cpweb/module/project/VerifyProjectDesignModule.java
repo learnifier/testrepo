@@ -126,6 +126,13 @@ public class VerifyProjectDesignModule extends AbstractWebAuthModule {
                         getProjectId());
                 throw new UnsupportedOperationException(msg);
             }
+
+            @Override
+            public RequestTarget callChallengeProject() {
+                String msg = String.format("Challenge projects are not supported (%d)", project.
+                        getProjectId());
+                throw new UnsupportedOperationException(msg);
+            }
         });
     }
 
