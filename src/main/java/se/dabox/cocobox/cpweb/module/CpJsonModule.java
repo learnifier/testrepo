@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.cpweb.module.user.UserModule;
 import se.dabox.cocobox.security.CocoboxSecurityConstants;
@@ -449,6 +450,15 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                         }
 
                         return "Project for "+name;
+                    }
+
+                    @Override
+                    public String callChallengeProject() {
+                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+                        OrgProject masterProject = ccbc.getProject(project.getMasterProject());
+
+                        return "Challenge project for " + masterProject.getName();
                     }
                 });
             }

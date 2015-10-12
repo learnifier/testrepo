@@ -64,6 +64,7 @@ import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.DataType;
+import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -119,6 +120,13 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             @Override
             public RequestTarget callIdProjectProject() {
                 String msg = String.format("IdProject projects are not supported (%d)", project.
+                        getProjectId());
+                throw new UnsupportedOperationException(msg);
+            }
+
+            @Override
+            public RequestTarget callChallengeProject() {
+                String msg = String.format("Challenge projects are not supported (%d)", project.
                         getProjectId());
                 throw new UnsupportedOperationException(msg);
             }
@@ -605,10 +613,14 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         }
 
         if (isPrimary) {
-            Component retval = new Component(component.getType(), component.getCid());
+            MutableComponent retval = new MutableComponent(component.getType(), component.getCid());
             retval.setProperties(component.getProperties());
-            retval.setChildren(children);
-            return retval;
+
+            List<MutableComponent> mutableChildren
+                    = CollectionsUtil.transformList(children, c -> new MutableComponent(c));
+
+            retval.setChildren(mutableChildren);
+            return retval.toComponent();
         }
 
         return null;
