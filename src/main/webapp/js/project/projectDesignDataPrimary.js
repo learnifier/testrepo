@@ -106,7 +106,6 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
         $(function () {
 
             var linkFn = function () {
-                console.log("Found datetime components: ", $("input[data-ccbfieldname=starts]").length);
                 $("input[data-ccbfieldname=starts]").each(function () {
                     var name = $(this).attr("id");
                     var newName = name.replace(/starts$/, "ends");
@@ -117,7 +116,6 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
 
             linkFn();
 
-            console.log("Registering event");
             $(window).on("dwsfu:validation:onready", linkFn);
             $(window).on("dwsfu:validation:js", linkFn);
 
