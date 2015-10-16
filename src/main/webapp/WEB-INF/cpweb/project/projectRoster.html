@@ -348,7 +348,30 @@ ${cpweb_foot}
 
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         require(['jquery.form', 'dabox-common', 'dabox-formbeanjs'], function() {
-            $("#uploadRoster").ajaxForm(cocobox.getAjaxFormbeanHandler("uploadRoster", undefined, {sectionClass: "alert alert-danger"}));
+
+            var handler = cocobox.getAjaxFormbeanHandler("uploadRoster", undefined, {sectionClass: "alert alert-danger"});
+
+            var oldBefore = handler.beforeSend;
+
+            var oldSuccess = handler.success;
+
+            var longOp;
+            
+            handler.beforeSend = function() {
+                longOp = cocobox.longOp();
+
+                if(oldBefore) {
+                    oldBefore();
+                }
+            }
+
+            handler.success = function() {
+                longOp.abort();
+
+                oldSuccess.apply(this, arguments);
+            }
+
+            $("#uploadRoster").ajaxForm(handler);
         });
         [/@]
 
