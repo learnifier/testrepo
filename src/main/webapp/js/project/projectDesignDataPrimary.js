@@ -102,17 +102,26 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
 
     validator.element("input[type=locUrlExtra]");
 
-    $(function () {
-        require(['cocobox-datetime'], function(dt) {
-            $("input[data-ccbfieldname=starts]").each(function() {
-                var name = $(this).attr("id");
-                var newName = name.replace(/starts$/, "ends");
-                
-                dt.linkToField("#"+name, "#"+newName);
-            });
+    require(['cocobox-datetime'], function (dt) {
+        $(function () {
+
+            var linkFn = function () {
+                console.log("Found datetime components: ", $("input[data-ccbfieldname=starts]").length);
+                $("input[data-ccbfieldname=starts]").each(function () {
+                    var name = $(this).attr("id");
+                    var newName = name.replace(/starts$/, "ends");
+
+                    dt.linkToField("#" + name, "#" + newName);
+                });
+            };
+
+            linkFn();
+
+            console.log("Registering event");
+            $(window).on("dwsfu:validation:onready", linkFn);
+            $(window).on("dwsfu:validation:js", linkFn);
 
         });
-    }
-    );
+    });
 
 });
