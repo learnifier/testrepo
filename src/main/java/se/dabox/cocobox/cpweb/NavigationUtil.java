@@ -219,12 +219,12 @@ public final class NavigationUtil {
     }
 
     public static RequestTarget toClientUserGroupList(RequestCycle cycle, long orgId) {
-        return new WebModuleRedirectRequestTarget(CpMainModule.class,
+        return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class,
                 ClientUserGroupModule.LIST_ACTION, Long.toString(orgId));
     }
 
     public static String toClientUserGroupListUrl(RequestCycle cycle, long orgId) {
-        return cycle.urlFor(CpMainModule.class,
+        return cycle.urlFor(ClientUserGroupModule.class,
                 ClientUserGroupModule.LIST_ACTION, Long.toString(orgId));
     }
 
