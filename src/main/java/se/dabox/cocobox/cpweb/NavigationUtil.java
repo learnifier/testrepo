@@ -221,7 +221,7 @@ public final class NavigationUtil {
     public static RequestTarget toClientUserGroupList(RequestCycle cycle, long orgId) {
         return new WebModuleRedirectRequestTarget(ClientUserGroupModule.class,
                 ClientUserGroupModule.LIST_ACTION, Long.toString(orgId));
-    } // Force build...
+    }
 
     public static String toClientUserGroupListUrl(RequestCycle cycle, long orgId) {
         return cycle.urlFor(ClientUserGroupModule.class,
