@@ -44,7 +44,7 @@ define([], function() {
                     "className": "block-link",
                     "data" : function(row, type, set) {
                         if (!row.nameDisplay) {
-                            var name = (row.name && row.name.length > 0) ? row.name : "(Name not set yet)";
+                            var name = (row.name && row.name.length > 0) ? row.name : "Name not set yet...";
                             row.nameDisplay = '<a href="'+ row.link + '">' +  name +'</a> ';
                         }
 

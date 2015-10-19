@@ -7,9 +7,6 @@
 ${cpweb_foot}
 <script>
     $('#menu-projects').addClass('active');
-    $('.ccb-flirt-addpost textarea').focus(function() {
-        $(this).height(80);
-    });
             require(['Chart'], function() {
             var chartAnimation = false;
                     if (Modernizr.canvas === true) {
@@ -51,11 +48,11 @@ ${cpweb_foot}
                             "orderable": false,
                             "data": function(row, type, set) {
                             if (!row.displayNameDisplay) {
-                            var dName = row.displayName;
-                                    var data = '';
-                                    if (dName.length < 2) {
-                            data = row.email;
-                            }
+                                var dName = row.displayName;
+                                var data = '';
+                                if (dName.length < 2) {
+                                    dName = row.email;
+                                }
                             data = '<p class="team-members__name" title="' + dName + '">' + cocobox.trunc(dName, 20) + '</p>';
                                     [#if security.hasPermission("BO_EDIT_USER")]
                                     for (var i = 0; i < row.roles.length; i++) {
@@ -124,6 +121,9 @@ ${cpweb_foot}
                     }
                     post.activityName = activityNames[post.tag].name;
                 }
+                $('.ccb-flirt-addpost textarea').focus(function() {
+                    $(this).height(80);
+                });
             }
         });
     });

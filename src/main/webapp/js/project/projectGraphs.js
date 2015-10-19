@@ -79,11 +79,11 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
     function renderStatusGraph() {
 
         $('#prj-ch-status-invited .chart-data').html(invited);
-        $('#prj-ch-status-invited').prop('title', invitedParticipants);
+        $('#prj-ch-status-invited').prop('title', invitedParticipants).tooltip();
         $('#prj-ch-status-inprogress .chart-data').html(inProgress);
-        $('#prj-ch-status-inprogress').prop('title', inProgressParticipants);
+        $('#prj-ch-status-inprogress').prop('title', inProgressParticipants).tooltip();
         $('#prj-ch-status-completed .chart-data').html(completed);
-        $('#prj-ch-status-completed').prop('title', completedParticipants);
+        $('#prj-ch-status-completed').prop('title', completedParticipants).tooltip();
 
         var sum = invited + inProgress + completed;
         if ( sum > 0){
