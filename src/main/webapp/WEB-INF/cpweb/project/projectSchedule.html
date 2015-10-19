@@ -104,7 +104,7 @@ ${cpweb_foot}
                             if (!row.delDisplay) {
                                 var str;
                                 if (row.status === 'N') {
-                                    str = '<button class="btn" onclick="deleteTask(\'' + row.taskId + '\',this)">Delete</button>';
+                                    str = '<button class="btn btn-sm btn-link danger" onclick="deleteTask(\'' + row.taskId + '\',this)">Delete</button>';
                                 } else {
                                     str = '';
                                 }
@@ -131,7 +131,7 @@ ${cpweb_foot}
                             if (!row.editDisplay) {
                                 var str;
                                 if (row.status === 'N') {
-                                    str = '<a type="button" class="btn btn-primary-outlined" onclick="editTask(\'' + row.editLink + '\',this)">Edit</a>';
+                                    str = '<a type="button" class="btn btn-sm btn-primary" onclick="editTask(\'' + row.editLink + '\',this)"><span class="glyphicon glyphicon-pencil"></span> Edit</a>';
                                 } else {
                                     str = '';
                                 }
