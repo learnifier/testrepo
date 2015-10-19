@@ -182,7 +182,7 @@ define([], function() {
                 ],
                 "ajax": listFavoritesAjaxSource,
                 "language": {
-                    "emptyTable": "<span class='emptytable'><a href='${helper.urlFor('CpMainModule','listProjects',[org.id])}'>Click the star next to a project to add it as a favorite.</a></span>",
+                    "emptyTable": "<span class='emptytable'><a href='" + projectListUrl + "'>Click the star next to a project to add it as a favorite.</a></span>",
                     "loadingRecords": "<p>Loading favorite projects...</p><img src='" + spinnerUrl + "' />"
                 }
             });            

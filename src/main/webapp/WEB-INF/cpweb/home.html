@@ -23,6 +23,7 @@ ${cpweb_foot}
     var spinnerUrl = "[@common.spinnerUrl /]";
     var listActionsAjaxSource = "${helper.urlFor('CpJsonModule','listProjectAlerts',[org.id])}";
     var listFavoritesAjaxSource = "${helper.urlFor('CpJsonModule','listFavoriteOrgProjects',[org.id])}";
+    var projectListUrl = "${helper.urlFor('CpMainModule','listProjects',[org.id])}";
 
     var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
