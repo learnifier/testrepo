@@ -3,6 +3,11 @@
 [#assign foot]
 ${cpweb_foot}
 <script>
+    $('#menu-settings').addClass('subMenuExpanded');
+    $('#menu-settings-publicapi-a').addClass('active');
+</script>
+
+<script>
     var apiWebUrlSource = "${helper.urlFor('papi.PapiJsonModule','listApiKeys',[org.id])}";
     var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair',[org.id])}";
     var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret',[org.id])}";
