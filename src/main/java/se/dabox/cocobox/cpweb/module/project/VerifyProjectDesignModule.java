@@ -130,6 +130,13 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
                         getProjectId());
                 throw new UnsupportedOperationException(msg);
             }
+
+            @Override
+            public RequestTarget callLinkedSubproject() {
+                String msg = String.format("Linked subprojects are not supported (%d)", project.
+                        getProjectId());
+                throw new UnsupportedOperationException(msg);
+            }
         });
     }
 

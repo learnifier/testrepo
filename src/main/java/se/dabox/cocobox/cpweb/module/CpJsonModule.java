@@ -460,6 +460,15 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
                         return "Challenge project for " + masterProject.getName();
                     }
+
+                    @Override
+                    public String callLinkedSubproject() {
+                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+                        OrgProject masterProject = ccbc.getProject(project.getMasterProject());
+
+                        return "Linked sub-project for " + masterProject.getName();
+                    }
                 });
             }
 
