@@ -23,6 +23,8 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
+import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
+import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.webfeature.WebFeatures;
@@ -76,6 +78,8 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         }
 
         map.put("projectThumbnail", new LazyProjectThumbnail(cycle, project));
+
+        map.put("canDeleteProject", isDeleteProjectPossible(project));
     }
 
     private Product getProductFromParticipationProjectState(RequestCycle cycle,
@@ -122,5 +126,25 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         }
         new UpdateRecentProjectList(cycle).addProject(project.getProjectId());
         return project;
+    }
+
+    private Boolean isDeleteProjectPossible(OrgProject project) {
+        return ProjectTypeUtil.callSubtype(project, new ProjectSubtypeCallable<Boolean>() {
+
+            @Override
+            public Boolean callMainProject() {
+                return true;
+            }
+
+            @Override
+            public Boolean callIdProjectProject() {
+                return false;
+            }
+
+            @Override
+            public Boolean callChallengeProject() {
+                return false;
+            }
+        });
     }
 }

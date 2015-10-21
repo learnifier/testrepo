@@ -85,7 +85,7 @@
                     <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
                 </form>
             [/#if]
-            [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && !isIdproject() ]
+            [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && canDeleteProject ]
                 <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
                     <button class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
