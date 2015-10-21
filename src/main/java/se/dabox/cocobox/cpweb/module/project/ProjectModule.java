@@ -312,6 +312,11 @@ public class ProjectModule extends AbstractProjectWebModule {
             public Long callChallengeProject() {
                 return project.getDesignId();
             }
+
+            @Override
+            public Long callLinkedSubproject() {
+                return project.getDesignId();
+            }
         });
 
         long brandingId =

@@ -263,6 +263,11 @@ class ProgressComponentResolver {
                     public List<DatabankEntry> callChallengeProject() {
                         return Collections.emptyList();
                     }
+
+                    @Override
+                    public List<DatabankEntry> callLinkedSubproject() {
+                        return Collections.emptyList();
+                    }
                 });
     }
 
