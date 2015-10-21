@@ -145,6 +145,11 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
             public Boolean callChallengeProject() {
                 return false;
             }
+
+            @Override
+            public Boolean callLinkedSubproject() {
+                return false;
+            }
         });
     }
 }
