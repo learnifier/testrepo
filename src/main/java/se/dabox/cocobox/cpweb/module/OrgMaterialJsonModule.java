@@ -27,6 +27,7 @@ import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
@@ -61,9 +62,12 @@ import se.dabox.service.common.ccbc.org.UpdateOrgProductLinkRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.filter.FilterProjectRequest;
+import se.dabox.service.common.ccbc.project.filter.FilterProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.material.MaterialUtils;
+import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.common.proddir.CocoboxProductUtil;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
@@ -709,6 +713,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             final String strProjectId,
             final List<Material> materials) {
 
+        final long projectId = toProjectIdLong(strProjectId);
+
         final LangBundle bundle = getLangBundle(cycle);
 
         PdwebProductEditorUrlFactory pdwebEditorFactory = new PdwebProductEditorUrlFactory(cycle);
@@ -744,6 +750,12 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         generator.writeStringField("editorUrl", editorUrl);
                     }
                     generator.writeBooleanField("crispConfigAvailable", hasCrispConfig(cycle, product));
+
+                    String adminLink = getAdminLink(cycle, projectId, product);
+                    if (adminLink != null) {
+                        generator.writeStringField("adminLink", adminLink);
+                        generator.writeStringField("adminLinkTitle", "Administrate");
+                    }
                 }
             }
 
@@ -788,7 +800,37 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         ctx.getDescription().getMethods().getGetProjectConfiguration() != null;
             }
 
+            private String getAdminLink(RequestCycle cycle, long parentProjectId, Product product) {
+                if (parentProjectId <= 0) {
+                    return null;
+                }
+
+                if (CocoboxProductTypeConstants.LINKEDSUBPROJECT.equals(product.getProductTypeId())) {
+                    FilterProjectRequest fpr = new FilterProjectRequestBuilder().setMasterProject(
+                            parentProjectId).setProductId(product.getId().getId()).buildRequest();
+
+                    List<OrgProject> projects
+                            = getCocoboxCordinatorClient(cycle).listOrgProjects(fpr);
+
+                    OrgProject project = CollectionsUtil.singleItemOrNull(projects);
+
+                    if (project != null) {
+                        return NavigationUtil.toProjectPageUrl(cycle, project.getProjectId());
+                    }
+                }
+
+                return null;
+            }
+
         }.encodeToStream(materials);
+    }
+
+    private static long toProjectIdLong(final String strProjectId) throws NumberFormatException {
+        long projectId = -1;
+        if (strProjectId != null) {
+            projectId = Long.valueOf(strProjectId);
+        }
+        return projectId;
     }
 
     private static String formatDate(Date activeTo) {

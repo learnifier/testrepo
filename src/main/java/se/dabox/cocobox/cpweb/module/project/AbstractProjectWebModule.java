@@ -24,6 +24,7 @@ import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
+import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductFetchUtil;
@@ -53,6 +54,9 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
             checkPermission(cycle, masterProject);
 
             map.put("masterProject", masterProject);
+            map.put("isSubproject", true);
+        } else {
+            map.put("isSubproject", false);
         }
 
         if (project.getParticipationOwner() != null) {
@@ -80,10 +84,17 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         map.put("projectThumbnail", new LazyProjectThumbnail(cycle, project));
 
         map.put("canDeleteProject", isDeleteProjectPossible(project));
+
+        map.put("isDesignDetailsAvailable", isDesignDetailsAvailable(project));
     }
 
     private Product getProductFromParticipationProjectState(RequestCycle cycle,
             ProjectParticipation participationOwner, OrgProject project, OrgProject masterProject) {
+
+        if (project.getProductId() != null) {
+            return ProductFetchUtil.getProduct(getProductDirectoryClient(cycle), project.
+                    getProductId());
+        }
 
         if (participationOwner == null || masterProject == null) {
             return null;
@@ -148,6 +159,45 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
 
             @Override
             public Boolean callLinkedSubproject() {
+                return false;
+            }
+        });
+    }
+
+    private boolean isDesignDetailsAvailable(OrgProject project) {
+        return ProjectTypeUtil.call(project, new ProjectTypeCallable<Boolean>() {
+            @Override
+            public Boolean callMaterialListProject() {
+                return false;
+            }
+
+            @Override
+            public Boolean callDesignedProject() {
+                return ProjectTypeUtil.callSubtype(project, new ProjectSubtypeCallable<Boolean>() {
+                    @Override
+                    public Boolean callMainProject() {
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean callIdProjectProject() {
+                        return false;
+                    }
+
+                    @Override
+                    public Boolean callChallengeProject() {
+                        return false;
+                    }
+
+                    @Override
+                    public Boolean callLinkedSubproject() {
+                        return false;
+                    }
+                });
+            }
+
+            @Override
+            public Boolean callSingleProductProject() {
                 return false;
             }
         });

@@ -89,7 +89,9 @@ ${cpweb_foot}
                         "data": function (row, type, set) {
                             if (!row.crispAdminLinkDisplay) {
                                 if (row.crispAdminAvailable) {
-                                    row.crispAdminLinkDisplay = '<a href="' + row.crispAdminLink + '" target="_blank">Administrated via ' + row.crispName + '</a>';
+                                    row.crispAdminLinkDisplay = '<a href="' + row.crispAdminLink + '" target="_blank">Administrate on ' + row.crispName + '</a>';
+                                } else if (row.adminLink) {
+                                    row.crispAdminLinkDisplay = '<a href="' + row.adminLink + '" target="_blank">' + row.adminLinkTitle + '</a>';
                                 } else {
                                     row.crispAdminLinkDisplay = ' ';
                                 }

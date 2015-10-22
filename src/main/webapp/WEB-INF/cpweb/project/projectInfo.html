@@ -49,6 +49,8 @@
         [#if isIdproject() ]
                 <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
                 <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
+        [#elseif isSubproject ]
+                <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${(masterProject.name!'No name')?xml}</h1>
         [#else]	
             <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
             <ul class="page-created-updated__wrapper list-inline">
@@ -75,8 +77,8 @@
             [/#if]
         [/#if]
         <div class="ccb-page-header__actions">
-            [#if isIdproject() ]
-                <form action="${helper.urlFor('project.ProjectModule', 'roster',[project.masterProject])}" method="post">
+            [#if isSubproject ]
+                <form action="${helper.urlFor('project.ProjectModule', 'overview',[project.masterProject])}" method="post">
                     <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
                 </form>
             [/#if]
@@ -121,7 +123,7 @@
             [#if project.type.ptype == 2 && !isIdproject(prj)]
                 <li class="[#if selected == 'info']active[/#if]"><a href="${helper.urlFor('ProjectModule','details',[project.projectId])}"><span>Info</span></a></li>
             [/#if]---]
-            [#if project.type.ptype == 2 && !isIdproject(prj)]
+            [#if isDesignDetailsAvailable]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
                 <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course[#--[@dws.txt key='cpweb.projectmenu.details' /]--]</span></a></li>
             [/@]
