@@ -61,16 +61,22 @@ ${cpweb_foot}
             </tr>
         </thead>
         <tbody>
-            [#list participantState.map?keys?sort as key]
-            <tr>
-                <td>
-                    ${key?xml}
-                </td>
-                <td style="padding-left: 20px">
-                    ${(participantState.map[key]?xml)!'(No value set)'}
-                </td>
-            </tr>
-            [/#list]
+            [#if participantState?? && participantState.map??]
+                [#list participantState.map?keys?sort as key]
+                <tr>
+                    <td>
+                        ${key?xml}
+                    </td>
+                    <td style="padding-left: 20px">
+                        ${(participantState.map[key]?xml)!'(No value set)'}
+                    </td>
+                </tr>
+                [/#list]
+            [#else]
+                <tr>
+                    <td colspan="0">No participant state available</td>
+                </tr>
+            [/#if]
         </tbody>
     </table>
 
