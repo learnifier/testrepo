@@ -239,7 +239,7 @@ class ActivityReportBuilder implements StatusSource {
         GetParticipationCrispProductStatusRequest req
                 = new GetParticipationCrispProductStatusRequest(participant.getParticipationId(),
                         productId.getId());
-        req.setFetchMode(FetchMode.CACHED);
+        req.setFetchMode(FetchMode.AUTO);
 
         ParticipationCrispProductStatus status = null;
         try {
