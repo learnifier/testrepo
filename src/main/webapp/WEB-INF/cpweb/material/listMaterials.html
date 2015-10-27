@@ -19,7 +19,7 @@ ${cpweb_foot}
             <li><a href='{{editorUrl}}' target="_blank">Edit</a></li>
         {{/if}}
         {{#unless editorUrl}}
-            <li><a href='#' data-id='{{row.id}}' onclick='return editItem(this)'>Edit</a></li>
+            <li><a href='#' data-id='{{id}}' onclick='return editItem(this)'>Edit</a></li>
         {{/unless}}
         {{!--
             <li><a href='#' data-trigger='click' data-action='delete' data-id='{{row.id}}'>Delete</a></li>
@@ -116,9 +116,9 @@ ${cpweb_foot}
             var id = $(this).data('id');            
             var action = $(this).data('action');
             
-            if(action == 'delete') {
+            if(action === 'delete') {
                 deleteOrgMat(id);
-            } else if (action == 'edit') {
+            } else if (action === 'edit') {
                 window.location.href = editOrgMatUrl + '/' + id;
             }
             

@@ -9,7 +9,7 @@
 [/#macro]
 
 [#macro addScript]
-<script>
+<script type="text/javascript">
     require(["${dwsrt.config['apiweb.baseurl']}js/createanonproduct.js"], function() {
         //log("anonprodcreate loaded");
     });
@@ -30,7 +30,7 @@
     
     function editItem(row){
       
-    productId = $(row).data("id");
+     var productId = $(row).data("id");
 
      CcbAnonymousProductUpload.open(function(pid) {
             if (pid) {
