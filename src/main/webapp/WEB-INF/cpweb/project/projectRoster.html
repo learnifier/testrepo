@@ -458,7 +458,7 @@ ${cpweb_foot}
                     expired: expired,
                     expirationStr: expirationStr,
                     expirationAgo: expirationAgo,
-                    reportsAvailable: data.reports.length
+                    reportsAvailable: data.reports.length !== 0
                 }));
                 
                 jQuery.timeago.settings.allowFuture = true;
