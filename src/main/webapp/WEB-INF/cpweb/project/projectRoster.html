@@ -410,7 +410,8 @@ ${cpweb_foot}
 
 
 
-    var fetchAndInjectDetails = function(detailsData, injectInRow) {
+var fetchAndInjectDetails = function(detailsData, injectInRow) {
+      require(['cocobox-handlebars', 'jquery.timeago', 'cocobox-icheck'], function (hb) {
         var ajaxCallUrl = detailsData.detailsUrl;
 
         cocobox.ajaxPost(ajaxCallUrl, {
@@ -422,14 +423,6 @@ ${cpweb_foot}
                 var expirationAgo = detailsData.expirationAgo;
                 var expired = detailsData.expired;
                 
-                var completed = 0;
-                for (var i = 0; i < data.progress.length; i++) {
-                    if (data.progress[i].completed) {
-                        completed++;
-                    }
-                    data.progress.completed = completed;
-                }
-
                 if (data.reports.length == 0) {
                     data.reports.push({empty: true});
                 } else {
@@ -441,17 +434,75 @@ ${cpweb_foot}
 
                     }
                 }
+                
+                 hb.registerHelper('StatusName', function (activityStatus) {
 
-                var renderedProgress = $('#progressTemplate').render(data.progress);
+
+                if (activityStatus == 'notAttempted') {
+                    var result = '<span class="text-muted">Not started</span>';
+                   return new hb.SafeString(result);
+                 } else if (activityStatus == 'incomplete') {
+                    var result = '<span class="text-info">In progress</span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'overdue') {
+                    var result = '<span class="text-danger">Overdue</span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'locked') {
+                    var result = '<span class="text-muted">Locked</span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'failed') {
+                    var result = '<span class="text-danger">Failed</span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'completed') {
+                    var result = '<span class="text-success">Completed</span>';
+                    return new hb.SafeString(result);
+                } else {
+                    return 'Unknown statusName:' + activityStatus;
+                }
+
+
+
+            });
+
+
+            hb.registerHelper('StatusImage', function (activityStatus) {
+
+                if (activityStatus == 'notAttempted') {
+                    var result = '<span class="item__icon text-muted pe-7s-play pe-va pe-2x pe-fw"></span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'incomplete') {
+                    var result = '<span class="item__icon text-info pe-7s-glasses pe-va pe-2x pe-fw"></span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'overdue') {
+                    var result = '<span class="item__icon text-danger pe-7s-attention pe-va pe-2x pe-fw"></span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'locked') {
+                    var result = '<span class="item__icon text-muted pe-7s-lock pe-va pe-2x pe-fw"></span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'failed') {
+                    var result = '<span class="item__icon text-danger pe-7s-close-circle pe-va pe-2x pe-fw"></span>';
+                    return new hb.SafeString(result);
+                } else if (activityStatus == 'completed') {
+                    var result = '<span class="item__icon text-success pe-7s-check pe-va pe-2x pe-fw"></span>';
+                    return new hb.SafeString(result);
+                } else {
+                    return 'Unknown statusImage:' + activityStatus;
+                }
+
+            });
+            
+                var templateSource = $("#roster-expand-template").html();
+                var template = hb.compile(templateSource);
+            
+                var renderedProgress = template(data)
                 var renderedReports = $('#reportinfoTemplate').render(data.reports);
                 var renderedAdminlinks = $('#adminlinkTemplate').render(data.adminlinks);
                 var renderedInvites = $('#invitesTemplate').render(data.idprojects);
 
-
                 $(injectInRow).append($('#detailsTable').render({
                     renderedProgress: renderedProgress,
-                    completedCids: completed,
-                    totalnumberOfCidsWithProgress: data.progress.length,
+                    activitiesCompleted: data.activitiesTotal,
+                    activityCount: data.activityCount,
                     renderedReports: renderedReports,
                     renderedAdminlinks: renderedAdminlinks,
                     renderedInvites: renderedInvites,
@@ -460,14 +511,28 @@ ${cpweb_foot}
                     expirationAgo: expirationAgo,
                     reportsAvailable: data.reports.length !== 0
                 }));
-                
+                //Show dropdown
+                    $(".showDetails", injectInRow).click(function () {
+                        $('.ToggleDrop').addClass("greyish");
+                        $('.hide').addClass("tbRow");
+                        $('[data-toggle="tooltip"]').tooltip()
+                    });
+                    
+                    //Hide dropdown
+                    $(".showOverview", injectInRow).click(function () {
+                        $('.ToggleDrop').removeClass("greyish");
+                        $('.hide').removeClass("tbRow");
+                    });
+                    
                 jQuery.timeago.settings.allowFuture = true;
                 $(injectInRow).find('.timeago').timeago();
                 //Hide invite section if no invites
-                if (renderedInvites.len < 1) {
+                if (renderedInvites.length < 1) {
                     $('.invites').hide();
                 }
+                $('[data-toggle="tooltip"]').tooltip();
             }
+        });
         });
     };
 
@@ -596,6 +661,7 @@ ${cpweb_foot}
 
 [#assign cpweb_head]
 ${cpweb_head}
+
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]

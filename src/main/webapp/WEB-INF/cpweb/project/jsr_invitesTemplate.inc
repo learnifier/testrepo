@@ -17,9 +17,9 @@
 
             <td class="completed">
             {{if completed}}
-                    <span> {{>completed}} completed</span>
+                    <span class="pull-right"> {{>completed}} completed</span>
             {{else}}
-                    <span> No completed</span>
+                    <span class="pull-right"> None completed</span>
             {{/if}}
 
             </td>

@@ -5,36 +5,41 @@
         {{if expirationStr}}
         <div class="expirationdetails">
             {{if expired}}
-                <div class="expired"><span>This participation expired </span><abbr class="timeago" title="{{:expirationAgo}}">{{:expirationAgo}}</abbr><span class="date"> ({{:expirationStr}})</span></div>
+                <div class="expired"><span>Access ended </span><abbr class="timeago" title="{{:expirationAgo}}" data-toggle="tooltip" data-placement="top">{{:expirationAgo}}</abbr><span class="date"> on {{:expirationStr}}</span></div>
             {{else}}
-                <div class="futureexpiration"><span>This participation will expire </span><abbr class="timeago" title="{{:expirationAgo}}">{{:expirationAgo}}</abbr><span class="date"> ({{:expirationStr}})</span></div>
+                <div class="futureexpiration"><span>Access will end </span><abbr class="timeago" title="{{:expirationAgo}}" data-toggle="tooltip" data-placement="top">{{:expirationAgo}}</abbr><span class="date"> on {{:expirationStr}}</span></div>
             {{/if}}
         </div>
         {{/if}}
+
         <div class="progressdetails">
-            <h3>Progress<span class="pull-right">{{:completedCids}} of {{:totalnumberOfCidsWithProgress}} activities completed</span></h3>
-            <table class="table table-hover table-striped ccb-table dt-responsive" width="100%">
-                {{:renderedProgress}}
-            </table>
+            <h4><span class="section-title">Progress</span><span class="showDrop"><span class="showOverview">Overview</span> | <span class="showDetails">Show details</span></span><span class="pull-right">{{:activitiesCompleted}} of {{:activityCount}} completed</span></h4>
+            {{:renderedProgress}}
         </div>
-        <div class="reportdetails">
-            <h3>Reports</h3>
-            {{:renderedReports}}
-        </div>
-        
-        [#-- 
-        <div class="adminlinks">
-            <h3>Adminlinks</h3>
-            {{:renderedAdminlinks}}
-        </div> --]
-		
+
+
+        {{if reportsAvailable}} [#-- Only show if there are any reports available--]
+            <div class="reportdetails">
+                <h4><span class="section-title">Reports</span></h4>
+                {{:renderedReports}}
+            </div>
+         {{/if}}
+
+        [#--
+            <div class="adminlinks">
+                <h4><span class="section-title">Adminlinks</span></h4>
+                {{:renderedAdminlinks}}
+            </div>
+        --]
+
         [#if prj.subtype != 'idproject'] [#-- Do not show invites section on idprojects --]
-        <div class="invites">
-            <h3>Invites</h3>
-            <table style="width: 100%;">
-            {{:renderedInvites}}
-            </table>
-        </div>
+            <div class="invites">
+                <h4><span class="section-title">Invites</span></h4>
+                <table style="width: 100%;">
+                {{:renderedInvites}}
+                </table>
+            </div>
         [/#if]
+
     </div>
 </script>

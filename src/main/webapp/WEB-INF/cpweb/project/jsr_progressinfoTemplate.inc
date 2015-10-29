@@ -1,40 +1,70 @@
-<script id="progressTemplate" type="text/x-jsrender">
-
+<script id="roster-expand-template" type="text/x-handlebars-template">
     
-    <tr>
-        <td>
-            {{if productThumbnail}}
-                <img src="{{>productThumbnail}}" alt="{{>productShortTitle}}"/>
-            {{else type=="TEMPORAL"}}
-                <img src="${contextPath}/img/temporal_event_64x64.png" alt="{{>productShortTitle}}"/>
-            {{else type=="ORGMAT"}}
-                <img src="${contextPath}/img/orgmaterial_64x64.png" title="{{>productShortTitle}}" alt="{{>productShortTitle}}"/>
-            {{else type=="CRISP"}}
-                <img src="${contextPath}/img/crisp_product_64x64.png" title="{{>productShortTitle}}" alt="{{>productShortTitle}}"/>
-			{{else type="PRODUCT"}}
-				<img src="${contextPath}/img/product_64x64.png" title="{{>productShortTitle}}" alt="{{>productShortTitle}}"/>
-            {{/if}}
-        </td>
-
-        {{if componentTitle}}
-            <td class="title">{{>componentTitle}}</td>
-        {{else productTitle}}
-            <td class="title">{{>productTitle}}</td>
-        {{/if}}
-        
-        <td class="completiondate">
-            {{if completedDate}}
-                <abbr class="timeago" title="{{>completedDateAgo}}">{{>completedDateStr}}</abbr>
-            {{/if}}
-        </td>
-        <td class="progresscol">    
-            {{if completed}}    
-                <div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">Completed</div></div>
-            {{else}}
-                <div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="width: 100%;">To be completed</div></div>
-            {{/if}}
-        </td>
-        
-    </tr>
+<div>
+{{#pages}}
+  <h5 class="page-title">{{title}}</h5>
+  <table class="table table-hover ccb-table dt-responsive ToggleDrop" width="100%" id="rosterDetails">
+      <tbody>
+          {{#activity}}
+            <tr class="{{activityStatus}}">
+                <td class="activityTitle">
+                  <span class="truncate navColor">{{title}}</span>
+                </td>
+                <td class="activityStatusToggle">
+                    
+                </td>
+                <td class="completionDate">
+                    {{completedDateStr}}
+                </td>
+                <td class="statusName">
+                    <span class="pull-right">{{StatusName activityStatus}}</span>
+                </td>
+                <td class="statusImage">
+                    <span class="pull-right">{{StatusImage activityStatus}}</span>
+                </td>
+            </tr>
+             {{#component}}
+                <tr class="hide white {{componentStatus}}">
+                     <td class="ptb0" colspan="8">
+                         <div>
+                                <ul class="dropdownUl">
+                                    <li class="componentThumbnail">
+                                        <img src="{{thumbnail}}">
+                                    </li>
+                                    <li class="componentTitle">
+                                        <span class="truncate">{{componentTitle}}</span>
+                                    </li>
+                                     <!-- Stacking from right from here -->   
+                                    <li class="statusImage pull-right">
+                                        {{StatusImage componentStatus}}
+                                    </li>
+                                    <li class="statusName pull-right">
+                                        {{StatusName componentStatus}}
+                                    </li>
+                                    <li class="completionDate pull-right">
+                                        {{#if completedDate}}
+                                            <abbr data-toggle="tooltip" class="timeago" title="{{completedDateAgo}}"> {{completedDateStr}} </abbr>
+                                        {{/if}}
+                                    </li>
+                                    <li class="score pull-right">
+                                        {{#if scoreStr}}
+                                            <span class="row-label">Score:</span><span class="row-value">{{scoreStr}}</span>
+                                        {{/if}}
+                                    </li>
+                                    <li class="successStatus pull-right">
+                                        {{#if successStatus }}
+                                            <span class="row-label">Passed/failed:</span><span class="row-value">{{successStatus}}</span>
+                                        {{/if}}
+                                    </li>
+                                </ul>
+                         </div>
+                    </td>
+                </tr>
+            {{/component}}  
+          {{/activity}}
+      </tbody>
+  </table>  
+{{/pages}}
+</div>
 
 </script>

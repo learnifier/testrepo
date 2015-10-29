@@ -134,6 +134,28 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
     
+     @WebAction
+    public RequestTarget onKevin(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        Map<String, Object> map = createMap();
+
+        map.put("formsess", getValidationSession(AddMemberForm.class, cycle));
+
+        map.put("rosterformsess", getValidationSession(UploadRosterForm.class, cycle));
+        map.put("uploadRosterFormLink", cycle.urlFor(ProjectModificationModule.class,
+                ProjectModificationModule.UPLOAD_ROSTER_ACTION,
+                projectId));
+        addCommonMapValues(map, project, cycle);
+        initSelfReg(cycle, project, map);
+
+        return new FreemarkerRequestTarget("/project/kevin.html", map);
+    }
+    
     @WebAction
     public RequestTarget onDetails(RequestCycle cycle, String projectId) {
         OrgProject project =

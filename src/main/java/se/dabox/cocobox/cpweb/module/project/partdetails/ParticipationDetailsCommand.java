@@ -5,9 +5,13 @@ package se.dabox.cocobox.cpweb.module.project.partdetails;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +29,8 @@ import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.date.DateFormatters;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.learnifier.cmi.CompletionStatus;
+import se.dabox.learnifier.cmi.SuccessStatus;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -69,6 +75,8 @@ import se.dabox.util.collections.ValueUtils;
 public class ParticipationDetailsCommand {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ParticipationDetailsCommand.class);
+
+    private enum ActivityStatus { notAttempted, incomplete, completed, overdue, locked, failed };
 
     private final RequestCycle cycle;
     private ProjectParticipation participation;
@@ -129,7 +137,7 @@ public class ParticipationDetailsCommand {
     }
 
     private RequestTarget createJsonResponse() {
-        Locale locale = CocositeUserHelper.getUserLocale(cycle);
+        final Locale locale = CocositeUserHelper.getUserLocale(cycle);
 
         DateFormat format =
                 DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
@@ -138,6 +146,10 @@ public class ParticipationDetailsCommand {
         byte[] jsonData = new JsonEncoding(format) {
             private JsonGenerator generator;
             private String thumbnailUrl;
+
+            private final NumberFormat percentFormat = NumberFormat.getPercentInstance(locale);
+            private final NumberFormat scoreFormat = NumberFormat.getInstance(locale);
+
             @Override
             protected void encodeData(JsonGenerator generator) throws IOException {
                 this.generator = generator;
@@ -155,13 +167,6 @@ public class ParticipationDetailsCommand {
                 generator.writeArrayFieldStart("adminlinks");
                 for (Product adminProduct : adminLinkProducts) {
                     encodeAdminProduct(generator, adminProduct);
-                }
-                generator.writeEndArray();
-
-                generator.writeArrayFieldStart("progress");
-                for (ProgressComponentInfo pinfo : progressInfos) {
-                    flushProgressComponentInfoCache();
-                    encodeProgressComponentInfo(generator, pinfo);
                 }
                 generator.writeEndArray();
 
@@ -256,10 +261,7 @@ public class ParticipationDetailsCommand {
                 generator.writeStringField("type", pinfo.getType().toString());
                 generator.writeBooleanField("completed", pinfo.getCompleted() != null);
                 if (pinfo.getCompleted() != null) {
-                    writeDateField(generator, "completedDate", pinfo.getCompleted());
-                }
-
-                if (pinfo.getCompleted() != null) {
+                    writeDateField(generator, "completedDate", pinfo.getCompleted());                
                     String isoDate = DateFormatters.JQUERYAGO_FORMAT.format(pinfo.getCompleted());
                     generator.writeStringField("completedDateAgo", isoDate);
                 }
@@ -283,7 +285,22 @@ public class ParticipationDetailsCommand {
                     generator.writeNullField("score");
                 } else {
                     generator.writeNumberField("score", pinfo.getScore());
+
+                    if (isPercentScore(pinfo)) {
+
+                        BigDecimal pscore = pinfo.getScore().divide(BigDecimal.valueOf(100), 2,
+                                RoundingMode.HALF_EVEN);
+
+                        String percent = percentFormat.format(pscore);
+                        generator.writeStringField("scoreStr", percent+"%");
+                    } else {
+                        String numVal = scoreFormat.format(pinfo.getScore());
+                        generator.writeStringField("scoreStr", numVal);
+                    }
+
                 }
+
+                generator.writeStringField("componentStatus", getComponentStatusStr(pinfo));
 
                 encodeThumbnail(pinfo);
 
@@ -336,6 +353,21 @@ public class ParticipationDetailsCommand {
                 generator.writeBooleanField("enabled", activity.isEnabled());
                 generator.writeBooleanField("overdue", activity.isOverdue());
                 generator.writeBooleanField("visible", activity.isVisible());
+                generator.writeStringField("activityStatus", getActivityStatusStr(activity));
+
+                final Date completeByDate = activity.getCompleteByDate();
+                writeDateField(generator, "completeByDate", completeByDate);
+                if (completeByDate != null) {
+                    String isoDate = DateFormatters.JQUERYAGO_FORMAT.format(completeByDate);
+                    generator.writeStringField("completeByDateAgo", isoDate);
+                }
+
+                final Date completedDate = activity.getCompletedDate();
+                writeDateField(generator, "completedDate", completedDate);
+                if (completedDate != null) {
+                    String isoDate = DateFormatters.JQUERYAGO_FORMAT.format(completedDate);
+                    generator.writeStringField("completedDateAgo", isoDate);
+                }
 
                 generator.writeArrayFieldStart("component");
                 for (ActivityComponent component : activity.getComponents()) {
@@ -380,6 +412,91 @@ public class ParticipationDetailsCommand {
 
             private void flushProgressComponentInfoCache() {
                 thumbnailUrl = null;
+            }
+
+            private String getActivityStatusStr(Activity activity) {
+                return getActivityStatus(activity).name();
+            }
+
+            private ActivityStatus getActivityStatus(Activity activity) {
+                
+                if (activity.isCompleted()) {
+                    SuccessStatus status = activity.getSuccessStatus();
+
+                    if (status == null) {
+                        status = SuccessStatus.unknown;
+                    }
+
+                    if (status == SuccessStatus.passed || status == SuccessStatus.unknown) {
+                        return ActivityStatus.completed;
+                    }
+
+                    return ActivityStatus.failed;
+                } else if (!activity.isEnabled()) {
+                    return ActivityStatus.locked;
+                } else if (activity.isOverdue()) {
+                    return ActivityStatus.overdue;
+                } else {
+                    CompletionStatus completionStatus = activity.getCompletionStatus();
+                    
+                    if (completionStatus == null) {
+                        return ActivityStatus.notAttempted;
+                    }
+                    
+                    if (completionStatus == CompletionStatus.unknown || completionStatus
+                            == CompletionStatus.notAttempted) {
+                        return ActivityStatus.notAttempted;
+                    }
+                    
+                    return ActivityStatus.incomplete;
+                }
+            }
+
+            private String getComponentStatusStr(ProgressComponentInfo pinfo) {
+                return getComponentStatus(pinfo).toString();
+            }
+
+            private ActivityStatus getComponentStatus(ProgressComponentInfo pinfo) {
+                CompletionStatus completionStatus = pinfo.getCompletionStatus();
+                if (completionStatus == null) {
+                    completionStatus = CompletionStatus.unknown;
+                }
+
+                if (completionStatus == CompletionStatus.completed) {
+                    SuccessStatus status = pinfo.getSuccessStatus();
+
+                    if (status == null) {
+                        status = SuccessStatus.unknown;
+                    }
+
+                    if (status == SuccessStatus.passed || status == SuccessStatus.unknown) {
+                        return ActivityStatus.completed;
+                    }
+
+                    return ActivityStatus.failed;
+                } else {
+                    if (completionStatus == null) {
+                        return ActivityStatus.notAttempted;
+                    }
+
+                    if (completionStatus == CompletionStatus.unknown || completionStatus
+                            == CompletionStatus.notAttempted) {
+                        return ActivityStatus.notAttempted;
+                    }
+
+                    return ActivityStatus.incomplete;
+                }
+            }
+
+            private boolean isPercentScore(ProgressComponentInfo pinfo) {
+                Product product = pinfo.getProduct();
+
+                if (product == null) {
+                    return false;
+                }
+
+                String scoretype = product.getFieldSingleValue("scormscoretype");
+                return "percent".equals(scoretype);
             }
 
 

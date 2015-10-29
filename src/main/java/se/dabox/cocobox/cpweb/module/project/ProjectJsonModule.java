@@ -25,7 +25,6 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections.map.Flat3Map;
-import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;

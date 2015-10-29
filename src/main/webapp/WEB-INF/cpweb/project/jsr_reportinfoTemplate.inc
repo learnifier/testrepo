@@ -3,27 +3,22 @@
         {{if empty}}
             <span>No reports available for this participant</span>
         {{else}}
-        
-  
-                {{if filetype}}
-                    <div class="{{>filetype}}"> <!-- typically pdf -->
-                {{else}}
-                    <div class="reportgeneral">
-                {{/if}}
-                    {{if isAdminReport}}
-                        <a href="{{>adminReportLink}}" target="_blank">{{>title}}</a>
-
-                        {{if isUserReport}}
-                            <span class="uservisibility">visible to user</span>
-                        {{/if}}
-
-                        {{if createdStr}}
-                            <p class="created date"><span>generated </span>
-                                <abbr class="timeago" title="{{>createdStr}}">{{>createdStr}}</abbr>
-                            </p>
-                        {{/if}}
+        {{if isAdminReport}}
+            <div>
+                <a href="{{>adminReportLink}}" target="_blank">
+                    <span class="pe-7s-news-paper pe-va pe-lg primaryColor"></span>
+                    <span>{{>title}}</span>
+                    {{if isUserReport}}
+                        <span class="uservisibility">visible to user</span>
                     {{/if}}
-                    </div>
+                    {{if createdStr}}
+                        <p class="created date"><span>generated </span>
+                            <abbr class="timeago" title="{{>createdStr}}">{{>createdStr}}</abbr>
+                        </p>
+                    {{/if}}
+                </a>
+            </div>
+        {{/if}}
         {{/if}}
     </div>
 </script>
