@@ -423,15 +423,9 @@ var fetchAndInjectDetails = function(detailsData, injectInRow) {
                 var expirationAgo = detailsData.expirationAgo;
                 var expired = detailsData.expired;
                 
-                if (data.reports.length == 0) {
-                    data.reports.push({empty: true});
-                } else {
-
-                    for (var i = 0; i < data.reports.length; i++) {
-                        if (data.reports[i].type == 'application/pdf') {
-                            data.reports[i].filetype = data.reports[i].type.split('application/').join('');
-                        }
-
+                for (var i = 0; i < data.reports.length; i++) {
+                    if (data.reports[i].type == 'application/pdf') {
+                        data.reports[i].filetype = data.reports[i].type.split('application/').join('');
                     }
                 }
                 
