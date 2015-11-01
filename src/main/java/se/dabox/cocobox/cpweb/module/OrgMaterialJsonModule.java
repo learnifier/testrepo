@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,7 @@ import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.pdweb.PdwebProductEditorUrlFactory;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
@@ -59,6 +62,7 @@ import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.org.UpdateOrgProductLinkRequest;
+import se.dabox.service.common.ccbc.product.ProductInUseException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
@@ -78,6 +82,7 @@ import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactor
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductPredicates;
 import se.dabox.service.proddir.data.ProductTypeId;
 import se.dabox.service.tokenmanager.client.AccountBalance;
@@ -177,7 +182,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final long userId = LoginUserAccountHelper.getUserId(cycle);
 
         List<OrgMaterial> materials = Collections.emptyList();
-        
+
         if (hasOrgPermission(cycle, userId, CocoboxPermissions.CP_LIST_ORGMATS)) {
             materials = getCocoboxCordinatorClient(cycle).searchOrgMaterial(userId, term,
                     Collections.
@@ -199,7 +204,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         List<Material> materials = getOrgMaterials(cycle, orgId, null, null);
 
-        return jsonTarget(toJsonMaterials(cycle, null, materials));
+        boolean allowDelete = hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_DELETE_ORGMAT);
+
+        return jsonTarget(toJsonMaterials(cycle, null, materials, allowDelete));
     }
 
     @WebAction
@@ -210,9 +217,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         List<Material> materials = getOrgMaterials(cycle, orgId, null, ProjectType.MATERIAL_LIST_PROJECT);
 
-        return jsonTarget(toJsonMaterials(cycle, null, materials));
+        return jsonTarget(toJsonMaterials(cycle, null, materials, false));
     }
-    
+
     @WebAction
     public RequestTarget onListPurchasedMats(RequestCycle cycle, String strOrgId)
             throws Exception {
@@ -229,13 +236,68 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
+    public RequestTarget onListProductProjects(RequestCycle cycle) {
+        String productId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(),
+                "productId");
+
+        Product product = getProductDirectoryClient(cycle).getProduct(productId);
+
+        Map<String,Object> map = new Flat3Map<>();
+
+        if (product == null) {
+            map.put("status", "notfound");
+        } else if (!product.isAnonymous()) {
+            map.put("status", "denied");
+        } else {
+            map.put("status", "ok");
+
+            List<OrgProject> projects
+                    = getCocoboxCordinatorClient(cycle).listOrgProjectsUsingProduct(new ProductId(
+                    productId));
+
+            map.put("projects", CollectionsUtil.transformList(projects, this::toProjectIdAndName));
+        }
+
+        return jsonTarget(map);
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onDeleteOrgProduct(RequestCycle cycle, String strOrgId) {
+        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_DELETE_ORGMAT);
+
+        String productId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(),
+                "productId");
+
+        Product product = getProductDirectoryClient(cycle).getProduct(productId);
+
+        Map<String,Object> map = new Flat3Map<>();
+
+        if (product == null) {
+            map.put("status", "notfound");
+        } else if (!product.isAnonymous()) {
+            map.put("status", "denied");
+        } else {
+            long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+            try {
+                getCocoboxCordinatorClient(cycle).
+                        deleteOrgProduct(caller, Long.valueOf(strOrgId), productId);
+                map.put("status", "ok");
+            } catch (ProductInUseException ex) {
+                map.put("status", "inuse");
+            }
+        }
+
+        return jsonTarget(map);
+    }
+
+    @WebAction
     public RequestTarget onSearchPurchasedMats(RequestCycle cycle, String strOrgId, String term)
             throws Exception {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
         List<OrgProduct> orgProds = Collections.emptyList();
-        
+
         if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_LIST_ORGMATS)) {
                 orgProds = getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
         }
@@ -453,10 +515,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
     @WebAction
     public RequestTarget onChangeLinkActiveTo(RequestCycle cycle, String strOrgId) {
-        
+
         secureGetMiniOrg(cycle, strOrgId);
-        
-        
+
+
         String strLinkId = cycle.getRequest().getParameter("pk");
         String[] split = strLinkId.split("-");
         Long linkid = Long.valueOf(split[1]);
@@ -678,14 +740,14 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     private static String getMaterialTypeTitle(LangBundle bundle, Material material) {
-        
+
         if (OrgMaterialConstants.NATIVE_SYSTEM.equals(material.getNativeSystem())) {
             return bundle.getKey("cpweb.materialtype.orgmat");
         } else if (material instanceof ProductMaterial) {
             ProductMaterial prodMat = (ProductMaterial) material;
             return getProductTypeTitle(bundle, prodMat.getProduct().getProductTypeId());
         }
-        
+
         return material.getNativeType();
     }
 
@@ -711,7 +773,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
      */
     public static ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
             final String strProjectId,
-            final List<Material> materials) {
+            final List<Material> materials,
+            Boolean allowDelete) {
+
+        final boolean deleteFlag = determineDeleteFlag(allowDelete);
 
         final long projectId = toProjectIdLong(strProjectId);
 
@@ -750,6 +815,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         generator.writeStringField("editorUrl", editorUrl);
                     }
                     generator.writeBooleanField("crispConfigAvailable", hasCrispConfig(cycle, product));
+                    generator.writeBooleanField("allowDelete", deleteFlag);
 
                     String adminLink = getAdminLink(cycle, projectId, product);
                     if (adminLink != null) {
@@ -971,7 +1037,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 getInstance());
 
         Map<String, AccountBalance> balances = Collections.emptyMap();
-        
+
         if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_ACCOUNTBALANCE)) {
             balances = getAccountBalanceMap(cycle, orgId, orgProds);
         }
@@ -1063,7 +1129,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         List<Product> sortedList = new ArrayList<>(products);
         Collections.sort(sortedList, (Product o1, Product o2) -> {
             int diff = col.compare(o1.getTitle(), o2.getTitle());
-            
+
             if (diff == 0) {
                 diff = o1.getId().compareTo(o2.getId());
             }
@@ -1132,6 +1198,23 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         List<Product> products = getGrantedProducts(cycle, orgProds);
 
         return CollectionsUtil.sublist(products, p -> p.isOrgUnitProduct());
+    }
+
+
+    private static boolean determineDeleteFlag(Boolean allowDelete) {
+        if (allowDelete == null) {
+            return false;
+        }
+
+        return allowDelete;
+    }
+
+    private Map<String,Object> toProjectIdAndName(OrgProject project) {
+        Map<String,Object> map = new Flat3Map<>();
+        map.put("projectId", project.getProjectId());
+        map.put("name", project.getName());
+
+        return map;
     }
 
     private static class CrispAdminLinkInfo {

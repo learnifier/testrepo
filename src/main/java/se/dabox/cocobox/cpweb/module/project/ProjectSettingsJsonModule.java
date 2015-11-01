@@ -15,7 +15,7 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
-import org.apache.commons.collections.map.Flat3Map;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
@@ -179,7 +179,7 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
             stringValue = fieldValue;
         }
 
-        Map<String, String> map = createFlatMap();
+        Map<String, String> map = new Flat3Map<>();
         map.put("status", "OK");
         map.put("value", fieldValue);
         map.put("stringValue", stringValue);
@@ -192,11 +192,6 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         cycle.getResponse().setContentType("text/plain;charset=UTF-8");
         cycle.getResponse().getWriter().append(fieldName);
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <K, V> Map<K, V> createFlatMap() {
-        return new Flat3Map();
     }
 
     private ObjectStringContainer<TimeZone> getProjectTimeZone(RequestCycle cycle, String fieldValue) {

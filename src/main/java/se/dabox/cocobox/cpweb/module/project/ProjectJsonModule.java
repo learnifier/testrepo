@@ -24,7 +24,7 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
-import org.apache.commons.collections.map.Flat3Map;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
@@ -87,7 +87,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     private static List<Material> getMissingProducts(
             List<String> prodIdList,
             List<Product> existingProductsList) {
-        
+
         Set<String> prodIdSet = new LinkedHashSet<>(prodIdList);
         Set<String> existingIdSet = CollectionsUtil.transform(existingProductsList,
                 ProductTransformers.getIdStringTransformer());
@@ -235,7 +235,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         List<Material> materials = getProjectMaterials(pmcClient, prjId, cycle);
 
-        return jsonTarget(OrgMaterialJsonModule.toJsonMaterials(cycle, strProjectId, materials));
+        return jsonTarget(OrgMaterialJsonModule.toJsonMaterials(cycle, strProjectId, materials, false));
     }
 
     @WebAction
@@ -481,7 +481,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 enabled);
 
         ccbc.updateOrgProject(upr);
-        
+
         Map<String, String> map = Collections.singletonMap("status", "OK");
 
         return jsonTarget(map);
