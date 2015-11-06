@@ -38,6 +38,31 @@ ${cpweb_foot}
     });
     //[/#if]
 
+    //[#if sms.ajaxProcessor]
+    $(function() {
+        $("#submitbutton").click(function() {
+            $("#submitbutton").prop("disabled",true);
+
+            require(['dabox-ajax-longrun-bootstrap'], function(lop) {
+                var jobUrl = "${jobUrl}";
+                var completedUrl = "${completedUrl}";
+
+                lop.guiLongRun(jobUrl, {
+                    "type": "post",
+                    "success": function(data) {
+                        window.location.href = completedUrl;
+                    },
+                    "complete": function() {
+                        $("#submitbutton").prop("disabled",false);
+                    }
+                });
+
+            }); //end require
+
+        }); //end click
+    });
+    //[/#if]
+
 </script>
 
 <script type="text/javascript">
@@ -153,7 +178,7 @@ ${cpweb_foot}
                     [@modal.formParams /]
 
                     [#if !modalMode ]
-                        <button id="submitbutton" tabindex="7" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.sendemail' /]</button>
+                    <button id="submitbutton" tabindex="7" class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.sendemail' /]</button>
                         [#if showCancel]
                         <a href="${helper.urlFor('mail.SendMailModule', 'cancel', [org.id, sms.uuid] )}" tabindex="8" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
                         [/#if]

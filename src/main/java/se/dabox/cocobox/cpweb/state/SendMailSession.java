@@ -16,6 +16,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebSession;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import se.dabox.cocobox.cpweb.module.mail.AjaxSendMailProcessor;
 import se.dabox.cocobox.cpweb.module.mail.RequestTargetGenerator;
 import se.dabox.cocobox.cpweb.module.mail.SendMailModule;
 import se.dabox.cocobox.cpweb.module.mail.SendMailProcessor;
@@ -46,6 +47,7 @@ public class SendMailSession implements Serializable {
     private PortableMailTemplate portableMailTemplate;
     private String skin;
     private String sendButtonText;
+    private boolean ajaxProcessor;
 
     public SendMailSession(SendMailProcessor processor,
             RequestTargetGenerator completedTargetGenerator,
@@ -64,6 +66,7 @@ public class SendMailSession implements Serializable {
         this.completedTargetGenerator = completedTargetGenerator;
         this.uuid = UUID.randomUUID();
         this.cancelTargetGenerator = cancelTargetGenerator;
+        this.ajaxProcessor = processor instanceof AjaxSendMailProcessor;
     }
 
     /**
@@ -393,6 +396,28 @@ public class SendMailSession implements Serializable {
         target.setExtraTargetParameterString(extraParams);
 
         return target;
+    }
+
+    /**
+     * Determines if the mail processor for this session should be executed as a
+     * ajax longrun task. The default is autodetected from the processor.
+     *
+     * @return True if the mail processor for this session should be executed as a
+     * ajax longrun task
+     */
+    public boolean isAjaxProcessor() {
+        return ajaxProcessor;
+    }
+
+    /**
+     * Sets if the mail processor for this session should be executed as a
+     * ajax longrun task. The default is autodetected from the processor.
+     *
+     * @param ajaxProcessor True if the mail processor for this session should be executed as a
+     * ajax longrun task.
+     */
+    public void setAjaxProcessor(boolean ajaxProcessor) {
+        this.ajaxProcessor = ajaxProcessor;
     }
 
 }

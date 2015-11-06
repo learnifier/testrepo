@@ -27,6 +27,7 @@ import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.client.Clients;
+import se.dabox.service.common.ajaxlongrun.AjaxLongOp;
 import se.dabox.service.common.mailsender.mailtemplate.GetHintedMailTemplateCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -98,6 +99,9 @@ public class SendMailModule extends AbstractWebAuthModule {
         map.put("formLink",
                 cycle.urlFor(SendMailModule.class.getName(), EXECUTE_SENDMAIL_ACTION,
                 strOrgId, strSessionId));
+        map.put("jobUrl", cycle.urlFor(SendMailModule.class, "processJob", strOrgId, strSessionId));
+        map.put("completedUrl", cycle.urlFor(SendMailModule.class, "finishJob", strOrgId,
+                strSessionId));
         map.put("sms", sms);
         map.put("showCancel", sms.getCancelTargetGenerator() != null);
         map.put("receivers", getReceivers(cycle, sms));
@@ -122,6 +126,70 @@ public class SendMailModule extends AbstractWebAuthModule {
         }
 
         return sms.getCancelTargetGenerator().generateTarget(cycle);
+    }
+
+    @WebAction(methods =  HttpMethod.POST)
+    public RequestTarget onProcessJob(RequestCycle cycle, String strOrgId, String strSessionId) {
+        checkOrgPermission(cycle, strOrgId);
+
+        SendMailSession sms = SendMailSession.getFromSession(cycle.getSession(), strSessionId);
+
+        if (sms == null) {
+            throw new IllegalStateException("Sendmail session not available");
+        }
+
+        AjaxSendMailProcessor ajaxProcessor = (AjaxSendMailProcessor) sms.getProcessor();
+
+        SendMailTemplate smt = null;
+        if (AjaxLongOp.isCommmandCall(cycle)) {
+            DruwaFormValidationSession<SendEmailForm> formsess = getValidationSession(
+                    SendEmailForm.class, cycle);
+
+            if (!formsess.process()) {
+                return new WebModuleRedirectRequestTarget(SendMailModule.class,
+                        VIEW_SENDMAIL_ACTION, strOrgId, strSessionId);
+            }
+
+            SendEmailForm form = formsess.getObject();
+
+            smt = new SendMailTemplate(form.getSubject(), form.
+                    getBody(), form.getMtype());
+
+            if (StringUtils.isEmpty(form.getBody())) {
+                return new WebModuleRedirectRequestTarget(SendMailModule.class,
+                        VIEW_SENDMAIL_ACTION, strOrgId, strSessionId);
+            }
+
+            if (!sms.verifySendMail(cycle, smt)) {
+                formsess.transferToViewSession();
+
+                return new WebModuleRedirectRequestTarget(SendMailModule.class,
+                        VIEW_SENDMAIL_ACTION, strOrgId, strSessionId);
+            }
+        }
+
+        return ajaxProcessor.processAjaxRequest(cycle, sms, smt);
+    }
+
+    @WebAction
+    public RequestTarget finishJob(RequestCycle cycle, String strOrgId, String strSessionId) {
+        checkOrgPermission(cycle, strOrgId);
+
+        SendMailSession sms = SendMailSession.getFromSession(cycle.getSession(), strSessionId);
+
+        if (sms == null) {
+            return NavigationUtil.toOrgMain(strOrgId);
+        }
+
+        sms.removeFromSession(cycle.getSession());
+
+        RequestTarget target = sms.getCompletedRequestTarget(cycle);
+
+        if (target == null) {
+            throw new IllegalStateException("No completedRequestTarget from SendMailSession");
+        }
+
+        return target;
     }
 
     @WebAction(methods = HttpMethod.POST)
