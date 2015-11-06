@@ -44,6 +44,7 @@ import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.reldate.DueOffsetCalculation;
 import se.dabox.service.common.coursedesign.reldate.RelativeDateCalculator;
+import se.dabox.service.common.coursedesign.reldate.RelativeDateErrorException;
 import se.dabox.service.common.coursedesign.reldate.RelativeStringDecoder;
 import se.dabox.service.common.coursedesign.reldate.RelativeStringInformation;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
@@ -109,8 +110,12 @@ public class ProjectDatabankJsonModule extends AbstractJsonAuthModule {
             return errorJson(cycle, "No field found");
         }
 
-        RelativeDateCalculator rdc = new RelativeDateCalculator().loadCourse(cdd).
-                withTimeZone(project.getTimezone());
+        RelativeDateCalculator rdc = new RelativeDateCalculator().withTimeZone(project.getTimezone());
+        try {
+            rdc.loadCourse(cdd);
+        } catch (RelativeDateErrorException ex){
+            LOGGER.warn("Relative date calculation errors: {}", ex.getErrors());
+        }
 
         if (rdc.isEpoch(comp)) {
             return errorJson(cycle, "Component is an epoch");

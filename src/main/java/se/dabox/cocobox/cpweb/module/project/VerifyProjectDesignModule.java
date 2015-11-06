@@ -59,6 +59,7 @@ import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.ValidateDataRequest;
 import se.dabox.service.common.coursedesign.ValidateDesignDataResponse;
 import se.dabox.service.common.coursedesign.reldate.RelativeDateCalculator;
+import se.dabox.service.common.coursedesign.reldate.RelativeDateErrorException;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
@@ -176,8 +177,13 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         DatabankFacade oldDatabankFacade = getOldDatabankFacade(project, ccbc);
 
-        RelativeDateCalculator rdCalculator = new RelativeDateCalculator().loadCourse(cdd).
-                withTimeZone(project.getTimezone());
+        RelativeDateCalculator rdCalculator = new RelativeDateCalculator();
+
+        try {
+            rdCalculator.withTimeZone(project.getTimezone()).loadCourse(cdd);
+        } catch (RelativeDateErrorException ex) {
+            LOGGER.warn("Relative date calculation errors: {}", ex.getErrors());
+        }
 
         for (Component component : cdd.getComponentsRecursive()) {
             String strCid = component.getCid().toString();
@@ -712,7 +718,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
     /**
      * Add values for all duration values that aren't set.
-     * 
+     *
      * @param cycle The current request cycle
      * @param cdd The design
      * @param databank The databank
@@ -721,10 +727,10 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             Set<DatabankEntry> databank,
             Map<String, Set<ExtendedComponentFieldName>> fieldMapSet) {
         final String wantedFieldName = "duration";
-        
+
         for (Map.Entry<String, Set<ExtendedComponentFieldName>> entry : fieldMapSet.entrySet()) {
             for (ExtendedComponentFieldName fieldName : entry.getValue()) {
-                
+
                 if (!fieldName.getName().equals(wantedFieldName)) {
                     continue;
                 }
