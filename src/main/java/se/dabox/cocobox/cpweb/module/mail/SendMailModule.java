@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.mail;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import net.unixdeveloper.druwa.DruwaInternalException;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -13,7 +14,9 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.SendEmailForm;
@@ -27,11 +30,14 @@ import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.client.Clients;
+import se.dabox.service.common.ajaxlongrun.AjaxLongOp;
+import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.mailsender.mailtemplate.GetHintedMailTemplateCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.mailsender.mailtemplate.MissingStickyMailTemplateException;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
+import se.dabox.service.webutils.json.JsonExceptionHandler;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
 
@@ -98,6 +104,9 @@ public class SendMailModule extends AbstractWebAuthModule {
         map.put("formLink",
                 cycle.urlFor(SendMailModule.class.getName(), EXECUTE_SENDMAIL_ACTION,
                 strOrgId, strSessionId));
+        map.put("jobUrl", cycle.urlFor(SendMailModule.class, "processJob", strOrgId, strSessionId));
+        map.put("completedUrl", cycle.urlFor(SendMailModule.class, "finishJob", strOrgId,
+                strSessionId));
         map.put("sms", sms);
         map.put("showCancel", sms.getCancelTargetGenerator() != null);
         map.put("receivers", getReceivers(cycle, sms));
@@ -122,6 +131,73 @@ public class SendMailModule extends AbstractWebAuthModule {
         }
 
         return sms.getCancelTargetGenerator().generateTarget(cycle);
+    }
+
+    @WebAction(methods =  HttpMethod.POST)
+    public RequestTarget onProcessJob(RequestCycle cycle, String strOrgId, String strSessionId) {
+        checkOrgPermission(cycle, strOrgId);
+
+        SendMailSession sms = SendMailSession.getFromSession(cycle.getSession(), strSessionId);
+
+        if (sms == null) {
+            return jsonAnswer("status", "selfpage");
+        }
+
+        AjaxSendMailProcessor ajaxProcessor = (AjaxSendMailProcessor) sms.getProcessor();
+
+        SendMailTemplate smt = null;
+        if (!AjaxLongOp.isCommmandCall(cycle)) {
+            DruwaFormValidationSession<SendEmailForm> formsess = getValidationSession(
+                    SendEmailForm.class, cycle);
+
+            if (!formsess.process()) {
+                return jsonAnswer("status", "params");
+            }
+
+            SendEmailForm form = formsess.getObject();
+
+            smt = new SendMailTemplate(form.getSubject(), form.
+                    getBody(), form.getMtype());
+
+            if (StringUtils.isEmpty(form.getBody())) {
+                return jsonAnswer("status", "missingbody");
+            }
+
+            if (!sms.verifySendMail(cycle, smt)) {
+                formsess.transferToViewSession();
+
+                return jsonAnswer("status", "params");
+            }
+        }
+
+        try {
+            return ajaxProcessor.processAjaxRequest(cycle, sms, smt);
+        } catch (DruwaInternalException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            return JsonExceptionHandler.exceptionHandler(cycle, null, ex);
+        }
+    }
+
+    @WebAction
+    public RequestTarget finishJob(RequestCycle cycle, String strOrgId, String strSessionId) {
+        checkOrgPermission(cycle, strOrgId);
+
+        SendMailSession sms = SendMailSession.getFromSession(cycle.getSession(), strSessionId);
+
+        if (sms == null) {
+            return NavigationUtil.toOrgMain(strOrgId);
+        }
+
+        sms.removeFromSession(cycle.getSession());
+
+        RequestTarget target = sms.getCompletedRequestTarget(cycle);
+
+        if (target == null) {
+            throw new IllegalStateException("No completedRequestTarget from SendMailSession");
+        }
+
+        return target;
     }
 
     @WebAction(methods = HttpMethod.POST)
@@ -210,5 +286,12 @@ public class SendMailModule extends AbstractWebAuthModule {
         if (formsess.getDefaultValue(name) == null) {
             formsess.putDefaultValue(name, value);
         }
+    }
+
+    private RequestTarget jsonAnswer(String name, String value) {
+        Map<String,String> map = new Flat3Map<>();
+        map.put(name, value);
+
+        return new JsonRequestTarget(JsonUtils.encode(map));
     }
 }

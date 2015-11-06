@@ -38,6 +38,52 @@ ${cpweb_foot}
     });
     //[/#if]
 
+    //[#if sms.ajaxProcessor]
+    $(function() {
+        $("#submitbutton").click(function() {
+            $("#submitbutton").prop("disabled",true);
+
+            require(['dabox-ajax-longrun-bootstrap','dabox-common'], function(lop) {
+                var jobUrl = "${jobUrl}";
+                var completedUrl = "${completedUrl}";
+
+                lop.guiLongRun(jobUrl, {
+                    "type": "post",
+                    "data": $("#emailform").serializeArray(),
+                    "success": function(data) {
+                        if (data.status === "selfpage") {
+                            window.location.href = window.location.href;
+                            return;
+                        } else if (data.status === "params") {
+                            cocobox.infoDialog("Missing parameters", "Make sure you have written a subject line and a message");
+                            return;
+                        } else if (data.status === "selfpage") {
+                            cocobox.infoDialog("Missing message", "Make sure you have written a message");
+                            return;
+                        } else if (data.status === "partial") {
+                            cocobox.infoDialog("Sendout failed", "Not all emails could be delivered. See roster for more information", function() {
+                                window.location.href = completedUrl;
+                            });
+                            return;
+                        }
+
+                        console.log("Redirecting");
+                        window.location.href = completedUrl;
+                    },
+                    "complete": function() {
+                        console.log("Complete");
+                        $("#submitbutton").prop("disabled",false);
+                    },
+                    "error": cocobox.internal.ajaxError
+                });
+
+            }); //end require
+
+            return false;
+        }); //end click        
+    });
+    //[/#if]
+
 </script>
 
 <script type="text/javascript">
@@ -153,7 +199,7 @@ ${cpweb_foot}
                     [@modal.formParams /]
 
                     [#if !modalMode ]
-                        <button id="submitbutton" tabindex="7" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.sendemail' /]</button>
+                    <button id="submitbutton" tabindex="7" class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.sendemail' /]</button>
                         [#if showCancel]
                         <a href="${helper.urlFor('mail.SendMailModule', 'cancel', [org.id, sms.uuid] )}" tabindex="8" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
                         [/#if]
