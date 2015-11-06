@@ -5,18 +5,21 @@ package se.dabox.cocobox.cpweb.module.project;
 
 import java.util.List;
 import net.unixdeveloper.druwa.RequestCycle;
+import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpwebConstants;
-import se.dabox.cocobox.cpweb.module.core.AbstractModule;
+import se.dabox.cocobox.cpweb.module.mail.AjaxSendMailProcessor;
 import se.dabox.cocobox.cpweb.module.mail.MailSender;
-import se.dabox.cocobox.cpweb.module.mail.SendMailProcessor;
 import se.dabox.cocobox.cpweb.module.project.credit.CpCreditCheck;
 import se.dabox.cocobox.cpweb.module.project.credit.CreditAllocationFailure;
 import se.dabox.cocobox.cpweb.state.SendMailSession;
 import se.dabox.cocobox.cpweb.state.SendMailTemplate;
 import se.dabox.cocobox.cpweb.state.SendMailVerifier;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.ProjectParticipantMailRequest;
+import se.dabox.service.common.ajaxlongrun.AjaxJob;
+import se.dabox.service.common.ajaxlongrun.AppBackgroundAjaxLongOp;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -27,7 +30,10 @@ import se.dabox.util.collections.Transformer;
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
-public class ProjectSendMailProcessor implements SendMailProcessor, SendMailVerifier {
+public class ProjectSendMailProcessor implements AjaxSendMailProcessor, SendMailVerifier {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ProjectSendMailProcessor.class);
+    
     private static final long serialVersionUID = 2L;
     private final long projectId;
     private final long orgId;
@@ -40,20 +46,7 @@ public class ProjectSendMailProcessor implements SendMailProcessor, SendMailVeri
     @Override
     public void processSendMail(RequestCycle cycle, SendMailSession session,
             SendMailTemplate template) {
-        CocoboxCoordinatorClient ccbc =
-                AbstractModule.getCocoboxCordinatorClient(cycle);
-
-        long userId = LoginUserAccountHelper.getUserId(cycle);
-
-        ProjectParticipantMailRequest req =
-                new ProjectParticipantMailRequest(userId, projectId, "dws/mail-template", template.
-                getSubject(), template.getBody());
-
-        for (Object object : session.getExtraDatas()) {
-            req.addParticipationId((Long)object);
-        }
-
-        ccbc.sendProjectParticipantMail(req);
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
@@ -87,6 +80,33 @@ public class ProjectSendMailProcessor implements SendMailProcessor, SendMailVeri
 
         cycle.getSession().setFlashAttribute(CpwebConstants.CREDIT_ALLOC_FLASH, failures);
         return false;
+    }
+
+    @Override
+    public RequestTarget processAjaxRequest(RequestCycle cycle, SendMailSession sms,
+            SendMailTemplate smt) {
+        return new AppBackgroundAjaxLongOp<Integer, ProjectSendMailJob>() {
+            @Override
+            public ProjectSendMailJob createBackgroundTask() {
+                long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+                return new ProjectSendMailJob(projectId, orgId, caller, smt, sms.getReceivers(), sms.
+                        getExtraDatas(), cycle.getApplication());
+            }
+
+            @Override
+            protected RequestTarget completeResponse(RequestCycle cycle,
+                    AjaxJob<Integer> job) {
+
+                int failures = job.getResult();
+
+                if (failures > 0) {
+                    LOGGER.warn("{} email sendout failures");
+                    return new JsonRequestTarget("{\"status\": \"partial\"}");
+                }
+
+                return new JsonRequestTarget("{\"status\": \"ok\"}");
+            }
+        }.process(cycle);
     }
 
 }

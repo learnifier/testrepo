@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.mail;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import net.unixdeveloper.druwa.DruwaInternalException;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -13,7 +14,9 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.SendEmailForm;
@@ -28,11 +31,13 @@ import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ajaxlongrun.AjaxLongOp;
+import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.mailsender.mailtemplate.GetHintedMailTemplateCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.mailsender.mailtemplate.MissingStickyMailTemplateException;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
+import se.dabox.service.webutils.json.JsonExceptionHandler;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
 
@@ -135,19 +140,18 @@ public class SendMailModule extends AbstractWebAuthModule {
         SendMailSession sms = SendMailSession.getFromSession(cycle.getSession(), strSessionId);
 
         if (sms == null) {
-            throw new IllegalStateException("Sendmail session not available");
+            return jsonAnswer("status", "selfpage");
         }
 
         AjaxSendMailProcessor ajaxProcessor = (AjaxSendMailProcessor) sms.getProcessor();
 
         SendMailTemplate smt = null;
-        if (AjaxLongOp.isCommmandCall(cycle)) {
+        if (!AjaxLongOp.isCommmandCall(cycle)) {
             DruwaFormValidationSession<SendEmailForm> formsess = getValidationSession(
                     SendEmailForm.class, cycle);
 
             if (!formsess.process()) {
-                return new WebModuleRedirectRequestTarget(SendMailModule.class,
-                        VIEW_SENDMAIL_ACTION, strOrgId, strSessionId);
+                return jsonAnswer("status", "params");
             }
 
             SendEmailForm form = formsess.getObject();
@@ -156,19 +160,23 @@ public class SendMailModule extends AbstractWebAuthModule {
                     getBody(), form.getMtype());
 
             if (StringUtils.isEmpty(form.getBody())) {
-                return new WebModuleRedirectRequestTarget(SendMailModule.class,
-                        VIEW_SENDMAIL_ACTION, strOrgId, strSessionId);
+                return jsonAnswer("status", "missingbody");
             }
 
             if (!sms.verifySendMail(cycle, smt)) {
                 formsess.transferToViewSession();
 
-                return new WebModuleRedirectRequestTarget(SendMailModule.class,
-                        VIEW_SENDMAIL_ACTION, strOrgId, strSessionId);
+                return jsonAnswer("status", "params");
             }
         }
 
-        return ajaxProcessor.processAjaxRequest(cycle, sms, smt);
+        try {
+            return ajaxProcessor.processAjaxRequest(cycle, sms, smt);
+        } catch (DruwaInternalException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            return JsonExceptionHandler.exceptionHandler(cycle, null, ex);
+        }
     }
 
     @WebAction
@@ -278,5 +286,12 @@ public class SendMailModule extends AbstractWebAuthModule {
         if (formsess.getDefaultValue(name) == null) {
             formsess.putDefaultValue(name, value);
         }
+    }
+
+    private RequestTarget jsonAnswer(String name, String value) {
+        Map<String,String> map = new Flat3Map<>();
+        map.put(name, value);
+
+        return new JsonRequestTarget(JsonUtils.encode(map));
     }
 }

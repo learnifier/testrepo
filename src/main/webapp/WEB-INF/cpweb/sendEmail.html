@@ -43,23 +43,44 @@ ${cpweb_foot}
         $("#submitbutton").click(function() {
             $("#submitbutton").prop("disabled",true);
 
-            require(['dabox-ajax-longrun-bootstrap'], function(lop) {
+            require(['dabox-ajax-longrun-bootstrap','dabox-common'], function(lop) {
                 var jobUrl = "${jobUrl}";
                 var completedUrl = "${completedUrl}";
 
                 lop.guiLongRun(jobUrl, {
                     "type": "post",
+                    "data": $("#emailform").serializeArray(),
                     "success": function(data) {
+                        if (data.status === "selfpage") {
+                            window.location.href = window.location.href;
+                            return;
+                        } else if (data.status === "params") {
+                            cocobox.infoDialog("Missing parameters", "Make sure you have written a subject line and a message");
+                            return;
+                        } else if (data.status === "selfpage") {
+                            cocobox.infoDialog("Missing message", "Make sure you have written a message");
+                            return;
+                        } else if (data.status === "partial") {
+                            cocobox.infoDialog("Sendout failed", "Not all emails could be delivered. See roster for more information", function() {
+                                window.location.href = completedUrl;
+                            });
+                            return;
+                        }
+
+                        console.log("Redirecting");
                         window.location.href = completedUrl;
                     },
                     "complete": function() {
+                        console.log("Complete");
                         $("#submitbutton").prop("disabled",false);
-                    }
+                    },
+                    "error": cocobox.internal.ajaxError
                 });
 
             }); //end require
 
-        }); //end click
+            return false;
+        }); //end click        
     });
     //[/#if]
 
