@@ -1,0 +1,128 @@
+[#ftl strip_text="true" /]
+
+[#import "inc_commonError.ftl" as ce /]
+
+[#assign valid = result.moveError.type == "ok" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script>
+require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+    modalClient.setButtons(
+            [
+                //[#if valid]
+                {
+                    text: "Move",
+                    cssClass: "btn-primary",
+                    id: "moveButton",
+                    prepareButton: function(button) {
+                        button.attr("data-loading-text", "Moving...");
+                    },
+                    action: function (dlg) {
+                        $(this).button('loading');
+                        $("#executeForm").submit();
+                    }
+                },
+                //[/#if]
+                {
+                    text: "Cancel",
+                    cssClass: "btn-cancel",
+                    action: function (dlg) {
+                        dlg.cancel();
+                    }
+                }
+            ]
+        );
+});
+</script>
+
+[#if valid]
+
+<div class="hidden">
+    <form action="${formUrl}" method="post" id="executeForm">
+            <input type="hidden" id="targetProjectId" name="targetProjectId" value="${targetProjectId?c}"/>
+            [@modal.formParams /]
+        </form>
+</div>
+
+[/#if]
+
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot title="Confirm move"]
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Confirm move</h1>
+        </div>
+    </div>
+
+    [#if valid]
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert">Verification successful</div>
+        </div>
+    </div>
+    [#else]
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">${ce.errorMessage()?xml}</div>
+        </div>
+    </div>
+
+
+        [#if result.productErrors?size > 0]
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger" role="alert">
+                    There was problems with the following products
+                    <ul class="list-group">
+                        [@ce.productErrors /]
+                    </ul>
+                </div>
+            </div>
+        </div>
+        [/#if]
+    [/#if]
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                The project you try to move are <mark>${(result.similarity*100)?round}%</mark> similar.
+            </p>
+        </div>
+    </div>
+
+    [#if deletedList?size != 0]
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                The learner will no longer have access to the following products since they are not
+                used in the selected project.
+            </p>
+            <p>
+                Any associated progress and information about the following products will be removed.
+                It will <strong>NOT</strong> be possible to recover that information afterwards.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="list-group">
+                [#list deletedList as deleted]
+                <li class="list-group-item">
+                    [#if progressSet?seq_contains(deleted.id)]<span class="badge">Progress is recorded</span>[/#if]
+                    ${deleted.title?xml} [@common.materialProductId deleted /]
+                </li>
+                [/#list]
+            </ul>
+        </div>
+    </div>
+    [/#if]
+
+</div>
+[/@dws.skin]

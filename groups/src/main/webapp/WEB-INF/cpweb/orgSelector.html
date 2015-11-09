@@ -1,0 +1,27 @@
+[#ftl strip_text="true" /]
+
+[@dws.skin skin="bootstrap_barebone" menu=menu head=cpweb_head foot=foot orgName=""]
+
+<div class="container-fluid">
+    <div class="row">
+<div class="col-md-12">
+    <div class="text-center" style="margin-top: 50px;">
+        <h1 style="margin-bottom: 50px;">Client selection</h1>
+        [#list orgs as org]
+        <div class="col-md-6">
+            <a href="${helper.urlFor('CpMainModule','home',[org.orgId])}">
+                <img src="${org.logo!cocoboxCdn +'/cocobox/img/cp/no-image.jpg'}" style="max-width: 234px; max-height: 60px;" />
+                <h1 title="${infoHelper.getMiniOrgInfo(org.orgId).displayName}">[@common.trunc str=infoHelper.getMiniOrgInfo(org.orgId).displayName maxLen=20 /]</h1>
+            </a>
+        <hr>
+        </div>
+        [/#list]
+      
+        
+        </div>
+</div>
+        </div>
+</div>
+
+
+[/@dws.skin]

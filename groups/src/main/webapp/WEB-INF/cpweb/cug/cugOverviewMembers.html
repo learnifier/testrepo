@@ -1,0 +1,81 @@
+[#ftl strip_text="true" /]
+
+[#import "cugOverviewMenu.html" as cugMenu]
+
+[#assign cpweb_foot ]
+    ${cpweb_foot}
+    <script>
+        $('#menu-cugs').addClass('active');
+
+        var spinnerUrl = "[@common.spinnerUrl /]";
+        var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
+        var userOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
+
+        var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[org.id, cug.groupId])}";
+
+        require(["${contextPath}/js/cug/cugMembersOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+           //No initialization needed
+        });
+        function addMemberListener() {
+          require(['dabox-common', 'dabox-jquery'], function() {
+            cocobox.longOp();
+            $(".save").cocobox('inputBlock');
+          });
+          return true;
+        }
+
+    </script>
+
+[/#assign]
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<section id="cugoverview">
+    [#include "cugInfo.html" /]
+    
+    
+    [@cugMenu.cugOverviewMenu selected="members"][/@cugMenu.cugOverviewMenu]
+    
+    [#if portalSecurity.hasPermission("CP_EDIT_USER")]
+    [#global formPrefix="cpweb" /]
+    <form action="${helper.urlFor('cug.ClientUserGroupModule','addMember',[org.id?c, cug.groupId?c])}" name="addMemberForm" id="addMemberForm" method="post" onsubmit="return addMemberListener()">
+        <div class="row">
+        <div class="col-xs-3">
+            [@bsform.inputEmail name="memberemail" tabindex="4" maxlength="96" /]
+        </div>
+        </div>
+        <div class="row">
+        <div class="col-xs-3">
+            <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add User</button>
+        </div>
+        </div>
+    </form>
+    [/#if]
+
+    
+    <section class="ccb-table-list-actions">
+        [#if portalSecurity.hasPermission("CP_EDIT_USER")]
+        <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#cugmembersform'), 'removeMembers', '${ctext("cpweb.cug.members.remove.title")?js_string}', '${ctext("cpweb.cug.members.remove.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+        [/#if]
+    </section>
+
+    <form method="post" id="cugmembersform" action="${helper.urlFor('cug.MemberOpsModule','memberOps', [org.id?c, cug.groupId?c])}">
+        [@bsform.listformFields /]
+        <span>Members</span>
+        
+        <table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listcugs">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </form>
+</section>
+[/@dws.skin]
+

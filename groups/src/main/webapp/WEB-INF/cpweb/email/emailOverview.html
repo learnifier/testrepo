@@ -1,0 +1,106 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-emailtemplates').addClass('active');
+</script>
+
+
+[#import "/se/dabox/services/dwsfu/ckeditor4.ftl" as ck /]
+
+[@ck.ckeditorScriptTags /]
+[@ck.initCkeditorReadOnly target="#body" /]
+
+<script type="text/javascript">
+    $(function() {
+
+        require(['dabox-common'], function() {
+
+        $("#emailform").submit(function(event) {
+            var body = $('#body');
+            body.ckeditorGet().updateElement();
+
+            if (body.val().length === 0) {
+                    cocobox.errorDialog('No email content', 'The email body cannot be empty.');
+                    event.stopPropagation();
+                    return false;
+                }
+            });
+
+            $('#deleteBtn').click(function () {
+                cocobox.confirmationDialog("Delete email template", "Do you want to delete this email template?", function () {
+                    $('#deleteForm').submit();
+                });
+                return false;
+            });
+
+        });
+    });
+
+</script>
+[/#assign]
+
+[#assign head]
+${cpweb_head}
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<section class="ccb-page-header">
+    <div class="ccb-page-header__info">
+        <p class="page-title-label">Email Template</p>
+        <h1 class="page-title">${template.name?xhtml}</h1>
+        <ul class="page-created-updated__wrapper list-inline">
+            <li>
+                <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail template.createdBy!-1 /]<span data-toggle="tooltip" data-placement="top" title="${(template.created?datetime?string.full)!''}">${(template.created?date?string.full)!''}</span></p>
+            </li>
+            <li>
+                <p class="page-updated-label">Updated</p><p class="page-updated">[@userNameAndEmail template.updatedBy!-1 /] <span data-toggle="tooltip" data-placement="top" title="${(template.updated?datetime?string.full)!''}">${(template.updated?date?string.full)!''}</span></p>
+            </li>
+        </ul>
+    </div>
+    <div class="ccb-page-header__actions">
+        [@portalSecurity.permissionBlock permission="CP_COPY_EMAIL"]
+        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id,'t'])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-flash"></span> Copy to New</button>
+        </form>
+        [/@]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
+        <form action="${helper.urlFor('MailModule','edit',[org.id, template.id])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit Settings</button>
+        </form>
+        [/#if]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_EDIT_EMAIL")]
+        <form action="${helper.urlFor('MailModule','editor',[org.id, template.id])}" method="get">
+            <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit Email</button>
+        </form>
+        [/#if]
+        [#if !template.stickyCheck && portalSecurity.hasPermission("CP_DELETE_EMAIL")]
+        <form action="${helper.urlFor('MailModule','delete',[org.id, template.id])}" method="get" id="deleteForm">
+            <button type="submit" id="deleteBtn" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </form>
+        [/#if]
+    </div>
+    <div class="ccb-page-header__details">
+        <ul>
+            <li><span class="row-label">Description</span><span class="row-setting">${template.description!''?xhtml}</span></li>
+            <li><span class="row-label">Origin</span><span class="row-setting">[@dws.txt key="cpweb.emailoverview." + template.sticky?string!""  /]</span></li>
+            <li><span class="row-label">Language</span><span class="row-setting">${template.locale.getDisplayName(userLocale)?xhtml}</span></li>
+        </ul>
+    </div>
+</section>
+
+<h2>Email template preview</h2>
+<section id="emailcontent">
+    <p>
+        <span><strong>Subject: </strong></span>
+        <span class="subject"> ${(template.subject!'')?xhtml}</span>
+    </p>
+     <p><strong>Body</strong></p>
+    <textarea id="body" contenteditable="true" disabled="disabled">${(template.mainContent!'')?xhtml}</textarea>
+</section>
+
+[/@dws.skin]
+

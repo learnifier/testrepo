@@ -1,0 +1,285 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+${cpweb_head}
+
+<!--[if lt IE 9]>
+<style>
+
+.toggle-button input {
+    position: static; !important
+}
+
+</style>
+
+
+<![endif]-->
+[/#assign]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+
+<script id="setExpirationDialogTemplate" type="text/x-jsrender"> 
+    <div id="setExpirationDialog" title="Set Standard Expiration ">
+        <p>Set the standard time for expirations in this project. Expiration will start counting downwards once the participants has been activated.</p>
+        <input id="expirationToggleSetter" type="number" />
+
+    </div>
+</script>
+
+<script>
+    
+    "use strict";
+    $('#menu-projects').addClass('active');
+
+    var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
+
+    cpweb.editable($('#language .editable-content'), 
+    $('#language .edit '),
+    function(value){},
+    {'type': 'select',
+        'url': settingsUrl,
+        'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
+        'pk': 'locale',
+        'value': "${prj.locale.toLanguageTag()}"
+    });
+
+    cpweb.editable($('#country .editable-content'),
+    $('#country .edit '),
+    function(value){},
+    {type: 'select',
+        'url': settingsUrl,
+        'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
+        'pk': 'country',
+        'value': "${prj.country.toLanguageTag()}"
+    });
+    
+    cpweb.editable($('#timezone .editable-content'),
+    $('#timezone .edit '),
+    function(value){},
+    {type: 'select',
+        'url': settingsUrl,
+        'source': "${helper.urlFor('project.ProjectJsonModule','listTimeZones',[prj.projectId])}",
+        'pk': 'timezone',
+        'value': "${prj.timezone.ID?js_string}"
+    });
+    
+    cpweb.editable($('#expiration .editable-content'),
+    $('#expiration .edit '),
+    function(value){},
+    {type: 'text',
+        'url': settingsUrl,
+        'pk': 'participationexpiration',
+        'value': "${((prj.defaultParticipationExpiration/86400000)?c)!''}"
+    });
+
+
+
+    $(function(){
+        require(['dabox-common', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function() {
+            //cocobox.setlist.expandableList('#settingsList');
+        });
+    });
+
+    var setIcal = function(autoIcal, sendUpdates) {
+        $("#meeting-maker-cb").bootstrapToggle('disable');
+        $.ajax({
+            type: 'POST',
+            url: "${helper.urlFor('project.ProjectJsonModule','setAutoIcalStatus',[prj.projectId])}",
+            data: {autoical: autoIcal, sendUpdates: sendUpdates},
+            success: function(data) {
+                $("#meeting-maker-cb").bootstrapToggle('enable');
+                $("#meeting-maker-cb").bootstrapToggle(autoIcal ? 'on' : 'off');
+                log(data);
+            },
+            complete: function() {
+                $("#meeting-maker-cb").bootstrapToggle('enable');
+            }
+        });
+    };
+
+    var setSocial = function(socialSetting) {
+
+        $.ajax({
+            type: 'POST',
+            url: "${helper.urlFor('project.ProjectJsonModule','setSocialSetting',[prj.projectId])}",
+            data: {enabled: socialSetting},
+            success: function(data) {
+                $('#socialfeatures-cb').bootstrapToggle('enable');
+                $('#socialfeatures-cb').bootstrapToggle(socialSetting ? 'on' : 'off');
+            },
+            complete: function() {
+                $('#socialfeatures-cb').bootstrapToggle('enable');
+            }
+        });
+    };
+
+    //onload and require is important. This code must run after toggle buttons are initialized
+    $(function() {
+        require(['bootstrap/toggle'], function() {
+
+            $('#meeting-maker-h').next().on('click', function(ev, st) {
+                var clicked = !$("#meeting-maker-cb").prop("checked");
+
+                if(clicked) {
+                    cocobox.confirmationDialog(
+                    'Turning calendar invitations ON',
+                    'As you turn this feature on, all participants will automatically receive calendar invitations via email, both as events are added, updated and deleted.' ,
+                    function() {
+                        setIcal(true, false);
+                    }
+                    );
+                } else {
+                    cocobox.confirmationDialogYesNo(
+                        'Turning calendar invitations OFF',
+                                        'Do you want to send cancellations to previously sent calendar invitations?',
+                                    function () {
+                                        //log('Send cancels');
+                                        setIcal(false, true);
+                                    },
+                                    function () {
+                                        //log('No cancels');
+                                        setIcal(false, false);
+                                    }
+                            );
+                }
+
+                return false;
+            });
+
+                $('#socialfeatures-h').next().on('click', function (ev) {
+                    $('#socialfeatures-cb').bootstrapToggle('disable');
+                    setSocial(!$("#socialfeatures-cb").prop("checked"));
+                    return false;
+                });
+            });
+    });
+    
+    $('#expirationtoggle-false').click(function() {
+        $.ajax({
+            type: "POST",
+            url: settingsUrl,
+            data: {
+                pk: 'participationexpiration',
+                value: 0
+            }
+        });
+    });
+    
+    $('#expirationtoggle-true').click(function() {
+        require(['jsrender'], function() {
+            $('body').append($('#setExpirationDialogTemplate').render());
+
+            $('#setExpirationDialog').dialog({
+                title: "Set expiration",
+                buttons: {
+                    "Set": function() {
+                        $.ajax({
+                            type: "POST",
+                            url: settingsUrl,
+                            data: {
+                                pk: 'participationexpiration',
+                                value: $('#expirationToggleSetter').val()
+                            }, 
+                            success: function() {
+                                $('#setExpirationDialog').dialog('close');
+                                window.location.reload(); 
+                            }
+                        });
+                    }
+                }
+            });
+        });
+        
+    });
+</script>
+
+[/#assign]
+
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="settings"][/@pInfo.projectInfo]
+
+<section class="ccb-expandable-list">
+<div id="settingsList">
+    <ul>
+        [@dwsrt.feature feature="autoical"]
+        [#-- Only for Course design projects --]
+        [#if prj.type.ptype == 2]
+        <li id="meeting-maker">
+            <a class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
+                [@bsform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
+            </a>
+        </li>
+        [/#if]
+        [/@dwsrt.feature]
+
+        <li id="language">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.language.title" /]</span>
+                <span class="short editable-content">${prj.locale.getDisplayName(userLocale)?xhtml}</span>
+            </span>
+        </li>
+        <li id="country">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.country.title" /]</span>
+                <span class="short editable-content">${prj.country.getDisplayCountry(userLocale)?xhtml}</span>
+            </span>
+        </li>
+        <li id="timezone">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.timezone.title" /]</span>
+                <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
+            </span>
+        </li>
+        
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <li id="expiration">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
+                <span class="short editable-content">${(prj.defaultParticipationExpiration/86400000)!'Click to set expiration'}</span>
+            </span>
+        </li>
+        [/@]
+        
+        
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <li id="expirationtoggle">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.expirationtoggle.title" /]</span>
+                [#if prj.defaultParticipationExpiration??]
+                    [#if prj.defaultParticipationExpiration?c?number?c?number > 0]
+                        [#assign expirationtoggleActive = "true" /]
+                    [#else] 
+                        [#assign expirationtoggleActive = "false" /]
+                    [/#if]
+                [/#if]
+
+                [@bsform.inputBoolean 'expirationtoggle' 'Expiration' 'ON' 'OFF' expirationtoggleActive session=formsess /]
+            </span>
+        </li>
+        [/@]
+        
+
+        [@dwsrt.feature feature="social"]
+        [#-- Only for Course design projects --]
+        [#if prj.type.ptype == 2]
+        <li id="socialfeatures">
+            <a class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
+                [@bsform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
+            </a>
+        </li>
+        [/#if]
+        [/@dwsrt.feature]
+    </ul>
+</div>
+    </section>
+
+[/@dws.skin]
+

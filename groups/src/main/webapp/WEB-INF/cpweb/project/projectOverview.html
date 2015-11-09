@@ -1,0 +1,297 @@
+[#ftl strip_text="true" /]
+
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#menu-projects').addClass('active');
+            require(['Chart'], function() {
+            var chartAnimation = false;
+                    if (Modernizr.canvas === true) {
+            chartAnimation = true;
+            }
+            var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
+                    pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);
+            });
+            require(['dataTables-bootstrap', 'dabox-common', 'dataTables-responsive'], function() {
+
+            var oTable = $('#userroleslist').dataTable({
+            "dom": '<"row"<"col-sm-12"rt>>',
+                    "paging": false,
+                    "columnDefs": [
+                    {
+                    "targets": [ 0 ],
+                            "width": "32",
+                            "orderable": false,
+                            "className": "userimage",
+                            "data": function(row, type, set) {
+                            if (!row.thumbnailDisplay) {
+                            row.thumbnailDisplay = '<img class="userimage" src="' + row.thumbnail + '"/>';
+                            }
+                            if (type === 'display') {
+                            return row.thumbnailDisplay;
+                            } else if (type === 'filter') {
+                                return null;
+                            } else if (type === 'sort') {
+                                return row.thumbnailDisplay;
+                            } else {
+                            //Anything else and raw row
+                            return row.thumbnailDisplay;
+                            }
+                            }
+                    },
+                    {
+                    "targets": [ 1 ],
+                            "width": "500",
+                            "orderable": false,
+                            "data": function(row, type, set) {
+                            if (!row.displayNameDisplay) {
+                                var dName = row.displayName;
+                                var data = '';
+                                if (dName.length < 2) {
+                                    dName = row.email;
+                                }
+                            data = '<p class="team-members__name" title="' + dName + '">' + cocobox.trunc(dName, 20) + '</p>';
+                                    [#if security.hasPermission("BO_EDIT_USER")]
+                                    for (var i = 0; i < row.roles.length; i++) {
+                            data += '<span class="team-members__role">' + row.roles[i].roleName + ' <a onclick="deleteMember(\'' + row.roles[i].role + '\',\'' + row.roles[i].deleteRoleLink + '\',\'' + row.userId + '\')"><span class="glyphicon glyphicon-remove-sign"></span></a></span>';
+                            }
+                            row.displayNameDisplay = data;
+                                    [#else]
+                                    row.displayNameDisplay = data;
+                                    [/#if]
+                                    }
+                                    if (type === 'display') {
+                                    return row.displayNameDisplay;
+                                    } else if (type === 'filter') {
+                                    return row.displayName;
+                                    } else if (type === 'sort') {
+                                    return row.displayName;
+                                    } else {
+                                    //Anything else and raw row
+                                    return row.displayName;
+                                    }
+                                    }
+                                    }
+                                    ],
+                                    "ajax": "${helper.urlFor('project.ProjectJsonModule','listProjectRoleUsers',[prj.projectId])}",
+                                    "language": {
+                                    "emptyTable": "<span class='emptytable'>There are no team members in this project</span>",
+                                            "loadingRecords": "<p>Loading team members...</p><img src='[@common.spinnerUrl /]' />"
+                                    }
+                     });
+                        });
+                            function deleteMember(role, deleteLink, userId) {
+                            var data = {"userId": userId, "role": role};
+                                    $.post(deleteLink, data, function() {
+                                    $("#userroleslist").DataTable().ajax.reload();
+                                    });
+                            };</script>
+
+<form id="deleteRoleForm" method="POST" action="">
+    <input type="hidden" id="delUserId" name="userId" />
+    <input type="hidden" id="delRole" name="role" />
+</form>
+[#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+<script>
+    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
+        f.startSingleFlirt('${prj.newsFlirtId}', {
+            templates: {
+                emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
+            }
+        });
+        
+        f.startSingleFlirt('${prj.flirtId}', {
+            templates: {
+                emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
+                    header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
+            },
+            success: function(data) {
+                var len = data.posts.length;
+                for (var i = 0; i < len; i++) {
+                    var post = data.posts[i];
+                    if (typeof activityNames === "undefined") {
+                        continue;
+                    }
+
+                    if (!activityNames[post.tag]) {
+                        continue;
+                    }
+                    post.activityName = activityNames[post.tag].name;
+                }
+                $('.ccb-flirt-addpost textarea').focus(function() {
+                    $(this).height(80);
+                });
+            }
+        });
+    });
+</script>
+[/#if]
+<script>
+    $(function () {
+        $("#addTeamMemberButton").click(function () {
+        require(["[@modal.javascript /]"], function(modal) {
+            modal.open({
+                src: "${helper.urlFor('project.ProjectModule','roles',[prj.projectId])}",
+                height: "450px",
+                cssClass: "modal-lg",
+                title: "Add team member",
+                cancel: function () { /* Do nothing*/
+                },
+                cancelUrl: window.location.href,
+                proceedUrl: window.location.href,
+                proceed: function(dlg) {
+                    $("#userroleslist").DataTable().ajax.reload();
+                    dlg.close();
+                }
+            });
+        });
+            return false;
+        });
+    })
+</script>
+
+[/#assign]
+
+[#assign cpweb_head]
+${cpweb_head}
+<!--[if lte IE 8]>
+    <script src="${cocoboxCdn}/cocobox/js/excanvas/excanvas.compiled.js"></script>
+<![endif]-->
+[/#assign]
+
+
+
+[#assign projectDetailsSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId]) /]
+
+[@bsform._onreadyJavascript]
+
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
+cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
+cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
+
+cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
+{type: 'select',
+source: [
+{value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
+{value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
+{value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
+]
+}
+);
+
+[/@]
+[/@bsform._onreadyJavascript]
+
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
+
+<article id="ccb-page-projectOverview">
+
+    <div class="col-md-8">
+    <div class="ccb-flat-card ccb-flat-card--colored">
+        <section class="container-fluid clearfix">
+            <div class="row project-status-wrapper">
+                <div class="col-xs-12 col-sm-6">
+                    <span id="prj-ch-total"></span> participants
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="project-status__wrapper">
+                        <span class="project-status__label">Status</span>
+                        <span class="project-status__info" id="project-status"><span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="status" data-value="${prj.status}">${ctext("project.status."+prj.status)?xhtml}</span>[#include "projectEditLabel.html" /]</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row prj-charts-wrapper">
+                    <div class="col-sm-12 col-md-4 prj-charts clearfix">
+                        <div class="prj-ch-wrapper">
+                            <canvas id="prj-ch-status" width="125" height="125"></canvas>
+                            <div class="ch-number-div"><p id="prj-ch-status-sum"></p></div>
+                        </div>
+                        <table>
+                            <tr id="prj-ch-status-invited"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Not Started</td></tr>
+                            <tr id="prj-ch-status-inprogress"><td><span class="badge chart-data okOrangeBackgroundColor"></span>In Progress</td></tr>
+                            <tr id="prj-ch-status-completed"><td><span class="badge chart-data happyGreenBackgroundColor"></span>Completed</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-sm-12 col-md-4 prj-charts clearfix">
+                        [#if prj.type.ptype == 2]
+                        <div class="prj-ch-wrapper">
+                            <canvas id="prj-ch-overdue" width="125" height="125"></canvas>
+                            <div class="ch-number-div"><p id="prj-ch-overdue-sum"></p></div>
+                        </div>
+                        <table>
+                            <tbody>
+                                <tr id="prj-ch-overdue-ontrack"><td><span class="badge chart-data happyGreenBackgroundColor"></span>On Track</td></tr>
+                                <tr id="prj-ch-overdue-overdue"><td><span class="badge chart-data troubleRedBackgroundColor"></span>Overdue</td></tr>
+                            </tbody>
+                        </table>
+                        [/#if]
+                    </div>
+                    <div class="col-sm-12 col-md-4  prj-charts clearfix">
+                        <div class="prj-ch-wrapper">
+                                <div id="prj-action-needed"></div>
+                        </div>
+                        <table>
+                            <tbody>
+                                <tr id="prj-ch-notinvited"><td><span class="badge chart-data"></span>Not Invited</td></tr>
+                                <tr id="prj-ch-bounced"><td><span class="badge chart-data"></span>Bounce Backs</td></tr>
+                                <tr id="prj-ch-inerror"><td><span class="badge chart-data"></span>Project Errors</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="prj-notes">
+                    <p><strong>Note</strong></p>
+                    <span class="setting clearfix" id="project-desc">
+                        <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="note">${prj.note!""?xhtml}</span>
+                        [#include "projectEditLabel.html" /]
+                    </span>
+                </div>
+            </section>
+        </div>
+        [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+        <section class="project-flirt-section">
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-comment"></span>Discussions</h3>
+            <div data-flirtid="${prj.flirtId}" class="ccb-flirt"></div>
+
+        </section>
+        [/#if]
+    </div>
+    <div class="col-md-4">
+        <section class="">
+            [@portalSecurity.permissionBlock permission="CP_ASSIGN_PROJECT_ROLE"]
+            <button type="button" class="btn btn-primary-outlined btn-sm pull-right" id="addTeamMemberButton">
+                <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
+            </button>
+            [/@]
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Team Members</h3>
+            <table class="table ccb-table dt-responsive team-members" width="100%" id="userroleslist">
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+
+        <div style="display: none">
+            <form id="deleteRoleForm" method="POST" action="">
+                <input type="hidden" id="delUserId" name="userId" />
+                <input type="hidden" id="delRole" name="role" />
+            </form>
+        </div>
+        [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
+        <section class="project-flirt-section">
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-bullhorn"></span>Announcements</h3>
+            <div data-flirtid="${prj.newsFlirtId}" class="ccb-flirt"></div>
+        </section>
+        [/#if]
+    </div>
+
+</article>
+[/@dws.skin]
+

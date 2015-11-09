@@ -1,0 +1,39 @@
+[#ftl strip_text="true" /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-emailtemplates').addClass('active');
+</script>
+[/#assign]
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.edittemplatesettings.title" /></h1>
+
+[#global formPrefix="cpweb.edittemplatesettings" /]
+<form action="${formLink}" name="newMaterial" method="post" enctype="multipart/form-data">
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
+    [@bsform.inputText name="name" class="input_full"  tabindex="1" /]
+
+    [@bsform.textarea name="description" tabindex="2" /]
+
+    [#assign defaultValue = formsess.getDefaultValue('lang')!'' /]
+    [@bsform.select name="lang" class="input_full" tabindex="3"]
+    [#list emailLocales as emailLocale]
+            [@bsform.option value=emailLocale.id defaultValue=defaultValue]${emailLocale.name?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
+
+    [@bsform.infosection]
+    [/@bsform.infosection]
+    <input type="hidden" name="orgId" value="${org.id}" />
+    <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.saveemailsettings' /></button>
+    <a href="${helper.urlFor('MailModule','overview',[org.id, template.id])}"  class="btn btn-default" tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+
+</form>
+
+[/@dws.skin>

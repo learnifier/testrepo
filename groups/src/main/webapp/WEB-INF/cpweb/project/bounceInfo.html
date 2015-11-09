@@ -1,0 +1,31 @@
+[#ftl strip_text="true" /]
+
+[#macro bRenderer ]
+
+<script id="bounceinfo" type="text/x-jsrender">
+    [#noparse]
+    <div class="bouncedialog" id="bouncedialog{{>bounceId}}"  title="Bounce back message">
+        <h1>Bounce back message</h1>
+
+        <div class="itemdetails">
+            <ul>
+                <li><span>Project: </span><span class="setting clearfix">{{>projectName}}</span></li>
+                <li><span>Bounce back time: </span><span class="setting clearfix">{{>bounceDateStr}}</span></li>
+            </ul>
+        </div>
+
+        <h2>Technical description</h2>
+        <pre>{{>techMessage}}</pre>
+
+        <a href="#" onclick="$('#techMessageExtended').slideToggle(); return false;">More detailed technical information</a>
+        <pre id="techMessageExtended" style="display:none;">
+            <h2>Extended Technical description</h2>
+            {{>techMessageExtended}}
+        </pre>
+
+    </div>
+    [/#noparse]
+
+</script>
+
+[/#macro]

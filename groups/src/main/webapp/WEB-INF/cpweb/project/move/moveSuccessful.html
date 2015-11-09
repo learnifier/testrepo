@@ -1,0 +1,47 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script>
+require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+    modalClient.setButtons(
+            [
+                {
+                    text: "Close",
+                    cssClass: "btn-cancel",
+                    id: "closeButton",
+                    action: function (dlg) {
+                        $("#targetForm").submit();
+                    }
+                }
+            ]
+        );
+});
+</script>
+
+
+<div class="hidden">
+    <form action="${targetProjectUrl}" method="get" id="targetForm" target="_top"></form>
+</div>
+
+<script>
+    $(function() {
+        $("#targetForm").submit();
+    });
+</script>
+
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot title="Confirm move"]
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Move successful</h1>
+        </div>
+    </div>
+
+</div>
+[/@dws.skin]

@@ -1,0 +1,207 @@
+[#ftl strip_text="true" /]
+
+[#import "/material/materialsMenu.html" as mMenu /]
+
+[#assign head]
+${cpweb_head}
+[/#assign]
+
+
+[#assign pagetitle='gridMaterials' /]
+
+[#assign foot]
+${cpweb_foot}
+
+<script id="video-partial" type="text/x-handlebars-template">
+    <div class="video">
+        <p class="title">{{title}}</p>
+    </div>
+</script>
+
+<script id="audio-partial" type="text/x-handlebars-template">
+    <div class="audio">
+        <p class="title">{{title}}</p>
+    </div>
+</script>
+
+<script id="file-partial" type="text/x-handlebars-template">
+    <div class="file">
+        <p class="title">{{title}}</p>
+    </div>
+</script>
+
+<script id="general-partial" type="text/x-handlebars-template">
+    <div class="general">
+        <p class="title">{{title}}</p>
+    </div>    
+</script>
+
+
+<script id="grid-entry-template" type="text/x-handlebars-template">
+    
+    <div id="grid-entries">
+        <div class="grid-entry" data-index="{{@index}}" data-type="{{type}}" data-materialtype="{{materialType}}">
+            <div class="body" style="background-image: url('{{thumbnailx256}}')">
+                <div class="info">
+                    
+                    {{#if_eq this.type 'vimeo2video'}}
+                        {{> video}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'vimeovideo'}}
+                        {{> video}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'brightcovevideo'}}
+                        {{> video}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'audioplayer'}}
+                        {{> audio}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'file'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'genericfile'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'pdf'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'powerpoint'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'idproject'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'daboxasmt'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    {{#if_eq this.type 'mobileapp'}}
+                        {{> file}}
+                    {{/if_eq}}
+                    
+                    
+                </div>
+                <div class="info-hover">
+                
+                    {{#if_eq this.materialType 'added'}}
+                        <div class="settings clearfix">
+                        
+                            <div class="settings-button">
+                                <div class="caret-button">
+                                    <span class="caret"></span>
+                                </div>
+                            </div>
+                        
+                            <div class="settings-actions">
+                                <a class="btn deletebutton" onclick="deleteOrgMat({{id}})">delete</a>
+                                <a class="btn editbutton" href="${helper.urlFor('material.MaterialModule','edit',[org.id])}/{{id}}">edit</a>
+                            </div> 
+                        </div>
+                    {{/if_eq}}
+                    
+                    <h1 class="title">
+                        {{#if_eq this.materialType 'added'}}<a href="{{viewLink}}">{{/if_eq}}
+                            {{title}}
+                        {{#if_eq this.materialType 'added'}}</a>{{/if_eq}}
+                    </h1>        
+                    <p class="description">{{desc}}</p>
+                </div>
+        
+                <div> 
+                
+                    
+                </div> 
+        
+            </div>
+        </div>
+    </div>
+</script>
+     
+
+
+<script>
+    var listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}";
+    var listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMats',[org.id])}";
+    
+    var deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}";
+    var editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+</script>
+
+<script>
+    
+    require(['isotoped-list'], function(il) {
+        $.ajax({
+            url: listPurchasedMatsUrl,
+            success: function(data) {
+                var $iso = il.isotopedFilteredList(data.aaData, {'templateSelector': '#grid-entry-template'}, {
+                    filters: [
+                        {
+                            'name': 'All', 
+                            'additionalCss': ' active',
+                            'filter': function() { 
+                                return true; 
+                            } 
+                        },
+                        {
+                            'name': 'File', 
+                            'filter': function() { 
+                                return false; 
+                            } 
+                        }
+                    ]
+                });
+            }
+        });
+    
+    });
+    
+    require(['handlebars'], function(Handlebars) {
+        Handlebars.registerHelper('if_eq', function(a, b, opts) {
+            if(a == b) 
+                return opts.fn(this);
+            else
+                return opts.inverse(this);
+        });
+
+        Handlebars.registerPartial('video', $('#video-partial').html());
+        Handlebars.registerPartial('audio', $('#audio-partial').html());
+        Handlebars.registerPartial('file', $('#file-partial').html());
+        Handlebars.registerPartial('general', $('#general-partial').html());
+    });
+    
+</script>
+
+
+[/#assign]
+
+[#assign cpweb_ctxMenu]
+[@mMenu.materialsMenu selected="materials"][/@mMenu.materialsMenu]
+[/#assign]
+
+[@dws.skin skin="CPAuthMenu2" head=head foot=foot ctxMenu=cpweb_ctxMenu orgName=orgName]
+ 
+<a href="${helper.urlFor('CpMainModule','newMaterial',[org.id])}" class="btn btn-add navBackgroundColor">Add Material</a>
+<h1>Materials</h1>test
+
+<div class='grid-header'>
+    <div class='list-toggle'>[#include 'listToggle.html' /]</div>
+</div>
+
+<div class="ccb-list ccb-filtered-list">
+    <div id="isotopeFilter" class="ccb-filtered-list__filter grid-filter"></div>
+    <div id="isotopeList" class="ccb-filtered-list__list"></div>
+</div>
+
+
+
+[/@dws.skin]
+

@@ -1,0 +1,72 @@
+[#ftl strip_text="true" /]
+
+[#assign foot]
+
+${cpweb_foot}
+
+<script>
+    $('#menu-settings').addClass('subMenuExpanded');
+    $('#menu-settings-directlinks-a').addClass('active');
+
+</script>
+<script>
+    
+    var listDeeplinksOrgMats = {};
+    
+    listDeeplinksOrgMats.listOrgMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listDeeplinkOrgMats',[org.id])}";
+    listDeeplinksOrgMats.listOrgMatLinksUrl = "${helper.urlFor('OrgMaterialJsonModule','listOrgMatLinks',[org.id])}";
+    listDeeplinksOrgMats.toggleActiveUrl = "${helper.urlFor('OrgMaterialJsonModule','changeLinkStatus',[org.id])}";
+    listDeeplinksOrgMats.contextPath = "${contextPath}";
+
+    require(['${contextPath}/js/deeplink/listOrgMatDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
+       
+   });
+    </script>
+
+[/#assign]
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
+
+<div class="container-fluid">
+ 
+<div style="display: none;" class="list-group" data-bind="foreach: materials, visible: true">
+
+    <div class="list-group-item" style="min-height: 124px;">
+
+        <img class="img-thumbnail pull-left" data-bind="attr:{src: thumbnail}" style="height: 100px; width: 100px; margin-right: 25px;">
+        <button type="button" class="btn btn-primary-outlined pull-right" data-bind="click: toggleLinkSection">Get Link</button>
+        <small class="pull-right" style="clear:right; margin-right: 9px; margin-top: 5px; margin-bottom: 5px;">Link Status</small>
+        <span class="label label-success pull-right" style="clear:right; margin-right: 24px;" data-bind="visible: status()">ON</span>
+        <span class="label label-danger pull-right" style="clear:right; margin-right: 22px;" data-bind="visible: !status()">OFF</span>
+    <h4 class="list-group-item-heading" data-bind="text: title" style="color:#5AB9D2;"></h4>
+    <p class="list-group-item-text" data-bind="text: description" style="max-width: 52%; display: flex;"></p>
+    <p data-bind="text: status"></p>
+    </div>
+
+    <!-- ko if: linkSectionVisible -->
+    <div class="list-group-item" style="min-height: 124px; background-color: #f5f5f5; border:1px solid #e3e3e3;">
+        
+            <h4 class="list-group-item-heading" style="margin-bottom: 25px;">Access Link</h4>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">
+                <input type="checkbox" data-bind="ccbBootstrapToggle: status, ccbBootstrapToggleClick: toggleStatus" />Active</p>
+            <p class="list-group-item-text pull-left" style="margin-right: 100px;">Active Until 
+                <span data-bind="text: activeUntilString, attr: {'data-pk': linkId, 'data-value': activeUntil}, ccbEditable: activeUntil, ccbEditableOpts: {display: dateDisplay}"
+                      data-type="ccbdate"
+                      data-placement="bottom"
+                      data-showbuttons="bottom"
+                      data-container="body"
+                      data-url="${helper.urlFor('OrgMaterialJsonModule','changeLinkActiveTo',[org.id])}"
+                      />
+            </p>
+            <p class="list-group-item-text pull-left">URL</p>
+            <input type="text" class="form-control" style="width: 40%;" data-bind="value: url">
+    </div>
+    <!-- /ko -->
+
+</div>
+         
+</div>
+ 
+[/@dws.skin]
+

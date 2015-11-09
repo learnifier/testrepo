@@ -1,0 +1,66 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#menu-reports').addClass('active');
+</script>
+<script>
+    $(document).ready(function() {
+        require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
+        var oTable = $('#listreports').dataTable({
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "paging": false,
+            "order": [[0,'asc']],
+            "initComplete": function() {
+                $('#listreports_filter input').attr('placeholder', 'Search reports');
+            },
+            "columnDefs": [ 
+                {
+                    "targets": [ 0 ],
+                    "width": "70%",
+                    "data": "name"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "zeroRecords": "No reports your query",
+                "loadingRecords": "<p>Loading reports...</p><img src='[@common.spinnerUrl /]' />"
+            }
+        });
+        });
+    } );
+                
+</script>
+
+
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<h1>Reports</h1>
+
+<table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listreports">
+    <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
+        <tr>
+            <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
+        </tr>
+        [/@]
+        <tr>
+            <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
+        </tr>
+        <tr>
+            <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
+        </tr>
+    </tbody>
+</table>
+
+[/@dws.skin]
+

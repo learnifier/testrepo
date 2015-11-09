@@ -1,0 +1,56 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+<script>
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-coursetemplates').addClass('active');
+    
+    var oldExpiration = 0;
+    $('#expirationtoggle-false').click(function() {
+        oldExpiration = $('#expiration').val();
+        $('#expiration').attr({'value': 0, 'disabled': 'disabled'});
+    });
+   
+    $('#expirationtoggle-true').click(function() {
+       $('#expiration').attr({'value': oldExpiration}).removeAttr('disabled').focus(); 
+    });
+    
+    
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.editdesignsettings.title" /></h1>
+    [#global formPrefix="cpweb.editdesignsettings" /]
+    <form action="${formLink}" id="newMaterial" name="newMaterial"method="post" enctype="multipart/form-data">
+        [@bsform.alertsection]
+        [/@bsform.alertsection]
+
+        [@bsform.inputText name="name" tabindex="1" /]
+
+        [@bsform.textarea name="description" tabindex="2" /]
+
+        [#assign expirationtoggle = "false" /]
+        [#if formsess.getDefaultValue("expiration")??]
+            [#if formsess.getDefaultValue("expiration")?number > 0]
+                [#assign expirationtoggle = "true" /]        
+            [/#if]
+        [/#if]
+
+        Activate Expiration Timer
+        [@bsform.inputBoolean name="expirationtoggle" label="Expiration toggle" truetext="Yes" falsetext="No" defaultstate=expirationtoggle /]
+
+        Expiration (Number of days)
+        [@bsform.inputNumber name="expiration"  tabindex="5" value=formsess.getDefaultValue("expiration")!"" /]
+                    
+        [@bsform.infosection]
+        [/@bsform.infosection]
+        <input type="hidden" name="orgId" value="${org.id}" />
+        <button type="submit" tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.savedesignsettings' /></button>
+        <a href="${helper.urlFor('coursedesign.DesignModule','overview',[org.id, info.designId])}"  tabindex="101" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+
+    </form>
+
+[/@dws.skin>

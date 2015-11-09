@@ -1,0 +1,28 @@
+[#ftl]
+[#global formsess=rosterformsess /]
+
+
+[@bsform._onreadyJavascript]
+    $('#file').change(function() {
+         $('#uploadRoster').submit();
+    });
+[/@bsform._onreadyJavascript]
+
+
+       <form action="${uploadRosterFormLink}" id="uploadRoster" name="uploadRoster" method="post" enctype="multipart/form-data">
+           <h3>Upload participant list</h3>
+               
+        <p><a href="${cocoboxCdn}/cocobox/roster/RosterTemplate.xlt"><span class="glyphicon glyphicon-cloud-download"></span> <strong>Download the template</strong></a> to get the list in the correct format. When you have completed the list with names and email address, click Upload Roster and select the file.</p>
+        [#global formPrefix="cpweb" /]
+            [@bsform.alertsection]
+            [/@bsform.alertsection]
+
+            [@bsform.inputFile name="file" tabindex="5"  style="position: absolute; left: -10000px;"/]
+
+            [@bsform.infosection]
+            [/@bsform.infosection]
+            <section class="action">
+                <input type="hidden" name="orgId" value="${org.id}" />
+            </section>
+        <label for="file" type="submit" class="btn btn-primary" id="rosterUploadBtn"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> [@dws.txt key='form.action.uploadroster' /]</label>
+    </form>

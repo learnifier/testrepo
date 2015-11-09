@@ -1,0 +1,85 @@
+[#ftl strip_text="true" /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#menu-settings').addClass('subMenuExpanded');
+    $('#menu-settings-publicapi-a').addClass('active');
+</script>
+
+<script>
+    var apiWebUrlSource = "${helper.urlFor('papi.PapiJsonModule','listApiKeys',[org.id])}";
+    var deleteKeyUrl = "${helper.urlFor('papi.PapiJsonModule','deleteApiKeyPair',[org.id])}";
+    var showKeyUrl = "${helper.urlFor('papi.PapiJsonModule','getApiKeyPairSecret',[org.id])}";
+    var createKeyUrl = "${helper.urlFor('papi.PapiJsonModule','createApiKeyPair',[org.id])}";
+
+    require(["${contextPath}/js/papi/listApiKeys.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+           //No initialization needed
+    });
+   
+</script>
+
+<script id="settings-template" type="text/x-handlebars-template">
+
+
+    {{#each data}}
+    <div class="valCont">
+    <p class="keyPos">{{publicKey}}</p>
+    <p class="namePos">{{name}}</p>
+
+    [#if security.hasPermission("CP_VIEW_APIKEY_SECRET")]
+    <button type="button" class="showBtnPos btn btn-primary btn-sm" data-id="{{publicKey}}">Show</button>
+    [/#if]
+
+    [#if security.hasPermission("CP_DELETE_APIKEY")]
+    <button type="button" class="delBtnPos btn btn-primary btn-sm" data-id="{{id}}">Delete</button>
+    [/#if]
+    </div>
+    {{/each}}
+
+
+</script>
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
+
+<div>
+    <h2>API Keys</h2>
+
+    <div>
+    The API endpoint is: <code>${apiEndpoint?xml}</code>
+    </div>
+
+    <div>
+    The API orgunit endpoint is: <code>${orgUnitEndpoint?xml}</code>
+    </div>
+    
+</div>
+
+<div id="settingsList">
+    <h2>API Keys</h2>
+
+    <div class="nameCont">
+        <p class="keyPos">Key</p>
+        <p class="namePos">Name</p>
+    </div>
+
+    <div id="list-settings">
+
+
+
+    </div>
+
+    <br>
+
+    <div class="clearALl">
+        [#if security.hasPermission("CP_CREATE_APIKEY")]
+        <button type="button" class="fl addBtn btn btn-primary btn-sm">Add Key</button>
+        [/#if]
+    </div>
+
+
+
+</div>
+
+[/@dws.skin]

@@ -1,0 +1,219 @@
+[#ftl strip_text="true" /]
+
+[#import "addAnonProduct.ftl" as addAnonProd /]
+
+[#assign cpweb_head]
+    ${cpweb_head}
+[/#assign]
+
+[#assign pagetitle='listMaterials' /]
+
+[#assign foot]
+${cpweb_foot}
+
+<script id="anonProductMenuTemplate" type="text/x-handlebars-template">
+<div class='btn-group'>
+    <button type='button' class='btn btn-primary btn-sm dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>Actions <span class='caret'></span></button>
+    <ul class='dropdown-menu dropdown-menu-right' role='menu'>
+        {{#if editorUrl}}
+            <li><a href='{{editorUrl}}' target="_blank">Edit</a></li>
+        {{/if}}
+        {{#unless editorUrl}}
+            <li><a href='#' data-id='{{id}}' onclick='return editItem(this)'>Edit</a></li>
+        {{/unless}}
+        {{#if allowDelete}}
+            <li><a href='#' data-id='{{id}}' data-action='delete'>Delete</a></li>
+        {{/if}}
+    </ul>
+</div>
+</script>
+
+
+<script>
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-materials').addClass('active');
+
+    require(["${contextPath}/js/material/listMaterials.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+       s.init({
+           "productDeleteCheck": "${helper.urlFor('OrgMaterialJsonModule','listProductProjects')}",
+           "productDelete": "${helper.urlFor('OrgMaterialJsonModule','deleteOrgProduct',[org.id])}"
+       });
+    });
+
+    require(['handlebars', 'dataTables-bootstrap', 'dataTables-responsive'], function(Handlebars) {
+        var pub = {
+            listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
+            spinnerUrl: "[@common.spinnerUrl /]"
+        };
+
+        var anonProductMenu = Handlebars.compile($("#anonProductMenuTemplate").html());
+
+        var pTable = $('#materialstable').dataTable({
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "paging": true,
+            "order": [[1,'asc']],
+            "ajax": pub.listUrl,
+            "initComplete": function() {
+                $('#materialstable_filter input').attr('placeholder', 'Search materials');
+            },
+            "columnDefs": [
+
+                {
+                    "targets": [0],
+                    "className": "material-thumbnail",
+                    "data" : function(row, type, set) {
+                        if (!row.thumbnailDisplay) {
+                            row.thumbnailDisplay = "<img src='" +  row.thumbnail + "' />";
+                        }
+
+                        if (type === 'display') {
+                            return row.thumbnailDisplay;
+                        } else if (type === 'filter') {
+                            return row.thumbnailDisplay;
+                        } else if (type === 'sort') {
+                            return row.thumbnailDisplay;
+                        } else {
+                            //Anything else and raw row
+                            return row.thumbnailDisplay;
+                        }
+                    }
+                },
+                {
+                    "targets": [ 1 ],
+                    "data": "title",
+                },
+                {
+                    "targets": [ 2 ],
+                    "data": "typeTitle"
+                },
+                {
+                    "targets": [ 3 ],
+                    "className": "row-actions",
+                    "data" : function(row, type, set) {
+                        if (row.anonymous == true) {
+
+                                var html = anonProductMenu(row);
+
+                                row.actionsDisplay = html;
+
+                        } else {
+                            row.actionsDisplay = '';
+                        }
+
+                        return row.actionsDisplay;
+                    }
+                }
+            ],
+            "pagingType": "full_numbers",
+            "language": {
+                "search": "",
+                "zeroRecords": "No materials matches your query",
+                "emptyTable": "<span class='emptytable'>No purchased products</span>",
+                "loadingRecords": "<p>Loading materials...</p><img src='" + pub.spinnerUrl + "' />"
+            }
+        });
+
+
+        $('#materialstable').on('click', 'a[data-trigger=click]', function() {
+
+            var id = $(this).data('id');
+            var action = $(this).data('action');
+
+            if(action === 'delete') {
+                deleteOrgMat(id);
+            } else if (action === 'edit') {
+                window.location.href = editOrgMatUrl + '/' + id;
+            }
+
+            $(this).val('');
+
+        });
+
+
+        var deleteOrgMatUrl = "${helper.urlFor('OrgMaterialJsonModule','deleteOrgMat')}";
+        var editOrgMatUrl = "${helper.urlFor('material.MaterialModule','edit',[org.id])}";
+
+
+        var deleteOrgMat = function(orgMatId) {
+            var ajaxData = {"orgmatid": orgMatId};
+            var ajaxSettings = {};
+            ajaxSettings.data = ajaxData;
+            ajaxSettings.success = processDeleteOrgMatAjaxResponse;
+            require(['dabox-common'], function() {
+                cocobox.confirmationDialog("Delete material",
+                        "Do you want to permanently delete this material?",
+                        function() {
+                            cocobox.ajaxPost(deleteOrgMatUrl, ajaxSettings);
+                        }
+                );
+            });
+
+        };
+
+        var processDeleteOrgMatAjaxResponse = function(data) {
+            log('Ajax response', data);
+
+            if (data.status == "OK") {
+                //Delete row with error
+                deleteOrgMatRow(data);
+            } else {
+                displayDeleteOrgMatError(data);
+            }
+        };
+
+        var displayDeleteOrgMatError = function(data) {
+            var lines = [];
+            lines.push("This material cannot be deleted due to the foilowing reason.");
+            lines.push("");
+            if (data.activeLinkCount > 0) {
+                lines.push("This material has an active access link");
+                lines.push();
+            }
+
+            var pns = data.linkedProjectNames;
+            if (pns && pns.length > 0) {
+                lines.push("This material is used in the following projects:");
+                lines.push();
+                for(var i = 0; i<pns.length; i++) {
+                    var pn = pns[i];
+                    lines.push(pn);
+                }
+            }
+
+            cocobox.infoDialog("Unable to delete material", lines);
+        };
+
+
+    });
+
+</script>
+
+[@addAnonProd.addScript /]
+[/#assign]
+
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
+
+<section class="ccb-page-header margin-bottom">
+    <div class="ccb-page-header__actions--right">
+        [@addAnonProd.addButton /]
+    </div>
+    <h1 class="page-title">Materials</h1>
+</section>
+<div class="grid-header">
+    [#include 'listToggle.html' /]
+</div>
+<table id="materialstable" class="table table-hover ccb-table dt-responsive" width="100%">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Kind</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+[/@dws.skin]

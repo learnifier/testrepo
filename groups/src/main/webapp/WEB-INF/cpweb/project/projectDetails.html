@@ -1,0 +1,58 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    $('#menu-projects').addClass('active');
+</script>
+[/#assign]
+
+
+[#assign projectDetailsSettingUrl = helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId]) /]
+
+[@bsform._onreadyJavascript]
+
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+    cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
+    cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
+    cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
+
+    cpweb.editable($('#project-status .editable-content'), $('#project-status .editable-control'), function(value){},
+    {type: 'select',
+        source: [
+        {value: "NEW", text: '${ctext("project.status.NEW")?js_string}'},
+        {value: "ACTIVE", text: '${ctext("project.status.ACTIVE")?js_string}'},
+        {value: "DISABLED", text: '${ctext("project.status.DISABLED")?js_string}'}
+        ]
+    }
+    );
+
+    [/@]
+[/@bsform._onreadyJavascript]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="info"][/@pInfo.projectInfo]
+
+<article id="ccb-page-projectDetails">
+
+<div class="col-md-12">
+    [#if prj.type.ptype == 2]
+        <span class="">Learner Portal Name</span>
+        <h2>${prj.displayUserTitle!""?xhtml}</h2>
+        <span class="">Learner Portal Description</span>
+        <h2>${prj.displayUserDescription!""?xhtml}</h2>
+    [#else]
+        <span class="">Course Name</span><span class=" " id="project-usertitle">
+            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="usertitle">${prj.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
+        <span class="">Course Description</span><span class=" " id="project-userdesc">
+            <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="userdesc">${prj.displayUserDescription!""?xhtml}</span>[#include "projectEditLabel.html" /]</span></li>
+    [/#if]
+</div>
+
+    
+</article>
+[/@dws.skin]
+

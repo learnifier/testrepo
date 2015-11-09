@@ -1,0 +1,107 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script id="list-item-template" type="text/x-handlebars-template">
+    <a href="#" class="list-group-item" data-projectid="{{id}}" >
+    <h4 class="list-group-item-heading">{{name}}</h4>
+    <p class="list-group-item-text">Added: {{added}} Invited: {{invited}}</p>
+    </a>
+</script>
+
+<script>
+    var projectList = "${cycle.urlFor('CpJsonModule','listOrgProjects',[org.id?c])}";
+    var projectListArchived = "${cycle.urlFor('CpJsonModule','listOrgProjects',[org.id?c])}?f=archived";
+
+    //[#include "inc_commonMoveJavascript.ftl" /]
+
+    function showList(url, selectedPill) {
+
+        $("#projectLg").empty();
+        $("#spinnerbox").show();
+        $("#ajaxErrorBox").addClass("hidden");
+        $("ul.nav-pills li").removeClass("active");
+        $(selectedPill).addClass("active");
+
+        require(['handlebars'], function (Handlebars) {
+            $.get(url)
+                    .always(function () {
+                        $("#spinnerbox").hide();
+                    })
+                    .done(function (data) {
+                        var tmpl = Handlebars.compile($("#list-item-template").html());
+
+                        var html = $.map(data.aaData, function (obj) {
+                            return tmpl(obj);
+                        });
+
+                        $("#projectLg").append(html);
+                    })
+                    .fail(function () {
+                        $("#ajaxErrorBox").toggleClass("hidden");
+                    });
+        });
+    }
+
+    $(function () {
+        $("#projectLg").on('click', 'a', null, function () {
+            var pid = $(this).data("projectid");
+
+            $("#targetProjectId").val(pid);
+            $("#verifyForm").submit();
+
+            return false;
+        });
+    });
+
+    $(function () {
+        showList(projectList, "#activePill");
+    });
+
+</script>
+
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot title="Select target project"]
+
+<div class="container">
+    <h1>Select target project</h1>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="nav nav-pills">
+                <li role="presentation" class="active" id="activePill"><a href="#" onclick="return showList(projectList, '#activePill')">${ctext("listprojects.activeandnew")?xml}</a></li>
+                <li role="presentation" id="disabledPill"><a href="#" onclick="return showList(projectListArchived, '#disabledPill')">${ctext("listprojects.disabled")?xml}</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="center-block" id="spinnerbox" style="padding-top: 10px;">[@common.spinner /]</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger hidden" role="alert" id="ajaxErrorBox">Failed to get data from the server. Please try again later.</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div id="projectLg" class="list-group">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden">
+            <form action="${formUrl}" method="post" id="verifyForm">
+                <input type="hidden" id="targetProjectId" name="targetProjectId" />
+            </form>
+        </div>
+        [/@dws.skin]

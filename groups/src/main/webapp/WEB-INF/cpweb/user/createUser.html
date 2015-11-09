@@ -1,0 +1,95 @@
+[#ftl strip_text="true" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script>
+    require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+        modalClient.setButtons(
+                [
+                    {
+                        content: "<span class='glyphicon glyphicon-floppy-saved'></span> ${ctext('form.action.saveuser')?js_string}",
+                        cssClass: "btn-primary",
+                        action: function (dlg) {
+                            $("#createUser").submit();
+                        }
+                    },
+                    {
+                        text: "Cancel",
+                        cssClass: "btn-cancel",
+                        action: function (dlg) {
+                            dlg.cancel();
+                        }
+                    }
+                ]
+                );
+    });
+</script>
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+<h1>[@dws.txt key="cpweb.createuser.title" /]</h1>
+
+[#global formPrefix="cpweb.createuser" /]
+<form action="${formLink}" name="createUser" id="createUser" class="fullpage" method="post">
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
+    <div class="row">
+        <div class="col-sm-6">
+            [@bsform.inputText name="firstname" tabindex="1" maxlength="64" /]
+        </div>
+        <div class="col-sm-6">
+            [@bsform.inputText name="lastname" tabindex="2" maxlength="64" /]
+        </div>
+    </div>
+    [@bsform.inputEmail name="email" tabindex="3" maxlength="96" /]
+
+    [@bsform.select name="organization" tabindex="4"]
+    [#list orgList as o]
+    [@bsform.option value=o.id?c defaultValue=formsess.getDefaultValue('organization')!"0"]${o.displayName?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
+
+    
+    [#assign defaultValue = formsess.getDefaultValue('lang')!defaultUserLocale.toLanguageTag() /]
+    [@bsform.select name="lang" tabindex="5"]
+    [@bsform.option value=""]xxx[/@bsform.option]
+    [#list userLocales as uLocale]
+    [@bsform.option value=uLocale.id defaultValue=defaultValue]${uLocale.name?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
+
+    [#if editMode]
+    <input type="hidden" name="role" value="edit" />
+    [#else]
+
+    [#assign defaultValue = formsess.getDefaultValue('role')!'clientadmin' /]
+    [@bsform.select name="role" class="input_full" tabindex="6"]
+    [@bsform.option value="" selected="selected" disabled="disabled"][/@bsform.option]
+    [@bsform.option value="none"]None[/@bsform.option]
+    [#list roles as role]
+    [@bsform.option value=role.uuid]${role.name?xhtml}[/@bsform.option]
+    [/#list]
+    [/@bsform.select]
+
+    [/#if]
+    [@bsform.infosection]
+    [/@bsform.infosection]
+    <input type="hidden" name="orgId" value="${org.id?c}" />
+
+    <input type="submit" id="hiddensubmit" style="display: none" />
+    [@modal.formParams /]
+    [#--
+    [#if editMode]
+    <button tabindex="100" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-saved"></span> [@dws.txt key='form.action.saveuser' /]</button>
+    [#else]
+    <button tabindex="101" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> [@dws.txt key='form.action.saveinvite' /]</button>
+    [/#if]
+    <a href="${helper.urlFor('CpMainModule', 'listUsers', [org.id] )}" tabindex="102" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+    --]
+</form>
+
+[/@dws.skin]
+

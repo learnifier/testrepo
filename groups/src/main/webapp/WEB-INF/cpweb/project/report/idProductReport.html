@@ -1,0 +1,129 @@
+[#ftl strip_text="true" /]
+
+[#import "../projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+${cpweb_head}
+[/#assign]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+	$('#menu-projects').addClass('active');
+</script>
+<script>
+	$(document).ready(function() {
+		require(['dabox-report-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function() {
+			$.ajax({
+				url: "${helper.urlFor('project.report.ProjectReportJsonModule','idProductReport',[prj.projectId, productId])}",
+				error: function() {
+					$('#r_idproduct').html($('<td class="errormessage">').text('We were unable to generate this report right now. Please, try again later.'));
+				},
+				success: function(data) {
+					var aaData = [];
+
+                                        var activatedSum = 0;
+					var notaccessedSum = 0;
+					var accessedSum = 0;
+					var completedSum = 0;
+					var totalParticipants = 0;
+
+					for (var i = 0; i < data.aaData.length; i++) {
+						var obj = data.aaData[i];
+						var completionRate = ((obj.completed/obj.activated)*100).toFixed(2) + '%';
+
+                                                var completed = obj.completed;
+                                                var inprogress = obj.accessed - completed;
+                                                var notaccessed = obj.activated - inprogress - completed;
+                                                var activated = obj.activated;
+
+						notaccessedSum = notaccessedSum + notaccessed;
+						accessedSum = accessedSum + inprogress;
+						completedSum = completedSum + completed;
+                                                activatedSum = activatedSum + obj.activated;
+						
+						var nameWithLink = "<a href='" + obj.link + " '>" + obj.name + "</a>"; 
+						
+						
+						totalParticipants++;
+						aaData.push([nameWithLink, activated, notaccessed, inprogress, completed, completionRate]);
+					}
+
+					$('#r_idproduct').dataTable({
+						"aaData": aaData,
+						"oTableTools": {
+                                                    "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
+                                                 },"aaSorting": [[0, 'asc']],
+						"asSorting": null,
+						"bPaginate": false,
+						"sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
+						"aoColumns": [
+							{"sTitle": "User", "sWidth": "400px"},
+							{"sTitle": "Invited"},
+							{"sTitle": "Not Accessed"},
+							{"sTitle": "In Progress"},
+							{"sTitle": "Completed"},
+							{"sTitle": "Completion rate (%)"}],
+                                                "oLanguage": {
+                                                    "sSearch": "",
+                                                    "sEmptyTable": "<span class='emptytable'>No invites has been sent.</span>",
+                                                    "sLoadingRecords": "<p>Loading report...</p><img src='[@common.spinnerUrl /]' />"
+                                                }
+					});
+					
+					if(totalParticipants > 0 ) {
+						var activatedAvg = Math.floor(activatedSum/totalParticipants);
+						var notaccessedAvg = Math.floor(notaccessedSum/totalParticipants);
+						var accessedAvg = Math.floor(accessedSum/totalParticipants);
+						var completedAvg = Math.floor(completedSum/totalParticipants);
+					
+						log(activatedAvg, accessedAvg, completedAvg);
+
+						var tfoot = $('tfoot.summary');
+
+						var tfootAvgRow = $('<tr class="average">');
+						tfootAvgRow.append($('<th>').html('Average'));
+						tfootAvgRow.append($('<td>').text(activatedAvg));
+						tfootAvgRow.append($('<td>').text(notaccessedAvg));
+						tfootAvgRow.append($('<td>').html(accessedAvg));
+						tfootAvgRow.append($('<td>').text(completedAvg));
+						tfoot.html(tfootAvgRow);
+
+						var tfootSumRow = $('<tr class="total">');
+						tfootSumRow.append($('<th>').html('Total'));
+						tfootSumRow.append($('<td>').text(activatedSum));
+						tfootSumRow.append($('<td>').text(notaccessedSum));
+						tfootSumRow.append($('<td>').html(accessedSum));
+						tfootSumRow.append($('<td>').text(completedSum));
+						tfoot.append(tfootSumRow);
+					}
+					
+				}
+			});
+		});
+	});
+</script>
+
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+
+[@pInfo.projectInfo selected="reports"][/@pInfo.projectInfo]
+
+<h2>[@dws.txt key="cpweb.project.report.idproduct.title" /] ${product.title!""}</h2>
+
+<section class="list">
+    <table class="report" id="r_idproduct">
+        <thead>
+        </thead>
+        <tbody>
+			<tr><th><img class="loading" src="${cocoboxCdn}/cocobox/img/loading.gif" ></th></tr>
+        </tbody>
+    <tfoot class="summary">
+    </tfoot>
+    </table>
+</section>
+
+
+[/@dws.skin]
+

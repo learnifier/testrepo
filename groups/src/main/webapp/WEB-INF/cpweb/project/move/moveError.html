@@ -1,0 +1,59 @@
+[#ftl strip_text="true" /]
+
+[#import "inc_commonError.ftl" as ce /]
+
+[#assign valid = result.moveError.type == "ok" /]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script>
+require(["[@modal.clientJavascript /]"], function (modalClient) {
+
+    modalClient.setButtons(
+            [
+                {
+                    text: "Close",
+                    cssClass: "btn-cancel",
+                    id: "closeButton",
+                    action: function (dlg) {
+                        dlg.cancel();
+                    }
+                }
+            ]
+        );
+});
+</script>
+
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot title="Confirm move"]
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Move failed</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">${ce.errorMessage()?xml}</div>
+        </div>
+    </div>
+
+    [#if result.productErrors?size > 0]
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger" role="alert">
+                    There was problems with the following products
+                    <ul class="list-group">
+                        [@ce.productErrors /]
+                    </ul>
+                </div>
+            </div>
+        </div>
+    [/#if]
+    
+</div>
+[/@dws.skin]
