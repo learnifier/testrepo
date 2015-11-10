@@ -111,7 +111,7 @@ public class ClientUserGroupModule extends AbstractUserClientGroupModule {
         long groupId = Long.valueOf(strCugId);
         long caller = LoginUserAccountHelper.getUserId(cycle);
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_DELETE_USER);
         ClientUserGroupClient cugService = getClientUserGroupService(cycle);
         ClientUserGroup cug = cugService.getGroup(groupId);
         List<ClientUserGroup> children = cugService.listChildren(groupId);
