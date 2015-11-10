@@ -17,7 +17,10 @@ ${cpweb_foot}
 [#include "jsr_invitesTemplate.inc"]
 [#include "jsr_expirationDialog.inc" /]
 [#include "projectRosterMoveDialog.html" /]
-[@pRegistration.foot /]
+
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+  [@pRegistration.foot /]
+[/@]
 
 <script>
     $('#menu-projects').addClass('active');
