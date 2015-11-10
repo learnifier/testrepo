@@ -46,6 +46,24 @@
                 {
                     "targets": [ 2 ],
                     "data": function(row, type, set) {
+                        if (!row.expiresDisplay) {
+                            row.expiresDisplay = row.expiresStr;
+                        }
+                        if (type === 'display') {
+                            return row.expiresDisplay;
+                        } else if (type === 'filter') {
+                            return row.expires;
+                        } else if (type === 'sort') {
+                            return row.expires;
+                        } else {
+                            //Anything else and raw row
+                            return row.expiresDisplay;
+                        }
+                    }
+                },
+                {
+                    "targets": [ 3 ],
+                    "data": function(row, type, set) {
                         if (!row.kitIdDisplay) {
                             var kitId = row.baseproduct;
                             var productId= '${product.id.id}';
@@ -68,7 +86,7 @@
                     }
                 },
                 {
-                    "targets": [ 3 ],
+                    "targets": [ 4 ],
                     "data": "amount"
                 }
             ],
@@ -116,6 +134,7 @@ ${cpweb_head}
                 <tr>
                     <th>Order Number</th>
                     <th>Created</th>
+                    <th>Expires</th>
                     <th>Kit</th>
                     <th>Available</th>
                 </tr>
