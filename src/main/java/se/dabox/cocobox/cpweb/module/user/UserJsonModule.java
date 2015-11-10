@@ -116,6 +116,9 @@ public class UserJsonModule extends AbstractJsonAuthModule {
             protected void encodeItem(ClientUserGroup cug) throws IOException {
                 generator.writeNumberField("id", cug.getGroupId());
                 generator.writeStringField("name", cug.getName());
+                generator.writeStringField("grouplink", NavigationUtil.toClientUserGroupOverviewUrl(cycle,
+                        orgId, cug.getGroupId()));
+
             }
         }.encodeToStream(groups));
     }

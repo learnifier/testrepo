@@ -22,7 +22,7 @@ $(document).ready(function() {
                     "targets": [ 0 ],
                     "data" : function(row, type, set) {
                         if (!row.nameDisplay) {
-                           row.nameDisplay = '<span title="' +row.name + '">' + cocobox.trunc(row.name, 20) + '</span>';
+                           row.nameDisplay = '<a href="'+ row.grouplink + '" style="display:block;">' + row.name +'</a> ';
                         }
 
                         if (type === 'display') {
