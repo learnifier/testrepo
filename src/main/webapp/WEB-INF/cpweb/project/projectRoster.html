@@ -203,7 +203,7 @@ ${cpweb_foot}
                                 if (row.sending) {
                                     row.lastEmailDisplay = "Sending..."
                                 } else if (row.bounced) {
-                                    row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '">Bounced back</a>';
+                                    row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '"><strong>Bounced back</strong></a>';
                                 } else {
                                     row.lastEmailDisplay = row.lastEmailStr;
                                 }
