@@ -2,18 +2,18 @@
 
 <script id="materialBox" type="text/x-jsrender">
     [#noparse]
-    <li>
-        <label>
-            <img src="{{>thumbnailx256}}" alt="{{>title}}" draggable="false" class="{{>type}}"/ width="35" height="35">
+    <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+          <img data-src="{{>thumbnailx256}}" alt="{{>title}}" style="height: 200px; width: 100%; display: block;" class="{{>type}}">
+          <div class="caption">
             <input type="checkbox" name="orgmat" value="{{:system}}|{{:id}}"/>
-            {{if desc != null }}
-            <div>
-                <p class="more" data-matid="toggle">More info</p>
-                <p class="desc" data-matid="toggle">{{>desc}}</p>
-            </div>
-            {{/if}}
-            <h3 class="clearfix">{{>title}}</h3>
-        </label>
-    </li>
+             {{if desc != null }}
+             <p class="more" data-matid="toggle">More info</p>
+             <p class="desc" data-matid="toggle">{{>desc}}</p>
+              {{/if}}
+            <h3>{{>title}}</h3>
+          </div>
+        </div>
+      </div>
     [/#noparse]
 </script>
