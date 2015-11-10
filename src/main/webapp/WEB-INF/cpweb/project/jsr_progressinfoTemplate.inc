@@ -28,13 +28,7 @@
                      <td class="ptb0" colspan="8">
                          <div>
                                 <ul class="dropdownUl">
-                                    <li class="componentThumbnail">
-                                        <img src="{{thumbnail}}">
-                                    </li>
-                                    <li class="componentTitle">
-                                        <span class="truncate">{{componentTitle}}</span>
-                                    </li>
-                                     <!-- Stacking from right from here -->   
+                                     <!-- Stacking from right from here -->
                                     <li class="statusImage pull-right">
                                         {{StatusImage componentStatus}}
                                     </li>
@@ -55,6 +49,13 @@
                                         {{#if successStatus }}
                                             <span class="row-label">Passed/failed:</span><span class="row-value">{{successStatus}}</span>
                                         {{/if}}
+                                    </li>
+                                     <!-- Stacking from left from here -->
+                                    <li class="componentThumbnail pull-left">
+                                        <img src="{{thumbnail}}">
+                                    </li>
+                                    <li class="componentTitle pull-left">
+                                        <span class="truncate">{{componentTitle}}</span>
                                     </li>
                                 </ul>
                          </div>
