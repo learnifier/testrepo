@@ -22,7 +22,7 @@ $('#menu-projects').addClass('active');
             $('#next_btn').removeAttr('disabled', 'disabled');
             $("#prjtype").val('MATERIAL_LIST_PROJECT');
             jQuery.post(listMats, null, function(data) {
-                $("#crprj_materialslist ul").html(
+                $("#crprj_materialslist div").html(
                 $("#materialBox").render(data.aaData)
             );
             }, "json");
@@ -65,8 +65,8 @@ $('#menu-projects').addClass('active');
                 <div id="typeselections" class="clearfix">
                     <div id="crprj_materialslist" >
                         <h2>5 Select materials for this course - can also be added later</h2>
-                            <ul id="matlist_options" class="crprj-option-list">                            
-                        </ul>
+                            <div id="matlist_options" class="crprj-option-list row">                            
+                        </div>
                     </div>
                 </div>
                 
@@ -83,9 +83,9 @@ $('#menu-projects').addClass('active');
         <button tabindex="100" class="primary next" type="submit" onclick="$('#ntarget').val('next');"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
         <button tabindex="100" class="save" type="submit" onclick="$('#ntarget').val('save');"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
         [#else]
-        <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
+        <button tabindex="100" class="primary save btn btn-primary"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
         [/#if]
-        <a href="${nps.cancelTarget}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+        <a href="${nps.cancelTarget}"  tabindex="101" class="btn btn-primary-outlined btn-sm">[@dws.txt key="form.action.cancel" /]</a>
     </section>
 
 </form>
