@@ -3,10 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import com.sun.deploy.util.SessionState;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -77,6 +79,8 @@ import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
+import se.dabox.service.cug.client.ClientUserGroup;
+import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
@@ -128,13 +132,66 @@ public class ProjectModule extends AbstractProjectWebModule {
         map.put("uploadRosterFormLink", cycle.urlFor(ProjectModificationModule.class,
                 ProjectModificationModule.UPLOAD_ROSTER_ACTION,
                 projectId));
+
+        // Dig out groups. May move this to a json call.
+        final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
+        final List<ClientUserGroup> cugs = cugClient.listGroups(project.getOrgId());
+        final Map<Long, ClientUserGroup> idCugHash = cugs.stream().
+                collect(Collectors.toMap(ClientUserGroup::getGroupId, Function.identity()));
+        final Map<Long, List<Long>> childrenHash = new HashMap<>();
+        cugs.stream()
+                .filter(cug -> cug.getParent() != null)
+                .forEach(cug -> {
+                    if(childrenHash.containsKey(cug.getParent())) {
+                       childrenHash.get(cug.getParent()).add(cug.getGroupId());
+                    } else {
+                        childrenHash.put(cug.getParent(), new ArrayList<>(Arrays.asList(cug.getGroupId())));
+                    }
+                });
+        final List <GroupInfo> gis = cugs.stream()
+                .filter(cug -> cug.getParent() == null)
+                .map(cug -> new GroupInfo(cug, idCugHash, childrenHash))
+                .collect(Collectors.toList());
+
+        map.put("groups", gis);
         addCommonMapValues(map, project, cycle);
         initSelfReg(cycle, project, map);
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
-    
-     @WebAction
+
+    public static class GroupInfo {
+        private final long groupId;
+        private final String name;
+        private final List<GroupInfo> children;
+
+        public GroupInfo(ClientUserGroup cug, Map<Long, ClientUserGroup> cugHash, Map<Long, List<Long>> childrenHash) {
+            this.groupId = cug.getGroupId();
+            this.name = cug.getName();
+            if(childrenHash.containsKey(groupId)) {
+                children = childrenHash.get(groupId).stream()
+                        .map(childId -> new GroupInfo(cugHash.get(childId), cugHash, childrenHash))
+                        .collect(Collectors.toList());
+            } else {
+                children = Collections.emptyList();
+            }
+        }
+
+        public long getGroupId() {
+            return groupId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<GroupInfo> getChildren() {
+            return children;
+        }
+    }
+
+
+    @WebAction
     public RequestTarget onKevin(RequestCycle cycle, String projectId) {
         OrgProject project =
                 getProject(cycle, projectId);

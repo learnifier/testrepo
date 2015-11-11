@@ -60,14 +60,14 @@ ${cpweb_foot}
         moveLink = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}";
         moveEnabled = true;
     [/@]
-        
-     
+
+
     $(document).ready(function() {
         require(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function(hb) {
 
             var source = $("#roster-cell-action-template").html();
             var rosterCellActionTemplate = hb.compile(source);
-            
+
             window.oTable = $('#projectroster').dataTable({
                 "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>><"row"<"col-sm-12"l>>',
                 "lengthMenu": [ [20, 50, 100, 1000, -1], [20, 50, 100, 1000, "All"] ],
@@ -104,7 +104,7 @@ ${cpweb_foot}
                         },
                         "createdCell": function (td, cellData, rowData, row, col) {
                             runiCheck(td);
-                      }
+                        }
                     },
 
                     {
@@ -129,7 +129,7 @@ ${cpweb_foot}
                                     row.iconDisplay = '<span class="pe-7s-plus pe-2x pull-right primaryColor expand"></span>';
                                 }
                             }
-                            
+
                             if (type === 'display') {
                                 return row.iconDisplay;
                             } else if (type === 'filter') {
@@ -143,7 +143,7 @@ ${cpweb_foot}
                         },
                         "createdCell": function (td, cellData, rowData, row, col) {
                             showRow(td);
-                      }
+                        }
                     },
                     {
                         "targets": [2],
@@ -153,7 +153,7 @@ ${cpweb_foot}
                                 var data = '<a class="name" href="' + row.link + '" title="' + row.email + '">' + row.displayName + '</a> ';
                                 row.displayNameDisplay = data;
                             }
-                            
+
                             if (type === 'display') {
                                 return row.displayNameDisplay;
                             } else if (type === 'filter') {
@@ -178,8 +178,8 @@ ${cpweb_foot}
                                 } else {
                                     return null;
                                 }
-                            } 
-                            
+                            }
+
                             if (type === 'display') {
                                 return row.firstEmailDisplay;
                             } else if (type === 'filter') {
@@ -205,7 +205,7 @@ ${cpweb_foot}
                                     row.lastEmailDisplay = row.lastEmailStr;
                                 }
                             }
-                            
+
                             if (type === 'display') {
                                 return row.lastEmailDisplay;
                             } else if (type === 'filter') {
@@ -223,12 +223,12 @@ ${cpweb_foot}
                         "data" : function(row, type, set) {
                             if (!row.lastAccessDisplay) {
                                 if (row.lastAccess) {
-                                     row.lastAccessDisplay = '<abbr data-toggle="tooltip" class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
-                                 } else {
-                                     row.lastAccessDisplay = 'Not yet logged in';
-                                 }
+                                    row.lastAccessDisplay = '<abbr data-toggle="tooltip" class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
+                                } else {
+                                    row.lastAccessDisplay = 'Not yet logged in';
+                                }
                             }
-                            
+
                             if (type === 'display') {
                                 return row.lastAccessDisplay;
                             } else if (type === 'filter') {
@@ -243,7 +243,7 @@ ${cpweb_foot}
                         "createdCell": function (td, cellData, rowData, row, col) {
                             $('.timeago', td).timeago();
                             $('[data-toggle="tooltip"]', td).tooltip()
-                      }
+                        }
                     },
                     {
                         "targets": [6],
@@ -252,7 +252,7 @@ ${cpweb_foot}
                             if (!row.statusDisplay) {
                                 row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status +'%;">' + row.status +'%</div</div>';
                             }
-                            
+
                             if (type === 'display') {
                                 return row.statusDisplay;
                             } else if (type === 'filter') {
@@ -297,17 +297,17 @@ ${cpweb_foot}
                 }
             });
         });
-        
-        $('#projectroster').on('click', 'a[data-trigger=roster-row-action]',function(ev){            
+
+        $('#projectroster').on('click', 'a[data-trigger=roster-row-action]',function(ev){
             var row = oTable.DataTable().row( $(this).parents('tr').first() ).data();
             var action = $(this).data('action');
             if (action==='link'){
                 rowLinkAction(row);
             } else if (action==='impersonate') {
-                rowImpersonateAction(row);                
+                rowImpersonateAction(row);
             } else if (action==='move') {
-                rowMoveAction(row);                
-            } 
+                rowMoveAction(row);
+            }
             [#if security.userAccount.superUser]
             else if (action==="raps") {
                 window.location = "${helper.urlFor('project.ProjectModule','raps',[prj.projectId])}/"+row.id;
@@ -316,22 +316,22 @@ ${cpweb_foot}
             else {
                 alert('Undefined row action: ' + action);
             }
-            
+
             return false;
         });
         function rowLinkAction(row) {
             cocobox.infoDialog('Participation access link', row.participationLink);
-            log(row);            
+            log(row);
         };
-        
+
         function rowImpersonateAction(row) {
             window.open(impersonateLink + '/' + row.id,'_blank');
         };
-        
+
         function rowMoveAction(row) {
             moveParticipation(row.id);
         };
-        
+
 
         cpweb.registerListform($("#projectrosterform").first());
         $('#listprojects_filter input').attr('placeholder', 'Search for projects');
@@ -356,7 +356,7 @@ ${cpweb_foot}
             var oldSuccess = handler.success;
 
             var longOp;
-            
+
             handler.beforeSend = function() {
                 longOp = cocobox.longOp();
 
@@ -389,144 +389,145 @@ ${cpweb_foot}
             }
         });
 
-    function runiCheck(cell) {
-      $('input', cell).icheck({
-        checkboxClass: 'icheckbox_square-red',
-        radioClass: 'iradio_square-red'
-      });
-    };
-    
-  function toggleAllCheck() {
-      $('#cball').icheck({
-        checkboxClass: 'icheckbox_square-red',
-        radioClass: 'iradio_square-red'
-      });
-    };
+        function runiCheck(cell) {
+            $('input', cell).icheck({
+                checkboxClass: 'icheckbox_square-red',
+                radioClass: 'iradio_square-red'
+            });
+        };
+
+        function toggleAllCheck() {
+            $('#cball').icheck({
+                checkboxClass: 'icheckbox_square-red',
+                radioClass: 'iradio_square-red'
+            });
+        };
 
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
+        $("")
 
-    });
+    }); // End document ready
 
 
 
-var fetchAndInjectDetails = function(detailsData, injectInRow) {
-      require(['cocobox-handlebars', 'jquery.timeago', 'cocobox-icheck'], function (hb) {
-        var ajaxCallUrl = detailsData.detailsUrl;
+    var fetchAndInjectDetails = function(detailsData, injectInRow) {
+        require(['cocobox-handlebars', 'jquery.timeago', 'cocobox-icheck'], function (hb) {
+            var ajaxCallUrl = detailsData.detailsUrl;
 
-        cocobox.ajaxPost(ajaxCallUrl, {
-            success: function(data) {
-                $(injectInRow).empty();
-                $(injectInRow).removeClass('loading');
+            cocobox.ajaxPost(ajaxCallUrl, {
+                success: function(data) {
+                    $(injectInRow).empty();
+                    $(injectInRow).removeClass('loading');
 
-                var expirationStr = detailsData.expirationStr;
-                var expirationAgo = detailsData.expirationAgo;
-                var expired = detailsData.expired;
-                
-                for (var i = 0; i < data.reports.length; i++) {
-                    if (data.reports[i].type == 'application/pdf') {
-                        data.reports[i].filetype = data.reports[i].type.split('application/').join('');
+                    var expirationStr = detailsData.expirationStr;
+                    var expirationAgo = detailsData.expirationAgo;
+                    var expired = detailsData.expired;
+
+                    for (var i = 0; i < data.reports.length; i++) {
+                        if (data.reports[i].type == 'application/pdf') {
+                            data.reports[i].filetype = data.reports[i].type.split('application/').join('');
+                        }
                     }
-                }
-                
-                 hb.registerHelper('StatusName', function (activityStatus) {
+
+                    hb.registerHelper('StatusName', function (activityStatus) {
 
 
-                if (activityStatus == 'notAttempted') {
-                    var result = '<span class="text-muted">Not started</span>';
-                   return new hb.SafeString(result);
-                 } else if (activityStatus == 'incomplete') {
-                    var result = '<span class="text-info">In progress</span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'overdue') {
-                    var result = '<span class="text-danger">Overdue</span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'locked') {
-                    var result = '<span class="text-muted">Locked</span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'failed') {
-                    var result = '<span class="text-danger">Failed</span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'completed') {
-                    var result = '<span class="text-success">Completed</span>';
-                    return new hb.SafeString(result);
-                } else {
-                    return 'Unknown statusName:' + activityStatus;
-                }
+                        if (activityStatus == 'notAttempted') {
+                            var result = '<span class="text-muted">Not started</span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'incomplete') {
+                            var result = '<span class="text-info">In progress</span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'overdue') {
+                            var result = '<span class="text-danger">Overdue</span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'locked') {
+                            var result = '<span class="text-muted">Locked</span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'failed') {
+                            var result = '<span class="text-danger">Failed</span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'completed') {
+                            var result = '<span class="text-success">Completed</span>';
+                            return new hb.SafeString(result);
+                        } else {
+                            return 'Unknown statusName:' + activityStatus;
+                        }
 
 
 
-            });
+                    });
 
 
-            hb.registerHelper('StatusImage', function (activityStatus) {
+                    hb.registerHelper('StatusImage', function (activityStatus) {
 
-                if (activityStatus == 'notAttempted') {
-                    var result = '<span class="item__icon text-muted pe-7s-play pe-va pe-2x pe-fw"></span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'incomplete') {
-                    var result = '<span class="item__icon text-info pe-7s-glasses pe-va pe-2x pe-fw"></span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'overdue') {
-                    var result = '<span class="item__icon text-danger pe-7s-attention pe-va pe-2x pe-fw"></span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'locked') {
-                    var result = '<span class="item__icon text-muted pe-7s-lock pe-va pe-2x pe-fw"></span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'failed') {
-                    var result = '<span class="item__icon text-danger pe-7s-close-circle pe-va pe-2x pe-fw"></span>';
-                    return new hb.SafeString(result);
-                } else if (activityStatus == 'completed') {
-                    var result = '<span class="item__icon text-success pe-7s-check pe-va pe-2x pe-fw"></span>';
-                    return new hb.SafeString(result);
-                } else {
-                    return 'Unknown statusImage:' + activityStatus;
-                }
+                        if (activityStatus == 'notAttempted') {
+                            var result = '<span class="item__icon text-muted pe-7s-play pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'incomplete') {
+                            var result = '<span class="item__icon text-info pe-7s-glasses pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'overdue') {
+                            var result = '<span class="item__icon text-danger pe-7s-attention pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'locked') {
+                            var result = '<span class="item__icon text-muted pe-7s-lock pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'failed') {
+                            var result = '<span class="item__icon text-danger pe-7s-close-circle pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'completed') {
+                            var result = '<span class="item__icon text-success pe-7s-check pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else {
+                            return 'Unknown statusImage:' + activityStatus;
+                        }
 
-            });
-            
-                var templateSource = $("#roster-expand-template").html();
-                var template = hb.compile(templateSource);
-            
-                var renderedProgress = template(data)
-                var renderedReports = $('#reportinfoTemplate').render(data.reports);
-                var renderedAdminlinks = $('#adminlinkTemplate').render(data.adminlinks);
-                var renderedInvites = $('#invitesTemplate').render(data.idprojects);
+                    });
 
-                $(injectInRow).append($('#detailsTable').render({
-                    renderedProgress: renderedProgress,
-                    activitiesCompleted: data.activitiesTotal,
-                    activityCount: data.activityCount,
-                    renderedReports: renderedReports,
-                    renderedAdminlinks: renderedAdminlinks,
-                    renderedInvites: renderedInvites,
-                    expired: expired,
-                    expirationStr: expirationStr,
-                    expirationAgo: expirationAgo,
-                    reportsAvailable: data.reports.length !== 0
-                }));
-                //Show dropdown
+                    var templateSource = $("#roster-expand-template").html();
+                    var template = hb.compile(templateSource);
+
+                    var renderedProgress = template(data)
+                    var renderedReports = $('#reportinfoTemplate').render(data.reports);
+                    var renderedAdminlinks = $('#adminlinkTemplate').render(data.adminlinks);
+                    var renderedInvites = $('#invitesTemplate').render(data.idprojects);
+
+                    $(injectInRow).append($('#detailsTable').render({
+                        renderedProgress: renderedProgress,
+                        activitiesCompleted: data.activitiesTotal,
+                        activityCount: data.activityCount,
+                        renderedReports: renderedReports,
+                        renderedAdminlinks: renderedAdminlinks,
+                        renderedInvites: renderedInvites,
+                        expired: expired,
+                        expirationStr: expirationStr,
+                        expirationAgo: expirationAgo,
+                        reportsAvailable: data.reports.length !== 0
+                    }));
+                    //Show dropdown
                     $(".showDetails", injectInRow).click(function () {
                         $('.ToggleDrop').addClass("greyish");
                         $('.hide').addClass("tbRow");
                         $('[data-toggle="tooltip"]').tooltip()
                     });
-                    
+
                     //Hide dropdown
                     $(".showOverview", injectInRow).click(function () {
                         $('.ToggleDrop').removeClass("greyish");
                         $('.hide').removeClass("tbRow");
                     });
-                    
-                jQuery.timeago.settings.allowFuture = true;
-                $(injectInRow).find('.timeago').timeago();
-                //Hide invite section if no invites
-                if (renderedInvites.length < 1) {
-                    $('.invites').hide();
+
+                    jQuery.timeago.settings.allowFuture = true;
+                    $(injectInRow).find('.timeago').timeago();
+                    //Hide invite section if no invites
+                    if (renderedInvites.length < 1) {
+                        $('.invites').hide();
+                    }
+                    $('[data-toggle="tooltip"]').tooltip();
                 }
-                $('[data-toggle="tooltip"]').tooltip();
-            }
-        });
+            });
         });
     };
 
@@ -541,14 +542,14 @@ var fetchAndInjectDetails = function(detailsData, injectInRow) {
                 var clickedRow = $(parentTd).parent()[0];
 
                 var aoData = oTable.fnGetData(clickedRow);
-                
+
                 log('this is the data for the clicked row', aoData);
-                
+
                 //attach the expirationDetails
                 detailsData.expirationStr = aoData.expirationStr;
                 detailsData.expirationAgo = aoData.expirationAgo;
                 detailsData.expired = aoData.expired;
-                
+
                 detailsData.detailsUrl = aoData.detailsUrl;
 
                 $(this).toggleClass('pe-7s-plus');
@@ -587,22 +588,22 @@ var fetchAndInjectDetails = function(detailsData, injectInRow) {
     };
 
 
-   
-   function showBounceDialog(data) {
-       require(['dabox-common'], function() {
-        var bDialog = $("#bounceinfo").render(data);
-        cocobox.infoDialog('Bounce back message',bDialog);
-            });
-    }
-    
 
-    
+    function showBounceDialog(data) {
+        require(['dabox-common'], function() {
+            var bDialog = $("#bounceinfo").render(data);
+            cocobox.infoDialog('Bounce back message',bDialog);
+        });
+    }
+
+
+
     function showBounceInfo(strPartId) {
         cocobox.ajaxPost("${helper.urlFor('ProjectJsonModule','participationBounceInfo')}/" + strPartId, {
             success: showBounceDialog
         });
     }
-    
+
 
 
 
@@ -621,7 +622,7 @@ var fetchAndInjectDetails = function(detailsData, injectInRow) {
 
 
     var impersonateBaseUrl = "${helper.urlFor('ProjectModule','impersonate')}";
-    
+
     function impersonate(participationId) {
         window.location.href = impersonateBaseUrl+'/'+participationId;
         return false;
@@ -633,13 +634,13 @@ var fetchAndInjectDetails = function(detailsData, injectInRow) {
 
         require(["[@modal.javascript /]"], function(modal) {
             modal.open({
-	               title: "Move",
-	               src: moveSrc,
-	               height: "400px",
-                       width: "900px",
-                       cancel: function() 
-                        {/* Do nothing, otherwise redirect in popup */},
-                       cancelUrl: window.location.href
+                title: "Move",
+                src: moveSrc,
+                height: "400px",
+                width: "900px",
+                cancel: function()
+                {/* Do nothing, otherwise redirect in popup */},
+                cancelUrl: window.location.href
             });
         });
     };
@@ -673,6 +674,7 @@ ${cpweb_head}
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-pencil"></span> Manual</a></li>
+    <li role="presentation"><a href="#group" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-group"></span> Group</a></li>
     <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</a></li>
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
     <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
@@ -694,6 +696,27 @@ ${cpweb_head}
                 <div class="col-xs-12">
                     [@bsform.inputEmail name="memberemail" tabindex="4" maxlength="96" /]
                     <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmember' /]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    [#macro genOptions group level prefix]
+      [#assign l = level+1]
+      [#assign p = prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"]
+      <option value="${group.groupId?c}">${prefix}${group.name?xhtml}</option>
+      [#list group.children as sg]
+        [@genOptions group=sg level=l prefix=p][/@genOptions]
+      [/#list]
+    [/#macro]
+    <div role="tabpanel" class="tab-pane fade in active" id="group">
+        <div class="row">
+            <div class="col-xs-12">
+                    <select>
+                        [#list groups as g]
+                          [@genOptions group=g level=0 prefix=""][/@genOptions]
+                        [/#list]
+                    </select>
+                    <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
                 </div>
             </form>
         </div>
