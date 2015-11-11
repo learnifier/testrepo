@@ -4,19 +4,6 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.servlet.http.HttpServletResponse;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.RetargetException;
@@ -31,13 +18,12 @@ import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
-import se.dabox.cocobox.security.permission.CocoboxPermissions;
-import se.dabox.cocobox.security.project.ProjectPermissionCheck;
-import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -45,14 +31,8 @@ import se.dabox.service.common.ccbc.ListProjectParticipationsRequest;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
-import se.dabox.service.common.ccbc.project.MailBounce;
-import se.dabox.service.common.ccbc.project.MailBounceUtil;
-import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.common.ccbc.project.ProjectParticipation;
-import se.dabox.service.common.ccbc.project.ProjectProduct;
-import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
-import se.dabox.service.common.ccbc.project.ProjectTask;
-import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.*;
+import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
@@ -61,6 +41,8 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.cug.client.ClientUserGroup;
+import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.proddir.data.Product;
@@ -73,6 +55,12 @@ import se.dabox.util.RecentList;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
 import se.dabox.util.collections.Transformer;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.util.*;
 
 /**
  *
@@ -104,6 +92,58 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 return new MissingProductMaterial(item);
             }
         });
+    }
+
+    @WebAction
+    public RequestTarget onClientUserGroupInfo(RequestCycle cycle, String strProjectId, String strCugId)
+            throws Exception {
+        long prjId = Long.valueOf(strProjectId);
+        long cugId = Long.valueOf(strCugId);
+
+        final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj, strProjectId);
+
+        final List<ClientUserGroup> cugs = cugClient.listGroups(prj.getOrgId());
+
+        // Dig out the group to make sure we have access to this cugId
+        cugs.stream()
+                .filter(c -> c.getGroupId() == cugId)
+                .findFirst()
+                .get(); // Will throw exception if we do not have any matches
+
+        final List<UserAccount> uas = cugClient.listGroupMembers(cugId);
+
+        return jsonTarget(Collections.singletonMap("members", uas.size()));
+    }
+
+    @WebAction
+    public RequestTarget onAddMembersByGroup(RequestCycle cycle, String strProjectId, String strCugId)
+            throws Exception {
+        long prjId = Long.valueOf(strProjectId);
+        long cugId = Long.valueOf(strCugId);
+
+        final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj, strProjectId);
+
+        final List<ClientUserGroup> cugs = cugClient.listGroups(prj.getOrgId());
+
+        // Dig out the group to make sure we have access to this cugId
+        cugs.stream()
+                .filter(c -> c.getGroupId() == cugId)
+                .findFirst()
+                .get(); // Will throw exception if we do not have any matches
+
+        final List<UserAccount> uas = cugClient.listGroupMembers(cugId);
+
+        return jsonTarget(Collections.singletonMap("status", "OK"));
     }
 
     @WebAction

@@ -133,27 +133,9 @@ public class ProjectModule extends AbstractProjectWebModule {
                 ProjectModificationModule.UPLOAD_ROSTER_ACTION,
                 projectId));
 
-        // Dig out groups. May move this to a json call.
-        final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
-        final List<ClientUserGroup> cugs = cugClient.listGroups(project.getOrgId());
-        final Map<Long, ClientUserGroup> idCugHash = cugs.stream().
-                collect(Collectors.toMap(ClientUserGroup::getGroupId, Function.identity()));
-        final Map<Long, List<Long>> childrenHash = new HashMap<>();
-        cugs.stream()
-                .filter(cug -> cug.getParent() != null)
-                .forEach(cug -> {
-                    if(childrenHash.containsKey(cug.getParent())) {
-                       childrenHash.get(cug.getParent()).add(cug.getGroupId());
-                    } else {
-                        childrenHash.put(cug.getParent(), new ArrayList<>(Arrays.asList(cug.getGroupId())));
-                    }
-                });
-        final List <GroupInfo> gis = cugs.stream()
-                .filter(cug -> cug.getParent() == null)
-                .map(cug -> new GroupInfo(cug, idCugHash, childrenHash))
-                .collect(Collectors.toList());
+        final List<ClientUserGroup> cugs = getClientUserGroupClient(cycle).listGroups(project.getOrgId());
 
-        map.put("groups", gis);
+        map.put("groups", GroupInfo.fromCugs(cugs));
         addCommonMapValues(map, project, cycle);
         initSelfReg(cycle, project, map);
 
@@ -165,7 +147,26 @@ public class ProjectModule extends AbstractProjectWebModule {
         private final String name;
         private final List<GroupInfo> children;
 
-        public GroupInfo(ClientUserGroup cug, Map<Long, ClientUserGroup> cugHash, Map<Long, List<Long>> childrenHash) {
+        public static List<GroupInfo> fromCugs(List<ClientUserGroup> cugs) {
+            final Map<Long, ClientUserGroup> cugHash = cugs.stream().
+                    collect(Collectors.toMap(ClientUserGroup::getGroupId, Function.identity()));
+            final Map<Long, List<Long>> childrenHash = new HashMap<>();
+            cugs.stream()
+                    .filter(cug -> cug.getParent() != null)
+                    .forEach(cug -> {
+                        if(childrenHash.containsKey(cug.getParent())) {
+                            childrenHash.get(cug.getParent()).add(cug.getGroupId());
+                        } else {
+                            childrenHash.put(cug.getParent(), new ArrayList<>(Arrays.asList(cug.getGroupId())));
+                        }
+                    });
+            return cugs.stream()
+                    .filter(cug -> cug.getParent() == null)
+                    .map(cug -> new GroupInfo(cug, cugHash, childrenHash))
+                    .collect(Collectors.toList());
+        }
+
+        private GroupInfo(ClientUserGroup cug, Map<Long, ClientUserGroup> cugHash, Map<Long, List<Long>> childrenHash) {
             this.groupId = cug.getGroupId();
             this.name = cug.getName();
             if(childrenHash.containsKey(groupId)) {

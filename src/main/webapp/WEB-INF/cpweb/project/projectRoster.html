@@ -405,7 +405,28 @@ ${cpweb_foot}
 
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
-        $("")
+        $("#group button[type=submit]").on('click', function(ev) {
+            var select = cugId = $("#group select").val()
+                    , cugName = $("#group select option:selected").text()
+                    , infoUrl = "${helper.urlFor('project.ProjectJsonModule','clientUserGroupInfo', [prj.projectId?c])}/" + cugId ;
+            $.getJSON(infoUrl).done(function(data){
+                if(data.members == 0) {
+                    cocobox.infoDialog("Add members", "The group does not have any members.");
+                } else {
+                    cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group to the project?", function () {
+                        var addUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/" + cugId;
+                        $.getJSON(addUrl).done(function (data) {
+                            window.location.reload();
+                        }).fail(function (jqxhr, textStatus, error) {
+                            cocbox.infoDialog("Error", "There was a problem adding members: " + textStatus);
+                        });
+                    });
+                }
+            }).fail(function(jqxhr, textStatus, error){
+                console.error("Could not look up group id " + cugId + ". " + textStatus + ", " + error);
+
+            });
+        });
 
     }); // End document ready
 
@@ -674,7 +695,7 @@ ${cpweb_head}
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-pencil"></span> Manual</a></li>
-    <li role="presentation"><a href="#group" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-group"></span> Group</a></li>
+    <li role="presentation"><a href="#group" aria-controls="manual" role="tab" data-toggle="tab">Group</a></li>
     <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</a></li>
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
     <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
@@ -708,7 +729,7 @@ ${cpweb_head}
         [@genOptions group=sg level=l prefix=p][/@genOptions]
       [/#list]
     [/#macro]
-    <div role="tabpanel" class="tab-pane fade in active" id="group">
+    <div role="tabpanel" class="tab-pane fade" id="group">
         <div class="row">
             <div class="col-xs-12">
                     <select>
