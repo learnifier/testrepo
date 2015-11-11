@@ -3,12 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import com.sun.deploy.util.SessionState;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -25,44 +19,29 @@ import se.dabox.cocobox.coursebuilder.initdata.InitData;
 import se.dabox.cocobox.coursebuilder.initdata.InitDataBuilder;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.account.ChangePassword;
-import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
-import se.dabox.cocobox.cpweb.formdata.project.AddMemberForm;
-import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
-import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
-import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
-import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
+import se.dabox.cocobox.cpweb.formdata.project.*;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
 import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocobox.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.coursedesign.GetProjectCourseDesignCommand;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
-import se.dabox.cocobox.security.permission.CocoboxPermissions;
-import se.dabox.cocobox.security.role.CocoboxRoleUtil;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
-import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
-import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
-import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
-import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectDatabankSource;
-import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.*;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
-import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.common.ccbc.project.ProjectParticipation;
-import se.dabox.service.common.ccbc.project.ProjectParticipationState;
-import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
-import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
-import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.*;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectProductMaterialHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
@@ -71,6 +50,7 @@ import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.UpdateDesignRequest;
 import se.dabox.service.common.coursedesign.activity.MultiPageActivityCourse;
 import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
@@ -80,9 +60,13 @@ import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.cug.client.ClientUserGroup;
-import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  *
@@ -140,55 +124,6 @@ public class ProjectModule extends AbstractProjectWebModule {
         initSelfReg(cycle, project, map);
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
-    }
-
-    public static class GroupInfo {
-        private final long groupId;
-        private final String name;
-        private final List<GroupInfo> children;
-
-        public static List<GroupInfo> fromCugs(List<ClientUserGroup> cugs) {
-            final Map<Long, ClientUserGroup> cugHash = cugs.stream().
-                    collect(Collectors.toMap(ClientUserGroup::getGroupId, Function.identity()));
-            final Map<Long, List<Long>> childrenHash = new HashMap<>();
-            cugs.stream()
-                    .filter(cug -> cug.getParent() != null)
-                    .forEach(cug -> {
-                        if(childrenHash.containsKey(cug.getParent())) {
-                            childrenHash.get(cug.getParent()).add(cug.getGroupId());
-                        } else {
-                            childrenHash.put(cug.getParent(), new ArrayList<>(Arrays.asList(cug.getGroupId())));
-                        }
-                    });
-            return cugs.stream()
-                    .filter(cug -> cug.getParent() == null)
-                    .map(cug -> new GroupInfo(cug, cugHash, childrenHash))
-                    .collect(Collectors.toList());
-        }
-
-        private GroupInfo(ClientUserGroup cug, Map<Long, ClientUserGroup> cugHash, Map<Long, List<Long>> childrenHash) {
-            this.groupId = cug.getGroupId();
-            this.name = cug.getName();
-            if(childrenHash.containsKey(groupId)) {
-                children = childrenHash.get(groupId).stream()
-                        .map(childId -> new GroupInfo(cugHash.get(childId), cugHash, childrenHash))
-                        .collect(Collectors.toList());
-            } else {
-                children = Collections.emptyList();
-            }
-        }
-
-        public long getGroupId() {
-            return groupId;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public List<GroupInfo> getChildren() {
-            return children;
-        }
     }
 
 
