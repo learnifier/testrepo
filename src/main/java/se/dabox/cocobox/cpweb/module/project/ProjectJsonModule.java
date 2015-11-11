@@ -61,6 +61,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -95,7 +96,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onClientUserGroupInfo(RequestCycle cycle, String strProjectId, String strCugId)
+    public RequestTarget onGroupInfo(RequestCycle cycle, String strProjectId, String strCugId)
             throws Exception {
         long prjId = Long.valueOf(strProjectId);
         long cugId = Long.valueOf(strCugId);
@@ -142,7 +143,16 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 .get(); // Will throw exception if we do not have any matches
 
         final List<UserAccount> uas = cugClient.listGroupMembers(cugId);
-
+        final long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+        final CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
+        Set<Long> participants =
+                ccbcClient.listProjectParticipations(prj.getProjectId())
+                .stream().map(ProjectParticipation::getUserId).collect(Collectors.toSet());
+        uas.stream()
+                .filter(ua -> !participants.contains(ua.getUserId()))
+                .forEach(ua ->
+                    ccbcClient.newProjectParticipant(caller, prjId, ua.getUserId()));
+        // TODO: Should count number of successful adds and list of errors?
         return jsonTarget(Collections.singletonMap("status", "OK"));
     }
 

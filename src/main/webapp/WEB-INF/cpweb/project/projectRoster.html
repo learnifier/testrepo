@@ -408,7 +408,7 @@ ${cpweb_foot}
         $("#group button[type=submit]").on('click', function(ev) {
             var select = cugId = $("#group select").val()
                     , cugName = $("#group select option:selected").text()
-                    , infoUrl = "${helper.urlFor('project.ProjectJsonModule','clientUserGroupInfo', [prj.projectId?c])}/" + cugId ;
+                    , infoUrl = "${helper.urlFor('project.ProjectJsonModule','groupInfo', [prj.projectId?c])}/" + cugId ;
             $.getJSON(infoUrl).done(function(data){
                 if(data.members == 0) {
                     cocobox.infoDialog("Add members", "The group does not have any members.");
