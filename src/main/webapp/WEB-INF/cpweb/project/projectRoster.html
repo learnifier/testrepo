@@ -405,9 +405,9 @@ ${cpweb_foot}
 
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
-        // Group tab
         require(['select2.min'], function() {
-            $("#group select").select2({
+            // Group tab
+            $("#addByGroup").select2({
                 placeholder: "Select a group",
                 allowClear: true,
                 formatSelection: function(opt){return opt.text.trim()}
@@ -421,7 +421,7 @@ ${cpweb_foot}
                     if (data.members == 0) {
                         cocobox.infoDialog("Add members", "The group does not have any members.");
                     } else {
-                        cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group to the project?", function () {
+                        cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group " + cugName + " to the project?", function () {
                             var addUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/" + cugId;
                             $.getJSON(addUrl).done(function (data) {
                                 window.location.reload();
@@ -432,9 +432,18 @@ ${cpweb_foot}
                     }
                 }).fail(function (jqxhr, textStatus, error) {
                     console.error("Could not look up group id " + cugId + ". " + textStatus + ", " + error);
-
                 });
             });
+            // Group tab
+            $("#markByGroup").select2({
+                placeholder: "Mark members by group",
+                allowClear: true,
+                formatSelection: function(opt){return opt.text.trim()}
+                // formatResult is templateSelection in 4.0
+            }).change(function(){
+                console.log("Change");
+            });
+
         });
 
     }); // End document ready
@@ -699,6 +708,24 @@ ${cpweb_head}
 
 
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
+
+[#macro genOptions group level prefix]
+    [#assign l = level+1]
+    [#assign p = prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"]
+    <option value="${group.groupId?c}">${prefix}${group.name?xhtml}</option>
+    [#list group.children as sg]
+        [@genOptions group=sg level=l prefix=p][/@genOptions]
+    [/#list]
+[/#macro]
+[#macro genGroupSelect groups selectId]
+    <select id="${selectId}">
+        <option value=""></option>
+        [#list groups as g]
+        [@genOptions group=g level=0 prefix=""][/@genOptions]
+        [/#list]
+    </select>
+[/#macro]
+
 <div role="tabpanel" class="ccb-tabpanel ccb-tabpanel--colored">
 
   <!-- Nav tabs -->
@@ -730,26 +757,12 @@ ${cpweb_head}
             </form>
         </div>
     </div>
-    [#macro genOptions group level prefix]
-      [#assign l = level+1]
-      [#assign p = prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"]
-      <option value="${group.groupId?c}">${prefix}${group.name?xhtml}</option>
-      [#list group.children as sg]
-        [@genOptions group=sg level=l prefix=p][/@genOptions]
-      [/#list]
-    [/#macro]
     <div role="tabpanel" class="tab-pane fade" id="group">
         <div class="row">
             <div class="col-xs-12">
-                    <select>
-                        <option value=""></option>
-                        [#list groups as g]
-                          [@genOptions group=g level=0 prefix=""][/@genOptions]
-                        [/#list]
-                    </select>
-                    <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
-                </div>
-            </form>
+                [@genGroupSelect groups=groups selectId="addByGroup"][/@genGroupSelect]
+                <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
+            </div>
         </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="uploadroster">
@@ -787,7 +800,8 @@ ${cpweb_head}
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         [/@]
-        
+        [@genGroupSelect groups=groups selectId="markByGroup"][/@genGroupSelect]
+
         
         [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
