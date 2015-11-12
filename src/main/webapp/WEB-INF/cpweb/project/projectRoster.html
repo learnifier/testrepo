@@ -405,26 +405,33 @@ ${cpweb_foot}
 
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
-        $("#group button[type=submit]").on('click', function(ev) {
-            var select = cugId = $("#group select").val()
-                    , cugName = $("#group select option:selected").text()
-                    , infoUrl = "${helper.urlFor('project.ProjectJsonModule','groupInfo', [prj.projectId?c])}/" + cugId ;
-            $.getJSON(infoUrl).done(function(data){
-                if(data.members == 0) {
-                    cocobox.infoDialog("Add members", "The group does not have any members.");
-                } else {
-                    cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group to the project?", function () {
-                        var addUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/" + cugId;
-                        $.getJSON(addUrl).done(function (data) {
-                            window.location.reload();
-                        }).fail(function (jqxhr, textStatus, error) {
-                            cocbox.infoDialog("Error", "There was a problem adding members: " + textStatus);
+        // Group tab
+        require(['select2.min'], function() {
+            $("#group select").select2({
+                placeholder: "Select a group",
+                allowClear: true
+            });
+            $("#group button[type=submit]").on('click', function (ev) {
+                var select = cugId = $("#group select").val()
+                        , cugName = $("#group select option:selected").text()
+                        , infoUrl = "${helper.urlFor('project.ProjectJsonModule','groupInfo', [prj.projectId?c])}/" + cugId;
+                $.getJSON(infoUrl).done(function (data) {
+                    if (data.members == 0) {
+                        cocobox.infoDialog("Add members", "The group does not have any members.");
+                    } else {
+                        cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group to the project?", function () {
+                            var addUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/" + cugId;
+                            $.getJSON(addUrl).done(function (data) {
+                                window.location.reload();
+                            }).fail(function (jqxhr, textStatus, error) {
+                                cocbox.infoDialog("Error", "There was a problem adding members: " + textStatus);
+                            });
                         });
-                    });
-                }
-            }).fail(function(jqxhr, textStatus, error){
-                console.error("Could not look up group id " + cugId + ". " + textStatus + ", " + error);
+                    }
+                }).fail(function (jqxhr, textStatus, error) {
+                    console.error("Could not look up group id " + cugId + ". " + textStatus + ", " + error);
 
+                });
             });
         });
 
@@ -733,6 +740,7 @@ ${cpweb_head}
         <div class="row">
             <div class="col-xs-12">
                     <select>
+                        <option value=""></option>
                         [#list groups as g]
                           [@genOptions group=g level=0 prefix=""][/@genOptions]
                         [/#list]
