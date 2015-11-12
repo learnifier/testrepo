@@ -8,6 +8,7 @@ import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.annotation.AroundInvoke;
+import net.unixdeveloper.druwa.linkencoder.RequestCycleLinkEncoders;
 import net.unixdeveloper.druwa.module.InvocationContext;
 import se.dabox.cocobox.cpweb.FragmentInitializer;
 import se.dabox.cocobox.security.CocoboxSecurityConstants;
@@ -69,6 +70,18 @@ public abstract class AbstractWebAuthModule extends AbstractAuthModule {
 
         return ctx.proceed();
     }
+
+    @AroundInvoke(order = 600)
+    public Object detectTpHybridMode(InvocationContext ctx) {
+        String cpmode = ctx.getRequestCycle().getRequest().getParameter("_cpmode");
+
+        if ("tp".equals(cpmode)) {
+            RequestCycleLinkEncoders.addLinkEncoder(ctx.getRequestCycle(), new TpHybridModeLinkEncoder());
+        }
+
+        return ctx.proceed();
+    }
+
 
     @Override
     protected void checkOrgPermission(RequestCycle cycle, String strOrgId) {
