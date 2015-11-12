@@ -73,10 +73,12 @@ public abstract class AbstractWebAuthModule extends AbstractAuthModule {
 
     @AroundInvoke(order = 600)
     public Object detectTpHybridMode(InvocationContext ctx) {
-        String cpmode = ctx.getRequestCycle().getRequest().getParameter("_cpmode");
+        final RequestCycle cycle = ctx.getRequestCycle();
+        String cpmode = cycle.getRequest().getParameter("_cpmode");
 
         if ("tp".equals(cpmode)) {
-            RequestCycleLinkEncoders.addLinkEncoder(ctx.getRequestCycle(), new TpHybridModeLinkEncoder());
+            RequestCycleLinkEncoders.addLinkEncoder(cycle, new TpHybridModeLinkEncoder());
+            TpHybridModeLinkEncoder.setHybridMode(cycle, true);
         }
 
         return ctx.proceed();

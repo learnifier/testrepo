@@ -13,6 +13,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirectoryClient;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.cpweb.module.core.TpHybridModeLinkEncoder;
 import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
@@ -86,6 +87,8 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         map.put("canDeleteProject", isDeleteProjectPossible(project));
 
         map.put("isDesignDetailsAvailable", isDesignDetailsAvailable(project));
+
+        map.put("skinName", TpHybridModeLinkEncoder.isHybridMode(cycle) ? "TPFlorida" : "CPAuth3");
     }
 
     private Product getProductFromParticipationProjectState(RequestCycle cycle,

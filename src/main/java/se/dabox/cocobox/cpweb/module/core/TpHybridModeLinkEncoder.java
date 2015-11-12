@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.core;
 
 import java.net.URI;
+import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.linkencoder.LinkEncoder;
 import net.unixdeveloper.druwa.linkencoder.LinkEncoderContext;
 import net.unixdeveloper.druwa.util.UrlBuilder;
@@ -12,9 +13,18 @@ import net.unixdeveloper.druwa.util.UrlBuilder;
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
-class TpHybridModeLinkEncoder implements LinkEncoder {
+public class TpHybridModeLinkEncoder implements LinkEncoder {
+    public static final String HYBRID_MODE_NAME = "tpHybridMode";
 
-    public TpHybridModeLinkEncoder() {
+    TpHybridModeLinkEncoder() {
+    }
+
+    public static boolean isHybridMode(RequestCycle cycle) {
+        return cycle.getAttribute(HYBRID_MODE_NAME) != null;
+    }
+
+    public static void setHybridMode(RequestCycle cycle, boolean hybridMode) {
+        cycle.setAttribute(HYBRID_MODE_NAME, hybridMode ? Boolean.TRUE : null);
     }
 
     @Override
