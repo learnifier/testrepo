@@ -31,7 +31,7 @@ ${cpweb_head}
 
 
 [#assign title = (prj.name!'') + " course ("+orgName+")" /]
-[@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=title]
+[@dws.skin skin=skinName head=cpweb_head foot=foot orgName=title]
 <article id="ccb-page-designData">
     <h1>[@dws.txt key="cpweb.designdata.title" /]<span> ${prj.name?xhtml}</span></h1>
     <p>Bring your course to life by setting duration for activites, when a session starts and ends, the phone number for a conference call, etc...</p>
