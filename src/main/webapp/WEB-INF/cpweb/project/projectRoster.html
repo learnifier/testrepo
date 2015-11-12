@@ -409,7 +409,9 @@ ${cpweb_foot}
         require(['select2.min'], function() {
             $("#group select").select2({
                 placeholder: "Select a group",
-                allowClear: true
+                allowClear: true,
+                formatSelection: function(opt){return opt.text.trim()}
+                // formatResult is templateSelection in 4.0
             });
             $("#group button[type=submit]").on('click', function (ev) {
                 var select = cugId = $("#group select").val()
