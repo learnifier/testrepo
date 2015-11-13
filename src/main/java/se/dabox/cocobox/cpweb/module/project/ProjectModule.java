@@ -42,6 +42,7 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.role.CocoboxRoleUtil;
+import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
@@ -79,6 +80,7 @@ import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient
 import se.dabox.service.common.material.Material;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.collections.ValueUtils;
 
 /**
  *
@@ -334,6 +336,31 @@ public class ProjectModule extends AbstractProjectWebModule {
         map.put("participantState", state);
 
         return new FreemarkerRequestTarget("/project/participationStatusRaw.html", map);
+    }
+
+    /**
+     * Dumps the current course design definition for the project. If no primary
+     * design is found the stage design is dumped.
+     *
+     * @param cycle
+     * @param projectId
+     * @return
+     */
+    @WebAction
+    public RequestTarget onCdd(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
+
+        CourseDesign design
+                = cdClient.getDesign(ValueUtils.coalesce(project.getDesignId(), project.
+                        getStageDesignId()));
+
+        return new StringRequestTarget("text/xml", design.getDesign());
     }
 
     @WebAction
