@@ -12,12 +12,14 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.user.UserModule;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
@@ -104,7 +106,6 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
-
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj, strProjectId);
 
@@ -119,6 +120,31 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         final List<UserAccount> uas = cugClient.listGroupMembers(cugId);
 
         return jsonTarget(Collections.singletonMap("members", uas.size()));
+    }
+
+    @WebAction
+    public RequestTarget onListGroupMembers(RequestCycle cycle, String strProjectId, String strCugId)
+            throws Exception {
+        long prjId = Long.valueOf(strProjectId);
+        long cugId = Long.valueOf(strCugId);
+
+        final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj, strProjectId);
+
+        final List<ClientUserGroup> cugs = cugClient.listGroups(prj.getOrgId());
+
+        // Dig out the group to make sure we have access to this cugId
+        cugs.stream()
+                .filter(c -> c.getGroupId() == cugId)
+                .findFirst()
+                .get(); // Will throw exception if we do not have any matches
+
+        final List<UserAccount> uas = cugClient.listGroupMembers(cugId);
+
+        return jsonTarget(toJson(uas));
     }
 
     @WebAction
@@ -807,5 +833,22 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
             this.products = products;
             this.missing = missing;
         }
+    }
+
+    private byte[] toJson(final List<UserAccount> uas) {
+        return new JsonEncoding() {
+            @Override
+            protected void encodeData(JsonGenerator generator) throws IOException {
+                generator.writeStartObject();
+                generator.writeArrayFieldStart("aaData");
+                for(UserAccount ua: uas) {
+                    generator.writeStartObject();
+                    generator.writeNumberField("userId", ua.getUserId());
+                    generator.writeEndObject();
+                }
+                generator.writeEndArray();
+                generator.writeEndObject();
+            }
+        }.encode();
     }
 }

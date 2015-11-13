@@ -138,6 +138,7 @@ class ProjectRosterJsonGenerator {
                 g.writeNumberField("status", percentage(prj, completedCids, item));
                 g.writeStringField("link", NavigationUtil.toUserPageUrl(cycle,
                         strOrgId, item.getUserId())+'/'+item.getParticipationId());
+                g.writeNumberField("userId", item.getUserId());
                 g.writeBooleanField("bounced", item.isMailBounced());
 
                 String participationLink = getConfValue(cycle, "cocobox.user.loginsite") + '/'
