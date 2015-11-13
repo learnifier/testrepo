@@ -495,11 +495,11 @@ ${cpweb_foot}
                             oTable.api().cell(ri, 0).data(true);
                         }
                     });
-
                 }).fail(function (jqxhr, textStatus, error) {
                     cocbox.infoDialog("Error", "There was a problem getting members from group: " + textStatus);
-                });
-
+                }).always(function(){
+                    $("#markByGroup").select2("val", "");
+                })
             });
 
         });
