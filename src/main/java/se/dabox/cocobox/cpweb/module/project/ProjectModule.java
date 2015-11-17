@@ -56,6 +56,7 @@ import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
@@ -449,10 +450,12 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         legacyDesignTitleHandling(cycle, project, designId);
 
+        String projectName = new GetProjectAdministrativeName(cycle).getName(project);
+
         InitData initData = new InitDataBuilder().setProjectInitData(
                 project.getOrgId(),
                 brandingId,
-                project.getName(),
+                projectName,
                 designId,
                 project.getProjectId(),
                 backUrl).createInitData();
@@ -475,10 +478,12 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         String backUrl = NavigationUtil.toProjectPageUrl(cycle, project.getProjectId());
 
+        String projectName = new GetProjectAdministrativeName(cycle).getName(project);
+
         InitData initData = new InitDataBuilder().setProjectInitData(
                 project.getOrgId(),
                 brandingId,
-                project.getName(),
+                projectName,
                 designId,
                 project.getProjectId(),
                 backUrl).

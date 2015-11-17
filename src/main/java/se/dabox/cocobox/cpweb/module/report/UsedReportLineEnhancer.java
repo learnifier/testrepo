@@ -13,6 +13,7 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
@@ -26,12 +27,15 @@ class UsedReportLineEnhancer {
     private final RequestCycle cycle;
     private final CocoboxCoordinatorClient ccbc;
     private final ProductDirectoryClient pdClient;
+    private final GetProjectAdministrativeName projectNameHelper;
 
     UsedReportLineEnhancer(RequestCycle cycle) {
         this.cycle = cycle;
 
         ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
         pdClient = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+        
+        projectNameHelper = new GetProjectAdministrativeName(cycle);
     }
 
     List<Map<String, Object>> enhance(List<Map<String, Object>> reportLines) {
@@ -77,7 +81,7 @@ class UsedReportLineEnhancer {
             return null;
         }
 
-        return prj.getName();
+        return projectNameHelper.getName(prj);
     }
 
     private String getDeeplinkName(Map<String, Object> map) {

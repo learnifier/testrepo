@@ -45,6 +45,7 @@ import se.dabox.service.common.ccbc.ListProjectParticipationsRequest;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.MailBounce;
 import se.dabox.service.common.ccbc.project.MailBounceUtil;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -173,6 +174,9 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL,
                 CocositeUserHelper.getUserLocale(cycle));
 
+        final GetProjectAdministrativeName projectNameHelper = new GetProjectAdministrativeName(
+                cycle);
+        
         ByteArrayOutputStream stream =
                 new JsonEncoding(format) {
                     @Override
@@ -190,7 +194,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
                         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
                         OrgProject prj = ccbc.getProject(data.getProjectId());
-                        generator.writeStringField("projectName", prj.getName());
+                        generator.writeStringField("projectName", projectNameHelper.getName(prj));
 
                         writeDateField(generator, "created", data.getCreated());
 

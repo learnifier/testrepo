@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
@@ -63,6 +65,7 @@ import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.org.UpdateOrgProductLinkRequest;
 import se.dabox.service.common.ccbc.product.ProductInUseException;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.project.ProjectType;
@@ -975,7 +978,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     private List<String> getLinkedProjectNames(CocoboxCoordinatorClient ccbc, OrgMaterial orgMat) {
         List<OrgProject> projects = ccbc.listOrgProjectsUsingOrgMat(orgMat.getOrgMaterialId());
 
-        return CollectionsUtil.transformList(projects, OrgProject::getName);
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+        final GetProjectAdministrativeName nameHelper = new GetProjectAdministrativeName(cycle);
+
+        return CollectionsUtil.transformList(projects, nameHelper::getName);
     }
 
     private Map<String, AccountBalance> getAccountBalanceMap(RequestCycle cycle, long orgId,
@@ -1210,9 +1216,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     private Map<String,Object> toProjectIdAndName(OrgProject project) {
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+
         Map<String,Object> map = new Flat3Map<>();
         map.put("projectId", project.getProjectId());
-        map.put("name", project.getName());
+        map.put("name", new GetProjectAdministrativeName(cycle).getName(project));
 
         return map;
     }
