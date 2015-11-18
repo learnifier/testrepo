@@ -776,7 +776,7 @@ ${cpweb_head}
     [/#list]
 [/#macro]
 [#macro genGroupSelect groups selectId]
-    <select id="${selectId}">
+    <select id="${selectId}" style="margin-bottom: 10px;">
         <option value=""></option>
         [#list groups as g]
         [@genOptions group=g level=0 prefix=""][/@genOptions]
