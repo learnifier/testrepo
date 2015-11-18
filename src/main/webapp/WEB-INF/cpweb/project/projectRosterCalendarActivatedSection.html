@@ -1,9 +1,10 @@
 [#ftl /]
 [@dwsrt.feature feature="autoical"]
     [#if prj.autoIcal]
-        Calendar invitations are ON.
+    <p class="calenderInvites">Calendar invitations are ON.
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <a href="${helper.urlFor('ProjectModule','settings',[prj.projectId?c])}">Turn them OFF?</a>
         [/@]
+        </p>
     [/#if]
 [/@dwsrt.feature]
