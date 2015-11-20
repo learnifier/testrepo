@@ -47,10 +47,10 @@
         <img class="page-thumbnail img-thumbnail" src="${projectThumbnail}" />
         <p class="page-title-label">Project</p>
         [#if isIdproject() ]
-                <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${infoHelper.getUserIdentifier((participationOwner.userId)!0)!''?xhtml}</h1>
+                <h1 class="page-title" id="project-name">${projectName?xml}</h1>
                 <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
         [#elseif isSubproject ]
-                <h1 class="page-title" id="project-name">${(material.title?xhtml)!'Unknown product'} for ${(masterProject.name!'No name')?xml}</h1>
+                <h1 class="page-title" id="project-name">${projectName?xml}</h1>
         [#else]	
             <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
             <ul class="page-created-updated__wrapper list-inline">

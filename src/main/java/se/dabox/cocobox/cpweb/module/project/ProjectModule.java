@@ -42,7 +42,6 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.role.CocoboxRoleUtil;
-import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
@@ -133,6 +132,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 projectId));
         addCommonMapValues(map, project, cycle);
         initSelfReg(cycle, project, map);
+        map.put("moveEnabled", isMoveEnabled(cycle, project));
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }

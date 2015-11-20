@@ -46,7 +46,6 @@ import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -64,7 +63,11 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         OrgProject project = getProject(cycle, strProjectId);
 
         checkPermission(cycle, project);
-        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
+        if (isMoveEnabled(cycle, project)) {
+            throw new IllegalStateException("Not allowed for this project type");
+        }
+
         ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
 
         Map<String, Object> map = createMap();
@@ -82,7 +85,10 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         OrgProject project = getProject(cycle, strProjectId);
 
         checkPermission(cycle, project);
-        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
+        if (isMoveEnabled(cycle, project)) {
+            throw new IllegalStateException("Not allowed for this project type");
+        }
         ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
 
         Map<String, Object> map = createMap();
@@ -117,7 +123,10 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         OrgProject project = getProject(cycle, strProjectId);
 
         checkPermission(cycle, project);
-        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
+        if (isMoveEnabled(cycle, project)) {
+            throw new IllegalStateException("Not allowed for this project type");
+        }
         ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
 
         Long targetProjectId
@@ -239,13 +248,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         List<Material> materials = OrgMaterialJsonModule.getOrgMaterials(cycle, project.getOrgId(),
                 project, null);
 
-        return CollectionsUtil.createMap(materials, new Transformer<Material,String>() {
-
-            @Override
-            public String transform(Material item) {
-                return item.getId();
-            }
-        });
+        return CollectionsUtil.createMap(materials, Material::getId);
     }
 
 }

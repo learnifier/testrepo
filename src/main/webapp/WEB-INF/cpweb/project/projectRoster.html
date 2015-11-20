@@ -58,10 +58,9 @@ ${cpweb_foot}
     [/@]
 
     var moveLink = "";
-    var moveEnabled = false;
+    var moveEnabled = ${moveEnabled?c};
     [@portalSecurity.permissionBlock permission="CP_MOVE_PARTICIPANT"]
         moveLink = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}";
-        moveEnabled = true;
     [/@]
         
      

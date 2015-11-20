@@ -62,6 +62,7 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.proddir.data.Product;
@@ -98,13 +99,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         //Now only missing ids are left
 
-        return CollectionsUtil.transformList(prodIdSet, new Transformer<String, Material>() {
-
-            @Override
-            public Material transform(String item) {
-                return new MissingProductMaterial(item);
-            }
-        });
+        return CollectionsUtil.transformList(prodIdSet, (String item) ->
+                new MissingProductMaterial(item));
     }
 
     @WebAction
@@ -661,6 +657,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 Clients.getClient(cycle, ProductDirectoryClient.class);
 
         List<Product> existingProducts = pdClient.getProducts(true, prodIds);
+        ProductTypeUtil.setTypes(pdClient, existingProducts);
 
         List<Material> missing = getMissingProducts(prodIds, existingProducts);
 
