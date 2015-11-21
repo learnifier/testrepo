@@ -64,9 +64,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
 
         checkPermission(cycle, project);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
-        if (isMoveEnabled(cycle, project)) {
-            throw new IllegalStateException("Not allowed for this project type");
-        }
+        ensureMoveAllowed(cycle, project);
 
         ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
 
@@ -86,9 +84,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
 
         checkPermission(cycle, project);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
-        if (isMoveEnabled(cycle, project)) {
-            throw new IllegalStateException("Not allowed for this project type");
-        }
+        ensureMoveAllowed(cycle, project);
         ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
 
         Map<String, Object> map = createMap();
@@ -124,9 +120,7 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
 
         checkPermission(cycle, project);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
-        if (isMoveEnabled(cycle, project)) {
-            throw new IllegalStateException("Not allowed for this project type");
-        }
+        ensureMoveAllowed(cycle, project);
         ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
 
         Long targetProjectId
@@ -152,6 +146,12 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
             return new FreemarkerRequestTarget("/project/move/moveSuccessful.html", map);
         } else {
             return new FreemarkerRequestTarget("/project/move/moveError.html", map);
+        }
+    }
+
+    private void ensureMoveAllowed(RequestCycle cycle, OrgProject project) throws IllegalStateException {
+        if (!isMoveEnabled(cycle, project)) {
+            throw new IllegalStateException("Not allowed for this project type: "+project.getSubtype());
         }
     }
 
