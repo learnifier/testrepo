@@ -470,6 +470,7 @@ ${cpweb_foot}
                     } else {
                         cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group " + cugName + " to the project?", function () {
                             var addUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/" + cugId;
+                            cocobox.longOp();
                             $.getJSON(addUrl).done(function (data) {
                                 window.location.reload();
                             }).fail(function (jqxhr, textStatus, error) {
