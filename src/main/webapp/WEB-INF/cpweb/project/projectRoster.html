@@ -73,7 +73,11 @@ ${cpweb_foot}
                 "lengthMenu": [ [2, 20, 50, 100, 1000, -1], [2, 20, 50, 100, 1000, "All"] ],
                 "pageLength": 2,
                 "order": [[2, 'asc']],
+                "drawCallback": function(settings) {
+                    console.log("drawCallback");
+                },
                 "createdRow": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
+                    console.log("createdRow");
                     if (oObj.inError) {
                         $(nRow).addClass('error');
                         $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
@@ -97,6 +101,7 @@ ${cpweb_foot}
                     {
                         "targets": [0],
                         "data": function(row, type, val, meta) {
+                            console.log("data");
                             var hiddenString = $("input[name=__ids]").val(); // TODO: Handle multiple datatables
                             var allValues = hiddenString == "" ? [] : hiddenString.split(',');
 
@@ -122,20 +127,20 @@ ${cpweb_foot}
                         "orderable": false,
                         "width": "24px",
                         "render": function(data, type, row, meta) {
+                            console.log("render", data, type, row, meta);
                             var ids = $("input[name=__ids]").val().split(","),
                                     checked = (jQuery.inArray(String(row.id), ids) !== -1),
                                     cbId = "memberCb" + cbCounter,
-                                    html = '<input id="' + cbId + '" type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + row.id + '"'+ (checked?" checked":"") + ' />';
-                            cbCounter++;
-//                            setTimeout(function() {
-//                                // This is a bit of a hack: I can not find a callback after the returned html is actually inserted.
-//                                // This seems to work; but I do not know if the checkbox is in the Dom or not, so code below may or may
-//                                // nor be run.
-//                                runiCheckElement($('#' + cbId));
-//                            }, 0);
-                            return html;
+                                    html = '<div><input id="' + cbId + '" type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + row.id + '"'+ (checked?" checked":"") + ' /></div>';
+                            var $toProcess = $(html);
+                            $toProcess.icheck({
+                                checkboxClass: 'icheckbox_square-red',
+                                radioClass: 'iradio_square-red'
+                            });
+                            return $toProcess.html();
                         },
                         "createdCell": function (td, cellData, rowData, row, col) {
+                            console.log("createdCell");
                             runiCheck(td);
                         }
                     },
