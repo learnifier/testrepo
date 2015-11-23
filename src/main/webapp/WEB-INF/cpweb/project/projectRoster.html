@@ -131,7 +131,7 @@ ${cpweb_foot}
                             var ids = $("input[name=__ids]").val().split(","),
                                     checked = (jQuery.inArray(String(row.id), ids) !== -1),
                                     cbId = "memberCb" + cbCounter,
-                                    html = '<div><input id="' + cbId + '" type="checkbox" class="rowcb" onchange="return cpweb.rowcbChange(this)" data-rowid="' + row.id + '"'+ (checked?" checked":"") + ' /></div>';
+                                    html = '<div><input id="' + cbId + '" type="checkbox" class="rowcb" data-rowid="' + row.id + '"'+ (checked?" checked":"") + ' /></div>';
                             var $toProcess = $(html);
                             $toProcess.icheck({
                                 checkboxClass: 'icheckbox_square-red',
@@ -141,7 +141,7 @@ ${cpweb_foot}
                         },
                         "createdCell": function (td, cellData, rowData, row, col) {
                             console.log("createdCell");
-                            runiCheck(td);
+//                            runiCheck(td);
                         }
                     },
 
@@ -334,6 +334,10 @@ ${cpweb_foot}
                     "sLoadingRecords": "<p>Loading roster...</p><img src='[@common.spinnerUrl /]' />"
                 }
             });
+        });
+
+        $(document).on('change', 'input.rowcb[type=checkbox]', function(){
+            return cpweb.rowcbChange(this);
         });
 
         $('#projectroster').on('click', 'a[data-trigger=roster-row-action]',function(ev){
