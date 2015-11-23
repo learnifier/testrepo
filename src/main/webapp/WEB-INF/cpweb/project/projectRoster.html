@@ -70,14 +70,10 @@ ${cpweb_foot}
             var cbCounter = 0;
             window.oTable = $('#projectroster').dataTable({
                 "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>><"row"<"col-sm-12"l>>',
-                "lengthMenu": [ [2, 20, 50, 100, 1000, -1], [2, 20, 50, 100, 1000, "All"] ],
-                "pageLength": 2,
+                "lengthMenu": [ [20, 50, 100, 1000, -1], [2, 20, 50, 100, 1000, "All"] ],
+                "pageLength": 100,
                 "order": [[2, 'asc']],
-                "drawCallback": function(settings) {
-                    console.log("drawCallback");
-                },
                 "createdRow": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
-                    console.log("createdRow");
                     if (oObj.inError) {
                         $(nRow).addClass('error');
                         $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
@@ -101,12 +97,10 @@ ${cpweb_foot}
                     {
                         "targets": [0],
                         "data": function(row, type, val, meta) {
-                            console.log("data");
                             var hiddenString = $("input[name=__ids]").val(); // TODO: Handle multiple datatables
                             var allValues = hiddenString == "" ? [] : hiddenString.split(',');
 
                             if(type === 'set') {
-                                console.log("data:set", row, type, val);
                                 if (val === true) {
                                     if (jQuery.inArray(String(row.id), allValues) == -1) {
                                         allValues.push(row.id);
@@ -127,7 +121,6 @@ ${cpweb_foot}
                         "orderable": false,
                         "width": "24px",
                         "render": function(data, type, row, meta) {
-                            console.log("render", data, type, row, meta);
                             var ids = $("input[name=__ids]").val().split(","),
                                     checked = (jQuery.inArray(String(row.id), ids) !== -1),
                                     cbId = "memberCb" + cbCounter,
@@ -138,10 +131,6 @@ ${cpweb_foot}
                                 radioClass: 'iradio_square-red'
                             });
                             return $toProcess.html();
-                        },
-                        "createdCell": function (td, cellData, rowData, row, col) {
-                            console.log("createdCell");
-//                            runiCheck(td);
                         }
                     },
 
@@ -418,17 +407,6 @@ ${cpweb_foot}
         [/@]
 
         $("#cball").on('click', function(ev) {
-//            if (this.checked) {
-//                var items = $("input.rowcb").not(":checked");
-//                items.trigger('click');
-//                //Trigger change so that IE8- picks up the change
-//                items.trigger('change');
-//            } else {
-//                var items = $("input.rowcb").filter(":checked");
-//                items.trigger('click');
-//                //Trigger change so that IE8- picks up the change
-//                items.trigger('change');
-//            }
             var checked = this.checked;
             $.each(oTable.api().rows().indexes(), function(i, ri){
                 oTable.api().cell(ri, 0).data(checked);
@@ -490,7 +468,6 @@ ${cpweb_foot}
                 formatSelection: function(opt){return opt.text.trim()}
                 // formatResult is templateSelection in 4.0
             }).change(function(){
-                console.log("Change");
                 var cugId = $("#markByGroup").val(),
                         url = "${helper.urlFor('project.ProjectJsonModule','listGroupMembers', [prj.projectId?c])}/" + cugId;
                 $.getJSON(url).done(function (data) {
