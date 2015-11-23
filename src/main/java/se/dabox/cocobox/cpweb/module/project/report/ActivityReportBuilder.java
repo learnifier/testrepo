@@ -178,8 +178,9 @@ class ActivityReportBuilder implements StatusSource {
 
         int progressPercent  = activityCompleted ? 100 : 0;
 
-        if (primaryComp != null) {
-            overdue = primaryComp.getDueDateInfo().isOverdue();
+        //Only try to fetch progress if we're uncompleted, otherwise assume 100% (since we're complete).
+        if (!activityCompleted && primaryComp != null) {
+            overdue = activity.isOverdue();
 
             Integer primaryProgressPercent = getProgressPercent(participant, activity, primaryComp);
 
