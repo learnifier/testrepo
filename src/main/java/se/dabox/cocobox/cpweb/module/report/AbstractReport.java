@@ -75,6 +75,7 @@ public abstract class AbstractReport {
         Map<String, Object> l = getLine();
         l.put(LineConstants.AMOUNT, getTokenAmount(token));
         l.put(LineConstants.CREATED, token.getCreated());
+        l.put(LineConstants.EXPIRES, token.getExpiryDate());
         l.put(LineConstants.ORDER_SOURCE, token.getSource());
     }
 
@@ -107,7 +108,7 @@ public abstract class AbstractReport {
     protected Map<String, Object> getLine() {
         if (newLine) {
             newLine = false;
-            currentLine = new HashMap<String, Object>();
+            currentLine = new HashMap<>();
             reportLines.add(currentLine);
         }
 

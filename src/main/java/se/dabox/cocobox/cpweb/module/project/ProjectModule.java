@@ -62,6 +62,7 @@ import se.dabox.service.common.material.Material;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.collections.ValueUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -122,6 +123,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         map.put("groups", GroupInfo.fromCugs(cugs));
         addCommonMapValues(map, project, cycle);
         initSelfReg(cycle, project, map);
+        map.put("moveEnabled", isMoveEnabled(cycle, project));
 
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
@@ -329,6 +331,31 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/participationStatusRaw.html", map);
     }
 
+    /**
+     * Dumps the current course design definition for the project. If no primary
+     * design is found the stage design is dumped.
+     *
+     * @param cycle
+     * @param projectId
+     * @return
+     */
+    @WebAction
+    public RequestTarget onCdd(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
+
+        CourseDesign design
+                = cdClient.getDesign(ValueUtils.coalesce(project.getDesignId(), project.
+                        getStageDesignId()));
+
+        return new StringRequestTarget("text/xml", design.getDesign());
+    }
+
     @WebAction
     public RequestTarget onDiscussion(RequestCycle cycle, String projectId) {
         OrgProject project =
@@ -415,10 +442,12 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         legacyDesignTitleHandling(cycle, project, designId);
 
+        String projectName = new GetProjectAdministrativeName(cycle).getName(project);
+
         InitData initData = new InitDataBuilder().setProjectInitData(
                 project.getOrgId(),
                 brandingId,
-                project.getName(),
+                projectName,
                 designId,
                 project.getProjectId(),
                 backUrl).createInitData();
@@ -441,10 +470,12 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         String backUrl = NavigationUtil.toProjectPageUrl(cycle, project.getProjectId());
 
+        String projectName = new GetProjectAdministrativeName(cycle).getName(project);
+
         InitData initData = new InitDataBuilder().setProjectInitData(
                 project.getOrgId(),
                 brandingId,
-                project.getName(),
+                projectName,
                 designId,
                 project.getProjectId(),
                 backUrl).

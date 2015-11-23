@@ -17,7 +17,10 @@ ${cpweb_foot}
 [#include "jsr_invitesTemplate.inc"]
 [#include "jsr_expirationDialog.inc" /]
 [#include "projectRosterMoveDialog.html" /]
-[@pRegistration.foot /]
+
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+  [@pRegistration.foot /]
+[/@]
 
 <script>
     $('#menu-projects').addClass('active');
@@ -55,10 +58,9 @@ ${cpweb_foot}
     [/@]
 
     var moveLink = "";
-    var moveEnabled = false;
+    var moveEnabled = ${moveEnabled?c};
     [@portalSecurity.permissionBlock permission="CP_MOVE_PARTICIPANT"]
         moveLink = "${helper.urlFor('project.move.ParticipantMoveModule','selectTarget',[prj.projectId])}";
-        moveEnabled = true;
     [/@]
 
 
@@ -227,7 +229,7 @@ ${cpweb_foot}
                                 if (row.sending) {
                                     row.lastEmailDisplay = "Sending..."
                                 } else if (row.bounced) {
-                                    row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '">Bounced back</a>';
+                                    row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '"><strong>Bounced back</strong></a>';
                                 } else {
                                     row.lastEmailDisplay = row.lastEmailStr;
                                 }

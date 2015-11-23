@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
-import org.apache.commons.lang3.StringUtils;
 import se.dabox.cocosite.login.CocositeUserHelper;
 
 /**
@@ -34,12 +33,13 @@ class LineDateEnhancer {
             return reportLines;
         }
 
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(reportLines.size());
+        List<Map<String, Object>> list = new ArrayList<>(reportLines.size());
 
         for (Map<String, Object> map : reportLines) {
-            Map<String, Object> enhancedMap = new HashMap<String, Object>(map);
+            Map<String, Object> enhancedMap = new HashMap<>(map);
 
-            dateEnhance(enhancedMap, "created");
+            dateEnhance(enhancedMap, LineConstants.CREATED);
+            dateEnhance(enhancedMap, LineConstants.EXPIRES);
 
             list.add(enhancedMap);
         }

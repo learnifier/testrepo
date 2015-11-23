@@ -55,5 +55,10 @@ public class LineConstants {
      * the actual product of the line.
      */
     public static final String BASEPRODUCT = "baseproduct";
+
+    /**
+     * A java.util.Date with the line's/token's expiration date
+     */
+    public static final String EXPIRES = "expires";
     
 }

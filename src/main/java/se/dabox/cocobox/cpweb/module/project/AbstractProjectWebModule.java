@@ -14,6 +14,8 @@ import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordin
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirectoryClient;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.cocosite.project.GetIdProjectProductIdCommand;
@@ -21,6 +23,7 @@ import se.dabox.cocosite.project.UpdateRecentProjectList;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
@@ -86,6 +89,9 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         map.put("canDeleteProject", isDeleteProjectPossible(project));
 
         map.put("isDesignDetailsAvailable", isDesignDetailsAvailable(project));
+
+        map.put("projectName", new GetProjectAdministrativeName(cycle).getName(project));
+
     }
 
     private Product getProductFromParticipationProjectState(RequestCycle cycle,
@@ -198,6 +204,35 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
 
             @Override
             public Boolean callSingleProductProject() {
+                return false;
+            }
+        });
+    }
+
+    protected boolean isMoveEnabled(RequestCycle cycle, OrgProject project) {
+        ProjectPermissionCheck ppc = ProjectPermissionCheck.fromCycle(cycle);
+        if (!ppc.checkPermission(project, CocoboxPermissions.CP_MOVE_PARTICIPANT)) {
+            return false;
+        }
+        return ProjectTypeUtil.callSubtype(project,
+                new ProjectSubtypeCallable<Boolean>() {
+            @Override
+            public Boolean callMainProject() {
+                return true;
+            }
+
+            @Override
+            public Boolean callIdProjectProject() {
+                return false;
+            }
+
+            @Override
+            public Boolean callChallengeProject() {
+                return false;
+            }
+
+            @Override
+            public Boolean callLinkedSubproject() {
                 return false;
             }
         });

@@ -46,17 +46,12 @@ import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.alert.ProjectAlertInfo;
 import se.dabox.service.common.ccbc.alert.ProjectAlertRequest;
 import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.MailBounceInfo;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.OrgProjectPredicates;
-import se.dabox.service.common.ccbc.project.ProjectParticipation;
-import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
-import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
-import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.io.RuntimeIOException;
-import se.dabox.service.cug.client.ClientUserGroup;
-import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -64,7 +59,6 @@ import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
-import se.dabox.util.collections.Predicate;
 import se.dabox.util.collections.Transformer;
 import se.dabox.util.collections.ValueUtils;
 
@@ -286,6 +280,9 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         NumberFormat nf = NumberFormat.getIntegerInstance(userLocale);
         InfoCacheHelper icHelper = InfoCacheHelper.getInstance(cycle);
 
+        final GetProjectAdministrativeName projectNameHelper = new GetProjectAdministrativeName(
+                cycle);
+
         try {
             try (JsonGenerator generator = FACTORY.createGenerator(baos, com.fasterxml.jackson.core.JsonEncoding.UTF8)) {
                 generator.writeStartObject();
@@ -295,7 +292,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                 for (OrgProject project : projects) {
                     generator.writeStartObject();
                     generator.writeNumberField("id", project.getProjectId());
-                    generator.writeStringField("name", project.getName());
+                    generator.writeStringField("name", projectNameHelper.getName(project));
                     generator.writeStringField("added", nf.format(project.getUserCount()));
                     generator.writeStringField("invited", nf.format(project.getInvited()));
                     generator.writeStringField("link",
@@ -364,21 +361,10 @@ public class CpJsonModule extends AbstractJsonAuthModule {
             Set<UserAccount> loaded) {
 
         Set<Long> loadedIds =
-                CollectionsUtil.transform(loaded, new Transformer<UserAccount, Long>() {
-            @Override
-            public Long transform(UserAccount item) {
-                return item.getUserId();
-            }
-        });
+                CollectionsUtil.transform(loaded, UserAccount::getUserId);
 
         List<OrgUser> orgUsers = getCocoboxCordinatorClient(cycle).listOrgUsers(orgId);
-        Set<Long> userIds = CollectionsUtil.transform(orgUsers,
-                new Transformer<OrgUser, Long>() {
-                    @Override
-                    public Long transform(OrgUser item) {
-                        return item.getUserId();
-                    }
-                });
+        Set<Long> userIds = CollectionsUtil.transform(orgUsers, OrgUser::getUserId);
         orgUsers = null;
 
         userIds.removeAll(loadedIds);
@@ -425,77 +411,17 @@ public class CpJsonModule extends AbstractJsonAuthModule {
     }
 
     private String getProjectName(final RequestCycle cycle, final OrgProject project) {
-        return ProjectTypeUtil.call(project, new ProjectTypeCallable<String>() {
-
-            @Override
-            public String callDesignedProject() {
-                return ProjectTypeUtil.callSubtype(project, new ProjectSubtypeCallable<String>() {
-
-                    @Override
-                    public String callMainProject() {
-                        return project.getName();
-                    }
-
-                    @Override
-                    public String callIdProjectProject() {
-                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-                        ProjectParticipation part =
-                                ccbc.getProjectParticipation(project.getParticipationOwner());
-
-                        String name = "";
-
-                        if (part != null) {
-                            name = InfoCacheHelper.getInstance(cycle).getUserDisplayName(part.
-                                    getUserId());
-                        }
-
-                        return "Project for "+name;
-                    }
-
-                    @Override
-                    public String callChallengeProject() {
-                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-
-                        OrgProject masterProject = ccbc.getProject(project.getMasterProject());
-
-                        return "Challenge project for " + masterProject.getName();
-                    }
-
-                    @Override
-                    public String callLinkedSubproject() {
-                        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-
-                        OrgProject masterProject = ccbc.getProject(project.getMasterProject());
-
-                        return "Linked sub-project for " + masterProject.getName();
-                    }
-                });
-            }
-
-            @Override
-            public String callMaterialListProject() {
-                return project.getName();
-            }
-
-            @Override
-            public String callSingleProductProject() {
-                return project.getName();
-            }
-        });
+        return new GetProjectAdministrativeName(cycle).getName(project);
     }
 
     private List<OrgProject> filterProjects(String parameter, List<OrgProject> projects) {
         final boolean ongoing = decodeStatus(parameter);
 
-        return CollectionsUtil.sublist(projects, new Predicate<OrgProject>() {
-
-            @Override
-            public boolean evalute(OrgProject item) {
-                if (ongoing) {
-                    return item.getStatus() != ProjectStatus.DISABLED;
-                } else {
-                    return item.getStatus() == ProjectStatus.DISABLED;
-                }
+        return CollectionsUtil.sublist(projects, (OrgProject item) -> {
+            if (ongoing) {
+                return item.getStatus() != ProjectStatus.DISABLED;
+            } else {
+                return item.getStatus() == ProjectStatus.DISABLED;
             }
         });
 
@@ -519,15 +445,12 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         List<OrgProject> sortedList = new ArrayList<>(projects);
 
-        Collections.sort(sortedList, new Comparator<OrgProject>() {
-
-            @Override
-            public int compare(OrgProject o1, OrgProject o2) {
-                return new CompareToBuilder().
+        //TODO: This does not take computed names into account. Shouldn't matter much since subprojects
+        //normally shouldn't be listed anywhere.
+        Collections.sort(sortedList, (OrgProject o1, OrgProject o2) ->
+                new CompareToBuilder().
                         append(o1.getName(), o2.getName(), collator).
-                        append(o1.getProjectId(), o2.getProjectId()).build();
-            }
-        });
+                        append(o1.getProjectId(), o2.getProjectId()).build());
 
         return sortedList;
     }

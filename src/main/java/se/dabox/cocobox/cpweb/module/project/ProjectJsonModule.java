@@ -12,14 +12,12 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
-import se.dabox.cocobox.cpweb.module.user.UserModule;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
@@ -43,6 +41,7 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
@@ -88,13 +87,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         //Now only missing ids are left
 
-        return CollectionsUtil.transformList(prodIdSet, new Transformer<String, Material>() {
-
-            @Override
-            public Material transform(String item) {
-                return new MissingProductMaterial(item);
-            }
-        });
+        return CollectionsUtil.transformList(prodIdSet, (String item) ->
+                new MissingProductMaterial(item));
     }
 
     @WebAction
@@ -249,6 +243,9 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL,
                 CocositeUserHelper.getUserLocale(cycle));
 
+        final GetProjectAdministrativeName projectNameHelper = new GetProjectAdministrativeName(
+                cycle);
+        
         ByteArrayOutputStream stream =
                 new JsonEncoding(format) {
                     @Override
@@ -266,7 +263,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
                         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
                         OrgProject prj = ccbc.getProject(data.getProjectId());
-                        generator.writeStringField("projectName", prj.getName());
+                        generator.writeStringField("projectName", projectNameHelper.getName(prj));
 
                         writeDateField(generator, "created", data.getCreated());
 
@@ -733,6 +730,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 Clients.getClient(cycle, ProductDirectoryClient.class);
 
         List<Product> existingProducts = pdClient.getProducts(true, prodIds);
+        ProductTypeUtil.setTypes(pdClient, existingProducts);
 
         List<Material> missing = getMissingProducts(prodIds, existingProducts);
 
