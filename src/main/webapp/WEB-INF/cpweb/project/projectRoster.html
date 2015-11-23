@@ -414,17 +414,21 @@ ${cpweb_foot}
         [/@]
 
         $("#cball").on('click', function(ev) {
-            if (this.checked) {
-                var items = $("input.rowcb").not(":checked");
-                items.trigger('click');
-                //Trigger change so that IE8- picks up the change
-                items.trigger('change');
-            } else {
-                var items = $("input.rowcb").filter(":checked");
-                items.trigger('click');
-                //Trigger change so that IE8- picks up the change
-                items.trigger('change');
-            }
+//            if (this.checked) {
+//                var items = $("input.rowcb").not(":checked");
+//                items.trigger('click');
+//                //Trigger change so that IE8- picks up the change
+//                items.trigger('change');
+//            } else {
+//                var items = $("input.rowcb").filter(":checked");
+//                items.trigger('click');
+//                //Trigger change so that IE8- picks up the change
+//                items.trigger('change');
+//            }
+            var checked = this.checked;
+            $.each(oTable.api().rows().indexes(), function(i, ri){
+                oTable.api().cell(ri, 0).data(checked);
+            });
         });
 
         function runiCheck(cell) {
@@ -434,14 +438,8 @@ ${cpweb_foot}
             });
         };
 
-        function runiCheckElement($element) {
-            $element.icheck({
-                checkboxClass: 'icheckbox_square-red',
-                radioClass: 'iradio_square-red'
-            });
-        };
-
         function toggleAllCheck() {
+
             $('#cball').icheck({
                 checkboxClass: 'icheckbox_square-red',
                 radioClass: 'iradio_square-red'
