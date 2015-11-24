@@ -13,7 +13,7 @@
     <groupId>se.dabox.cocobox</groupId>
     <artifactId>cpweb</artifactId>
     <packaging>war</packaging>
-    <version>1.0-florida-SNAPSHOT</version>
+    <version>1.0-posl2-SNAPSHOT</version>
     <name>Customer Portal Florida web</name>
     <url>http://dabox.se</url>
 
