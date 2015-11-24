@@ -446,7 +446,7 @@ ${cpweb_foot}
                         , infoUrl = "${helper.urlFor('project.ProjectJsonModule','groupInfo', [prj.projectId?c])}/" + cugId;
                 $.getJSON(infoUrl).done(function (data) {
                     if (data.members == 0) {
-                        cocobox.infoDialog("Add members", "The group does not have any members.");
+                        cocobox.infoDialog("Add members", "There are no members in this group.");
                     } else {
                         cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group " + cugName + " to the project?", function () {
                             var addUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/" + cugId;
@@ -465,7 +465,7 @@ ${cpweb_foot}
 
             // "Mark by group"
             $("#markByGroup").select2({
-                placeholder: "Mark members by group",
+                placeholder: "Select members in group",
                 allowClear: true,
                 formatSelection: function(opt){return opt.text.trim()}
                 // formatResult is templateSelection in 4.0
@@ -775,11 +775,11 @@ ${cpweb_head}
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-pencil"></span> Manual</a></li>
-    <li role="presentation"><a href="#group" aria-controls="manual" role="tab" data-toggle="tab">Group</a></li>
-    <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</a></li>
+    <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab"><span class="pe-7s-add-user pe-va pe-lg"></span> Individual</a></li>
+    <li role="presentation"><a href="#group" aria-controls="manual" role="tab" data-toggle="tab"><span class="pe-7s-users pe-va pe-lg"></span> Group</a></li>
+    <li role="presentation"><a href="#uploadroster" aria-controls="uploadroster" role="tab" data-toggle="tab"><span class="pe-7s-cloud-upload pe-va pe-lg" aria-hidden="true"></span> Upload</a></li>
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
-    <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
+    <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="pe-7s-id pe-va pe-lg" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
     [/@]
   </ul>
 
@@ -804,9 +804,15 @@ ${cpweb_head}
     </div>
     <div role="tabpanel" class="tab-pane fade" id="group">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-sm-6 col-lg-6">
                 [@genGroupSelect groups=groups selectId="addByGroup"][/@genGroupSelect]
-                <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
+                </div>
             </div>
         </div>
     </div>
