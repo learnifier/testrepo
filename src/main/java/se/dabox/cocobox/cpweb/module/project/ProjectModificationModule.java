@@ -189,6 +189,21 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         return toRoster(projectId);
     }
 
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onAddMemberByGroup(final RequestCycle cycle, String projectId) {
+
+        // TODO: Add member by group. Not sure if it will be form based or not.
+        final CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(
+                cycle);
+
+        final OrgProject prj = ccbcClient.getProject(Long.valueOf(
+                projectId));
+        checkPermission(cycle, prj);
+
+        return toRoster(projectId);
+    }
+
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onListCommand(RequestCycle cycle) {
 

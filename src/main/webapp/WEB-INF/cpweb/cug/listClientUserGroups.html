@@ -3,7 +3,8 @@
 [#assign cpweb_foot ]
     ${cpweb_foot}
     <script>
-        $('#menu-cugs').addClass('active');
+        $('#menu-settings').addClass('subMenuExpanded');
+        $('#menu-settings-groups-a').addClass('active');
 
         var spinnerUrl = "[@common.spinnerUrl /]";
         var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
