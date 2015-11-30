@@ -758,11 +758,9 @@ ${cpweb_head}
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
 
 [#macro genOptions group level prefix]
-    [#assign l = level+1]
-    [#assign p = prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"]
     <option value="${group.groupId?c}">${prefix}${group.name?xhtml}</option>
     [#list group.children as sg]
-        [@genOptions group=sg level=l prefix=p][/@genOptions]
+        [@genOptions group=sg level=level+1 prefix=prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"][/@genOptions]
     [/#list]
 [/#macro]
 [#macro genGroupSelect groups selectId]
