@@ -444,6 +444,9 @@ ${cpweb_foot}
                 var cugId = $("#group select").val()
                         , cugName = $("#group select option:selected").text()
                         , infoUrl = "${helper.urlFor('project.ProjectJsonModule','groupInfo', [prj.projectId?c])}/" + cugId;
+                if(!cugId) {
+                    return;
+                }
                 $.getJSON(infoUrl).done(function (data) {
                     if (data.members == 0) {
                         cocobox.infoDialog("Add members", "There are no members in this group.");
