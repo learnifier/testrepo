@@ -27,7 +27,7 @@
                 <tr class="hide white {{componentStatus}}">
                      <td class="ptb0" colspan="8">
                          <div>
-                                <ul class="dropdownUl">
+                                <ul class="dropdownUl clearfix">
                                      <!-- Stacking from right from here -->
                                     <li class="statusImage pull-right">
                                         {{StatusImage componentStatus}}
