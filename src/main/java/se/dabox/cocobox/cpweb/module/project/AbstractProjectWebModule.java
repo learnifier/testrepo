@@ -18,7 +18,7 @@ import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
-import se.dabox.cocosite.project.GetIdProjectProductIdCommand;
+import se.dabox.service.common.ccbc.project.GetIdProjectProductIdCommand;
 import se.dabox.cocosite.project.UpdateRecentProjectList;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
