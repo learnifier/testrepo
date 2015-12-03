@@ -1,4 +1,4 @@
-define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places', 'jquery.validate'], function () {
+define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places', 'jquery.validate'], function () {
     "use strict";
 
     $(document).ready(function () {
@@ -16,12 +16,10 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
                     return;
                 }
 
-
                 //log('place', place);
                 mapsUrl = createMapsUrl(place);
 
-                //log(elementId);
-                //log(mapsUrl);
+                console.log(mapsUrl);
                 //log($(elementId).closest('.details').find('.locUrl input'));
 
                 $('#' + elementId).next('label.error').remove();
@@ -34,21 +32,13 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
 
         function createMapsUrl(place) {
 
-            var street, num, town = '';
-
-            if (place.address_components) {
-                street = (place.address_components[1] && place.address_components[1].short_name || '');
-                num = (place.address_components[0] && place.address_components[0].short_name || '');
-                town = (place.address_components[2] && place.address_components[2].short_name || '');
-            }
-
             var longLat;
             if(place.geometry.location) {
                 longLat = place.geometry.location.toUrlValue();
             }
 
             var mapsBaseUrl = 'http://www.google.com/maps/place/',
-            mapsUrl = mapsBaseUrl + encodeURIComponent(street) + ',' + encodeURIComponent(num) + ',' + encodeURIComponent(town) + '/@' + longLat + ',17z';
+            mapsUrl = mapsBaseUrl + encodeURIComponent(place.name) + '/@' + longLat + ',17z';
             return mapsUrl;
 
         }
