@@ -11,8 +11,8 @@ import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordin
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirectoryClient;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.service.common.ccbc.project.GetIdProjectProductIdCommand;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
-import se.dabox.cocosite.project.GetIdProjectProductIdCommand;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.material.Material;
