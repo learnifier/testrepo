@@ -11,6 +11,8 @@ import java.util.Map;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.crisp.runtime.CrispErrorException;
+import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.user.MiniUserInfo;
@@ -178,8 +180,9 @@ class ActivityReportBuilder implements StatusSource {
 
         int progressPercent  = activityCompleted ? 100 : 0;
 
-        if (primaryComp != null) {
-            overdue = primaryComp.getDueDateInfo().isOverdue();
+        //Only try to fetch progress if we're uncompleted, otherwise assume 100% (since we're complete).
+        if (!activityCompleted && primaryComp != null) {
+            overdue = activity.isOverdue();
 
             Integer primaryProgressPercent = getProgressPercent(participant, activity, primaryComp);
 
@@ -241,6 +244,8 @@ class ActivityReportBuilder implements StatusSource {
                         productId.getId());
         req.setFetchMode(FetchMode.DIRECT);
 
+        boolean retry = false;
+
         ParticipationCrispProductStatus status = null;
         try {
             List<ParticipationCrispProductStatus> statuses
@@ -248,6 +253,34 @@ class ActivityReportBuilder implements StatusSource {
             status = CollectionsUtil.singleItemOrNull(statuses);
         } catch (NotFoundException nfe) {
             //Participation not available
+        } catch(CrispErrorException crex) {
+            LOGGER.warn(
+                    "Failed to get information. Got a crisp exception. Trying to use cached result. Product: {}, error: {}",
+                    crex.getProductId(),
+                    crex.getError());
+            retry = true;
+        } catch(CrispException crex) {
+            LOGGER.warn(
+                    "Failed to get information. Got a crisp exception. Trying to use cached result. Product: {}",
+                    crex.getProductId());
+            retry = true;
+        }
+
+        if (retry) {
+            LOGGER.debug("Trying to fetch local result");
+            req.setFetchMode(FetchMode.CACHED);
+            List<ParticipationCrispProductStatus> statuses = null;
+            try {
+                statuses
+                        = pmcClient.getParticipationCrispProductStatus(req);
+            } catch (CrispException crispException) {
+                LOGGER.warn(
+                        "Still getting an error while trying to get cached result. Progress will be unknown for product {}",
+                        crispException.getProductId());
+            } catch (NotFoundException notFoundException) {
+                //Participation not available
+            }
+            status = CollectionsUtil.singleItemOrNull(statuses);
         }
 
         if (status == null) {

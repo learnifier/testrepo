@@ -44,7 +44,7 @@ ${cpweb_foot}
         <h2>${prj.displayUserTitle!""?xhtml}</h2>
         <span class="">Learner Portal Description</span>
         <h2>${prj.displayUserDescription!""?xhtml}</h2>
-    [#else]
+    [#else]    
         <span class="">Course Name</span><span class=" " id="project-usertitle">
             <span class="editable-content" data-url="${projectDetailsSettingUrl}" data-pk="usertitle">${prj.displayUserTitle!""?xhtml}</span>[#include "projectEditLabel.html" /]</li>
         <span class="">Course Description</span><span class=" " id="project-userdesc">

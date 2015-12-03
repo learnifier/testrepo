@@ -8,7 +8,6 @@
 ${cpweb_foot}
 
 <script>
-console.log("******************** userRoles.html");
 $('#menu-users').addClass('active');
 
 $(document).ready(function() {
@@ -45,7 +44,7 @@ $(document).ready(function() {
                     "orderable": false,
                     "data" : function(row, type, set) {
                         if (!row.actionDisplay) {
-                            [#if security.hasPermission("BO_EDIT_USER")]
+                            [#if security.hasPermission("CP_EDIT_USER")]
                               row.actionDisplay = '<button onclick="deleteMember(\'' +  row.uuid +'\')" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>';
                             [#else]
                               row.actionDisplay = '';

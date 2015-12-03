@@ -60,7 +60,7 @@ define([textSource], function(t) {
                         }
                     }
                 },
-				{
+                {
                     "targets": [ 2 ],
                     "data": "localeStr",
                     "className": "language"

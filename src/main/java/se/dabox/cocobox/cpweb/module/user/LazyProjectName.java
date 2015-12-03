@@ -3,10 +3,12 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
+import net.unixdeveloper.druwa.DruwaService;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.util.cache.LazyCache;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -16,14 +18,11 @@ public class LazyProjectName {
     private final LazyCache<Long,String> cache;
 
     public LazyProjectName(final CocoboxCoordinatorClient ccbc) {
-        this.cache = new LazyCache<>(new Transformer<Long, String>() {
+        this.cache = new LazyCache<>((Long pid) -> {
+            OrgProject project = ccbc.getProject(pid);
 
-            @Override
-            public String transform(Long pid) {
-                OrgProject project = ccbc.getProject(pid);
-
-                return project.getName();
-            }
+            final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+            return new GetProjectAdministrativeName(cycle).getName(project);
         });
 
     }
