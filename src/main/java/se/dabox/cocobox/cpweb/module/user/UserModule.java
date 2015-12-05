@@ -4,6 +4,13 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -27,13 +34,12 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
-
-import java.util.*;
+import se.dabox.service.login.client.UserVerificationStatus;
+import se.dabox.service.login.client.UserVerificationStatusVisitor;
 
 /**
  *
@@ -81,6 +87,7 @@ public class UserModule extends AbstractWebAuthModule {
         map.put("role", userRole);
         map.put("isAdmin", isAdmin);
         map.put("userimg", new MiniUserAccountHelper(cycle).createInfo(user).getThumbnail());
+        map.put("verificationStatus", getVerificationStatus(user));
 
         map.put("org", org);
 
@@ -109,10 +116,10 @@ public class UserModule extends AbstractWebAuthModule {
         map.put("isAdmin", isAdmin);
         map.put("locale", userLocale);
         map.put("roles", roles);
-
-        
         map.put("userimg", InfoCacheHelper.getInstance(cycle).getMiniUserInfo(user.getUserId()).
                 getThumbnail());
+        map.put("verificationStatus", getVerificationStatus(user));
+
 
         map.put("org", org);
         
@@ -143,6 +150,7 @@ public class UserModule extends AbstractWebAuthModule {
         map.put("locale", userLocale);
         map.put("userimg", InfoCacheHelper.getInstance(cycle).getMiniUserInfo(user.getUserId()).
                 getThumbnail());
+        map.put("verificationStatus", getVerificationStatus(user));
 
         map.put("org", org);
 
@@ -197,22 +205,38 @@ public class UserModule extends AbstractWebAuthModule {
             infoList.add(new RoleInfo(entry.getKey(), entry.getValue()));
         }
 
-        Collections.sort(infoList, new Comparator<RoleInfo>() {
-
-            @Override
-            public int compare(RoleInfo o1, RoleInfo o2) {
-                return new CompareToBuilder().
+        Collections.sort(infoList, (RoleInfo o1, RoleInfo o2) ->
+                new CompareToBuilder().
                         append(o1.getName(), o2.getName()).
                         append(o1.getUuid(), o2.getUuid()).
-                        build();
-            }
-        });
+                        build());
         
         return infoList;
     }
 
     private void checkOrgUserAccess(RequestCycle cycle, MiniOrgInfo org, UserAccount user) {
 
+    }
+
+    private String getVerificationStatus(UserAccount user) {
+        final UserVerificationStatus vstatus = user.getVerificationStatus();
+
+        return vstatus.accept(new UserVerificationStatusVisitor<String>() {
+            @Override
+            public String visitUnverified() {
+                return "No";
+            }
+
+            @Override
+            public String visitVerified() {
+                return "Yes";
+            }
+
+            @Override
+            public String visitUnknown() {
+                return "Unknown";
+            }
+        });
     }
 
     public static class RoleInfo {
