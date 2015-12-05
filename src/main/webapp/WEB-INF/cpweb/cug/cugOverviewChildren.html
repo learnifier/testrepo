@@ -5,7 +5,8 @@
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    $('#menu-cugs').addClass('active');
+    $('#menu-settings').addClass('subMenuExpanded');
+    $('#menu-settings-groups-a').addClass('active');
 
     var spinnerUrl = "[@common.spinnerUrl /]";
     var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
@@ -27,8 +28,8 @@ ${cpweb_foot}
             modal.open({               
                 title: "Create Group",
                 src: "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id,cug.groupId])}",
-                height: "450px",
-                cssClass: "modal-lg",
+                height: "200px",
+                cssClass: "",
                 cancel: function () { /* Do nothing*/
                 },
                 cancelUrl: window.location.href,

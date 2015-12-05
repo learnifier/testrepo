@@ -4,13 +4,6 @@
  */
 package se.dabox.cocobox.cpweb.module.user;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -23,22 +16,24 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocobox.security.role.CocoboxRoleUtil;
+import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
-import static se.dabox.cocosite.login.CocositeUserHelper.getUserAccountUserLocale;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocobox.security.permission.CocoboxPermissions;
-import se.dabox.cocobox.security.role.CocoboxRoleUtil;
-import se.dabox.cocobox.security.user.UserAccountRoleCheck;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.client.CacheClients;
-import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
+
+import java.util.*;
 
 /**
  *
@@ -125,6 +120,36 @@ public class UserModule extends AbstractWebAuthModule {
     }
 
     @WebAction
+    public RequestTarget onGroups(RequestCycle cycle, String strOrgId, String strUserId) {
+
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
+
+        UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
+
+        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
+
+//        List<GroupInfo> groups = getGroups(cycle, org.getId(), user.getUserId());
+
+        Map<String, Object> map = createMap();
+        CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
+        String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
+
+        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
+
+        map.put("user", user);
+        map.put("role", userRole);
+        map.put("isAdmin", isAdmin);
+        map.put("locale", userLocale);
+        map.put("userimg", InfoCacheHelper.getInstance(cycle).getMiniUserInfo(user.getUserId()).
+                getThumbnail());
+
+        map.put("org", org);
+
+        return new FreemarkerRequestTarget("/user/userGroups.html", map);
+    }
+
+    @WebAction
     public RequestTarget onAddRole(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_USER);
@@ -163,7 +188,6 @@ public class UserModule extends AbstractWebAuthModule {
     private OrganizationDirectoryClient getOrganizationDirectoryClient(final RequestCycle cycle) {
         return CacheClients.getClient(cycle, OrganizationDirectoryClient.class);
     }
-
 
     private List<RoleInfo> getRoles(RequestCycle cycle) {
         Map<String, String> roleMap = new CocoboxRoleUtil().getCpRoles(cycle);
@@ -209,4 +233,5 @@ public class UserModule extends AbstractWebAuthModule {
         }
         
     }
+
 }

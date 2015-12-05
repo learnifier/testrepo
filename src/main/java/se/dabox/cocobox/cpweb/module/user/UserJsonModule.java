@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+//import com.sun.deploy.util.SessionState;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -33,6 +36,8 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.io.RuntimeIOException;
+import se.dabox.service.cug.client.ClientUserGroup;
+import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -91,6 +96,33 @@ public class UserJsonModule extends AbstractJsonAuthModule {
         }.encodeToStream(roles));
     }
 
+
+
+
+    @WebAction
+    public RequestTarget onListGroups(final RequestCycle cycle, String strOrgId, String strUserId) {
+        long userId = Long.valueOf(strUserId);
+        long orgId = secureGetMiniOrg(cycle, strOrgId).getId();
+        checkOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_USER);
+
+//        UserAccount account = getUserAccount(cycle, userId);
+
+//        Set<String> roles = UserAccountRoleCheck.getCpRoles(account, orgId);
+//        final Map<String, String> cpRoles = new CocoboxRoleUtil().getCpRoles(cycle);
+        List<ClientUserGroup> groups = getGroups(cycle, orgId, userId);
+
+        return jsonTarget(new DataTablesJson<ClientUserGroup>() {
+            @Override
+            protected void encodeItem(ClientUserGroup cug) throws IOException {
+                generator.writeNumberField("id", cug.getGroupId());
+                generator.writeStringField("name", cug.getName());
+                generator.writeStringField("grouplink", NavigationUtil.toClientUserGroupOverviewUrl(cycle,
+                        orgId, cug.getGroupId()));
+
+            }
+        }.encodeToStream(groups));
+    }
+
     @WebAction
     public RequestTarget onRemoveCpRole(RequestCycle cycle, String strOrgId) {
         
@@ -127,6 +159,29 @@ public class UserJsonModule extends AbstractJsonAuthModule {
 
         return onListRoles(cycle, strOrgId, Long.toString(userId));
     }
+
+    private ClientUserGroupClient getClientUserGroupClient(final RequestCycle cycle) {
+        return CacheClients.getClient(cycle, ClientUserGroupClient.class);
+    }
+
+    private boolean isMember(ClientUserGroupClient cugClient, ClientUserGroup cug, long userId) {
+        return cugClient.listGroupMembers(cug.getGroupId()).stream().anyMatch(u -> u.getUserId() == userId);
+    }
+
+    private List<ClientUserGroup> getGroups(RequestCycle cycle, long orgId, long userId) {
+        // NOTE: This is kinda slow; we get a list of all groups and then look up all members in those groups.
+        // Add a tailored call to ccbc for this?
+        final ClientUserGroupClient cugClient = getClientUserGroupClient(cycle);
+        final List<ClientUserGroup> cugs = cugClient.listGroups(orgId);
+        final List<ClientUserGroup> groups = cugs.stream()
+                .filter(cug -> isMember(cugClient, cug, userId))
+                .collect(Collectors.toList()
+                );
+
+        return groups;
+    }
+
+
 
     private ByteArrayOutputStream toJsonResponse(
             RequestCycle cycle,
