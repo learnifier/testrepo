@@ -6,6 +6,8 @@ package se.dabox.cocobox.cpweb.module.project.report;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import java.util.Locale;
@@ -31,14 +33,19 @@ import se.dabox.service.common.ajaxlongrun.AjaxJob;
 import se.dabox.service.common.ajaxlongrun.AppAjaxLongOp;
 import se.dabox.service.common.ajaxlongrun.FutureAjaxJob;
 import se.dabox.service.common.ajaxlongrun.Status;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.filter.FilterProjectRequest;
+import se.dabox.service.common.ccbc.project.filter.FilterProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 import se.dabox.service.webutils.json.DataTablesJson;
+import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -71,6 +78,8 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
                 String url = cycle.urlFor(ProjectReportModule.class, "idProductReport", strProjectId, mat.getId());
                 String title = mat.getTitle() + " - report for current project";
                 infos.add(new ReportInfo(url, title, false));
+            } if ("challenge".equals(mat.getNativeType())) {
+                infos.addAll(getChallengeReports(cycle, project.getProjectId(), mat));
             } else if (ProductMaterialConstants.NATIVE_SYSTEM.equals(mat.getNativeSystem()) && "EL0873".equals(mat.getId())) {
                 String url = cycle.urlFor(ProjectReportModule.class, "sliiChallengeReport", strProjectId);
                 String title = "SLII Challenge";
@@ -206,6 +215,34 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
         }
 
         return jsonTarget(data);
+    }
+
+    private Collection<? extends ReportInfo> getChallengeReports(RequestCycle cycle, long projectId, Material mat) {
+        String productId = mat.getId();
+
+        FilterProjectRequest fpr = new FilterProjectRequestBuilder().
+                setProductId(productId).
+                setMasterProject(projectId).
+                buildRequest();
+
+        List<OrgProject> projects = getCocoboxCordinatorClient(cycle).listOrgProjects(fpr);
+
+        JavaCocoText ctext = new JavaCocoText();
+
+        final String strProjectId = Long.toString(projectId);
+
+        List<ReportInfo> reports = CollectionsUtil.transformList(projects, p -> {
+            String projectName = new GetProjectAdministrativeName(cycle).getName(p);
+            String reportName = ctext.get("cpweb.project.report.challengeactivity.title", projectName);
+
+            String url = cycle.
+                    urlFor(ProjectReportModule.class, "innerActivityReport", strProjectId, Long.
+                            toString(p.getProjectId()));
+
+            return new ReportInfo(url, reportName, false);
+        });
+
+        return reports;
     }
 
 }
