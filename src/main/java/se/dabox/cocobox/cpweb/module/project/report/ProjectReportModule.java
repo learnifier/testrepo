@@ -13,9 +13,13 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirectoryClient;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectWebModule;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 
 /**
  *
@@ -35,6 +39,36 @@ public class ProjectReportModule extends AbstractProjectWebModule {
         Map<String, Object> map = createMap();
 
         addCommonMapValues(map, project, cycle);
+
+        String reportJsonUrl = cycle.urlFor(ProjectReportJsonModule.class, "activityReport",
+                strProjectId);
+
+        JavaCocoText jct = new JavaCocoText();
+        String title = jct.get("cpweb.project.report.activity.title");
+
+        map.put("reportJsonUrl", reportJsonUrl);
+        map.put("title", title);
+
+        return new FreemarkerRequestTarget("/project/report/activityReport.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onInnerActivityReport(RequestCycle cycle, String strProjectId, String innerProjectId) {
+        OrgProject project = getProject(cycle, strProjectId);
+        OrgProject innerProject = getProject(cycle, innerProjectId);
+
+        checkPermission(cycle, project);
+        checkPermission(cycle, innerProject);
+
+        Map<String, Object> map = createMap();
+
+        addCommonMapValues(map, project, cycle);
+
+        String reportJsonUrl = cycle.urlFor(ProjectReportJsonModule.class, "activityReport",
+                innerProjectId);
+
+        map.put("reportJsonUrl", reportJsonUrl);
+        map.put("title", new GetProjectAdministrativeName(cycle).getName(innerProject));
 
         return new FreemarkerRequestTarget("/project/report/activityReport.html", map);
     }

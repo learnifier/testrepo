@@ -12,6 +12,9 @@ ${cpweb_foot}
 </script>
 
 <script>
+    var ccbPage = ccbPage || {};
+    ccbPage.googleMapsEnabled = ${googleMapsEnabled?c};
+
     require(["${contextPath}/js/project/projectDesignDataPrimary.js?${cycle.application.formattedStartTime.base36String}", "${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}"], function() {
        //Do nothing
     });
@@ -115,7 +118,9 @@ ${cpweb_head}
 <div class="details clearfix">
     <ul class="list-unstyled">
         [#list fields as field]
-        [#if component.type = "ev_classroom" && field.name = "locUrl"]
+        [#if component.type = "ev_classroom" && field.name = "locUrl" && googleMapsEnabled]
+                [#assign visibility = "hidden"]
+        [#elseif component.type = "ev_classroom" && field.name = "locUrlExtra" && !googleMapsEnabled]
                 [#assign visibility = "hidden"]
         [#else]
                 [#assign visibility = "visible"]
@@ -137,7 +142,7 @@ ${cpweb_head}
   [#assign fieldType = "tel"]
 [#elseif field.name = "url" || field.name = "locUrl"]
     [#assign fieldType = "url"]
-    [#if (component.type = "ev_classroom") ]
+    [#if (component.type = "ev_classroom") && googleMapsEnabled]
         [#assign fieldType = "hidden"]
     [/#if]
 [#elseif field.name = "locUrlExtra"]

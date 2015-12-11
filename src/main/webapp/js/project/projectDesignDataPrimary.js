@@ -1,4 +1,5 @@
-define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places', 'jquery.validate'], function () {
+define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places' : 'jquery',
+        'jquery.validate'], function () {
     "use strict";
 
     $(document).ready(function () {
@@ -44,23 +45,29 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places', 'jqu
         }
 
 
-        $('input[type=locUrlExtra]').focus(function () {
-            initialize(this.id);
-        });
+        if (ccbPage.googleMapsEnabled) {
+            $('input[type=locUrlExtra]').focus(function () {
+                initialize(this.id);
+            });
 
-        $('input[type=locUrlExtra]').blur(function () {
+            $('input[type=locUrlExtra]').blur(function () {
 
-            if ($(this).val() == '') {
-                $(this).closest('.details').find('.locUrl input').val('');
-            }
-        });
+                if ($(this).val() == '') {
+                    $(this).closest('.details').find('.locUrl input').val('');
+                }
+            });
 
-        $('input[type=locUrlExtra]').keydown(function (event) {
-            if (event.keyCode == 13) {
-                event.preventDefault();
-                return false;
-            }
-        });
+            $('input[type=locUrlExtra]').keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        } else {
+            $('input[type=locUrl]').change(function() {
+                $(this).closest('.details').find('.locUrlExtra input').val($(this).val());
+            })
+        }
 
     });
 

@@ -215,7 +215,9 @@ ${cpweb_foot}
 <div class="details clearfix">
     <ul class="list-unstyled">
         [#list fields as field]
-            [#if field.name = "locUrl" ]
+            [#if field.name = "locUrl" && googleMapsEnabled ]
+                [#assign visibility = "hidden"]
+            [#elseif field.name = "locUrlExtra" && !googleMapsEnabled ]
                 [#assign visibility = "hidden"]
             [#else]
                 [#assign visibility = "visible"]
