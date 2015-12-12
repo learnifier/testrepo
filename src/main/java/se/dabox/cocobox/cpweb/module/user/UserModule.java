@@ -222,6 +222,7 @@ public class UserModule extends AbstractWebAuthModule {
 
         if (autoLoginLink == null) {
             map.put("hasAutoLoginLink", false);
+            map.put("autoLoginLink", "");
         } else {
             map.put("hasAutoLoginLink", true);
             map.put("autoLoginLink", autoLoginLink);

@@ -7,7 +7,7 @@
     <div class="row-setting clearfix">
         [#if hasAutoLoginLink]
             <button type="button" class="btn btn-primary" id="showAutoLoginLinkButton">Show link</button>
-            <form method="post" action="${helper.urlFor('user.UserModificationModule','deactivateAutoLoginLink',[org.id,user.userId])}">
+            <form id="autoLoginDeactivateForm" method="post" action="${helper.urlFor('user.UserModificationModule','deactivateAutoLoginLink',[org.id,user.userId])}">
                 <button type="submit" class="btn btn-primary" >Deactivate</button>
             </form>
         [#else]
@@ -23,5 +23,24 @@
        require(['dabox-common'], function() {
           cocobox.infoDialog("Auto login link", "<br/>${autoLoginLink?js_string}<br/><br/><strong>Be very careful with this link. Anyone that know it will be able to access the full account for this user.</strong>");
        });
+    });
+
+
+    var confirmDeactivate = true;
+
+    $("#autoLoginDeactivateForm").submit(function() {
+        if (confirmDeactivate) {
+            require(['dabox-common'], function() {
+               cocobox.confirmationDialog("Deactivate auto login link?",
+               "Do you want to deactivate the auto login link? It will not be possible to use the same link again to access the user",
+               function() {
+                   confirmDeactivate = false;
+                   $("#autoLoginDeactivateForm").submit();
+               });
+            });
+            return false;
+        } else {
+            return true;
+        }
     });
 </script>
