@@ -6,7 +6,6 @@ package se.dabox.cocobox.cpweb.module.user;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,19 +26,25 @@ import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.role.CocoboxRoleUtil;
 import se.dabox.cocobox.security.user.OrgRoleName;
 import se.dabox.cocobox.security.user.UserAccountRoleCheck;
+import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
-import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.user.MiniUserAccountHelper;
+import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.context.DwsRealmHelper;
+import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.login.client.LoginService;
+import se.dabox.service.login.client.NotFoundException;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.login.client.UserVerificationStatus;
 import se.dabox.service.login.client.UserVerificationStatusVisitor;
+import se.dabox.service.login.client.autologinlink.AutoLoginLink;
 
 /**
  *
@@ -63,33 +68,9 @@ public class UserModule extends AbstractWebAuthModule {
 
         checkOrgUserAccess(cycle, org, user);
 
-        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
-
-        CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
-        String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
-
-        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
-
-        OrganizationDirectoryClient odc = getOrganizationDirectoryClient(cycle);
-        OrgUnitInfo organization;
-        if(user.getOrganizationId() != null) {
-            organization = odc.getOrgUnitInfo(user.getOrganizationId());
-        } else {
-            organization = null;
-        }
-        
         Map<String, Object> map = createMap();
 
-        
-        map.put("user", user);
-        map.put("organization", organization);
-        map.put("locale", userLocale);
-        map.put("role", userRole);
-        map.put("isAdmin", isAdmin);
-        map.put("userimg", new MiniUserAccountHelper(cycle).createInfo(user).getThumbnail());
-        map.put("verificationStatus", getVerificationStatus(user));
-
-        map.put("org", org);
+        addCommonValue(cycle, map, org, user);
 
         return new FreemarkerRequestTarget("/user/userOverview.html", map);
     }
@@ -101,27 +82,13 @@ public class UserModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_USER);
 
-        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
-
         List<RoleInfo> roles = getRoles(cycle);
 
         Map<String, Object> map = createMap();
-        CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
-        String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
 
-        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
+        addCommonValue(cycle, map, org, user);
 
-        map.put("user", user);
-        map.put("role", userRole);
-        map.put("isAdmin", isAdmin);
-        map.put("locale", userLocale);
         map.put("roles", roles);
-        map.put("userimg", InfoCacheHelper.getInstance(cycle).getMiniUserInfo(user.getUserId()).
-                getThumbnail());
-        map.put("verificationStatus", getVerificationStatus(user));
-
-
-        map.put("org", org);
         
         return new FreemarkerRequestTarget("/user/userRoles.html", map);
     }
@@ -134,25 +101,9 @@ public class UserModule extends AbstractWebAuthModule {
 
         UserAccount user = getUserAccountService(cycle).getUserAccount(Long.valueOf(strUserId));
 
-        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
-
-//        List<GroupInfo> groups = getGroups(cycle, org.getId(), user.getUserId());
-
         Map<String, Object> map = createMap();
-        CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
-        String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
 
-        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
-
-        map.put("user", user);
-        map.put("role", userRole);
-        map.put("isAdmin", isAdmin);
-        map.put("locale", userLocale);
-        map.put("userimg", InfoCacheHelper.getInstance(cycle).getMiniUserInfo(user.getUserId()).
-                getThumbnail());
-        map.put("verificationStatus", getVerificationStatus(user));
-
-        map.put("org", org);
+        addCommonValue(cycle, map, org, user);
 
         return new FreemarkerRequestTarget("/user/userGroups.html", map);
     }
@@ -237,6 +188,70 @@ public class UserModule extends AbstractWebAuthModule {
                 return "Unknown";
             }
         });
+    }
+
+    private void addCommonValue(RequestCycle cycle, Map<String, Object> map, MiniOrgInfo org,
+            UserAccount user) {
+
+        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
+
+        CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
+        String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
+
+        boolean isAdmin = UserAccountRoleCheck.isCpAdmin(user, org.getId());
+
+        OrganizationDirectoryClient odc = getOrganizationDirectoryClient(cycle);
+        OrgUnitInfo homeOrg;
+        if (user.getOrganizationId() != null) {
+            homeOrg = odc.getOrgUnitInfo(user.getOrganizationId());
+        } else {
+            homeOrg = null;
+        }
+
+        map.put("user", user);
+        map.put("organization", homeOrg);
+        map.put("locale", userLocale);
+        map.put("role", userRole);
+        map.put("isAdmin", isAdmin);
+        map.put("userimg", new MiniUserAccountHelper(cycle).createInfo(user).getThumbnail());
+        map.put("verificationStatus", getVerificationStatus(user));
+
+        map.put("org", org);
+
+        String autoLoginLink = getAutoLoginLink(cycle, org.getId(), user);
+
+        if (autoLoginLink == null) {
+            map.put("hasAutoLoginLink", false);
+        } else {
+            map.put("hasAutoLoginLink", true);
+            map.put("autoLoginLink", autoLoginLink);
+        }
+    }
+
+    private String getAutoLoginLink(RequestCycle cycle, long orgId, UserAccount user) {
+
+        if (!WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.AUTOLOGINLINK)) {
+            return null;
+        }
+        
+        if (!hasOrgPermission(cycle, orgId, CocoboxPermissions.BO_CREATE_USER_AUTOLOGINLINK)) {
+            return null;
+        }
+
+        LoginService lsClient = CacheClients.getClient(cycle, LoginService.class);
+
+        try {
+            AutoLoginLink autoLoginLink = lsClient.getAutoLoginLink(user.getUserId());
+
+            String key = autoLoginLink.getLoginKey();
+
+            String loginsite = DwsRealmHelper.getRealmConfiguration(cycle).getValue(
+                    CocoSiteConfKey.LOGINSITE_BASEURL);
+
+            return loginsite + "dlogin/" + key;
+        } catch (NotFoundException notFoundException){
+            return null;
+        }
     }
 
     public static class RoleInfo {

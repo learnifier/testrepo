@@ -99,6 +99,14 @@ public final class NavigationUtil {
         return new RedirectUrlRequestTarget(toMainUrl(cycle));
     }
 
+    /**
+     * Returns an url to the user overview (details) page.
+     *
+     * @param cycle
+     * @param strOrgId
+     * @param userId
+     * @return
+     */
     public static String toUserPageUrl(RequestCycle cycle, String strOrgId, long userId) {
         return cycle.urlFor(UserModule.class,
                 UserModule.OVERVIEW_ACTION, strOrgId, Long.toString(userId));
