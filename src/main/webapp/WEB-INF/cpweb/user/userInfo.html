@@ -21,7 +21,9 @@
             <li><div class="row-label">Locked</div><div class="row-setting clearfix">${(user.locked?string('Yes','No'))}</div></li>
             <li><div class="row-label">Last login</div><div class="row-setting clearfix">${(user.lastLogin?datetime?string.full)!''}</div></li>
             [@dwsrt.feature feature="autologinlink"]
-                [#include "userInfo-autoLoginLink.html" /]
+                [@security.permissionBlock permission="BO_CREATE_USER_AUTOLOGINLINK"]
+                    [#include "userInfo-autoLoginLink.html" /]
+                [/@]
             [/@]
         </ul>
     </div>
