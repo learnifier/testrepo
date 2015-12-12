@@ -84,8 +84,11 @@ ${cpweb_foot}
                         $(nRow).addClass('inactive');
                         $(nRow).css('opacity', '0.6');
                         return nRow;
-                    }
-                    else if (oObj.expired) {
+                    } else if (oObj.verificationStatus == 'UNVERIFIED') {
+                        $(nRow).addClass('unverified');
+                        $(nRow).attr('title', 'The email address has not been verified.');
+                        return nRow;
+                    } else if (oObj.expired) {
                         $(nRow).attr('title', 'This participation has expired');
                         $(nRow).addClass('expired');
                         return nRow;
