@@ -1,27 +1,28 @@
 [#ftl /]
 
-<li>
-    <div class="row-label">
-        Auto login link
-    </div>
-    <div class="row-setting clearfix">
-        [#if hasAutoLoginLink]
-            <button type="button" class="btn btn-primary" id="showAutoLoginLinkButton">Show link</button>
-            <form id="autoLoginDeactivateForm" method="post" action="${helper.urlFor('user.UserModificationModule','deactivateAutoLoginLink',[org.id,user.userId])}">
-                <button type="submit" class="btn btn-primary" >Deactivate</button>
-            </form>
-        [#else]
-            <form method="post" action="${helper.urlFor('user.UserModificationModule','activateAutoLoginLink',[org.id,user.userId])}">
-                <button type="submit" class="btn btn-primary" >Activate</button>
-            </form>
-        [/#if]
-    </div>
-</li>
+[#if hasAutoLoginLink]
+<form id="autoLoginDeactivateForm" method="post" action="${helper.urlFor('user.UserModificationModule','deactivateAutoLoginLink',[org.id,user.userId])}">
+</form>            
+<div class="dropdown">
+  <button class="btn btn-primary-outlined btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    <span class="glyphicon glyphicon-link"></span> Auto-Login Link
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="#" id="showAutoLoginLinkButton"><span class="glyphicon glyphicon-link"></span> Copy Link</a></li>
+    <li><a href="#" onclick="$('#autoLoginDeactivateForm').submit();"><span class="glyphicon glyphicon-ban-circle"></span> Close Link</a> </li>
+  </ul>
+</div>
+[#else]
+    <form method="post" action="${helper.urlFor('user.UserModificationModule','activateAutoLoginLink',[org.id,user.userId])}">
+        <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-link"></span> Open Auto-Login</button>
+    </form>
+[/#if]
 
 <script>
     $("#showAutoLoginLinkButton").click(function() {
        require(['dabox-common'], function() {
-          cocobox.infoDialog("Auto login link", "<br/>${autoLoginLink?js_string}<br/><br/><strong>Be very careful with this link. Anyone that know it will be able to access the full account for this user.</strong>");
+          cocobox.infoDialog("Auto login link", "<p><small>${autoLoginLink?js_string}</small></p><p><strong>Be very careful with this link. Anyone that know it will be able to access the full account for this user.</strong></p>");
        });
     });
 

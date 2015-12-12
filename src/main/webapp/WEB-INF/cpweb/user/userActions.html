@@ -1,4 +1,9 @@
 [#ftl /]
+[@dwsrt.feature feature="autologinlink"]
+    [@security.permissionBlock permission="BO_CREATE_USER_AUTOLOGINLINK"]
+        [#include "userInfo-autoLoginLink.html" /]
+    [/@]
+[/@]
 [#if portalSecurity.hasPermission("CP_EDIT_USER")]
     <button class="btn btn-primary-outlined btn-sm" type="button" id="edituser"><span class="glyphicon glyphicon-pencil"></span> Edit User</button>
     [@bsform._onreadyJavascript]

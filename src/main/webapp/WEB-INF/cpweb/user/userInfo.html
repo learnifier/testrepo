@@ -20,11 +20,6 @@
             <li><div class="row-label">Organization</div><div class="row-setting clearfix">${(organization.displayName?xhtml)!'Not set'}</div></li>
             <li><div class="row-label">Locked</div><div class="row-setting clearfix">${(user.locked?string('Yes','No'))}</div></li>
             <li><div class="row-label">Last login</div><div class="row-setting clearfix">${(user.lastLogin?datetime?string.full)!''}</div></li>
-            [@dwsrt.feature feature="autologinlink"]
-                [@security.permissionBlock permission="BO_CREATE_USER_AUTOLOGINLINK"]
-                    [#include "userInfo-autoLoginLink.html" /]
-                [/@]
-            [/@]
         </ul>
     </div>
 </section>
