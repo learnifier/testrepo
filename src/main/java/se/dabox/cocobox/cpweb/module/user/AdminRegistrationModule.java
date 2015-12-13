@@ -15,6 +15,7 @@ import se.dabox.cocobox.cpweb.module.core.AbstractModule;
 import se.dabox.cocobox.cpweb.module.project.role.ActivateNewProjectAdmin;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.coocbox.user.emaillink.enhancer.UserLinkEnhancerFactory;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.json.JsonUtils;
@@ -33,6 +34,8 @@ public class AdminRegistrationModule extends AbstractModule {
 
     @WebAction(name="a")
     public RequestTarget onFirstStage(RequestCycle cycle, String id) {
+        processUserEnhacements(cycle);
+
         Map<String,?> map = getStoredMap(cycle, id);
 
         if (map == null) {
@@ -89,6 +92,16 @@ public class AdminRegistrationModule extends AbstractModule {
     private String activateProjectAdmin(RequestCycle cycle, String id,
             Map<String, ?> map) {
         return new ActivateNewProjectAdmin(cycle, id, map).getTargetUrl();
+    }
+
+    private void processUserEnhacements(RequestCycle cycle) {
+        final StringBuilder reqUrl = cycle.getRequest().getRequestUrl();
+        reqUrl.append('?').append(cycle.getRequest().getQueryString());
+
+        String url = reqUrl.toString();
+
+        UserLinkEnhancerFactory factory = new UserLinkEnhancerFactory();
+        factory.processEnhancedLink(url);
     }
 
 }
