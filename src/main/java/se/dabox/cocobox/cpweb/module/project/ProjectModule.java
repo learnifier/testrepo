@@ -332,7 +332,8 @@ public class ProjectModule extends AbstractProjectWebModule {
                 project.getName(),
                 designId,
                 project.getProjectId(),
-                backUrl).createInitData();
+                backUrl,
+                project.getSubtype()).createInitData();
 
         return new RedirectUrlRequestTarget(GotoDesignBuilder.process(cycle, initData));
     }
@@ -358,7 +359,8 @@ public class ProjectModule extends AbstractProjectWebModule {
                 project.getName(),
                 designId,
                 project.getProjectId(),
-                backUrl).
+                backUrl,
+                project.getSubtype()).
                 setReadOnly(true).
                 createInitData();
 
