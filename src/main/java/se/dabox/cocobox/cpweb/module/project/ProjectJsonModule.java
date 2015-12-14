@@ -583,30 +583,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(map);
     }
-    
-    @WebAction
-    public RequestTarget setCatalogModeration(RequestCycle cycle, String strProjectId) {
-        long prjId = Long.valueOf(strProjectId);
 
-        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
-
-        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
-                getRequest(), "enabled"));
-
-        String mode = enabled?"DIRECT":"REQUEST"; // These should probably be some enum somewhere
-
-        long userId = LoginUserAccountHelper.getUserId(cycle);
-
-        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogMode(mode).createUpdateProjectRequest();
-        ccbc.updateOrgProject(upr);
-
-        Map<String, String> map = Collections.singletonMap("status", "OK");
-
-        return jsonTarget(map);
-    }
-    
     @WebAction
     public RequestTarget setCatalogVisibility(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
@@ -621,6 +598,29 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
         final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogProject(enabled).createUpdateProjectRequest();
+        ccbc.updateOrgProject(upr);
+
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+
+    @WebAction
+    public RequestTarget setCatalogModeration(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+        String mode = enabled?"REQUEST":"DIRECT"; // These should probably be some enum somewhere
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogMode(mode).createUpdateProjectRequest();
         ccbc.updateOrgProject(upr);
 
         Map<String, String> map = Collections.singletonMap("status", "OK");
