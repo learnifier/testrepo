@@ -31,12 +31,12 @@ ${cpweb_foot}
         <input type="hidden" name="orgId" value="${org.id}" />
         <input type="hidden" name="ntarget" id="ntarget" value="" />
         [#if !nps.editMode && designProject]
-        <button tabindex="100" class="primary next" type="submit" onclick="$('#ntarget').val('next');"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
-        <button tabindex="100" class="save" type="submit" onclick="$('#ntarget').val('save');"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
+        <button tabindex="100" class="btn btn-primary" type="submit" onclick="$('#ntarget').val('next');"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
+        <button tabindex="100" class="btn btn-primary-outlined" type="submit" onclick="$('#ntarget').val('save');"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
         [#else]
-        <button tabindex="100" class="primary save"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
+        <button tabindex="100" class="btn btn-primary"><span>[@dws.txt key='form.action.saveprj' /]</span></button>
         [/#if]
-        <a href="${nps.cancelTarget}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
+        <a class="btn btn-link" href="${nps.cancelTarget}"  tabindex="101">[@dws.txt key="form.action.cancel" /]</a>
     </section>
 
 </form>
