@@ -559,7 +559,127 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(map);
     }
+    
+    @WebAction
+    public RequestTarget onSetProgressVisibility(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
 
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        UpdateProjectRequest upr = new UpdateProjectRequest(
+                project.getProjectId(),
+                project.getName(),
+                project.getLocale(),
+                userId,
+                project.getCountry(),
+                project.getTimezone(),
+                project.getDesignId(),
+                project.getStageDesignId(),
+                project.getMasterDatabank(),
+                project.getStageDatabank(),
+                project.getNote(),
+                project.getInvitePassword(),
+                project.getInviteLimit(),
+                project.isSelfRegistrationEnabled(),
+                project.getUserTitle(),
+                project.getUserDescription(),
+                project.isAutoIcal(),
+                enabled);
+
+        ccbc.updateOrgProject(upr);
+
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+    
+    @WebAction
+    public RequestTarget setCatalogModeration(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        UpdateProjectRequest upr = new UpdateProjectRequest(
+                project.getProjectId(),
+                project.getName(),
+                project.getLocale(),
+                userId,
+                project.getCountry(),
+                project.getTimezone(),
+                project.getDesignId(),
+                project.getStageDesignId(),
+                project.getMasterDatabank(),
+                project.getStageDatabank(),
+                project.getNote(),
+                project.getInvitePassword(),
+                project.getInviteLimit(),
+                project.isSelfRegistrationEnabled(),
+                project.getUserTitle(),
+                project.getUserDescription(),
+                project.isAutoIcal(),
+                enabled);
+
+        ccbc.updateOrgProject(upr);
+
+        Map<String, String> map = Collections.singletonMap("status", "OK1");
+
+        return jsonTarget(map);
+    }
+    
+    @WebAction
+    public RequestTarget setCatalogVisibility(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        UpdateProjectRequest upr = new UpdateProjectRequest(
+                project.getProjectId(),
+                project.getName(),
+                project.getLocale(),
+                userId,
+                project.getCountry(),
+                project.getTimezone(),
+                project.getDesignId(),
+                project.getStageDesignId(),
+                project.getMasterDatabank(),
+                project.getStageDatabank(),
+                project.getNote(),
+                project.getInvitePassword(),
+                project.getInviteLimit(),
+                project.isSelfRegistrationEnabled(),
+                project.getUserTitle(),
+                project.getUserDescription(),
+                project.isAutoIcal(),
+                enabled);
+
+        ccbc.updateOrgProject(upr);
+
+        Map<String, String> map = Collections.singletonMap("status", "OK2");
+
+        return jsonTarget(map);
+    }
+    
     @WebAction
     public RequestTarget onListCountries(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);

@@ -3,6 +3,7 @@
 [#import "bounceInfo.html" as bInfoRender /]
 [#import "projectInfo.html" as pInfo /]
 [#import "projectRegistration.html" as pRegistration /]
+[#import "projectCatalog.html" as pCatalog /]
 
 [#assign foot]
 
@@ -20,6 +21,9 @@ ${cpweb_foot}
 
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
   [@pRegistration.foot /]
+[/@]
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+  [@pCatalog.foot /]
 [/@]
 
 <script>
@@ -785,6 +789,11 @@ ${cpweb_head}
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
     <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="pe-7s-id pe-va pe-lg" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
     [/@]
+    [@dwsrt.feature feature="coursecatalog"]
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+            <li role="presentation"><a href="#catalog" aria-controls="catalog" role="tab" data-toggle="tab"><span class="pe-7s-id pe-va pe-lg" aria-hidden="true"></span> Catalog <span class="badge" id='catalog-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
+        [/@]
+    [/@dwsrt.feature]
   </ul>
 
   <!-- Tab panes -->
@@ -828,6 +837,11 @@ ${cpweb_head}
             [@pRegistration.html /]
     </div>
     [/@]
+    [@dwsrt.feature feature="coursecatalog"]
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+            [@pCatalog.html /]
+        [/@]
+    [/@dwsrt.feature]
   </div>
 
 </div>
