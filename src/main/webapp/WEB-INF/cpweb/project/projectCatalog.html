@@ -29,6 +29,7 @@
                     url: "${helper.urlFor('project.ProjectJsonModule','setCatalogModeration',[prj.projectId])}",
                     data: {enabled: moderation},
                     success: function (data) {
+                        console.log("moderation =", moderation );
                         $('#catalog_moderation_status-cb').bootstrapToggle('enable');
                         $('#catalog_moderation_status-cb').bootstrapToggle(moderation ? 'on' : 'off');
                     },
@@ -66,13 +67,13 @@
                         <li id="catalog_status">
                             <a class="setting">
                                 <span class="row-label">Show course in catalog [#--@dws.txt key="cpweb.project.settings.social.title" /--]</span>
-                                [@bsform.inputBoolean 'catalog_status' 'Show in course catalog' 'ON' 'OFF' prj.social?string session=formsess /]
+                                [@bsform.inputBoolean 'catalog_status' 'Show in course catalog' 'ON' 'OFF' prj.catalogProject?string session=formsess /]
                             </a>
                         </li>
                         <li id="catalog_moderation_status">
                             <a class="setting">
                                 <span class="row-label">Moderate course registrations[#--@dws.txt key="cpweb.project.settings.social.title" /--]</span>
-                                [@bsform.inputBoolean 'catalog_moderation_status' 'Moderate sign-ups' 'YES' 'NO' prj.social?string session=formsess /]
+                                [@bsform.inputBoolean 'catalog_moderation_status' 'Moderate sign-ups' 'YES' 'NO' prj.catalogMode?string session=formsess /]
                             </a>
                         </li>
                     </ul>
