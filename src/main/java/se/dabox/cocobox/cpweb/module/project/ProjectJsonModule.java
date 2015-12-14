@@ -32,8 +32,10 @@ import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.project.*;
+import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.ccbc.project.update.*;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -571,28 +573,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
 
+
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        UpdateProjectRequest upr = new UpdateProjectRequest(
-                project.getProjectId(),
-                project.getName(),
-                project.getLocale(),
-                userId,
-                project.getCountry(),
-                project.getTimezone(),
-                project.getDesignId(),
-                project.getStageDesignId(),
-                project.getMasterDatabank(),
-                project.getStageDatabank(),
-                project.getNote(),
-                project.getInvitePassword(),
-                project.getInviteLimit(),
-                project.isSelfRegistrationEnabled(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                enabled);
-
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setProgressVisible(enabled).createUpdateProjectRequest();
         ccbc.updateOrgProject(upr);
 
         Map<String, String> map = Collections.singletonMap("status", "OK");
@@ -611,31 +595,14 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
 
+        String mode = enabled?"DIRECT":"REQUEST"; // These should probably be some enum somewhere
+
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        UpdateProjectRequest upr = new UpdateProjectRequest(
-                project.getProjectId(),
-                project.getName(),
-                project.getLocale(),
-                userId,
-                project.getCountry(),
-                project.getTimezone(),
-                project.getDesignId(),
-                project.getStageDesignId(),
-                project.getMasterDatabank(),
-                project.getStageDatabank(),
-                project.getNote(),
-                project.getInvitePassword(),
-                project.getInviteLimit(),
-                project.isSelfRegistrationEnabled(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                enabled);
-
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogMode(mode).createUpdateProjectRequest();
         ccbc.updateOrgProject(upr);
 
-        Map<String, String> map = Collections.singletonMap("status", "OK1");
+        Map<String, String> map = Collections.singletonMap("status", "OK");
 
         return jsonTarget(map);
     }
@@ -653,29 +620,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        UpdateProjectRequest upr = new UpdateProjectRequest(
-                project.getProjectId(),
-                project.getName(),
-                project.getLocale(),
-                userId,
-                project.getCountry(),
-                project.getTimezone(),
-                project.getDesignId(),
-                project.getStageDesignId(),
-                project.getMasterDatabank(),
-                project.getStageDatabank(),
-                project.getNote(),
-                project.getInvitePassword(),
-                project.getInviteLimit(),
-                project.isSelfRegistrationEnabled(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                enabled);
-
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogProject(enabled).createUpdateProjectRequest();
         ccbc.updateOrgProject(upr);
 
-        Map<String, String> map = Collections.singletonMap("status", "OK2");
+        Map<String, String> map = Collections.singletonMap("status", "OK");
 
         return jsonTarget(map);
     }
