@@ -85,7 +85,7 @@
 </div>
 [/#macro]
 [#function moderationfn]
-  [#if prj.catalogMode == 'REQUEST']
+  [#if !prj.catalogMode?? || prj.catalogMode == 'REQUEST']
     [#return 'true']
   [/#if]
   [#return 'false']
