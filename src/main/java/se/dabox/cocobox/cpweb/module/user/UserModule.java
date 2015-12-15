@@ -36,6 +36,7 @@ import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.LoginService;
 import se.dabox.service.login.client.NotFoundException;
 import se.dabox.service.login.client.UserAccount;
@@ -227,6 +228,8 @@ public class UserModule extends AbstractWebAuthModule {
             map.put("hasAutoLoginLink", true);
             map.put("autoLoginLink", autoLoginLink);
         }
+
+        map.put("profileSettingsAllowed", new CocoboxUserAccount(user).isUserSettingsAllowed(cycle));
     }
 
     private String getAutoLoginLink(RequestCycle cycle, long orgId, UserAccount user) {
