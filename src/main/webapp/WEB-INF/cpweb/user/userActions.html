@@ -46,6 +46,10 @@
         [/@]
     [/#if]
 
-    [#include "userInfo-profileSettingsSetting.html" /]
-
 [/#if]
+
+[@security.permissionBlock permission="BO_EDIT_USER"]
+  [#-- Yes, it should be BO_EDIT_USER here. The profile settings setting is realm wide. --]
+  
+  [#include "userInfo-profileSettingsSetting.html" /]
+[/@]
