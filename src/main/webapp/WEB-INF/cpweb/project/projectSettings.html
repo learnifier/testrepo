@@ -123,11 +123,11 @@ ${cpweb_foot}
             url: "${helper.urlFor('project.ProjectJsonModule','setProgressVisibility',[prj.projectId])}",
             data: {enabled: visibility},
             success: function(data) {
-                $('#progressVisisble-cb').bootstrapToggle('enable');
-                $('#progressVisisble-cb').bootstrapToggle(visibility ? 'on' : 'off');
+                $('#progressVisible-cb').bootstrapToggle('enable');
+                $('#progressVisible-cb').bootstrapToggle(visibility ? 'on' : 'off');
             },
             complete: function() {
-                $('#progressVisisble-cb').bootstrapToggle('enable');
+                $('#progressVisible-cb').bootstrapToggle('enable');
             }
         });
     };
@@ -172,9 +172,9 @@ ${cpweb_foot}
                     setSocial(!$("#socialfeatures-cb").prop("checked"));
                     return false;
                 });
-                $('#progressVisisble-h').next().on('click', function (ev) {
-                    $('#progressVisisble-cb').bootstrapToggle('disable');
-                    setProgressVisibility(!$("#progressVisisble-cb").prop("checked"));
+                $('#progressVisible-h').next().on('click', function (ev) {
+                    $('#progressVisible-cb').bootstrapToggle('disable');
+                    setProgressVisibility(!$("#progressVisible-cb").prop("checked"));
                     return false;
                 });
             });
@@ -277,7 +277,7 @@ ${cpweb_foot}
 
         
         [@dwsrt.feature feature="social"]
-        <li id="progressVisisble">
+        <li id="progressVisible">
             <a class="setting">
                 <span class="row-label">Show progress[#--@dws.txt key="cpweb.project.settings.social.title" /--]</span>
                 [@bsform.inputBoolean 'progressVisible' 'Show progress for learners' 'ON' 'OFF' prj.progressVisible?string session=formsess /]
