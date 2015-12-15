@@ -33,6 +33,7 @@ import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRe
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.project.*;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.catalog.CatalogMode;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.*;
@@ -594,11 +595,13 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
-
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogProject(enabled).createUpdateProjectRequest();
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogProject(enabled);
+        if(project.getCatalogMode() == null || "".equals(project.getCatalogMode())) {
+            uprb.setCatalogMode(CatalogMode.REQUEST.name());
+        }
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
         Map<String, String> map = Collections.singletonMap("status", "OK");
 
@@ -616,11 +619,11 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
 
-        String mode = enabled?"REQUEST":"DIRECT"; // These should probably be some enum somewhere
+        final CatalogMode mode = enabled ? CatalogMode.REQUEST : CatalogMode.DIRECT;
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogMode(mode).createUpdateProjectRequest();
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogMode(mode.name()).createUpdateProjectRequest();
         ccbc.updateOrgProject(upr);
 
         Map<String, String> map = Collections.singletonMap("status", "OK");
