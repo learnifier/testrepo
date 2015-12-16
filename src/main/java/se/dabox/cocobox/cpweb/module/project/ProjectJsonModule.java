@@ -362,17 +362,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         }
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                project.getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                project.getStageDatabank(), project.getNote(), project.getInvitePassword(),
-                inviteLimit, project.isInvitePossible(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
 
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setInviteLimit(inviteLimit);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
         return new FormbeanJsRequestTargetFactory(cycle, bundle, prefix).
                 getSuccessfulMap(Collections.
@@ -414,17 +407,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         }
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                project.getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                project.getStageDatabank(), project.getNote(), pw,
-                project.getInviteLimit(), project.isInvitePossible(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
 
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setInvitePassword(pw);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
         return new FormbeanJsRequestTargetFactory(cycle, bundle, prefix).
                 getSuccessfulMap(Collections.
@@ -445,17 +431,11 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 getValidationSession(SetRegPasswordForm.class, cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                project.getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                project.getStageDatabank(), project.getNote(), project.getInvitePassword(),
-                project.getInviteLimit(), enabled,
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
 
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setSelfRegistrationEnabled(enabled);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
+
 
         return jsonTarget(Collections.singletonMap("status", "OK"));
     }
@@ -479,28 +459,9 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
             long userId = LoginUserAccountHelper.getUserId(cycle);
 
-            UpdateProjectRequest upr =
-                    new UpdateProjectRequest(
-                    project.getProjectId(),
-                    project.getName(),
-                    project.getLocale(),
-                    userId,
-                    project.getCountry(),
-                    project.getTimezone(),
-                    project.getDesignId(),
-                    project.getStageDesignId(),
-                    project.getMasterDatabank(),
-                    project.getStageDatabank(),
-                    project.getNote(),
-                    project.getInvitePassword(),
-                    project.getInviteLimit(),
-                    project.isSelfRegistrationEnabled(),
-                    project.getUserTitle(),
-                    project.getUserDescription(),
-                    enabled,
-                    project.isSocial());
-
-            ccbc.updateOrgProject(upr);
+            final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                    .setAutoIcal(enabled);
+            ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
             if (enabled) {
                 reactivateProjectParticipants(cycle, project);
@@ -536,27 +497,11 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        UpdateProjectRequest upr = new UpdateProjectRequest(
-                project.getProjectId(),
-                project.getName(),
-                project.getLocale(),
-                userId,
-                project.getCountry(),
-                project.getTimezone(),
-                project.getDesignId(),
-                project.getStageDesignId(),
-                project.getMasterDatabank(),
-                project.getStageDatabank(),
-                project.getNote(),
-                project.getInvitePassword(),
-                project.getInviteLimit(),
-                project.isSelfRegistrationEnabled(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                enabled);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setSocial(enabled);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
-        ccbc.updateOrgProject(upr);
+
 
         Map<String, String> map = Collections.singletonMap("status", "OK");
 
