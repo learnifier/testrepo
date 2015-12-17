@@ -179,33 +179,39 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onProjectRoster(RequestCycle cycle, String strProjectId)
-            throws Exception {
+    public RequestTarget onProjectRoster(RequestCycle cycle, String strProjectId) {
+
         long prjId = Long.valueOf(strProjectId);
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj, strProjectId);
-        List<UserAccount> users =
-                Clients.getClient(cycle, UserAccountService.class).
-                getUserGroupAccounts(prj.getUserGroupId());
-
-        List<ProjectParticipation> participations;
-
         try {
-            participations = ccbc.listProjectParticipations(new ListProjectParticipationsRequest(
-                    prjId, true));
-        } catch (NotFoundException nfe) {
-            return new ErrorCodeRequestTarget(404);
+            List<UserAccount> users = Clients.getClient(cycle, UserAccountService.class).
+                    getUserGroupAccounts(prj.getUserGroupId());
+
+            List<ProjectParticipation> participations;
+
+            try {
+                participations = ccbc.listProjectParticipations(
+                        new ListProjectParticipationsRequest(
+                                prjId, true));
+            } catch (NotFoundException nfe) {
+                return new ErrorCodeRequestTarget(404);
+            }
+
+            String strOrgId = Long.toString(prj.getOrgId());
+
+            boolean impersonateAllowed = ProjectPermissionCheck.fromCycle(cycle).
+                    checkPermission(prj,
+                            CocoboxPermissions.PRJ_IMPERSONATE_PARTICIPANT);
+
+            return jsonTarget(new ProjectRosterJsonGenerator().toJson(cycle, participations, users,
+                    strOrgId, prj, impersonateAllowed));
+        } catch (RuntimeException ex) {
+            throw new IllegalStateException("Failed to generate roster response for project "
+                    + strProjectId, ex);
         }
-
-        String strOrgId = Long.toString(prj.getOrgId());
-
-        boolean impersonateAllowed = ProjectPermissionCheck.fromCycle(cycle).checkPermission(prj,
-                CocoboxPermissions.PRJ_IMPERSONATE_PARTICIPANT);
-
-        return jsonTarget(new ProjectRosterJsonGenerator().toJson(cycle, participations, users,
-                strOrgId, prj, impersonateAllowed));
     }
 
     @WebAction
