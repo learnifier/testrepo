@@ -464,7 +464,7 @@ ${cpweb_foot}
                             $.getJSON(addUrl).done(function (data) {
                                 window.location.reload();
                             }).fail(function (jqxhr, textStatus, error) {
-                                cocbox.infoDialog("Error", "There was a problem adding members: " + textStatus);
+                                cocobox.infoDialog("Error", "There was a problem adding members: " + textStatus);
                             });
                         });
                     }
@@ -482,21 +482,23 @@ ${cpweb_foot}
             }).change(function(){
                 var cugId = $("#markByGroup").val(),
                         url = "${helper.urlFor('project.ProjectJsonModule','listGroupMembers', [prj.projectId?c])}/" + cugId;
-                $.getJSON(url).done(function (data) {
-                    var h = {};
-                    $.each(data.aaData, function(i, member){
-                        h[member.userId] = true;
+                if(cugId) {
+                    $.getJSON(url).done(function (data) {
+                        var h = {};
+                        $.each(data.aaData, function (i, member) {
+                            h[member.userId] = true;
+                        });
+                        $.each(oTable.api().rows().indexes(), function (i, ri) {
+                            if (oTable.api().row(ri).data().userId in h) {
+                                oTable.api().cell(ri, 0).data(true);
+                            }
+                        });
+                    }).fail(function (jqxhr, textStatus, error) {
+                        cocobox.infoDialog("Error", "There was a problem getting members from group: " + textStatus);
+                    }).always(function () {
+                        $("#markByGroup").select2("val", "");
                     });
-                    $.each(oTable.api().rows().indexes(), function(i, ri){
-                        if(oTable.api().row(ri).data().userId in h) {
-                            oTable.api().cell(ri, 0).data(true);
-                        }
-                    });
-                }).fail(function (jqxhr, textStatus, error) {
-                    cocbox.infoDialog("Error", "There was a problem getting members from group: " + textStatus);
-                }).always(function(){
-                    $("#markByGroup").select2("val", "");
-                })
+                }
             });
 
         });
