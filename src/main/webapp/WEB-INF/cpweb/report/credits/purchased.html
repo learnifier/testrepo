@@ -47,7 +47,7 @@
                     "targets": [ 2 ],
                     "data": function(row, type, set) {
                         if (!row.expiresDisplay) {
-                            row.expiresDisplay = row.expiresStr;
+                            row.expiresDisplay = row.expiresStr ? row.expiresStr : "";
                         }
                         if (type === 'display') {
                             return row.expiresDisplay;
