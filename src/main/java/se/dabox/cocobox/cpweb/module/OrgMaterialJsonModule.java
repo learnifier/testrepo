@@ -99,6 +99,7 @@ import se.dabox.util.collections.MapUtil;
 import se.dabox.util.collections.NotPredicate;
 import se.dabox.util.collections.OrListPredicate;
 import se.dabox.util.collections.Predicate;
+import se.dabox.util.collections.ValueUtils;
 import se.dabox.util.converter.ConversionContext;
 
 /**
@@ -1046,6 +1047,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_VIEW_ACCOUNTBALANCE)) {
             balances = getAccountBalanceMap(cycle, orgId, orgProds);
+            products = maybeFilterZeroBalanceProducts(cycle, balances, products);
         }
         Map<String, Long> orgProdIdMap = getOrgProdIdMap(orgProds);
 
@@ -1223,6 +1225,33 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         map.put("name", new GetProjectAdministrativeName(cycle).getName(project));
 
         return map;
+    }
+
+    private List<Product> maybeFilterZeroBalanceProducts(RequestCycle cycle,
+            Map<String, AccountBalance> balances, List<Product> products) {
+
+        String strParam = ValueUtils.coalesce(cycle.getRequest().getParameter("zero"), "true");
+        boolean includeZeroBalanceProducts = Boolean.valueOf(strParam);
+
+        if (includeZeroBalanceProducts) {
+            return filterZeroBalanceProducts(balances, products);
+        }
+
+        return products;
+    }
+
+    private List<Product> filterZeroBalanceProducts(final Map<String, AccountBalance> balances,
+            List<Product> products) {
+
+        return CollectionsUtil.sublist(products, p -> {
+            AccountBalance balance = balances.get(p.getId().getId());
+
+            if (balance == null) {
+                return false;
+            }
+
+            return !balance.isZeroBalance();
+        });
     }
 
     private static class CrispAdminLinkInfo {
