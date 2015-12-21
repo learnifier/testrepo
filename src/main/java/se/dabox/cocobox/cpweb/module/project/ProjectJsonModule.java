@@ -65,6 +65,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
+import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 
 /**
  *
@@ -170,10 +174,27 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         Set<Long> participants =
                 ccbcClient.listProjectParticipations(prj.getProjectId())
                 .stream().map(ProjectParticipation::getUserId).collect(Collectors.toSet());
-        uas.stream()
+        long added = uas.stream()
                 .filter(ua -> !participants.contains(ua.getUserId()))
-                .forEach(ua ->
-                    ccbcClient.newProjectParticipant(caller, prjId, ua.getUserId()));
+                .map(ua -> {
+                    ccbcClient.newProjectParticipant(caller, prjId, ua.getUserId());
+                    return ua;
+                }).count();
+
+        JavaCocoText ctext = new JavaCocoText();
+        String message;
+
+        if (added == 0) {
+            message = ctext.get("cpweb.project.roster.added.0");
+        } else if (added == 1) {
+            message = ctext.get("cpweb.project.roster.added.1");
+        } else {
+            message = ctext.get("cpweb.project.roster.added.many", added);
+        }
+
+        WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(message,
+                WebMessageType.success));
+
         // TODO: Should count number of successful adds and list of errors?
         return jsonTarget(Collections.singletonMap("status", "OK"));
     }
