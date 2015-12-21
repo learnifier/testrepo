@@ -98,14 +98,14 @@ ${cpweb_foot}
 <script>
     require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
         f.startSingleFlirt('${prj.newsFlirtId}', {
-            bubbleColor: '${brandingPackage.getMetadataImageColor("cpNavColor")}',
+            bubbleColor: '${(brandingPackage.getMetadataImageColor("cpNavColor"))!""}',
             templates: {
                 emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
             }
         });
         
         f.startSingleFlirt('${prj.flirtId}', {
-            bubbleColor: '${brandingPackage.getMetadataImageColor("cpNavColor")}',
+            bubbleColor: '${(brandingPackage.getMetadataImageColor("cpNavColor"))!""}',
             templates: {
                 emptyResponse: "<li class='ccb-flirt-empty'>Be the first to post a comment in this discussion.</li>",
                     header: "<img src='{{{userimage}}}' alt='{{username}}'  class='img-circle'/><strong>{{username}}</strong> posted {{#if activityName}}in <strong>{{activityName}}</strong>{{/if}} about <span class='ccb-flirt-timeago' title='{{createdIso}}'>{{createdStr}}</span>"
