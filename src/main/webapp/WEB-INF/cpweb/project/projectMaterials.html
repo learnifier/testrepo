@@ -121,7 +121,7 @@ ${cpweb_foot}
 
 
 
-                            if (row.anonymous === true) {
+                            if (row.anonymous && row.projectProduct) {
                                 if (row.editorUrl) {
                                     html += "<li><a href='" + row.editorUrl + "' target='_blank'>Edit</a></li>";
                                 } else {

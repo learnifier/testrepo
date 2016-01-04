@@ -32,8 +32,10 @@ import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.project.*;
+import se.dabox.service.common.ccbc.project.catalog.CatalogMode;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -63,6 +65,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
+import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 
 /**
  *
@@ -168,42 +174,65 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         Set<Long> participants =
                 ccbcClient.listProjectParticipations(prj.getProjectId())
                 .stream().map(ProjectParticipation::getUserId).collect(Collectors.toSet());
-        uas.stream()
+        long added = uas.stream()
                 .filter(ua -> !participants.contains(ua.getUserId()))
-                .forEach(ua ->
-                    ccbcClient.newProjectParticipant(caller, prjId, ua.getUserId()));
+                .map(ua -> {
+                    ccbcClient.newProjectParticipant(caller, prjId, ua.getUserId());
+                    return ua;
+                }).count();
+
+        JavaCocoText ctext = new JavaCocoText();
+        String message;
+
+        if (added == 0) {
+            message = ctext.get("cpweb.project.roster.added.0");
+        } else if (added == 1) {
+            message = ctext.get("cpweb.project.roster.added.1");
+        } else {
+            message = ctext.get("cpweb.project.roster.added.many", added);
+        }
+
+        WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(message,
+                WebMessageType.success));
+
         // TODO: Should count number of successful adds and list of errors?
         return jsonTarget(Collections.singletonMap("status", "OK"));
     }
 
     @WebAction
-    public RequestTarget onProjectRoster(RequestCycle cycle, String strProjectId)
-            throws Exception {
+    public RequestTarget onProjectRoster(RequestCycle cycle, String strProjectId) {
+
         long prjId = Long.valueOf(strProjectId);
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj, strProjectId);
-        List<UserAccount> users =
-                Clients.getClient(cycle, UserAccountService.class).
-                getUserGroupAccounts(prj.getUserGroupId());
-
-        List<ProjectParticipation> participations;
-
         try {
-            participations = ccbc.listProjectParticipations(new ListProjectParticipationsRequest(
-                    prjId, true));
-        } catch (NotFoundException nfe) {
-            return new ErrorCodeRequestTarget(404);
+            List<UserAccount> users = Clients.getClient(cycle, UserAccountService.class).
+                    getUserGroupAccounts(prj.getUserGroupId());
+
+            List<ProjectParticipation> participations;
+
+            try {
+                participations = ccbc.listProjectParticipations(
+                        new ListProjectParticipationsRequest(
+                                prjId, true));
+            } catch (NotFoundException nfe) {
+                return new ErrorCodeRequestTarget(404);
+            }
+
+            String strOrgId = Long.toString(prj.getOrgId());
+
+            boolean impersonateAllowed = ProjectPermissionCheck.fromCycle(cycle).
+                    checkPermission(prj,
+                            CocoboxPermissions.PRJ_IMPERSONATE_PARTICIPANT);
+
+            return jsonTarget(new ProjectRosterJsonGenerator().toJson(cycle, participations, users,
+                    strOrgId, prj, impersonateAllowed));
+        } catch (RuntimeException ex) {
+            throw new IllegalStateException("Failed to generate roster response for project "
+                    + strProjectId, ex);
         }
-
-        String strOrgId = Long.toString(prj.getOrgId());
-
-        boolean impersonateAllowed = ProjectPermissionCheck.fromCycle(cycle).checkPermission(prj,
-                CocoboxPermissions.PRJ_IMPERSONATE_PARTICIPANT);
-
-        return jsonTarget(new ProjectRosterJsonGenerator().toJson(cycle, participations, users,
-                strOrgId, prj, impersonateAllowed));
     }
 
     @WebAction
@@ -359,17 +388,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         }
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                project.getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                project.getStageDatabank(), project.getNote(), project.getInvitePassword(),
-                inviteLimit, project.isInvitePossible(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
 
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setInviteLimit(inviteLimit);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
         return new FormbeanJsRequestTargetFactory(cycle, bundle, prefix).
                 getSuccessfulMap(Collections.
@@ -411,17 +433,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         }
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                project.getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                project.getStageDatabank(), project.getNote(), pw,
-                project.getInviteLimit(), project.isInvitePossible(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
 
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setInvitePassword(pw);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
         return new FormbeanJsRequestTargetFactory(cycle, bundle, prefix).
                 getSuccessfulMap(Collections.
@@ -442,17 +457,11 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
                 getValidationSession(SetRegPasswordForm.class, cycle);
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                project.getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                project.getStageDatabank(), project.getNote(), project.getInvitePassword(),
-                project.getInviteLimit(), enabled,
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
 
-        ccbc.updateOrgProject(upr);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setSelfRegistrationEnabled(enabled);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
+
 
         return jsonTarget(Collections.singletonMap("status", "OK"));
     }
@@ -476,28 +485,9 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
             long userId = LoginUserAccountHelper.getUserId(cycle);
 
-            UpdateProjectRequest upr =
-                    new UpdateProjectRequest(
-                    project.getProjectId(),
-                    project.getName(),
-                    project.getLocale(),
-                    userId,
-                    project.getCountry(),
-                    project.getTimezone(),
-                    project.getDesignId(),
-                    project.getStageDesignId(),
-                    project.getMasterDatabank(),
-                    project.getStageDatabank(),
-                    project.getNote(),
-                    project.getInvitePassword(),
-                    project.getInviteLimit(),
-                    project.isSelfRegistrationEnabled(),
-                    project.getUserTitle(),
-                    project.getUserDescription(),
-                    enabled,
-                    project.isSocial());
-
-            ccbc.updateOrgProject(upr);
+            final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                    .setAutoIcal(enabled);
+            ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
             if (enabled) {
                 reactivateProjectParticipants(cycle, project);
@@ -533,26 +523,32 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
 
-        UpdateProjectRequest upr = new UpdateProjectRequest(
-                project.getProjectId(),
-                project.getName(),
-                project.getLocale(),
-                userId,
-                project.getCountry(),
-                project.getTimezone(),
-                project.getDesignId(),
-                project.getStageDesignId(),
-                project.getMasterDatabank(),
-                project.getStageDatabank(),
-                project.getNote(),
-                project.getInvitePassword(),
-                project.getInviteLimit(),
-                project.isSelfRegistrationEnabled(),
-                project.getUserTitle(),
-                project.getUserDescription(),
-                project.isAutoIcal(),
-                enabled);
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId())
+                .setSocial(enabled);
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
 
+
+
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+    
+    @WebAction
+    public RequestTarget onSetProgressVisibility(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setProgressVisible(enabled).createUpdateProjectRequest();
         ccbc.updateOrgProject(upr);
 
         Map<String, String> map = Collections.singletonMap("status", "OK");
@@ -560,6 +556,52 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(map);
     }
 
+    @WebAction
+    public RequestTarget setCatalogVisibility(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        final UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogProject(enabled);
+        if(project.getCatalogMode() == null || "".equals(project.getCatalogMode())) {
+            uprb.setCatalogMode(CatalogMode.REQUEST.name());
+        }
+        ccbc.updateOrgProject(uprb.createUpdateProjectRequest());
+
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+
+    @WebAction
+    public RequestTarget setCatalogModeration(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
+                getRequest(), "enabled"));
+
+        final CatalogMode mode = enabled ? CatalogMode.REQUEST : CatalogMode.DIRECT;
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+
+        final se.dabox.service.common.ccbc.project.update.UpdateProjectRequest upr = new UpdateProjectRequestBuilder(userId, project.getProjectId()).setCatalogMode(mode.name()).createUpdateProjectRequest();
+        ccbc.updateOrgProject(upr);
+
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+    
     @WebAction
     public RequestTarget onListCountries(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);

@@ -1,0 +1,10 @@
+[#ftl /]
+<form method="post" action="${helper.urlFor('user.UserModificationModule','profileSettingsSetting',[org.id,user.userId])}">
+    [#if profileSettingsAllowed]
+        <input type="hidden" name="mode" value="disabled" />
+        <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-user"></span> Disable profile settings</button>
+    [#else]
+        <input type="hidden" name="mode" value="enabled" />
+        <button type="submit" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-user"></span> Enable profile settings</button>
+    [/#if]
+</form>

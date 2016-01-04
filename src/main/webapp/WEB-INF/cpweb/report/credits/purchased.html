@@ -44,7 +44,25 @@
                     }
                 },
                 {
-                    "aTargets": [ 2 ],
+                    "targets": [ 2 ],
+                    "data": function(row, type, set) {
+                        if (!row.expiresDisplay) {
+                            row.expiresDisplay = row.expiresStr ? row.expiresStr : "";
+                        }
+                        if (type === 'display') {
+                            return row.expiresDisplay;
+                        } else if (type === 'filter') {
+                            return row.expires;
+                        } else if (type === 'sort') {
+                            return row.expires;
+                        } else {
+                            //Anything else and raw row
+                            return row.expiresDisplay;
+                        }
+                    }
+                },
+                {
+                    "aTargets": [ 3 ],
                     "data": function(row, type, set) {
                         if (!row.kitIdDisplay) {
                             var kitId = row.baseproduct;
@@ -68,11 +86,15 @@
                     }
                 },
                 {
-                    "aTargets": [ 3 ],
+                    "aTargets": [ 4 ],
                     "data": "amount"
+                },
+                {
+                    "aTargets": [ 5 ],
+                    "data": "used"
                 }
             ],
-            "ajax": "${helper.urlFor('report.ReportJsonModule','listPurchasedReport',[org.id, product.id.id])}",
+            "ajax": "${helper.urlFor('report.ReportJsonModule','listPurchasedReport',[org.id, product.id.id])}?zero=false",
             "pagingType": "full_numbers",
             "language": {
                 "search": "",
@@ -116,8 +138,10 @@ ${cpweb_head}
                 <tr>
                     <th>Order Number</th>
                     <th>Created</th>
+                    <th>Expires</th>
                     <th>Kit</th>
                     <th>Purchased</th>
+                    <th>Used</th>
                 </tr>
             </thead>
             <tbody>

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.unixdeveloper.druwa.DruwaApplication;
+import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,9 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.project.AbstractRosterListCommand;
 import se.dabox.cocobox.cpweb.module.project.DeleteFailure;
 import se.dabox.cocosite.user.UserIdentifierHelper;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -63,7 +68,29 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
 
         List<DeleteFailure> failures = getOrCreateDeleteFailures(context);
         if (!failures.isEmpty()) {
+
+            RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
+
+            String message = String.format(
+                    "%d errors occured while trying to delete %d participants", failures.size(),
+                    values.size());
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(message,
+                    WebMessageType.error));
+
             setDeleteFailures(context, failures);
+        } else {
+            RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
+
+            String message;
+
+            if (values.size() == 1) {
+                message = "Deleted 1 participant";
+            } else {
+                message = String.format("Deleted %d participants", values.size());
+            }
+
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(message,
+                    WebMessageType.success));
         }
 
         return retval;

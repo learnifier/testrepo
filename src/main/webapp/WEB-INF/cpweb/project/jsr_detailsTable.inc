@@ -2,6 +2,12 @@
 <script id="detailsTable" type="text/x-jsrender">
     <div id="details">
 
+        {{if verificationStatus == 'UNVERIFIED'}}
+        <div class="unverifieddetails">
+            <div class="unverified"> The email address has not yet been verified.</div>
+        </div>
+        {{/if}}
+
         {{if expirationStr}}
         <div class="expirationdetails">
             {{if expired}}

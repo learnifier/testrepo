@@ -1,0 +1,93 @@
+[#ftl strip_text="true" /]
+
+[#macro foot]
+<script>
+    $(function(){
+
+        require(['dabox-common', 'jquery.form', 'dabox-formbeanjs', 'bootstrap/toggle'], function () {
+
+            var setCatalogVisibility = function (visibility) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: "${helper.urlFor('project.ProjectJsonModule','setCatalogVisibility',[prj.projectId])}",
+                    data: {enabled: visibility},
+                    success: function (data) {
+                        $('#catalog_status-cb').bootstrapToggle('enable');
+                        $('#catalog_status-cb').bootstrapToggle(visibility ? 'on' : 'off');
+                        $("#catalog-badge").text(visibility ? 'On' : 'Off');
+                    },
+                    complete: function () {
+                        $('#catalog_status-cb').bootstrapToggle('enable');
+                    }
+                });
+            };
+
+            var setCatalogModeration = function (moderation) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: "${helper.urlFor('project.ProjectJsonModule','setCatalogModeration',[prj.projectId])}",
+                    data: {enabled: moderation},
+                    success: function (data) {
+                        console.log("moderation =", moderation );
+                        $('#catalog_moderation_status-cb').bootstrapToggle('enable');
+                        $('#catalog_moderation_status-cb').bootstrapToggle(moderation ? 'on' : 'off');
+                    },
+                    complete: function () {
+                        $('#catalog_moderation_status-cb').bootstrapToggle('enable');
+                    }
+                });
+            };
+
+            $('#catalog_status-h').next().on('click', function (ev) {
+                $('#catalog_status-cb').bootstrapToggle('disable');
+                setCatalogVisibility(!$("#catalog_status-cb").prop("checked"));
+                return false;
+            });
+            
+            $('#catalog_moderation_status-h').next().on('click', function (ev) {
+                $('#catalog_moderation_status-cb').bootstrapToggle('disable');
+                setCatalogModeration(!$("#catalog_moderation_status-cb").prop("checked"));
+                return false;
+            });
+        });
+
+    });
+
+</script>
+[/#macro]
+
+[#macro html]
+<div role="tabpanel" class="tab-pane fade" id="catalog">
+    <div class="row">
+        <div class="col-xs-12">
+            <section class="ccb-expandable-list">
+                <div id="settingsList">
+                    <ul>
+                        <li id="catalog_status">
+                            <a class="setting">
+                                <span class="row-label">Show course in catalog [#--@dws.txt key="cpweb.project.settings.catalogproject.title" /--]</span>
+                                [@bsform.inputBoolean 'catalog_status' 'Show in course catalog' 'ON' 'OFF' prj.catalogProject?string session=formsess /]
+                            </a>
+                        </li>
+                        <li id="catalog_moderation_status">
+                            <a class="setting">
+                                <span class="row-label">Moderate course registrations[#--@dws.txt key="cpweb.project.settings.catalogmode.title" /--]</span>
+                                [@bsform.inputBoolean 'catalog_moderation_status' 'Moderate sign-ups' 'YES' 'NO' moderationfn() session=formsess /]
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+[/#macro]
+[#function moderationfn]
+  [#if !prj.catalogMode?? || prj.catalogMode == 'REQUEST']
+    [#return 'true']
+  [/#if]
+  [#return 'false']
+[/#function]
+

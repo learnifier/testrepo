@@ -35,6 +35,7 @@ public class PurchasedReport extends AbstractReport {
         Map<String, Object> line = getLine();
         addOrderAndLineId(line, token);
         getEnhancers().enhance(line);
+        line.put("used", token.getAmount() - token.getUnbalancedAmount());
     }
 
     @Override

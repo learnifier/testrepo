@@ -124,6 +124,7 @@ class ProjectRosterJsonGenerator {
                 writeDateField("firstEmail", item.getFirstMail());
                 writeDateField("lastEmail", item.getLastMail());
                 writeDateField("firstAccess", item.getFirstAccess(), dateTimeFormat);
+                g.writeStringField("verificationStatus", ua.getVerificationStatus().name());
 
                 writeDateField("lastAccess", item.getLastAccess(), dateTimeFormat);
                 if (item.getLastAccess() != null) {

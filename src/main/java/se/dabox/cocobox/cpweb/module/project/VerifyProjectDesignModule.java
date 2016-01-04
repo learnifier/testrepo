@@ -50,6 +50,7 @@ import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.cddb.DatabankDateConverter;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
+import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
 import se.dabox.service.common.coursedesign.ComponentUtil;
@@ -351,6 +352,9 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
                 return NavigationUtil.toProjectPage(project.getProjectId());
             }
         }
+
+
+        map.put("googleMapsEnabled", isGoogleMapsEnabled(cycle));
 
         addCommonMapValues(map, project, cycle);
 
@@ -773,5 +777,10 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         Product product = ProductFetchUtil.getExistingProduct(pdClient, pid);
 
         return product.getFieldSingleValue("duration");
+    }
+
+    private Boolean isGoogleMapsEnabled(RequestCycle cycle) {
+        return DwsRealmHelper.getRealmConfiguration(cycle).getBooleanValue(
+                "cocobox.cpweb.googlemaps", Boolean.TRUE);
     }
 }

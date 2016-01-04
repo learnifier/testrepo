@@ -15,10 +15,16 @@ import se.dabox.cocobox.cpweb.module.core.AbstractModule;
 import se.dabox.cocobox.cpweb.module.project.role.ActivateNewProjectAdmin;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.coocbox.user.emaillink.enhancer.UserLinkEnhancerFactory;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.LoginService;
+import se.dabox.service.login.client.UpdateUserAccountRequest;
+import se.dabox.service.login.client.UpdateUserAccountRequestBuilder;
+import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.login.client.UserVerificationStatus;
 import se.dabox.service.orgadmin.client.ActivateCpAdminTokenGenerator;
 
 /**
@@ -33,6 +39,8 @@ public class AdminRegistrationModule extends AbstractModule {
 
     @WebAction(name="a")
     public RequestTarget onFirstStage(RequestCycle cycle, String id) {
+        processUserEnhacements(cycle);
+
         Map<String,?> map = getStoredMap(cycle, id);
 
         if (map == null) {
@@ -50,6 +58,8 @@ public class AdminRegistrationModule extends AbstractModule {
         final String url = processRegistration(cycle, id, type, map);
 
         long userId = ((Number) map.get("userId")).longValue();
+
+        processUserEmailConfirmation(cycle, userId);
 
         long brandingId = new GetRealmBrandingId(cycle).getBrandingId();
 
@@ -89,6 +99,33 @@ public class AdminRegistrationModule extends AbstractModule {
     private String activateProjectAdmin(RequestCycle cycle, String id,
             Map<String, ?> map) {
         return new ActivateNewProjectAdmin(cycle, id, map).getTargetUrl();
+    }
+
+    private void processUserEnhacements(RequestCycle cycle) {
+        final StringBuilder reqUrl = cycle.getRequest().getRequestUrl();
+        reqUrl.append('?').append(cycle.getRequest().getQueryString());
+
+        String url = reqUrl.toString();
+
+        UserLinkEnhancerFactory factory = new UserLinkEnhancerFactory();
+        factory.processEnhancedLink(url);
+    }
+
+    private void processUserEmailConfirmation(RequestCycle cycle, long userId) {
+        UserAccountService uaClient = CacheClients.getClient(cycle, UserAccountService.class);
+
+        UserAccount account = uaClient.getUserAccount(userId);
+        if (account == null) {
+            return;
+        }
+
+        if (account.getVerificationStatus() != UserVerificationStatus.VERIFIED) {
+            UpdateUserAccountRequest updateReq = new UpdateUserAccountRequestBuilder(userId).
+                    setVerificationStatus(UserVerificationStatus.VERIFIED).
+                    createUpdateUserAccountRequest();
+
+            uaClient.updateUserAccount(account.getUserId(), updateReq);
+        }
     }
 
 }

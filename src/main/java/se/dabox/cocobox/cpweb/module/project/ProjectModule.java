@@ -68,6 +68,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import se.dabox.cocobox.coursebuilder.initdata.CourseBuilderActivationLink;
 
 /**
  *
@@ -450,9 +451,35 @@ public class ProjectModule extends AbstractProjectWebModule {
                 projectName,
                 designId,
                 project.getProjectId(),
-                backUrl).createInitData();
+                backUrl,
+                project.getSubtype()).createInitData();
 
-        return new RedirectUrlRequestTarget(GotoDesignBuilder.process(cycle, initData));
+        String confKey = ProjectTypeUtil.callSubtype(project, new ProjectSubtypeCallable<String>() {
+            public static final String ALT = "cbweb-alt.baseurl";
+
+            @Override
+            public String callMainProject() {
+                return null;
+            }
+
+            @Override
+            public String callIdProjectProject() {
+                return null;
+            }
+
+            @Override
+            public String callChallengeProject() {
+                return ALT;
+            }
+
+            @Override
+            public String callLinkedSubproject() {
+                return ALT;
+            }
+        });
+
+        return new RedirectUrlRequestTarget(CourseBuilderActivationLink.generate(cycle, initData,
+                confKey));
     }
 
     @WebAction
@@ -478,7 +505,8 @@ public class ProjectModule extends AbstractProjectWebModule {
                 projectName,
                 designId,
                 project.getProjectId(),
-                backUrl).
+                backUrl,
+                project.getSubtype()).
                 setReadOnly(true).
                 createInitData();
 

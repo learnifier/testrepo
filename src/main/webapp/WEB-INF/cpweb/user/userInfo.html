@@ -14,12 +14,12 @@
     </div>
     <div class="ccb-page-header__details">
         <ul>
-            <li><span class="row-label">Email</span><span class="row-setting clearfix">${user.primaryEmail?xhtml}</span></li>
-            <li><span class="row-label">Language</span><span class="row-setting clearfix">${(locale.getDisplayName(userLocale)?xhtml)!'Not set'}</span></li>
-            <li><span class="row-label">Organization</span><span class="row-setting clearfix">${(organization.displayName?xhtml)!'Not set'}</span></li>
-            <li><span class="row-label">Locked</span><span class="row-setting clearfix">${(user.locked?string('Yes','No'))}</span></li>
-            <li><span class="row-label">Last login</span><span class="row-setting clearfix">${(user.lastLogin?datetime?string.full)!''}</span></li>
-
+            <li><div class="row-label">Email</div><div class="row-setting clearfix">${user.primaryEmail?xhtml}</div></li>
+            <li><div class="row-label">Email verified</div><div class="row-setting clearfix">${verificationStatus?xhtml}</div></li>
+            <li><div class="row-label">Language</div><div class="row-setting clearfix">${(locale.getDisplayName(userLocale)?xhtml)!'Not set'}</div></li>
+            <li><div class="row-label">Organization</div><div class="row-setting clearfix">${(organization.displayName?xhtml)!'Not set'}</div></li>
+            <li><div class="row-label">Locked</div><div class="row-setting clearfix">${(user.locked?string('Yes','No'))}</div></li>
+            <li><div class="row-label">Last login</div><div class="row-setting clearfix">${(user.lastLogin?datetime?string.full)!''}</div></li>
         </ul>
     </div>
 </section>

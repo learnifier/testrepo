@@ -1,4 +1,5 @@
-define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places', 'jquery.validate'], function () {
+define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places' : 'jquery',
+        'jquery.validate'], function () {
     "use strict";
 
     $(document).ready(function () {
@@ -16,12 +17,10 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
                     return;
                 }
 
-
                 //log('place', place);
                 mapsUrl = createMapsUrl(place);
 
-                //log(elementId);
-                //log(mapsUrl);
+                console.log(mapsUrl);
                 //log($(elementId).closest('.details').find('.locUrl input'));
 
                 $('#' + elementId).next('label.error').remove();
@@ -34,43 +33,41 @@ define(['async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=
 
         function createMapsUrl(place) {
 
-            var street, num, town = '';
-
-            if (place.address_components) {
-                street = (place.address_components[1] && place.address_components[1].short_name || '');
-                num = (place.address_components[0] && place.address_components[0].short_name || '');
-                town = (place.address_components[2] && place.address_components[2].short_name || '');
-            }
-
             var longLat;
             if(place.geometry.location) {
                 longLat = place.geometry.location.toUrlValue();
             }
 
             var mapsBaseUrl = 'http://www.google.com/maps/place/',
-            mapsUrl = mapsBaseUrl + encodeURIComponent(street) + ',' + encodeURIComponent(num) + ',' + encodeURIComponent(town) + '/@' + longLat + ',17z';
+            mapsUrl = mapsBaseUrl + encodeURIComponent(place.name) + '/@' + longLat + ',17z';
             return mapsUrl;
 
         }
 
 
-        $('input[type=locUrlExtra]').focus(function () {
-            initialize(this.id);
-        });
+        if (ccbPage.googleMapsEnabled) {
+            $('input[type=locUrlExtra]').focus(function () {
+                initialize(this.id);
+            });
 
-        $('input[type=locUrlExtra]').blur(function () {
+            $('input[type=locUrlExtra]').blur(function () {
 
-            if ($(this).val() == '') {
-                $(this).closest('.details').find('.locUrl input').val('');
-            }
-        });
+                if ($(this).val() == '') {
+                    $(this).closest('.details').find('.locUrl input').val('');
+                }
+            });
 
-        $('input[type=locUrlExtra]').keydown(function (event) {
-            if (event.keyCode == 13) {
-                event.preventDefault();
-                return false;
-            }
-        });
+            $('input[type=locUrlExtra]').keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        } else {
+            $('input[type=locUrl]').change(function() {
+                $(this).closest('.details').find('.locUrlExtra input').val($(this).val());
+            })
+        }
 
     });
 

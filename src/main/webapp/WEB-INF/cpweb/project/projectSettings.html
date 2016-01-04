@@ -115,6 +115,24 @@ ${cpweb_foot}
             }
         });
     };
+    
+    var setProgressVisibility = function(visibility) {
+
+        $.ajax({
+            type: 'POST',
+            url: "${helper.urlFor('project.ProjectJsonModule','setProgressVisibility',[prj.projectId])}",
+            data: {enabled: visibility},
+            success: function(data) {
+                $('#progressVisible-cb').bootstrapToggle('enable');
+                $('#progressVisible-cb').bootstrapToggle(visibility ? 'on' : 'off');
+            },
+            complete: function() {
+                $('#progressVisible-cb').bootstrapToggle('enable');
+            }
+        });
+    };
+
+
 
     //onload and require is important. This code must run after toggle buttons are initialized
     $(function() {
@@ -152,6 +170,11 @@ ${cpweb_foot}
                 $('#socialfeatures-h').next().on('click', function (ev) {
                     $('#socialfeatures-cb').bootstrapToggle('disable');
                     setSocial(!$("#socialfeatures-cb").prop("checked"));
+                    return false;
+                });
+                $('#progressVisible-h').next().on('click', function (ev) {
+                    $('#progressVisible-cb').bootstrapToggle('disable');
+                    setProgressVisibility(!$("#progressVisible-cb").prop("checked"));
                     return false;
                 });
             });
@@ -207,17 +230,6 @@ ${cpweb_foot}
 <section class="ccb-expandable-list">
 <div id="settingsList">
     <ul>
-        [@dwsrt.feature feature="autoical"]
-        [#-- Only for Course design projects --]
-        [#if prj.type.ptype == 2]
-        <li id="meeting-maker">
-            <a class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
-                [@bsform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
-            </a>
-        </li>
-        [/#if]
-        [/@dwsrt.feature]
 
         <li id="language">
             <span class="setting">
@@ -237,16 +249,41 @@ ${cpweb_foot}
                 <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
+                
         
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <li id="expiration">
-            <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
-                <span class="short editable-content">${(prj.defaultParticipationExpiration/86400000)!'Click to set expiration'}</span>
-            </span>
+        [@dwsrt.feature feature="autoical"]
+        [#-- Only for Course design projects --]
+        [#if prj.type.ptype == 2]
+        <li id="meeting-maker">
+            <a class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.meetingmaker.title" /]</span>
+                [@bsform.inputBoolean 'meeting-maker' 'Meeting Maker Setting' 'ON' 'OFF' prj.autoIcal?string session=formsess /]
+            </a>
         </li>
-        [/@]
+        [/#if]
+        [/@dwsrt.feature]
         
+        [@dwsrt.feature feature="social"]
+        [#-- Only for Course design projects --]
+        [#if prj.type.ptype == 2]
+        <li id="socialfeatures">
+            <a class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
+                [@bsform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
+            </a>
+        </li>
+        [/#if]
+        [/@dwsrt.feature]
+
+        
+        [@dwsrt.feature feature="social"]
+        <li id="progressVisible">
+            <a class="setting">
+                <span class="row-label">Show progress[#--@dws.txt key="cpweb.project.settings.social.title" /--]</span>
+                [@bsform.inputBoolean 'progressVisible' 'Show progress for learners' 'ON' 'OFF' prj.progressVisible?string session=formsess /]
+            </a>
+        </li>
+        [/@dwsrt.feature]
         
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <li id="expirationtoggle">
@@ -264,19 +301,16 @@ ${cpweb_foot}
             </span>
         </li>
         [/@]
-        
 
-        [@dwsrt.feature feature="social"]
-        [#-- Only for Course design projects --]
-        [#if prj.type.ptype == 2]
-        <li id="socialfeatures">
-            <a class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.settings.social.title" /]</span>
-                [@bsform.inputBoolean 'socialfeatures' 'Social features' 'ON' 'OFF' prj.social?string session=formsess /]
-            </a>
+        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
+        <li id="expiration">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.settings.expiration.title" /]</span>
+                <span class="short editable-content">${(prj.defaultParticipationExpiration/86400000)!'Click to set expiration'}</span>
+            </span>
         </li>
-        [/#if]
-        [/@dwsrt.feature]
+        [/@]
+        
     </ul>
 </div>
     </section>

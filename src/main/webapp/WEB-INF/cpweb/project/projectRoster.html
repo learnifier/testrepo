@@ -3,6 +3,7 @@
 [#import "bounceInfo.html" as bInfoRender /]
 [#import "projectInfo.html" as pInfo /]
 [#import "projectRegistration.html" as pRegistration /]
+[#import "projectCatalog.html" as pCatalog /]
 
 [#assign foot]
 
@@ -20,6 +21,9 @@ ${cpweb_foot}
 
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
   [@pRegistration.foot /]
+[/@]
+[@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+  [@pCatalog.foot /]
 [/@]
 
 <script>
@@ -84,8 +88,11 @@ ${cpweb_foot}
                         $(nRow).addClass('inactive');
                         $(nRow).css('opacity', '0.6');
                         return nRow;
-                    }
-                    else if (oObj.expired) {
+                    } else if (oObj.verificationStatus == 'UNVERIFIED') {
+                        $(nRow).addClass('unverified');
+                        $(nRow).attr('title', 'The email address has not been verified.');
+                        return nRow;
+                    } else if (oObj.expired) {
                         $(nRow).attr('title', 'This participation has expired');
                         $(nRow).addClass('expired');
                         return nRow;
@@ -457,7 +464,7 @@ ${cpweb_foot}
                             $.getJSON(addUrl).done(function (data) {
                                 window.location.reload();
                             }).fail(function (jqxhr, textStatus, error) {
-                                cocbox.infoDialog("Error", "There was a problem adding members: " + textStatus);
+                                cocobox.infoDialog("Error", "There was a problem adding members: " + textStatus);
                             });
                         });
                     }
@@ -475,21 +482,23 @@ ${cpweb_foot}
             }).change(function(){
                 var cugId = $("#markByGroup").val(),
                         url = "${helper.urlFor('project.ProjectJsonModule','listGroupMembers', [prj.projectId?c])}/" + cugId;
-                $.getJSON(url).done(function (data) {
-                    var h = {};
-                    $.each(data.aaData, function(i, member){
-                        h[member.userId] = true;
+                if(cugId) {
+                    $.getJSON(url).done(function (data) {
+                        var h = {};
+                        $.each(data.aaData, function (i, member) {
+                            h[member.userId] = true;
+                        });
+                        $.each(oTable.api().rows().indexes(), function (i, ri) {
+                            if (oTable.api().row(ri).data().userId in h) {
+                                oTable.api().cell(ri, 0).data(true);
+                            }
+                        });
+                    }).fail(function (jqxhr, textStatus, error) {
+                        cocobox.infoDialog("Error", "There was a problem getting members from group: " + textStatus);
+                    }).always(function () {
+                        $("#markByGroup").select2("val", "");
                     });
-                    $.each(oTable.api().rows().indexes(), function(i, ri){
-                        if(oTable.api().row(ri).data().userId in h) {
-                            oTable.api().cell(ri, 0).data(true);
-                        }
-                    });
-                }).fail(function (jqxhr, textStatus, error) {
-                    cocbox.infoDialog("Error", "There was a problem getting members from group: " + textStatus);
-                }).always(function(){
-                    $("#markByGroup").select2("val", "");
-                })
+                }
             });
 
         });
@@ -782,6 +791,11 @@ ${cpweb_head}
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
     <li role="presentation"><a href="#selfreg" aria-controls="selfreg" role="tab" data-toggle="tab"><span class="pe-7s-id pe-va pe-lg" aria-hidden="true"></span> Self-Registration <span class="badge" id='selfreg-badge'>${prj.selfRegistrationEnabled?string('On','Off')}</span></a></li>
     [/@]
+    [@dwsrt.feature feature="coursecatalog"]
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+            <li role="presentation"><a href="#catalog" aria-controls="catalog" role="tab" data-toggle="tab"><span class="pe-7s-bookmarks pe-va pe-lg" aria-hidden="true"></span> Catalog <span class="badge" id='catalog-badge'>${prj.catalogProject?string('On','Off')}</span></a></li>
+        [/@]
+    [/@dwsrt.feature]
   </ul>
 
   <!-- Tab panes -->
@@ -825,6 +839,11 @@ ${cpweb_head}
             [@pRegistration.html /]
     </div>
     [/@]
+    [@dwsrt.feature feature="coursecatalog"]
+        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_SELFREG"]
+            [@pCatalog.html /]
+        [/@]
+    [/@dwsrt.feature]
   </div>
 
 </div>
