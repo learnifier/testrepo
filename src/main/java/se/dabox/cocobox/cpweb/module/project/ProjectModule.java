@@ -455,17 +455,16 @@ public class ProjectModule extends AbstractProjectWebModule {
                 project.getSubtype()).createInitData();
 
         String confKey = ProjectTypeUtil.callSubtype(project, new ProjectSubtypeCallable<String>() {
-            public static final String NORMAL = "cbweb.baseurl";
             public static final String ALT = "cbweb-alt.baseurl";
 
             @Override
             public String callMainProject() {
-                return NORMAL;
+                return null;
             }
 
             @Override
             public String callIdProjectProject() {
-                return NORMAL;
+                return null;
             }
 
             @Override
