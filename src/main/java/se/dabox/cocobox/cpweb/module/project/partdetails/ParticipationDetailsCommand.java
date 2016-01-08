@@ -292,7 +292,7 @@ public class ParticipationDetailsCommand {
                                 RoundingMode.HALF_EVEN);
 
                         String percent = percentFormat.format(pscore);
-                        generator.writeStringField("scoreStr", percent+"%");
+                        generator.writeStringField("scoreStr", percent);
                     } else {
                         String numVal = scoreFormat.format(pinfo.getScore());
                         generator.writeStringField("scoreStr", numVal);
