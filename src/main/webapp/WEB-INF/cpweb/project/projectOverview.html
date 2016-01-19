@@ -103,7 +103,7 @@ ${cpweb_foot}
                 emptyResponse: "<li class='ccb-flirt-empty'>No announcements have been posted.</li>"
             }
         });
-        
+
         f.startSingleFlirt('${prj.flirtId}', {
             bubbleColor: '${(brandingPackage.getMetadataImageColor("cpNavColor"))!""}',
             templates: {
@@ -139,7 +139,7 @@ ${cpweb_foot}
                 src: "${helper.urlFor('project.ProjectModule','roles',[prj.projectId])}",
                 height: "450px",
                 cssClass: "modal-lg",
-                title: "Add team member",
+                title: "Add member",
                 cancel: function () { /* Do nothing*/
                 },
                 cancelUrl: window.location.href,
@@ -273,7 +273,7 @@ source: [
                 <span class="glyphicon glyphicon-plus-sign"></span> Add Team Member
             </button>
             [/@]
-            <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Team Members</h3>
+            <h3 class="page-section-title"><span class="glyphicon glyphicon-user"></span>Project Team</h3>
             <table class="table ccb-table dt-responsive team-members" width="100%" id="userroleslist">
                 <tbody>
                 </tbody>
@@ -296,4 +296,3 @@ source: [
 
 </article>
 [/@dws.skin]
-
