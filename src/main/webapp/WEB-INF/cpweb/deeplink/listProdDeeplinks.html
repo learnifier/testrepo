@@ -10,9 +10,9 @@ ${cpweb_foot}
 
 </script>
 <script>
-    
+
     var listDeeplinksProducts = {};
-    
+
     listDeeplinksProducts.listPurchasedMatsUrl = "${helper.urlFor('OrgMaterialJsonModule','listPurchasedMats',[org.id])}?exclude=project,orgunit";
     listDeeplinksProducts.listLinksUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listPurchasedMatLinks',[org.id])}";
     listDeeplinksProducts.listLinksHistoryUrl = "${helper.urlFor('deeplink.ProductMaterialJsonModule','listLinkTokens')}";
@@ -26,11 +26,11 @@ ${cpweb_foot}
     listDeeplinksProducts.creditBalance = "${helper.urlFor('deeplink.ProductMaterialJsonModule','productBalance',[org.id])}";
     listDeeplinksProducts.updateCredits = "${addLinkCreditsFormLink}";
     listDeeplinksProducts.orgId = "${org.id?c}";
-    
+
     listDeeplinksProducts.deleteCredit = "${helper.urlFor('deeplink.ProductMaterialJsonModule', 'removeLinkToken', [org.id])}";
 
    require(['${contextPath}/js/deeplink/listProdDeeplinks.js?${cycle.application.formattedStartTime.base36String}'],function(){
-       
+
    });
     </script>
 
@@ -40,29 +40,30 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot]
 
 <div class="container-fluid">
-    
+
     <div class="PageLoader list-group">
         <div class="loaderPosition">
         [@common.spinner /]
         </div>
     </div>
- 
-    <div id="koFix">    
-    
+
+    <div id="koFix">
+
 <div class="list-group" data-bind="foreach: materials">
 
     <div class="list-group-item deepLheight">
 
         <img class="img-thumbnail pull-left deepImgStyle" data-bind="attr:{src: thumbnail}">
-        
+
         <button type="button" class="btn btn-primary-outlined pull-right" data-bind="click: toggleLinkSection, text: buttonStatus"></button>
         <small class="pull-right activeLinks">Active Links</small>
         <p class="pull-right linkStatus"><span data-bind="text: activeLinks"></span> of <span data-bind="text: totalLinks"></span></p>
         <small class="pull-right assignCredits">Assigned credits</small>
         <p class="pull-right creditStats"><span data-bind="text: linkCredits"></span></p>
-        
+
     <h4 class="list-group-item-heading hColor" data-bind="text: title"></h4>
     <p class="list-group-item-text descStyle" data-bind="text: description"></p>
+    <p class="list-group-item-text descStyle">Product Number: <span data-bind="text: productId"></span></p>
     </div>
     <!-- ko if: linkSectionVisible -->
     <div class="linksLoader">
@@ -70,7 +71,7 @@ ${cpweb_foot}
     </div>
     <div data-bind="foreach: links">
     <div class="list-group-item deepLinkItem">
-        
+
         <h4 class="list-group-item-heading mb25">Link <span class="spanStyle">&nbsp; Edit link title</span></h4>
 
         <div class="pull-left mr100">
@@ -93,8 +94,8 @@ ${cpweb_foot}
                       data-url="${helper.urlFor('deeplink.ProductMaterialJsonModule','changeLinkActiveTo', [org.id])}"
                       />
         </div>
-       
-        
+
+
         <!-- ko if: creditSectionVisible -->
         <div class="pull-left cSection">
             <p class="list-group-item-text greyColor">Credit history</p>
@@ -103,7 +104,7 @@ ${cpweb_foot}
             <p class="list-group-item-text pull-left ml97">Added By</p>
             <p class="list-group-item-text pull-left addedDate">Added Date</p>
             <hr class="creditHrFix">
-            
+
             <div data-bind="foreach: credits">
             <p class="pull-left cAmount" data-bind="text: amount"></p>
             <p class="pull-left cCby" data-bind="text: createdBy"></p>
@@ -111,15 +112,15 @@ ${cpweb_foot}
             <button type="button" class="btn btn-default btn-xs mt5" data-bind="click: deleteCreditHistory.bind($data, $parent)">Delete</button>
             <hr class="creditHrFixBottom">
             </div>
-            
+
             <div data-bind="if: credits() == 0">
              <p class="cHmessage">- This link has no credit history -</p>
             </div>
             </div>
         </div>
         <!-- /ko -->
-      
-        
+
+
         <div class="pull-left urlContainer">
             <p class="list-group-item-text greyColor">URL</p>
             <input type="text" class="form-control urlWidth" data-bind="value: url">
@@ -128,17 +129,17 @@ ${cpweb_foot}
             </div>
         </div>
     </div>
-         
+
     </div>
-    
+
     <div class="addLinkContainer">
         <button type="button" class="btn btn-default btn-sm mt5" data-bind="click: addLink.bind($data, $parent)">Add Link</button>
     </div>
      <!-- /ko -->
-     
-    
+
+
 </div>
-    </div>   
+    </div>
 </div>
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-bind="with: addLinkModel">
@@ -162,6 +163,5 @@ ${cpweb_foot}
     </div>
   </div>
 </div>
- 
-[/@dws.skin]
 
+[/@dws.skin]
