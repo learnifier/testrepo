@@ -28,7 +28,6 @@ ${cpweb_foot}
 
 <script>
     $('#menu-projects').addClass('active');
-    
 </script>
 
 
@@ -49,7 +48,7 @@ ${cpweb_foot}
         <li><a href='#' data-trigger='roster-row-action' data-action='raps'><span class="glyphicon glyphicon-list-alt"></span>  Technical info</a></li>
         [/#if]
     </ul>
-</div>   
+</div>
 </script>
 
 
@@ -855,15 +854,15 @@ ${cpweb_head}
     <input type="hidden" name="projectId" value="${prj.projectId?c}" />
     <input id="expirationdate" type="hidden" name="expirationdate" value="" />
     <input id="adjusteddate" type="hidden" name="expirationadjustment" value="" />
-    
+
     <section class="ccb-table-list-actions">
         [@projectSecurity.permissionBlock permission="CP_SEND_MAIL_PROJECT"]
-        <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');        
+        <button class="btn btn-primary btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'send');
                 return false" ${prj.invitePossible?string('','disabled="disabled"')}><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Send Email...</button>
         [/@]
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <button class="btn btn-primary-outlined btn-sm" onclick="setExpiration(this, $('#projectrosterform'), 'setExpiration'); return false"><span class="glyphicon glyphicon-dashboard"></span> Change Expiration</button>
-        [/@]        
+        [/@]
         [@projectSecurity.permissionBlock permission="PRJ_ACTIVATE_PARTICIPANT"]
             <button class="btn btn-primary-outlined btn-sm" onclick="cpweb.runListCommand(this, $('#projectrosterform'), 'activate');
                     return false" ${prj.invitePossible?string('','disabled="disabled"')} ><span class="glyphicon glyphicon-flash"></span> Activate</button>
@@ -873,7 +872,7 @@ ${cpweb_head}
         [/@]
         [@genGroupSelect groups=groups selectId="markByGroup"][/@genGroupSelect]
 
-        
+
         [#include "projectRosterCalendarActivatedSection.html" /]
     </section>
 
@@ -904,4 +903,3 @@ ${cpweb_head}
 </article>
 
 [/@dws.skin]
-
