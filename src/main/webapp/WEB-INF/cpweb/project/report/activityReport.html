@@ -52,7 +52,7 @@ ${cpweb_foot}
                            }
                         });
 
-                        element.activities.push({
+                        element.activities.unshift({
                             'title': 'Completed',
                             'progressPercent': completed
                         });
@@ -66,7 +66,11 @@ ${cpweb_foot}
             function extractCols(activities, activityCount) {
                 for (var i = 0; i < activityCount; i++) {
                     tableColTitles.push(activities[i].title);
-                    tableColIds.push("activities." + [i] + ".progressPercent");
+                    if (i === 0) {
+                        tableColIds.push("activities." + [i] + ".progressPercent");
+                    } else {
+                        tableColIds.push("activities." + [i] + ".completionStatus");
+                    }
                 };
 
             };
@@ -74,14 +78,29 @@ ${cpweb_foot}
               function renderColDefs(activityCount) {
                 //create JSON array for aoColumnDefs
                 for (var i = 0; i < tableColTitles.length; i++) {
+
+                    var renderFn;
+
+                    console.log("Definition for", i);
+                    if (i === 1) {                        
+                        renderFn = function(data) {
+                            return data + " of " + (activityCount-1);
+                        };
+                    } else {
+                        renderFn = function(data) {
+                            return data;
+                        };
+                    }
+
                     tableJSON.push({
                         "title": "<div class='report-header' data-toggle='tooltip' data-placement='top' data-container='body' title='" + tableColTitles[i] + "'>" + tableColTitles[i] + "</div>",
                         "data": tableColIds[i],
                         "targets": [i],
                         "defaultContent": "0",
                         "width": "10",
+                        "render": renderFn,
                         "createdCell": function(td, data, oData, row, col) {
-                            if (oData.activities && oData.activities[col - 1] != undefined) {
+                            if (oData.activities && oData.activities[col - 1] !== undefined) {
                                 if (oData.activities[col - 1].overdue) {
                                     $(td).addClass('text-danger');
                                 }
@@ -89,14 +108,6 @@ ${cpweb_foot}
                                 if (oData.activities && oData.activities[col - 1].completed) {
                                     $(td).addClass('text-success');
                                 }
-
-                                if(col == activityCount) {
-                                    var textAfter = ' of ' + (activityCount-1).toString();
-                                    $(td).append(textAfter);
-                                } else {
-                                    $(td).append('%');
-                                }
-
                             }
                         }
                     });
@@ -105,7 +116,7 @@ ${cpweb_foot}
 
             function initializeTable(JSONdata) {
                 oTable = $('#r_project_activity').dataTable({
-                    "columnDefs": tableJSON,
+                    "columns": tableJSON,
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                     "tableTools": {
                         "sSwfPath": "[@cdt.tableToolsSwf /]"
@@ -124,7 +135,7 @@ ${cpweb_foot}
                         if (iDisplayIndex.activities) {
                             for (var i = 0; i < iDisplayIndex.activities.length; i++) {
                                 if (iDisplayIndex.activities[i].completed === true) {
-                                                            sumCompleted++;
+                                    sumCompleted++;
                                 }
                             }
                         }
