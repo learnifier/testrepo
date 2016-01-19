@@ -10,6 +10,15 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 </script>
 <script>
+    statusNames = {
+        "notAttempted": "Not attempted",
+        "incomplete": "Incomplete",
+        "completed": "Completed",
+        "unknown": "Unknwon"
+    };
+
+</script>
+<script>
 
     $(document).ready(function() {
         require(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive', 'dabox-common', 'dabox-jquery'], function(lr) {
@@ -52,7 +61,7 @@ ${cpweb_foot}
                            }
                         });
 
-                        element.activities.push({
+                        element.activities.unshift({
                             'title': 'Completed',
                             'progressPercent': completed
                         });
@@ -66,7 +75,11 @@ ${cpweb_foot}
             function extractCols(activities, activityCount) {
                 for (var i = 0; i < activityCount; i++) {
                     tableColTitles.push(activities[i].title);
-                    tableColIds.push("activities." + [i] + ".progressPercent");
+                    if (i === 0) {
+                        tableColIds.push("activities." + [i] + ".progressPercent");
+                    } else {
+                        tableColIds.push("activities." + [i] + ".completionStatus");
+                    }
                 };
 
             };
@@ -74,38 +87,92 @@ ${cpweb_foot}
               function renderColDefs(activityCount) {
                 //create JSON array for aoColumnDefs
                 for (var i = 0; i < tableColTitles.length; i++) {
+
+                    var renderFn;
+
+                    console.log("Definition for", i);
+                    if (i === 1) {
+                        renderFn = function(data) {
+                            if (data === undefined) {
+                                data = "0";
+                            }
+
+                            return data + " of " + (activityCount-1);
+                        };
+                    } else if (i === 0) {
+                        enderFn = function(data) {
+                            return data;
+                        };
+                    } else {
+                        renderFn = function(data) {
+                            return statusNames[data];
+                        };
+                    }
+
                     tableJSON.push({
                         "title": "<div class='report-header' data-toggle='tooltip' data-placement='top' data-container='body' title='" + tableColTitles[i] + "'>" + tableColTitles[i] + "</div>",
                         "data": tableColIds[i],
                         "targets": [i],
                         "defaultContent": "0",
                         "width": "10",
+                        "render": renderFn,
                         "createdCell": function(td, data, oData, row, col) {
-                            if (oData.activities[col - 1] != undefined) {
+                            if (oData.activities && oData.activities[col - 1] !== undefined) {
                                 if (oData.activities[col - 1].overdue) {
                                     $(td).addClass('text-danger');
                                 }
 
-                                if (oData.activities[col - 1].completed) {
+                                if (oData.activities && oData.activities[col - 1].completed) {
                                     $(td).addClass('text-success');
                                 }
-
-                                if(col == activityCount) {
-                                    var textAfter = ' of ' + (activityCount-1).toString();
-                                    $(td).append(textAfter);
-                                } else {
-                                    $(td).append('%');
-                                }
-
                             }
                         }
                     });
                 };
             };
 
+            function generateFooter(JSONdata) {
+                var sumColumns = [];
+                for (var i = 0; i < JSONdata[0].activities.length - 1; i++) {
+                    sumColumns[i] = 0;
+                }
+
+                for (var j = 0; j < JSONdata.length; j++) {
+                    if (JSONdata[j].activities != null) {
+                        for (var h = 0; h < JSONdata[j].activities.length - 1; h++) {
+                            if (JSONdata[j].activities[h+1].completed === true) {
+                                sumColumns[h] = sumColumns[h] + 1;
+                            }
+                        }
+                    }
+                }
+
+                var nFootAbsoluteRow = $('#completed_absolute');
+                var nFootRelativeRow = $('#completed_relative');
+
+                $(nFootAbsoluteRow).append($('<th>').text('Completed'));
+                //Empty footer for summary column
+                $(nFootAbsoluteRow).append($('<th>'));
+                $(nFootRelativeRow).append($('<th>').text('Completed (%)'));
+                //Empty footer for summary column
+                $(nFootRelativeRow).append($('<th>'));
+
+
+                var participantsSum = parseInt(JSONdata.length);
+
+                $.each(sumColumns, function (index, value) {
+                    $(nFootAbsoluteRow).append($('<td>').text(value));
+                    $(nFootRelativeRow).append($('<td>').text(((value / participantsSum) * 100).toFixed(2) + '%'));
+                });
+
+
+                $(nFootAbsoluteRow).append($('<td>'));
+                $(nFootRelativeRow).append($('<td>'));
+            }
+
             function initializeTable(JSONdata) {
                 oTable = $('#r_project_activity').dataTable({
-                    "columnDefs": tableJSON,
+                    "columns": tableJSON,
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                     "tableTools": {
                         "sSwfPath": "[@cdt.tableToolsSwf /]"
@@ -121,55 +188,23 @@ ${cpweb_foot}
                     },
                     "rowCallback": function(nRow, iDisplayIndex) {
                         var sumCompleted = 0;
-                        for (var i = 0; i < iDisplayIndex.activities.length; i++) {
-                            if (iDisplayIndex.activities[i].completed === true) {
-                                sumCompleted++;
+                        if (iDisplayIndex.activities) {
+                            for (var i = 0; i < iDisplayIndex.activities.length; i++) {
+                                if (iDisplayIndex.activities[i].completed === true) {
+                                    sumCompleted++;
+                                }
                             }
                         }
+
                         $('.completedSum', nRow).text(sumCompleted);
                     },
                     "initComplete": function() {
                         // $('[data-toggle="tooltip"]').tooltip({container : 'body'});
                         $('#r_project_activity_filter input').attr('placeholder', 'Search report');
-                    },
-                    "footerCallback": function( nFoot, aData, iStart, iEnd, aiDisplay ) {
-                        //nFoot.getElementsByTagName('th')[0].innerHTML = "Starting index is "+iStart;
-                        log(nFoot, aData, iStart, iEnd, aiDisplay);
-                        var sumColumns = [];
-                        for (var i = 0; i < JSONdata[0].activities.length-1; i++) {
-                            sumColumns[i] = 0;
-                        }
-
-                        for (var j = 0; j < JSONdata.length; j++) {
-                            if (JSONdata[j].activities != null) {
-                                for (var h = 0; h < JSONdata[j].activities.length-1; h++) {
-                                    if (JSONdata[j].activities[h].completed === true) {
-                                        sumColumns[h] = sumColumns[h]+1;
-                                    }
-                                }
-                            }
-                        }
-
-                        var nFootAbsoluteRow = $('#completed_absolute');
-                        var nFootRelativeRow = $('#completed_relative');
-
-                        $(nFootAbsoluteRow).append($('<th>').text('Completed'));
-                        $(nFootRelativeRow).append($('<th>').text('Completed (%)'));
-
-
-                        var participantsSum = parseInt(JSONdata.length);
-
-                        $.each(sumColumns, function(index, value) {
-                            $(nFootAbsoluteRow).append($('<td>').text(value));
-                            $(nFootRelativeRow).append($('<td>').text(((value / participantsSum) * 100).toFixed(2) + '%'));
-                        });
-
-
-                        $(nFootAbsoluteRow).append($('<td>'));
-                        $(nFootRelativeRow).append($('<td>'));
                     }
                 });
 
+                generateFooter(JSONdata);
             };
        });
     });

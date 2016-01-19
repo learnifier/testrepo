@@ -173,6 +173,7 @@ class ActivityReportBuilder implements StatusSource {
         map.put("completed", activityCompleted);
         map.put("enabled", activity.isEnabled());
         map.put("visible", activity.isVisible());
+        map.put("completionStatus", activity.getCompletionStatus());
 
         ActivityComponent primaryComp = activity.getPrimaryComponent();
 
