@@ -85,7 +85,7 @@ ${cpweb_foot}
                         return nRow;
                     } else if (!oObj.activated) {
                         $(nRow).addClass('inactive');
-                        $(nRow).css('opacity', '0.6');
+                        $(nRow).find('.name').css('opacity', '0.6');
                         return nRow;
                     } else if (oObj.verificationStatus == 'UNVERIFIED') {
                         $(nRow).addClass('unverified');
@@ -183,6 +183,7 @@ ${cpweb_foot}
                     {
                         "targets": [2],
                         "width": "17%",
+                        "class": "name",
                         "data" : function(row, type, set) {
                             if (!row.displayNameDisplay) {
                                 var data = '<a class="name" href="' + row.link + '" title="' + row.email + '">' + row.displayName + '</a> ';
@@ -259,8 +260,10 @@ ${cpweb_foot}
                             if (!row.lastAccessDisplay) {
                                 if (row.lastAccess) {
                                     row.lastAccessDisplay = '<abbr data-toggle="tooltip" class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
-                                } else {
+                                } else if (row.activated) {
                                     row.lastAccessDisplay = '<span class="text-danger">Not yet logged in</span>';
+                                } else {
+                                  row.lastAccessDisplay = '<span class="text-danger">Not yet activated</span>';
                                 }
                             }
 
@@ -284,8 +287,10 @@ ${cpweb_foot}
                         "targets": [6],
                         "width": "120px",
                         "data" : function(row, type, set) {
-                            if (!row.statusDisplay) {
+                            if (!row.statusDisplay && row.activated) {
                                 row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status +'%;">' + row.status +'%</div</div>';
+                            } else if (!row.statusDisplay && !row.activated) {
+                              row.statusDisplay = '';
                             }
 
                             if (type === 'display') {
