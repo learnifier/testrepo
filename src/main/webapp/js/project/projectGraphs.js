@@ -117,25 +117,25 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
                 notInvited = notInvited + 1;
                 notInvitedParticipants.push(item.displayName);
             } else {
-                
+
                 if (item.status === 100) {
                     completed = completed + 1;
                     completedParticipants.push(' ' + item.displayName);
                 } else if (item.activated && item.status > 0 && item.status !== 100) {
-                    // accessed but not completed
+                    // inprogress  but not completed
                     inProgress = inProgress + 1;
                     inProgressParticipants.push(' ' + item.displayName);
-                } else if (item.firstAccess === null) {
-                    // invited but not accessed
+                } else if (item.firstAccess === null || item.status === 0) {
+                    // invited but not yet in progress
                     invited = invited + 1;
                     invitedParticipants.push(' ' + item.displayName);
-                } 
-                
+                }
+
                 if (item.bounced === true) {
                     bounced = bounced + 1;
                     bouncedParticipants.push(' ' + item.displayName);
                 }
-                
+
                 if (item.overdue === true) {
                     overDue = overDue + 1;
                     overDueParticipants.push(' ' + item.displayName);
@@ -143,7 +143,7 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
                     onTrack = onTrack + 1;
                     onTrackParticipants.push(' ' + item.displayName);
                 }
-                
+
                 if (item.inError === true) {
                     inError = inError + 1;
                     inErrorParticipants.push(' ' + item.displayName);
@@ -154,4 +154,3 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
     ;
 
 };
-
