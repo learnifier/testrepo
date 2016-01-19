@@ -81,12 +81,12 @@ ${cpweb_foot}
                         "defaultContent": "0",
                         "width": "10",
                         "createdCell": function(td, data, oData, row, col) {
-                            if (oData.activities[col - 1] != undefined) {
+                            if (oData.activities && oData.activities[col - 1] != undefined) {
                                 if (oData.activities[col - 1].overdue) {
                                     $(td).addClass('text-danger');
                                 }
 
-                                if (oData.activities[col - 1].completed) {
+                                if (oData.activities && oData.activities[col - 1].completed) {
                                     $(td).addClass('text-success');
                                 }
 
@@ -121,11 +121,14 @@ ${cpweb_foot}
                     },
                     "rowCallback": function(nRow, iDisplayIndex) {
                         var sumCompleted = 0;
-                        for (var i = 0; i < iDisplayIndex.activities.length; i++) {
-                            if (iDisplayIndex.activities[i].completed === true) {
-                                sumCompleted++;
+                        if (iDisplayIndex.activities) {
+                            for (var i = 0; i < iDisplayIndex.activities.length; i++) {
+                                if (iDisplayIndex.activities[i].completed === true) {
+                                                            sumCompleted++;
+                                }
                             }
                         }
+
                         $('.completedSum', nRow).text(sumCompleted);
                     },
                     "initComplete": function() {
