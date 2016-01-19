@@ -29,7 +29,7 @@ $('#menu-projects').addClass('active');
             return false;
         });
 
-        $('#crprj_materialslist ul').on('click', 'li, p[data-matid]' , function(event) {
+        $('#matlist_options').on('click', ' > div' , function(event) {
             log('clickTarget:',this)
             if ($(this).data('matid') == 'toggle') {
                 $(this).parent().children().toggle();
@@ -65,12 +65,12 @@ $('#menu-projects').addClass('active');
                 <div id="typeselections" class="clearfix">
                     <div id="crprj_materialslist" >
                         <h2>5 Select materials for this course - can also be added later</h2>
-                            <div id="matlist_options" class="crprj-option-list row">                            
+                            <div id="matlist_options" class="crprj-option-list row">
                         </div>
                     </div>
                 </div>
-                
-                
+
+
             </fieldset>
         </div>
     </section>
@@ -91,4 +91,3 @@ $('#menu-projects').addClass('active');
 </form>
 
 [/@dws.skin]
-
