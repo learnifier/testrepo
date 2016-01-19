@@ -260,7 +260,7 @@ ${cpweb_foot}
                                 if (row.lastAccess) {
                                     row.lastAccessDisplay = '<abbr data-toggle="tooltip" class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
                                 } else {
-                                    row.lastAccessDisplay = 'Not yet logged in';
+                                    row.lastAccessDisplay = '<span class="text-danger">Not yet logged in</span>';
                                 }
                             }
 
