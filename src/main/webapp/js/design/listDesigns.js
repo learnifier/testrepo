@@ -1,4 +1,4 @@
-/* 
+/*
  * (c) Dabox AB 2013 All Rights Reserved
  */
 define([textSource], function(t) {
@@ -38,7 +38,7 @@ define([textSource], function(t) {
                  },
                 {
                     "targets": [ 1 ],
-                    "className": "control",
+                    "className": "",
                     "data" : function(row, type, set) {
                         if (!row.statusDisplay) {
                             if ( row.sticky ) {
@@ -76,4 +76,3 @@ define([textSource], function(t) {
 
     return exports;
 });
-

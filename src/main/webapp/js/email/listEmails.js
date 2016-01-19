@@ -1,4 +1,4 @@
-/* 
+/*
  * (c) Dabox AB 2013 All Rights Reserved
  */
 define([textSource], function(t) {
@@ -6,7 +6,7 @@ define([textSource], function(t) {
     var exports = {};
 
     $(document).ready(function() {
-        
+
     require(['dataTables-bootstrap', 'dataTables-responsive'], function() {
         var oTable = $('#listemails').dataTable({
             "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
@@ -36,31 +36,30 @@ define([textSource], function(t) {
                         }
                     }
                  },
-                {
-                    "targets": [ 1 ],
-                    "className": "control",
-                    "data" : function(row, type, set) {
-                        if (!row.statusDisplay) {
-                            if ( row.sticky ) {
-                                row.statusDisplay = t._T('cpweb.emailoverview.true');
-                            } else {
-                                row.statusDisplay = t._T('cpweb.emailoverview.false');
-                            }
-                        }
+                 {
+                     "targets": [ 1 ],
+                     "className": "",
+                     "data" : function(row, type, set) {
+                       if (!row.statusDisplay) {
+                           if ( row.sticky ) {
+                               row.statusDisplay = t._T('cpweb.emailoverview.true');
+                           } else {
+                               row.statusDisplay = t._T('cpweb.emailoverview.false');
+                           }
+                       }
 
-                        if (type === 'display') {
-                            return row.statusDisplay;
-                        } else if (type === 'filter') {
-                            return row.statusDisplay;
-                        } else if (type === 'sort') {
-                            return row.statusDisplay;
-                        } else {
-                            //Anything else and raw row
-                            return row.statusDisplay;
-                        }
-                    }
-                },
-                {
+                       if (type === 'display') {
+                           return row.statusDisplay;
+                       } else if (type === 'filter') {
+                           return row.statusDisplay;
+                       } else if (type === 'sort') {
+                           return row.statusDisplay;
+                       } else {
+                           //Anything else and raw row
+                           return row.statusDisplay;
+                       }
+                   }
+                 },                {
                     "targets": [ 2 ],
                     "data": "localeStr",
                     "className": "language"
@@ -80,4 +79,3 @@ define([textSource], function(t) {
 
     return exports;
 });
-
