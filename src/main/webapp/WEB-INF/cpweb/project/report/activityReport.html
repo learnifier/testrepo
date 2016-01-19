@@ -10,6 +10,15 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 </script>
 <script>
+    statusNames = {
+        "notAttempted": "Not attempted",
+        "incomplete": "Incomplete",
+        "completed": "Completed",
+        "unknown": "Unknwon"
+    };
+
+</script>
+<script>
 
     $(document).ready(function() {
         require(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tableTools', 'dataTables-responsive', 'dabox-common', 'dabox-jquery'], function(lr) {
@@ -86,9 +95,13 @@ ${cpweb_foot}
                         renderFn = function(data) {
                             return data + " of " + (activityCount-1);
                         };
+                    } else if (i === 0) {
+                        enderFn = function(data) {
+                            return data;
+                        };
                     } else {
                         renderFn = function(data) {
-                            return data;
+                            return statusNames[data];
                         };
                     }
 
