@@ -1,6 +1,6 @@
 [#ftl strip_text="true" /]
 
-[#macro fieldValue name]${oldValues[name]!databankValues[name]!''}[/#macro]
+[#macro fieldValue name]${oldValues["f"+name]!databankValues[name]!''}[/#macro]
 
 
 [#assign foot]
