@@ -118,6 +118,7 @@ ${cpweb_head}
 <div class="details clearfix">
     <ul class="list-unstyled">
         [#list fields as field]
+        [#assign fname = component.cid+'_'+field.name /]
         [#if component.type = "ev_classroom" && field.name = "locUrl" && googleMapsEnabled]
                 [#assign visibility = "hidden"]
         [#elseif component.type = "ev_classroom" && field.name = "locUrlExtra" && !googleMapsEnabled]
@@ -125,7 +126,7 @@ ${cpweb_head}
         [#else]
                 [#assign visibility = "visible"]
         [/#if]
-        <li class="${field.name} ${visibility} form-group">[@listComponentField component field /]</li>
+        <li class="${field.name} ${visibility} form-group [#if errorFields?seq_contains('f'+fname)]has-error[/#if]">[@listComponentField component field /]</li>
         [/#list]
     </ul>
 </div>
@@ -154,9 +155,8 @@ ${cpweb_head}
   [#assign fieldType = "hidden" /]
 [/#if]
 
-[#assign fname = component.cid+'_'+field.name /]
 <label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
-<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if errorFields?seq_contains('f'+fname)]invalid[/#if][#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
+<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
 [/#if]
