@@ -156,7 +156,7 @@ ${cpweb_head}
 
 [#assign fname = component.cid+'_'+field.name /]
 <label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
-<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if errorFields?seq_contains(fname)]invalid[/#if][#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
+<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if errorFields?seq_contains('f'+fname)]invalid[/#if][#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
 [/#if]
