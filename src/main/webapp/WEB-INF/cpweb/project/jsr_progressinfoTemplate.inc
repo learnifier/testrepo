@@ -1,5 +1,5 @@
 <script id="roster-expand-template" type="text/x-handlebars-template">
-    
+
 <div>
 {{#pages}}
   <h5 class="page-title">{{title}}</h5>
@@ -11,7 +11,7 @@
                   <span class="truncate navColor">{{title}}</span>
                 </td>
                 <td class="activityStatusToggle">
-                    
+
                 </td>
                 <td class="completionDate">
                     {{completedDateStr}}
@@ -47,7 +47,7 @@
                                     </li>
                                     <li class="successStatus pull-right">
                                         {{#if successStatus }}
-                                            <span class="row-label">Passed/failed:</span><span class="row-value">{{successStatus}}</span>
+                                            <span class="row-label">Quiz/test:</span><span class="row-value">{{successStatus}}</span>
                                         {{/if}}
                                     </li>
                                      <!-- Stacking from left from here -->
@@ -61,10 +61,10 @@
                          </div>
                     </td>
                 </tr>
-            {{/component}}  
+            {{/component}}
           {{/activity}}
       </tbody>
-  </table>  
+  </table>
 {{/pages}}
 </div>
 
