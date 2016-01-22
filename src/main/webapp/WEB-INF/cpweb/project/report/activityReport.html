@@ -118,11 +118,11 @@ ${cpweb_foot}
                         "render": renderFn,
                         "createdCell": function(td, data, oData, row, col) {
                             if (oData.activities && oData.activities[col - 1] !== undefined) {
-                                if (oData.activities[col - 1].overdue) {
+                                if (oData.activities && oData.activities[col - 1].completionStatus == "notAttempted" ) {
                                     $(td).addClass('text-danger');
-                                }
-
-                                if (oData.activities && oData.activities[col - 1].completed) {
+                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "incomplete" ) {
+                                    $(td).addClass('text-warning');
+                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "completed" ) {
                                     $(td).addClass('text-success');
                                 }
                             }
