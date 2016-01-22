@@ -84,8 +84,8 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
     var validator = $("form[name=createProjectGeneral]").validate({
         errorClass: "error bg-danger",
         errorPlacement: function (error, element) {
-            if (element.hasClass('hasDatepicker')) {
-                element.closest("li").find('span').html(error);
+            if (element.hasClass('ccbDatepicker') || element.hasClass('ccbTimepicker')) {
+                element.closest("div.input-group").append($('<span>').html(error));
             } else {
                 error.insertAfter(element);
             }
