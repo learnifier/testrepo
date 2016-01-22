@@ -124,7 +124,9 @@ ${cpweb_foot}
                                     $(td).addClass('text-warning');
                                 } else if (oData.activities && oData.activities[col - 1].completionStatus == "completed" ) {
                                     $(td).addClass('text-success');
-                                }
+                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "unknown" ) {
+                                      $(td).addClass('text-muted');
+                                  }
                             }
                         }
                     });
