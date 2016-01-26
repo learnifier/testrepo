@@ -7,9 +7,11 @@ package se.dabox.cocobox.cpweb.module.coursedesign;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import java.util.List;
 import java.util.Map;
+import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -70,7 +72,7 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(designId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(designId));
 
         if (bcd == null) {
             LOGGER.warn("Course design {} (in org {}) doesn't exist", designId, strOrgId);
@@ -90,6 +92,25 @@ public class DesignModule extends AbstractWebAuthModule {
         return new FreemarkerRequestTarget("/design/designOverview.html", map);
     }
 
+    private Long decodeDesignIdParam(String designId) throws NumberFormatException {
+        if (designId == null) {
+            final RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
+
+            LOGGER.warn("Missing design id");
+            throw new RetargetException(new RedirectUrlRequestTarget(NavigationUtil.toMainUrl(cycle)));
+        }
+
+        try {
+            return Long.valueOf(designId);
+        } catch (NumberFormatException nfe){
+            final RequestCycle cycle = DruwaApplication.getCurrentRequestCycle();
+
+            LOGGER.warn("Invalid design id: {}", designId);
+            throw new RetargetException(
+                    new RedirectUrlRequestTarget(NavigationUtil.toMainUrl(cycle)));
+        }
+    }
+
     @WebAction
     public RequestTarget onEdit(RequestCycle cycle, String strOrgId, String strDesignId,
             String strCopy) {
@@ -104,7 +125,7 @@ public class DesignModule extends AbstractWebAuthModule {
             checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_COURSEDESIGN);
         }
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(strDesignId));
 
         if (bcd == null || (bcd.getInfo().isSticky() && !copyMode)) {
             return toListPage(cycle, strOrgId);
@@ -149,7 +170,7 @@ public class DesignModule extends AbstractWebAuthModule {
             checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_COURSEDESIGN);
         }
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(strDesignId));
 
         DruwaFormValidationSession<EditDesignSettingsForm> formsess = getValidationSession(
                 EditDesignSettingsForm.class, cycle);
@@ -170,7 +191,7 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_DELETE_COURSEDESIGN);
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(strDesignId));
 
         if (bcd == null || bcd.getInfo().isSticky()) {
             return toListPage(cycle, strOrgId);
@@ -189,7 +210,7 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_EDIT_COURSEDESIGN);
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(strDesignId));
 
         if (bcd == null || bcd.getInfo().isSticky()) {
             return toListPage(cycle, strOrgId);
@@ -215,7 +236,7 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(strDesignId));
 
         if (bcd == null) {
             return toListPage(cycle, strOrgId);
@@ -240,7 +261,7 @@ public class DesignModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_COURSEDESIGN);
 
-        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), Long.valueOf(strDesignId));
+        BucketCourseDesign bcd = getOrgCourseDesign(cycle, org.getId(), decodeDesignIdParam(strDesignId));
 
         if (bcd == null) {
             return toListPage(cycle, strOrgId);
