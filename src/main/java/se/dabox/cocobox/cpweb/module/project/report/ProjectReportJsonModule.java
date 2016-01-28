@@ -84,7 +84,7 @@ public class ProjectReportJsonModule extends AbstractJsonAuthModule {
                 String url = cycle.urlFor(ProjectReportModule.class, "sliiChallengeReport", strProjectId);
                 String title = "SLII Challenge";
                 infos.add(new ReportInfo(url, title, false));
-            } else if (ProductMaterialConstants.NATIVE_SYSTEM.equals(mat.getNativeSystem())) {
+            } else if (mat instanceof ProductMaterial) {
                 Product product = ((ProductMaterial)mat).getProduct();
                 CrispContext crispCtx = DwsCrispContextHelper.getCrispContext(cycle, product);
 
