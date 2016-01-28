@@ -118,14 +118,14 @@ class ProjectRosterJsonGenerator {
                     }
                     g.writeStringField("displayName", name);
                     g.writeStringField("email", ua.getPrimaryEmail());
+                    g.writeStringField("verificationStatus", ua.getVerificationStatus().name());
                 }
                 boolean main = mainUserId != null && mainUserId == item.getUserId();
                 g.writeBooleanField("main", main);
                 writeDateField("firstEmail", item.getFirstMail());
                 writeDateField("lastEmail", item.getLastMail());
                 writeDateField("firstAccess", item.getFirstAccess(), dateTimeFormat);
-                g.writeStringField("verificationStatus", ua.getVerificationStatus().name());
-
+                
                 writeDateField("lastAccess", item.getLastAccess(), dateTimeFormat);
                 if (item.getLastAccess() != null) {
                     String isoDate = DateFormatters.JQUERYAGO_FORMAT.format(item.getLastAccess());
