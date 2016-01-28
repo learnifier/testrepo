@@ -219,8 +219,9 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         List<ParticipationProgress> progressList
                 = ccbc.getParticipationProgress(participation.getParticipationId());
         CourseDesignDefinition cdd
-                = new GetProjectCourseDesignCommand(cycle, null).forProjectId(participation.
-                        getProjectId());
+                = new GetProjectCourseDesignCommand(cycle, null).
+                        setFallbackToStageDesign(true).
+                        forProjectId(participation.getProjectId());
 
         Set<String> productSet = new HashSet<>();
 
