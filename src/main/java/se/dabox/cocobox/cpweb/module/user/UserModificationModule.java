@@ -81,7 +81,7 @@ public class UserModificationModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         long orgId = org.getId();
-        checkOrgPermission(cycle, orgId, CocoboxPermissions.BO_CREATE_USER_AUTOLOGINLINK);
+        checkOrgPermission(cycle, orgId, CocoboxPermissions.BO_EDIT_USER);
 
         UserAccountService lsClient = CacheClients.getClient(cycle, UserAccountService.class);
 
