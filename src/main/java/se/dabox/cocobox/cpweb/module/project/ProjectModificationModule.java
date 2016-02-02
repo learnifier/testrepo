@@ -350,8 +350,9 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
         try {
             getCocoboxCordinatorClient(cycle).deleteScheduledProjectTask(userId, projectId, taskId);
-        } catch (DwsServiceErrorCodeException ex) {
-            LOGGER.debug("Ignoring exception ", ex);
+            LOGGER.info("Task {} was deleted for project {} by {}.", taskId, projectId, userId);
+        } catch (NotFoundException nfe) {
+            LOGGER.info("Nothing to delete. Task {} was not found for project {}.", taskId, projectId);
         }
 
         WebModuleInfo webModule = cycle.getApplication().getWebModuleRegistry().getModuleInfo(
