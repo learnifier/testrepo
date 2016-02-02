@@ -774,9 +774,15 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         ProductDirectoryClient pdClient
                 = CacheClients.getClient(cycle, ProductDirectoryClient.class);
 
-        Product product = ProductFetchUtil.getExistingProduct(pdClient, pid);
+        Product product = ProductFetchUtil.getProduct(pdClient, pid);
 
-        return product.getFieldSingleValue("duration");
+        String duration = null;
+
+        if (product != null) {
+            duration = product.getFieldSingleValue("duration");
+        }
+
+        return duration;
     }
 
     private Boolean isGoogleMapsEnabled(RequestCycle cycle) {
