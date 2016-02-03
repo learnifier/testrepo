@@ -25,6 +25,9 @@ import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.modal.ModalParamsHelper;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.participation.move.ActionType;
@@ -66,7 +69,16 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_MOVE_PARTICIPANT);
         ensureMoveAllowed(cycle, project);
 
-        ProjectParticipation part = checkParticipation(cycle, project, strParticipationId);
+        ProjectParticipation part;
+        try {
+            part = checkParticipation(cycle, project, strParticipationId);
+        } catch (IllegalStateException e) {
+            WebMessage msg
+                    = WebMessage.createTextMessage("Participant not found.", WebMessageType.error);
+            WebMessages.getInstance(cycle).addMessage(msg);
+
+            return NavigationUtil.toProjectRoster(project.getProjectId());
+        }
 
         Map<String, Object> map = createMap();
         addCommonMapValues(map, project, cycle);
@@ -168,7 +180,12 @@ public class ParticipantMoveModule extends AbstractProjectWebModule {
         }
 
         if (part.getProjectId() != project.getProjectId()) {
-            throw new IllegalStateException("Invalid participation: " + strParticipationId);
+            String msg = String.format("Invalid participation %s. Expected p:%d but found p:%d",
+                    strParticipationId,
+                    project.getProjectId(),
+                    part.getProjectId());
+            LOGGER.warn(msg);
+            throw new IllegalStateException(msg);
         }
 
         return part;
