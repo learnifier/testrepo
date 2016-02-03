@@ -8,9 +8,13 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.partdetails.ParticipationDetailsCommand;
 import se.dabox.cocobox.crisp.runtime.CrispException;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.date.DateFormatters;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -26,6 +30,8 @@ import se.dabox.service.webutils.json.JsonErrorMessageException;
  */
 @WebModuleMountpoint("/project.jspart")
 public class ParticipationJsonModule extends AbstractJsonAuthModule {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ParticipationJsonModule.class);
 
     @WebAction
     public RequestTarget onParticipationDetails(RequestCycle cycle, String strParticipationId) {
@@ -37,8 +43,14 @@ public class ParticipationJsonModule extends AbstractJsonAuthModule {
         ProjectParticipation participation =
                 ccbc.getProjectParticipation(partId);
 
+        if (participation == null) {
+            LOGGER.warn("Participation {} doesn't exist", strParticipationId);
+            return new ErrorCodeRequestTarget(404);
+        }
+
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
         try {
             return new ParticipationDetailsCommand(cycle).
