@@ -6,7 +6,7 @@ ${cpweb_foot}
 
 [#if security.isBoAdmin()]
 <section class="orgname">
-    ${org.displayName!""}
+    ${org.displayName!""} - ${org.id!""}
 </section>
 <script>
     $('.orgname').show().delay(2000).slideUp();
@@ -31,8 +31,8 @@ ${cpweb_foot}
     require(["${contextPath}/js/home.js?${cycle.application.formattedStartTime.base36String}"], function (s) {
         //No initialization needed
     });
-   
-   
+
+
     function toggleFavorite(target) {
         require(['dataTables-bootstrap'], function() {
         //log('Toggle ', target);
@@ -47,9 +47,9 @@ ${cpweb_foot}
         var ajax = {};
         var ajaxData = {projectId: prjId};
         ajax.data = ajaxData;
-        
+
         var span = $("span", target);
-        
+
         if (span.hasClass("fav-star")) {
             ajax.success = function () {
                 span.removeClass("fav-star").addClass("glyphicon-star-empty");
@@ -63,7 +63,7 @@ ${cpweb_foot}
         }
         });
     }
-    
+
 
 </script>
 
@@ -264,7 +264,7 @@ ${cpweb_foot}
             <div class="ccb-flat-card ccb-flat-card--colored" id="contact">
                 <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     [#assign contact=infoHelper.getMiniUserInfo(welcomeMessage.userId) /]
-                    [#if contact.thumbnail??] 
+                    [#if contact.thumbnail??]
                         <img src="${contact.thumbnail}" class="photo">
                     [/#if]
                     <h1>${contact.displayName?xhtml}</h1>
@@ -280,7 +280,7 @@ ${cpweb_foot}
             [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
             <div class="ccb-flat-card ccb-flat-card--colored" id="balance">
                 <div class="ccb-flat-card__header"><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}" class="pull-right">See Full Report</a><h3>Your Account Status</h3></div>
-                <div class="ccb-flat-card__content ccb-flat-card__content--padding">                
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
                     <div id="product-count" class="secondaryBackgroundColor">
                         <span data-bind="text: productCount" class="count"></span><span  class="text">products available</span>
                     </div>
