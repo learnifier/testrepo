@@ -2,6 +2,8 @@
 
 [#import "../projectInfo.html" as pInfo /]
 
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+
 [#assign cpweb_head]
 ${cpweb_head}
 [/#assign]
@@ -13,7 +15,7 @@ ${cpweb_foot}
 </script>
 <script>
 	$(document).ready(function() {
-		require(['dabox-report-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function() {
+		require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function() {
 			$.ajax({
 				url: "${helper.urlFor('project.report.ProjectReportJsonModule','idProductReport',[prj.projectId, productId])}",
 				error: function() {
@@ -41,10 +43,10 @@ ${cpweb_foot}
 						accessedSum = accessedSum + inprogress;
 						completedSum = completedSum + completed;
                                                 activatedSum = activatedSum + obj.activated;
-						
-						var nameWithLink = "<a href='" + obj.link + " '>" + obj.name + "</a>"; 
-						
-						
+
+						var nameWithLink = "<a href='" + obj.link + " '>" + obj.name + "</a>";
+
+
 						totalParticipants++;
 						aaData.push([nameWithLink, activated, notaccessed, inprogress, completed, completionRate]);
 					}
@@ -52,8 +54,8 @@ ${cpweb_foot}
 					$('#r_idproduct').dataTable({
 						"aaData": aaData,
 						"oTableTools": {
-                                                    "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
-                                                 },"aaSorting": [[0, 'asc']],
+							"sSwfPath": "[@cdt.tableToolsSwf /]"
+             },"aaSorting": [[0, 'asc']],
 						"asSorting": null,
 						"bPaginate": false,
 						"sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
@@ -70,13 +72,13 @@ ${cpweb_foot}
                                                     "sLoadingRecords": "<p>Loading report...</p><img src='[@common.spinnerUrl /]' />"
                                                 }
 					});
-					
+
 					if(totalParticipants > 0 ) {
 						var activatedAvg = Math.floor(activatedSum/totalParticipants);
 						var notaccessedAvg = Math.floor(notaccessedSum/totalParticipants);
 						var accessedAvg = Math.floor(accessedSum/totalParticipants);
 						var completedAvg = Math.floor(completedSum/totalParticipants);
-					
+
 						log(activatedAvg, accessedAvg, completedAvg);
 
 						var tfoot = $('tfoot.summary');
@@ -97,7 +99,7 @@ ${cpweb_foot}
 						tfootSumRow.append($('<td>').text(completedSum));
 						tfoot.append(tfootSumRow);
 					}
-					
+
 				}
 			});
 		});
@@ -126,4 +128,3 @@ ${cpweb_foot}
 
 
 [/@dws.skin]
-
