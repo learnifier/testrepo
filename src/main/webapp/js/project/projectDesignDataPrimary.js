@@ -95,7 +95,7 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
         $(function () {
 
             var linkFn = function () {
-                $("input[data-ccbfieldname=starts]").each(function () {
+                $("input[type=hidden][data-ccbfieldname=starts]").each(function () {
                     var name = $(this).attr("id");
                     var newName = name.replace(/starts$/, "ends");
 
