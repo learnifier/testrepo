@@ -155,7 +155,7 @@ ${cpweb_head}
   [#assign fieldType = "hidden" /]
 [/#if]
 
-<label for="f${component.cid}_${field.name}">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
+<label for="f${component.cid}_${field.name}" class="control-label">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
 <input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
