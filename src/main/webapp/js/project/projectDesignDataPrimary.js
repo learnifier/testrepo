@@ -1,5 +1,5 @@
 define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places' : 'jquery',
-        'jquery.validate'], function () {
+        'bootstrap/jquery.validate'], function () {
     "use strict";
 
     $(document).ready(function () {
@@ -81,15 +81,7 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
 
 
 
-    var validator = $("form[name=createProjectGeneral]").validate({
-        errorClass: "error bg-danger",
-        errorPlacement: function (error, element) {
-            if (element.hasClass('ccbDatepicker') || element.hasClass('ccbTimepicker')) {
-                element.closest("div.input-group").append($('<span>').html(error));
-            } else {
-                error.insertAfter(element);
-            }
-        }
+    var validator = $("form[name=createProjectGeneral]").validate({        
     });
 
     $('input[type=locUrlExtra]').rules('add', {
