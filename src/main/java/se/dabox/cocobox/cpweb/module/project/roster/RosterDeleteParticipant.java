@@ -105,7 +105,7 @@ public class RosterDeleteParticipant extends AbstractRosterListCommand {
         try {
             ccbcClient.deleteProjectParticipant(userId, getProjectId(context), value);
         } catch(NotFoundException nfe) {
-            LOGGER.warn("Unable to delete participation {}. Participation not found");
+            LOGGER.warn("Unable to delete participation {}. Participation not found", value);
         } catch (DwsServiceErrorCodeException secx) {
 
             if (secx.getErrorCode() != 12) {
