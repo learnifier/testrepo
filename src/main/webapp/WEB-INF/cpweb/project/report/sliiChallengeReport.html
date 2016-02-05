@@ -2,6 +2,8 @@
 
 [#import "../projectInfo.html" as pInfo /]
 
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
@@ -10,7 +12,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dabox-ajax-longrun-bootstrap', 'dabox-report-datatables', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function(lr) {
+        require(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function(lr) {
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
@@ -29,7 +31,7 @@ ${cpweb_foot}
                                 var row = data.aaData[i];
                                 for (var j = 0; j < row.activities.length; j++) {
                                     var activity = row.activities[j];
-                                    activity.progressPercent2 = activity.progressPercent;                                    
+                                    activity.progressPercent2 = activity.progressPercent;
                                 }
                             }
                             var activities = data.aaData[0].activities;
@@ -80,7 +82,7 @@ ${cpweb_foot}
                     "sDefaultContent": "0",
                     "fnRender": function(oObj, data){
                         return data;
-                        
+
                     },
                     "fnCreatedCell": function(td, data, oData, row, col) {
                         $(td).append('%');
@@ -93,7 +95,7 @@ ${cpweb_foot}
                     "aoColumnDefs": tableJSON,
                     "sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
                     "oTableTools": {
-                        "sSwfPath": "${cocoboxCdn}/cocobox/tableTools/swf/copy_csv_xls_pdf.swf",
+                      "sSwfPath": "[@cdt.tableToolsSwf /]"
                     },
                     "bPaginate": false,
                     "aaSorting": [[0, 'asc']],
@@ -169,4 +171,3 @@ ${cpweb_head}
 
 
 [/@dws.skin]
-
