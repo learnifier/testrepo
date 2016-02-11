@@ -28,6 +28,7 @@ import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
 import se.dabox.cocosite.coursedesign.GetDatabankFacadeCommand;
 import se.dabox.cocosite.date.DateFormatters;
+import se.dabox.cocosite.freemarker.util.CdnUtils;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.learnifier.cmi.CompletionStatus;
 import se.dabox.learnifier.cmi.SuccessStatus;
@@ -404,9 +405,16 @@ public class ParticipationDetailsCommand {
                 String tn = thumbnailUrl;
 
                 if (tn == null) {
-                    tn = "http://png-4.findicons.com/files/icons/1690/developpers/32/smiley.png";
+                    if (pinfo.getComponent().getBasetype().equals("ev_classroom")) {
+                        tn = CdnUtils.getResourceUrl("/cocobox/img/eventtypes/date.svg");
+                    } else if (pinfo.getComponent().getBasetype().equals("ev_virtual")) {
+                        tn = CdnUtils.getResourceUrl("/cocobox/img/eventtypes/display1.svg");
+                    } else if (pinfo.getComponent().getBasetype().equals("ev_call")) {
+                        tn = CdnUtils.getResourceUrl("/cocobox/img/eventtypes/call.svg");
+                    } else {
+                        tn = CdnUtils.getResourceUrl("/cocobox/img/eventtypes/default.svg");
+                    }
                 }
-
                 generator.writeStringField("thumbnail", tn);
             }
 
