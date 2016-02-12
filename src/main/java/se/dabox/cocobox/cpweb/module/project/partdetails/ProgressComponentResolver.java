@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.apache.commons.lang3.StringUtils;
+import se.dabox.learnifier.cmi.CompletionStatus;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ParticipationProgress;
@@ -36,11 +37,11 @@ import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
+import se.dabox.service.common.proddir.source.ProductClientWithTypeProductSource;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
-import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -100,7 +101,7 @@ class ProgressComponentResolver {
         List<TemporalProgressComponent> tcList =
                 TemporalComponentExtractor.extract(cdd, databankEntries, project.getTimezone());
 
-        Map<UUID, TemporalProgressComponent> temporalMap = CollectionsUtil.createMap(tcList, 
+        Map<UUID, TemporalProgressComponent> temporalMap = CollectionsUtil.createMap(tcList,
                 TemporalProgressComponent::getCid);
 
         List<ProgressComponentInfo> infos = new ArrayList<>();
@@ -149,8 +150,9 @@ class ProgressComponentResolver {
             ParticipationProgress progress = progressMap.get(info.getCid());
             if (progress != null && progress.isCompleted()) {
                 info.setCompleted(progress.getCompletionDate());
+                info.setCompletionStatus(CompletionStatus.unknown);
             }
-            
+
             if (progress != null) {
                 info.setSuccessStatus(progress.getSuccess());
                 info.setCompletionStatus(progress.getCompletionStatus());
@@ -212,10 +214,10 @@ class ProgressComponentResolver {
             if (!helper.isTrackingEnabledForProduct(product)) {
                 return null;
             }
-            
+
             ProgressComponentType type =
                     ProgressComponentType.CRISP;
-            
+
             if (helper.isClickTrackingEnabledForProduct(product)) {
                 type = ProgressComponentType.PRODUCT;
             }
@@ -233,8 +235,8 @@ class ProgressComponentResolver {
     }
 
     private ProgressComponentHelper getProgressComponentHelper() {
-        if (cachedHelper == null) {            
-            cachedHelper = new ProgressComponentHelper(cycle);
+        if (cachedHelper == null) {
+            cachedHelper = new ProgressComponentHelper(new ProductClientWithTypeProductSource());
         }
 
         return cachedHelper;
@@ -248,7 +250,7 @@ class ProgressComponentResolver {
                         CocoboxCoordinatorClient ccbc =
                                 CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
-                        return ccbc.getDatabank(project.getMasterDatabank());                        
+                        return ccbc.getDatabank(project.getMasterDatabank());
                     }
 
                     @Override
