@@ -546,7 +546,10 @@ ${cpweb_foot}
                             var result = '<span class="text-muted">Locked</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'failed') {
-                            var result = '<span class="text-danger">Failed</span>';
+                            var result = '<span class="text-danger">Completed/Failed</span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'passed') {
+                            var result = '<span class="text-danger">Completed/Passed</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'completed') {
                             var result = '<span class="text-success">Completed</span>';
@@ -576,6 +579,9 @@ ${cpweb_foot}
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'failed') {
                             var result = '<span class="item__icon text-danger pe-7s-close-circle pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'passed') {
+                            var result = '<span class="item__icon text-success pe-7s-check pe-va pe-2x pe-fw"></span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'completed') {
                             var result = '<span class="item__icon text-success pe-7s-check pe-va pe-2x pe-fw"></span>';
