@@ -53,8 +53,11 @@ import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.activity.Activity;
 import se.dabox.service.common.coursedesign.activity.ActivityComponent;
 import se.dabox.service.common.coursedesign.activity.ActivityPage;
+import se.dabox.service.common.coursedesign.activity.CompletionInfo;
 import se.dabox.service.common.coursedesign.activity.MultiPageActivityCourse;
 import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
+import se.dabox.service.common.coursedesign.extstatus.ExtendedStatus;
+import se.dabox.service.common.coursedesign.extstatus.ExtendedStatusFactory;
 import se.dabox.service.common.coursedesign.project.GetProjectCourseDesignCommand;
 import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
@@ -262,7 +265,7 @@ public class ParticipationDetailsCommand {
                 generator.writeStringField("type", pinfo.getType().toString());
                 generator.writeBooleanField("completed", pinfo.getCompleted() != null);
                 if (pinfo.getCompleted() != null) {
-                    writeDateField(generator, "completedDate", pinfo.getCompleted());                
+                    writeDateField(generator, "completedDate", pinfo.getCompleted());
                     String isoDate = DateFormatters.JQUERYAGO_FORMAT.format(pinfo.getCompleted());
                     generator.writeStringField("completedDateAgo", isoDate);
                 }
@@ -426,74 +429,46 @@ public class ParticipationDetailsCommand {
                 return getActivityStatus(activity).name();
             }
 
-            private ActivityStatus getActivityStatus(Activity activity) {
-                
-                if (activity.isCompleted()) {
-                    SuccessStatus status = activity.getSuccessStatus();
-
-                    if (status == null) {
-                        status = SuccessStatus.unknown;
-                    }
-
-                    if (status == SuccessStatus.passed || status == SuccessStatus.unknown) {
-                        return ActivityStatus.completed;
-                    }
-
-                    return ActivityStatus.failed;
-                } else if (!activity.isEnabled()) {
-                    return ActivityStatus.locked;
-                } else if (activity.isOverdue()) {
-                    return ActivityStatus.overdue;
-                } else {
-                    CompletionStatus completionStatus = activity.getCompletionStatus();
-                    
-                    if (completionStatus == null) {
-                        return ActivityStatus.notAttempted;
-                    }
-                    
-                    if (completionStatus == CompletionStatus.unknown || completionStatus
-                            == CompletionStatus.notAttempted) {
-                        return ActivityStatus.notAttempted;
-                    }
-                    
-                    return ActivityStatus.incomplete;
-                }
+            private ExtendedStatus getActivityStatus(Activity activity) {
+                return new ExtendedStatusFactory().statusFor(activity);
             }
 
             private String getComponentStatusStr(ProgressComponentInfo pinfo) {
                 return getComponentStatus(pinfo).toString();
             }
 
-            private ActivityStatus getComponentStatus(ProgressComponentInfo pinfo) {
-                CompletionStatus completionStatus = pinfo.getCompletionStatus();
-                if (completionStatus == null) {
-                    completionStatus = CompletionStatus.unknown;
-                }
-
-                if (completionStatus == CompletionStatus.completed) {
-                    SuccessStatus status = pinfo.getSuccessStatus();
-
-                    if (status == null) {
-                        status = SuccessStatus.unknown;
+            private ExtendedStatus getComponentStatus(final ProgressComponentInfo pinfo) {
+                return new ExtendedStatusFactory().statusFor(new CompletionInfo() {
+                    @Override
+                    public Date getCompletedDate() {
+                        return pinfo.getCompleted();
                     }
 
-                    if (status == SuccessStatus.passed || status == SuccessStatus.unknown) {
-                        return ActivityStatus.completed;
+                    @Override
+                    public CompletionStatus getCompletionStatus() {
+                        return pinfo.getCompletionStatus();
                     }
 
-                    return ActivityStatus.failed;
-                } else {
-                    if (completionStatus == null) {
-                        return ActivityStatus.notAttempted;
+                    @Override
+                    public SuccessStatus getSuccessStatus() {
+                        return pinfo.getSuccessStatus();
                     }
 
-                    if (completionStatus == CompletionStatus.unknown || completionStatus
-                            == CompletionStatus.notAttempted) {
-                        return ActivityStatus.notAttempted;
+                    @Override
+                    public boolean isCompleted() {
+                        return pinfo.getCompletionStatus() == CompletionStatus.completed;
                     }
 
-                    return ActivityStatus.incomplete;
-                }
+                    @Override
+                    public boolean isEnabled() {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean isOverdue() {
+                        return false;
+                    }
+                });
             }
 
             private boolean isPercentScore(ProgressComponentInfo pinfo) {
