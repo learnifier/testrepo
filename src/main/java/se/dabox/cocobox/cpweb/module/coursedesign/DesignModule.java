@@ -385,7 +385,7 @@ public class DesignModule extends AbstractWebAuthModule {
 
         CourseDesignInfo oldInfo = cdd.getInfo();
         MutableCourseDesignInfo newInfo = new MutableCourseDesignInfo(oldInfo.getUserTitle(), oldInfo.
-                getUserDescription(), oldInfo.getThumbnailCrl(), newExpiration);
+								      getUserDescription(), oldInfo.getThumbnailCrl(), newExpiration, oldInfo.getCustomFields());
         mutator.setInfo(newInfo.toCourseDesignInfo());
 
         return mutator.toXmlString();
