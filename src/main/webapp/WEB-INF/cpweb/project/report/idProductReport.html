@@ -15,7 +15,7 @@ ${cpweb_foot}
 </script>
 <script>
 	$(document).ready(function() {
-		require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery'], function() {
+                require(['dataTables-bootstrap', 'dataTables-tableTools', 'dabox-common', 'dabox-jquery'], function() {
 			$.ajax({
 				url: "${helper.urlFor('project.report.ProjectReportJsonModule','idProductReport',[prj.projectId, productId])}",
 				error: function() {
@@ -58,7 +58,7 @@ ${cpweb_foot}
              },"aaSorting": [[0, 'asc']],
 						"asSorting": null,
 						"bPaginate": false,
-						"sDom": 'fT<"clear">rt<"dataTables_footer clearfix"i>',
+                                                "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
 						"aoColumns": [
 							{"sTitle": "User", "sWidth": "400px"},
 							{"sTitle": "Invited"},
@@ -115,7 +115,7 @@ ${cpweb_foot}
 <h2>[@dws.txt key="cpweb.project.report.idproduct.title" /] ${product.title!""}</h2>
 
 <section class="list">
-    <table class="report" width="100%" id="r_idproduct">
+    <table class="table table-striped" width="100%" id="r_idproduct">
         <thead>
         </thead>
         <tbody>
