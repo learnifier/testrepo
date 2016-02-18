@@ -37,6 +37,9 @@ ${cpweb_head}
 
     [#global formPrefix="cpweb" /]
     <form action="${helper.urlFor('project.VerifyProjectDesignModule','updateNewDesign',[prj.projectId])}" id="createProjectGeneral" name="createProjectGeneral" method="post">
+        <section class="action" style="margin: 20px 0;">
+            <button type="submit" tabindex="3" class="btn btn-primary-outlined"><span class="glyphicon glyphicon-floppy-disk"></span> [@dws.txt key='form.action.verifyPrjDesign' /]</button>
+        </section>
         [@bsform.alertsection]
         [/@bsform.alertsection]
         [#if errorFields?size > 0]
