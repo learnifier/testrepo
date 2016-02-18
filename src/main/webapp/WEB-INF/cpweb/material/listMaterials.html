@@ -40,7 +40,7 @@ ${cpweb_foot}
        });
     });
 
-    require(['handlebars', 'dataTables-bootstrap', 'dataTables-responsive'], function(Handlebars) {
+    require(['handlebars', 'dataTables-bootstrap'], function(Handlebars) {
         var pub = {
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
             spinnerUrl: "[@common.spinnerUrl /]"

@@ -15,7 +15,7 @@ ${cpweb_foot}
             var dataUrl = '${helper.urlFor("ProjectJsonModule","projectRoster", [prj.projectId?c])}';
                     pgraphs.renderProjectGraphs(dataUrl, ${prj.type.ptype}, chartAnimation);
             });
-            require(['dataTables-bootstrap', 'dabox-common', 'dataTables-responsive'], function() {
+            require(['dataTables-bootstrap', 'dabox-common'], function() {
 
             var oTable = $('#userroleslist').dataTable({
             "dom": '<"row"<"col-sm-12"rt>>',

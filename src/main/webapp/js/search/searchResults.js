@@ -30,7 +30,7 @@ define([], function () {
     };
 
     $(document).ready(function () {
-        require(['dataTables-bootstrap', 'dataTables-responsive'], function () {
+        require(['dataTables-bootstrap'], function () {
 
 
             var userTable = $('#listusers').dataTable({

@@ -15,7 +15,7 @@ ${cpweb_foot}
 </script>
 <script>
 	$(document).ready(function() {
-		require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery', 'dataTables-responsive'], function() {
+		require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery'], function() {
 			$.ajax({
 				url: "${helper.urlFor('project.report.ProjectReportJsonModule','idProductReport',[prj.projectId, productId])}",
 				error: function() {

@@ -25,7 +25,7 @@ ${cpweb_foot}
 <script>
     $('#menu-projects').addClass('active');
     $(document).ready(function () {
-        require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery', 'dataTables-responsive', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function () {
+        require(['dataTables-bootstrap', 'dabox-common', 'dabox-jquery', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function () {
             var oTable = $('#projecttasks').dataTable({
                 "dom": 'rt<"dataTables_footer clearfix"i>',
                 "paging": false,

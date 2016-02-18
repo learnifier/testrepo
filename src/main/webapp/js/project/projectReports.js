@@ -1,4 +1,4 @@
-define(["dataTables-bootstrap", 'dataTables-responsive'], function () {
+define(["dataTables-bootstrap"], function () {
     "use strict";
 
     $('#listreports').dataTable({
