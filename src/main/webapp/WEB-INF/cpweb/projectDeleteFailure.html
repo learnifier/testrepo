@@ -1,10 +1,10 @@
 [#ftl /]
 
 [#if session.hasFlashAttribute("projectDeleteFailures") ]
-<section class="alert">
+<section class="alert table-responsive">
     <h1>[@dws.txt key="cpweb.project.deletefailure.title" /]</h1>
     <p>[@dws.txt key="cpweb.project.deletefailure.text" /]</p>
-        <table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="deletefailure">
+        <table class="table table-hover table-striped ccb-table" id="deletefailure">
         <thead>
             <th>User</th>
             <th>Reason</th>

@@ -41,26 +41,27 @@ ${cpweb_foot}
 
 <h1>Reports</h1>
 
-<table class="table table-hover table-striped ccb-table dt-responsive" width="100%" id="listreports">
-    <thead>
-        <tr>
-            <th>Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
-        <tr>
-            <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
-        </tr>
-        [/@]
-        <tr>
-            <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
-        </tr>
-        <tr>
-            <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
-        </tr>
-    </tbody>
-</table>
-
+<div class="table-responsive">
+    <table class="table table-hover table-striped ccb-table" id="listreports">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
+            <tr>
+                <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
+            </tr>
+            [/@]
+            <tr>
+                <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
+            </tr>
+            <tr>
+                <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 [/@dws.skin]
 

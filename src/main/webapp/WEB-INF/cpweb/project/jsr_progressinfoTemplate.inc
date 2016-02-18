@@ -1,9 +1,9 @@
 <script id="roster-expand-template" type="text/x-handlebars-template">
 
-<div>
+<div class="table-responsive">
 {{#pages}}
   <h5 class="page-title">{{title}}</h5>
-  <table class="table table-hover ccb-table dt-responsive ToggleDrop" width="100%" id="rosterDetails">
+  <table class="table table-hover ccb-table ToggleDrop" id="rosterDetails">
       <tbody>
           {{#activity}}
             <tr class="{{activityStatus}}">
