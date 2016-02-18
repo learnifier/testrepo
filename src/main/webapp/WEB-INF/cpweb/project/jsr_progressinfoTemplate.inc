@@ -3,7 +3,7 @@
 <div class="table-responsive">
 {{#pages}}
   <h5 class="page-title">{{title}}</h5>
-  <table class="table table-hover ccb-table ToggleDrop" id="rosterDetails">
+  <table class="table table-hover ccb-table ToggleDrop" width="100%" id="rosterDetails">
       <tbody>
           {{#activity}}
             <tr class="{{activityStatus}}">
