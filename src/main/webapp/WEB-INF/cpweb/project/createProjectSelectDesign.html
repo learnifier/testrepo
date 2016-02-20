@@ -12,7 +12,7 @@ ${cpweb_foot}
 [#include "courseDesignRenderer.html" />
 
 <script>
-    $('#menu-projects').addClass('active');    
+    $('#menu-projects').addClass('active');
 
     var listCourseDesigns = "${helper.urlFor('project.NewProjectJsonModule', 'newProjectTypes', [org.id])?js_string}";
 
@@ -27,7 +27,7 @@ ${cpweb_foot}
 
 
     $(function(){
-        require(['handlebars', 'select2.min'] , function(Handlebars){
+        require(['handlebars', 'select2-4.min'] , function(Handlebars){
                     $("#prjtype").val('DESIGNED_PROJECT');
                     jQuery.post(listCourseDesigns, null, function(data) {
                         [#if orgMatListSupport]
@@ -48,8 +48,8 @@ ${cpweb_foot}
                                 this.designType = false;
                             }
                         });
-                        
-                        
+
+
                         var source = $('#courseDesignBox').html();
 
                         var template = Handlebars.compile(source);
@@ -59,10 +59,10 @@ ${cpweb_foot}
                         var output = template(context);
 
                         $('#crprj_designslist ul').append(output);
-                        
-                    
+
+
                     }, "json");
-                    
+
                     $('#timezone').select2({
                     formatResult: function(data) {
                         return '<span>' + data.text + '</span>';
@@ -72,8 +72,8 @@ ${cpweb_foot}
                     }
 
                 });
-                    
-                    
+
+
                 });
 
                 $('#crprj_designslist ul').on('click', 'a.preview', function(e) {
@@ -126,7 +126,7 @@ ${cpweb_head}
                     <div id="crprj_designslist" style="">
                         <input type="hidden" name="design" id="design" />
                         <h2>2 Select your course design</h2>
-                        <ul id="designlist_options" class="crprj-option-list clearfix">                            
+                        <ul id="designlist_options" class="crprj-option-list clearfix">
                         </ul>
                     </div>
                 </div>
@@ -173,7 +173,7 @@ ${cpweb_head}
                         [@bsform.option value=lang.toLanguageTag() defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@bsform.option]
                         [/#list]
                         [/@bsform.select]
-                        
+
                         [#assign defaultValue = formsess.getDefaultValue('country')!defaultCountryLocale.toLanguageTag() /]
                         [@bsform.select name="country" tabindex="6"]
                         [#list countries as country]

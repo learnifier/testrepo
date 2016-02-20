@@ -8,12 +8,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.apache.commons.lang3.StringUtils;
@@ -25,10 +29,13 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.client.CacheClients;
 import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.cocosite.infocache.InfoCacheHelper;
+import se.dabox.cocosite.user.MiniUserInfo;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -45,10 +52,10 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
         String query = StringUtils.trimToNull(cycle.getRequest().getParameter("term"));
 
         List<UserAccount> matching;
-        
+
         SearchContext ctx = new SearchContext(cycle, query, miniOrg);
             matching = getJsonUsers(ctx);
-        
+
         return toJson(matching);
     }
 
@@ -73,7 +80,7 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
 
         List<UserAccount> uas = getUserAccountService(ctx).searchUserAccounts(userId,
                 ctx.term,
-                CocoSiteConstants.UA_PROFILE, 
+                CocoSiteConstants.UA_PROFILE,
                 orgRole,
                 CocoboxSecurityConstants.USER_ROLE, 0, MAX_RESULT);
 
@@ -87,6 +94,10 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
     }
 
     private RequestTarget toJson(List<UserAccount> users) {
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+        InfoCacheHelper infoHelper = InfoCacheHelper.getInstance(cycle);
+        Set<Long> userIds = CollectionsUtil.transform(users, UserAccount::getUserId);
+        Map<Long, MiniUserInfo> infoMap = infoHelper.getMiniUserInfos(userIds);
         final DataTablesJson<UserAccount> dataTablesJson
                 = new DataTablesJson<UserAccount>() {
 
@@ -96,6 +107,9 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
                         generator.writeStringField("text", item.getDisplayName());
                         generator.writeStringField("email", item.getPrimaryEmail());
                         generator.writeStringField("type", "clientadmin");
+                        MiniUserInfo info = infoMap.get(item.getUserId());
+                        String tnUrl = info == null ? null : info.getThumbnail();
+                        generator.writeStringField("thumbnail", tnUrl);
                     }
 
                     @Override
@@ -132,16 +146,11 @@ public class ProjectRoleJsonModule extends AbstractJsonAuthModule {
     private List<UserAccount> getSortedMatching(SearchContext ctx) {
         List<UserAccount> users = getMatching(ctx);
 
-        Collections.sort(users, new Comparator<UserAccount>() {
-
-            @Override
-            public int compare(UserAccount o1, UserAccount o2) {
-                return new CompareToBuilder().append(o1.getDisplayName(), o2.getDisplayName()).
+        Collections.sort(users, (UserAccount o1, UserAccount o2) ->
+                new CompareToBuilder().append(o1.getDisplayName(), o2.getDisplayName()).
                         append(o1.getPrimaryEmail(), o2.getPrimaryEmail()).
                         append(o1.getUserId(), o2.getUserId()).
-                        build();
-            }
-        });
+                        build());
 
         return users;
     }
