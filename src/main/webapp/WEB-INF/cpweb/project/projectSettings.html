@@ -21,7 +21,7 @@ ${cpweb_head}
 [#assign cpweb_foot ]
 ${cpweb_foot}
 
-<script id="setExpirationDialogTemplate" type="text/x-jsrender"> 
+<script id="setExpirationDialogTemplate" type="text/x-jsrender">
     <div id="setExpirationDialog" title="Set Standard Expiration ">
         <p>Set the standard time for expirations in this project. Expiration will start counting downwards once the participants has been activated.</p>
         <input id="expirationToggleSetter" type="number" />
@@ -30,13 +30,13 @@ ${cpweb_foot}
 </script>
 
 <script>
-    
+
     "use strict";
     $('#menu-projects').addClass('active');
 
     var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
-    cpweb.editable($('#language .editable-content'), 
+    cpweb.editable($('#language .editable-content'),
     $('#language .edit '),
     function(value){},
     {'type': 'select',
@@ -55,7 +55,7 @@ ${cpweb_foot}
         'pk': 'country',
         'value': "${prj.country.toLanguageTag()}"
     });
-    
+
     cpweb.editable($('#timezone .editable-content'),
     $('#timezone .edit '),
     function(value){},
@@ -65,7 +65,7 @@ ${cpweb_foot}
         'pk': 'timezone',
         'value': "${prj.timezone.ID?js_string}"
     });
-    
+
     cpweb.editable($('#expiration .editable-content'),
     $('#expiration .edit '),
     function(value){},
@@ -115,7 +115,7 @@ ${cpweb_foot}
             }
         });
     };
-    
+
     var setProgressVisibility = function(visibility) {
 
         $.ajax({
@@ -179,7 +179,7 @@ ${cpweb_foot}
                 });
             });
     });
-    
+
     $('#expirationtoggle-false').click(function() {
         $.ajax({
             type: "POST",
@@ -190,7 +190,7 @@ ${cpweb_foot}
             }
         });
     });
-    
+
     $('#expirationtoggle-true').click(function() {
         require(['jsrender'], function() {
             $('body').append($('#setExpirationDialogTemplate').render());
@@ -205,17 +205,17 @@ ${cpweb_foot}
                             data: {
                                 pk: 'participationexpiration',
                                 value: $('#expirationToggleSetter').val()
-                            }, 
+                            },
                             success: function() {
                                 $('#setExpirationDialog').dialog('close');
-                                window.location.reload(); 
+                                window.location.reload();
                             }
                         });
                     }
                 }
             });
         });
-        
+
     });
 </script>
 
@@ -223,7 +223,8 @@ ${cpweb_foot}
 
 
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[#assign title = (prj.name!'') + " settings ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
 
 [@pInfo.projectInfo selected="settings"][/@pInfo.projectInfo]
 
@@ -249,8 +250,8 @@ ${cpweb_foot}
                 <span class="short editable-content">${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
-                
-        
+
+
         [@dwsrt.feature feature="autoical"]
         [#-- Only for Course design projects --]
         [#if prj.type.ptype == 2]
@@ -262,7 +263,7 @@ ${cpweb_foot}
         </li>
         [/#if]
         [/@dwsrt.feature]
-        
+
         [@dwsrt.feature feature="social"]
         [#-- Only for Course design projects --]
         [#if prj.type.ptype == 2]
@@ -275,7 +276,7 @@ ${cpweb_foot}
         [/#if]
         [/@dwsrt.feature]
 
-        
+
         [@dwsrt.feature feature="social"]
         <li id="progressVisible">
             <a class="setting">
@@ -284,7 +285,7 @@ ${cpweb_foot}
             </a>
         </li>
         [/@dwsrt.feature]
-        
+
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <li id="expirationtoggle">
             <span class="setting">
@@ -292,7 +293,7 @@ ${cpweb_foot}
                 [#if prj.defaultParticipationExpiration??]
                     [#if prj.defaultParticipationExpiration?c?number?c?number > 0]
                         [#assign expirationtoggleActive = "true" /]
-                    [#else] 
+                    [#else]
                         [#assign expirationtoggleActive = "false" /]
                     [/#if]
                 [/#if]
@@ -310,7 +311,7 @@ ${cpweb_foot}
             </span>
         </li>
         [/@]
-        
+
     </ul>
 </div>
     </section>

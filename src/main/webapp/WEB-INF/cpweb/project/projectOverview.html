@@ -190,7 +190,8 @@ source: [
 
 
 
-[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=orgName]
+[#assign title = (prj.name!'') + " overview ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=title]
 
 [@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
 

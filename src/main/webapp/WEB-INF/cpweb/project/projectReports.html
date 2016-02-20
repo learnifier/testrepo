@@ -10,7 +10,7 @@ ${cpweb_foot}
 
     var reportJson = "${helper.urlFor('project.report.ProjectReportJsonModule', 'availableReports', [prj.projectId])}";
     var spinnerUrl = '[@common.spinnerUrl /]';
-    
+
     require(["${contextPath}/js/project/projectReports.js?${cycle.application.formattedStartTime.base36String}", "${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}"], function(pr) {
         //Only init
     });
@@ -18,8 +18,8 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[#assign title = (prj.name!'') + " reports ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
 
 [@pInfo.projectInfo selected="reports"][/@pInfo.projectInfo]
 

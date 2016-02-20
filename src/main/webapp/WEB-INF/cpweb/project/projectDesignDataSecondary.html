@@ -14,7 +14,7 @@ ${cpweb_head}
 [#assign foot]
 ${cpweb_foot}
 <script type="text/javascript">
-    $('#menu-projects').addClass('active');    
+    $('#menu-projects').addClass('active');
 
     dpSettings = {
         'defaultDate': "+1d",
@@ -30,7 +30,7 @@ ${cpweb_foot}
 				instance = instance.inst;
 			}
 
-			var pk = $('#'+instance.id).data('cid');	
+			var pk = $('#'+instance.id).data('cid');
 			var override = $('#'+instance.id).data('override');
 			var name = $('#'+instance.id).data('name');
 			var value = $('#'+instance.id).val();
@@ -38,12 +38,12 @@ ${cpweb_foot}
 			var textfield = 'text'+instance.id.substring(1);
 
 			override = true;
-			
+
 			postSetValue(textfield, pk, override, name, value);
 
 		}
     };
-	
+
 	var postSetValue = function(textfield, pk, override, name, value, postOp) {
 		$.ajax({
 			type: 'post',
@@ -61,12 +61,12 @@ ${cpweb_foot}
 			}
 		});
 	};
-	
+
 	$('body').on('click', '.editspan', function() {
 		var hiddenid = $(this).data('hiddenid');
 		$('#'+hiddenid).datetimepicker('show');
 	});
-	
+
 	$('body').on('click', '.revertspan', function() {
 		var hiddenid = $(this).data('hiddenid');
 		var name = $('#'+hiddenid).data('name');
@@ -74,37 +74,38 @@ ${cpweb_foot}
 		var override = false; //time to revert, set override to false
 		var value = $('#'+hiddenid).val();
 		var textfield = 'text'+hiddenid.substring(1);
-		
+
 		postSetValue(textfield, pk, override, name, value, function() {
                     $("#"+hiddenid).editable('setValue', null);
                 } );
 	});
-	
+
 	requirejs(['bootstrap/editable','bootstrap/cocobox-editable-datetime', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function() {
 		$('.editable').editable({
 			title: '',
                         container: 'body'
 		});
 	});
-        
+
 </script>
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=orgName foot=foot ]
+[#assign title = (prj.name!'') + " course ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu orgName=title foot=foot ]
 
 <article id="ccb-page-designData">
 [@pInfo.projectInfo selected="details"][/@pInfo.projectInfo]
 
 <!--<div role="tabpanel">
 
-   Nav tabs 
+   Nav tabs
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#info" aria-controls="home" role="tab" data-toggle="tab">Info</a></li>
     <li role="presentation"><a href="#program" aria-controls="profile" role="tab" data-toggle="tab">Program</a></li>
     <li role="presentation"><a href="#library" aria-controls="messages" role="tab" data-toggle="tab">Library</a></li>
   </ul>
 
-   Tab panes 
+   Tab panes
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="info">info</div>
     <div role="tabpanel" class="tab-pane" id="program">Program</div>
@@ -124,7 +125,7 @@ ${cpweb_foot}
 <h2>[@dws.txt key="cpweb.designdatasecondary.title" /]</h2>
 
 
-    [#global formPrefix="cpweb" /]    
+    [#global formPrefix="cpweb" /]
         [@bsform.alertsection]
         [/@bsform.alertsection]
         [#if errorFields?size > 0]
@@ -135,7 +136,7 @@ ${cpweb_foot}
               </ul>
             </section>
         [/#if]
-        
+
        [#if primaryFieldCount > 0 ]
         <section class="action">
            <h4><b>STEP 1</b> - Start by setting the required course details and then move on to step 2</h4>

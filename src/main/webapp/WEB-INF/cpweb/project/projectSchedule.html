@@ -229,7 +229,8 @@ ${cpweb_foot}
 </script>
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[#assign title = (prj.name!'') + " communications ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
 
 [@pInfo.projectInfo selected="schedule"][/@pInfo.projectInfo]
 

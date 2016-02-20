@@ -765,7 +765,8 @@ ${cpweb_head}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+[#assign title = (prj.name!'') + " roster ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=title]
 
 <article id="ccb-page-projectRoster">
 

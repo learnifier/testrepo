@@ -313,7 +313,8 @@ ${cpweb_foot}
 
 [/#assign]
 
-[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+[#assign title = (prj.name!'') + " materials ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
 
 [@pInfo.projectInfo selected="materials"][/@pInfo.projectInfo]
 
