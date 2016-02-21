@@ -198,9 +198,11 @@ ${cpweb_foot}
                             <h1>Action</h1>
                             <p>Take action on the following issues. Reach out to tech support as needed.</p>
                     </div>
-                    <div class="ccb-flat-card__content table-responsive">
-                        <table class="table table-hover ccb-table" width="100%"id="tw_actions">
-                        </table>
+                    <div class="ccb-flat-card__content">
+                        <div class="table-responsive">
+                            <table class="table table-hover ccb-table" width="100%"id="tw_actions">
+                            </table>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -218,12 +220,14 @@ ${cpweb_foot}
                 [/@]
             </div>
             <div class="ccb-flat-card ccb-flat-card--colored">
-                <div class="ccb-flat-card__content table-responsive">
+                <div class="ccb-flat-card__content">
                     [@portalSecurity.permissionBlock permission="CP_LIST_PROJECTS"]
                     <div class="ccb-flat-card__header"><a href="${helper.urlFor('CpMainModule','listProjects',[org.id])}" class="pull-right yiq-contrasted-navColor">View All Projects</a><h3>Favorite Projects</h3></div>
 
-                    <table class="table table-hover table-condensed ccb-table" width="100%" id="tw-favorites">
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-condensed ccb-table" width="100%" id="tw-favorites">
+                        </table>
+                    </div>
                     [/@]
                 </div>
             </div>

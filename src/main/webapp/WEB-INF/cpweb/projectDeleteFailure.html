@@ -1,23 +1,25 @@
 [#ftl /]
 
 [#if session.hasFlashAttribute("projectDeleteFailures") ]
-<section class="alert table-responsive">
+<section class="alert">
     <h1>[@dws.txt key="cpweb.project.deletefailure.title" /]</h1>
     <p>[@dws.txt key="cpweb.project.deletefailure.text" /]</p>
-        <table class="table table-hover table-striped ccb-table" width="100%" id="deletefailure">
-        <thead>
-            <th>User</th>
-            <th>Reason</th>
-        </thead>
-        <tbody>
-            [#list session.getFlashAttribute("projectDeleteFailures") as DeleteFailure ]
-                <tr>
-                    <td class="num">${DeleteFailure.name}</td>
-                    <td class="num">${DeleteFailure.reason}</td>                
-                </tr>
-            [/#list]
-        </tbody>
-    </table>
+        <div class="table-responsive">
+            <table class="table table-hover table-striped ccb-table" width="100%" id="deletefailure">
+                <thead>
+                    <th>User</th>
+                    <th>Reason</th>
+                </thead>
+                <tbody>
+                    [#list session.getFlashAttribute("projectDeleteFailures") as DeleteFailure ]
+                        <tr>
+                            <td class="num">${DeleteFailure.name}</td>
+                            <td class="num">${DeleteFailure.reason}</td>                
+                        </tr>
+                    [/#list]
+                </tbody>
+            </table>
+        </div>
 </section>
 
 [/#if]
