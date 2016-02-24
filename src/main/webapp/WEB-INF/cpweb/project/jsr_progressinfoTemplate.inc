@@ -41,7 +41,7 @@
                                                   <abbr data-toggle="tooltip" class="timeago" title="{{completedDateAgo}}"> {{completedDateStr}} </abbr>
                                               {{/if}}
                                           </li>
-                                          <li class="score pull-right">                                     
+                                          <li class="score pull-right">
                                               {{#if scoreStr}}
                                                   <span class="row-label">Score:</span><span class="row-value">{{scoreStr}}</span>
                                               {{/if}}

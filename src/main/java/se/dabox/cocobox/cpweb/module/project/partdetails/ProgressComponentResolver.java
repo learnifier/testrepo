@@ -119,6 +119,9 @@ class ProgressComponentResolver {
                         ProgressComponentInfo.forTemporal(tempComp, comp);
                 if (tempComp.hasTriggered(now)) {
                     info.setCompleted(tempComp.getTriggerTime());
+                    info.setCompletionStatus(CompletionStatus.completed);
+                } else {
+                    info.setCompletionStatus(CompletionStatus.unknown);
                 }
                 infos.add(info);
                 continue;
