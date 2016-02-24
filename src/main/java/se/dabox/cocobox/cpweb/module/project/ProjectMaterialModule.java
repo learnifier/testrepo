@@ -30,6 +30,7 @@ import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
+import se.dabox.service.client.ApiRequestFailedException;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.DeniedException;
@@ -58,7 +59,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
     public RequestTarget onAddMaterial(final RequestCycle cycle, String strProjectId) {
 
         long prjId = Long.valueOf(strProjectId);
-        
+
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
 
@@ -209,7 +210,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
             Map<String,String> settings)
             throws IllegalStateException, JsonErrorMessageException {
         LangBundle bundle = getLangBundle(cycle);
-        try {            
+        try {
             getProjectMaterialCoordinatorClient(cycle).addProjectProduct(prjId, productId, settings);
         } catch (AllocatedCreditsProjectProductException ex) {
 
@@ -231,6 +232,9 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
                     Collections.singletonList(failure));
 
             //This catch will fall through and will be handled on the page reload
+        } catch(ApiRequestFailedException arfe) {
+            LOGGER.error("Failed to add product {} to {}", productId, prjId);
+            throw arfe;
         }
     }
     private static final String ERROR_TITLE = "Failed to add product";
@@ -282,10 +286,10 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
     }
 
     private boolean productNeedsConfiguration(RequestCycle cycle, long orgId, String productId) {
-        
+
         ProjectConfigResponse response = new GetCrispProjectProductConfig(cycle, orgId, productId).
                 get();
-        
+
         return response != null && response.isMandatoryItemsAvailable();
     }
 
