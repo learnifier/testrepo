@@ -2,7 +2,7 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define(['knockout'], function (ko) {
+define(['knockout', 'dabox-common'], function (ko) {
 
     "use strict";
 
@@ -26,10 +26,13 @@ define(['knockout'], function (ko) {
     };
 
     var Folder = function (id, name, folders) {
-        var self = Item(id, name, "", "Folder");
+        var self = Item(id, name, "Folder", "");
         self.folders = folders;
         self.materials = [];
-        
+
+        self.clickName = function() {
+            model.showFolder(id);
+        }
         return self;
     };
 
@@ -37,7 +40,10 @@ define(['knockout'], function (ko) {
         var self = Item(id, name, typeTitle, thumbnail);
         self.name = name;
         self.typeTitle = typeTitle;
-        self.thumbnail = thumbnail;
+
+        self.clickName = function() {
+            cocobox.infoDialog("Preview", "Nice material preview here.", function(){});
+        }
         return self;
     };
 
@@ -52,8 +58,8 @@ define(['knockout'], function (ko) {
                 return nf;
             });
         }
-        var nf = Folder(1377, "/", parseFoldersInner(json));
-        folderHash[1377] = nf;
+        var nf = Folder(1337, "/", parseFoldersInner(json));
+        folderHash[1337] = nf;
         return {
             folders: nf,
             folderHash: folderHash
@@ -74,7 +80,6 @@ define(['knockout'], function (ko) {
         self.selected = ko.observableArray();
 
         self.updateSelected = function(item, selectedFlag) {
-            console.log("updateSelected: ", item, selectedFlag);
             if(selectedFlag) {
                 self.selected.push(item);
             } else {
@@ -93,6 +98,11 @@ define(['knockout'], function (ko) {
             self.selected([]);
         };
 
+        self.showFolder = function(folderId) {
+            console.log("showFolder", folderId);
+            self.rows(self.folderHash[folderId].folders.concat(self.folderHash[folderId].materials));
+        };
+
         self.readAjax = function(url) {
             $.getJSON(url).done(function(data){
                 var folderInfo = parseFolders(data.folders);
@@ -102,12 +112,13 @@ define(['knockout'], function (ko) {
                     var r = Material(item.id, item.title, item.typeTitle, item.thumbnail);
                     var materialFolderId  = item.materialFolderId;
                     if(materialFolderId === null || materialFolderId === undefined) {
-                        materialFolderId = 1377;
+                        materialFolderId = 1337;
                     }
+                    console.log("self.folderHash[materialFolderId]", materialFolderId, self.folderHash[materialFolderId]);
                     self.folderHash[materialFolderId].materials.push(r);
                     return r;
                 });
-                self.rows(self.folderHash[1377].folders.concat(self.folderHash[1377].materials));
+                self.showFolder(1337);
             });
         }
 
