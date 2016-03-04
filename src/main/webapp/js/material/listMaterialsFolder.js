@@ -14,8 +14,11 @@ define(['knockout'], function (ko) {
         self.name = name;
         self.typeTitle = typeTitle;
         self.thumbnail = thumbnail;
+        self.selectRow = function(){
+            console.log("Klick: ", this);
+        };
         return self;
-    }
+    };
 
     var Folder = function (id, name, folders) {
         var self = Item(id, name, "", "Folder");
@@ -23,14 +26,15 @@ define(['knockout'], function (ko) {
         self.materials = [];
         
         return self;
-    }
+    };
 
     function Material(id, name, typeTitle, thumbnail) {
         var self = Item(id, name, typeTitle, thumbnail);
         self.name = name;
         self.typeTitle = typeTitle;
         self.thumbnail = thumbnail;
-    }
+        return self;
+    };
 
 
     function parseFolders(json) {
@@ -38,12 +42,12 @@ define(['knockout'], function (ko) {
 
         function parseFoldersInner(fs) {
             return $.map(fs, function(f){
-                var nf = new Folder(f.id, f.name, parseFoldersInner(f.folders));
+                var nf = Folder(f.id, f.name, parseFoldersInner(f.folders));
                 folderHash[f.id] = nf;
                 return nf;
             });
         }
-        var nf = new Folder(1377, "/", parseFoldersInner(json));
+        var nf = Folder(1377, "/", parseFoldersInner(json));
         folderHash[1377] = nf;
         return {
             folders: nf,
@@ -71,24 +75,19 @@ define(['knockout'], function (ko) {
                 self.folderHash = folderInfo.folderHash;
                 self.folders = folderInfo.folders;
                 var res = $.map(data.aaData, function(item) {
-                    var r = new Material(item.id, item.title, item.typeTitle, item.thumbnail);
+                    var r = Material(item.id, item.title, item.typeTitle, item.thumbnail);
                     var materialFolderId  = item.materialFolderId;
                     if(materialFolderId === null || materialFolderId === undefined) {
                         materialFolderId = 1377;
                     }
-                    console.log("Adding", materialFolderId, r);
                     self.folderHash[materialFolderId].materials.push(r);
                     return r;
                 });
-                console.log("Setting rows: ", self.folderHash[1377].folders, self.folderHash[1377].material);
                 self.rows(self.folderHash[1377].folders.concat(self.folderHash[1377].materials));
             });
 
         }
 
-        self.click = function(a, b, c){
-            console.log("Klick: ", this, a, b, c);
-        }
 
     }
 
