@@ -13,6 +13,8 @@ ${cpweb_foot}
 
     require(['${contextPath}/js/project/report/sliiChallengeReport.js?${cycle.application.formattedStartTime.base36String}'], function(s) {
            s.init({
+               swfPath: "[@cdt.tableToolsSwf /]",
+               spinnerUrl: "[@common.spinnerUrl /]",
                jsonUrl: '${helper.urlFor("project.report.ProjectReportJsonModule","activityReport",[prj.projectId])}'
            });
         });

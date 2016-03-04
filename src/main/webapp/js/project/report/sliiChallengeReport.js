@@ -7,7 +7,9 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tabl
     exports.init = function (options) {
 
         settings = $.extend({
-            jsonUrl: undefined
+            jsonUrl: undefined,
+            swfPath: undefined,
+            spinnerUrl: undefined
         }, options);
 
         var tableColTitles = ["Name"];
@@ -91,7 +93,7 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tabl
                 "aoColumnDefs": tableJSON,
                 "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "oTableTools": {
-                    "sSwfPath": "[@cdt.tableToolsSwf /]"
+                    "sSwfPath": settings.swfPath
                 },
                 "bPaginate": false,
                 "aaSorting": [[0, 'asc']],
@@ -99,7 +101,7 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tabl
                 "language": {
                     "sSearch": "",
                     "sEmptyTable": "<span class='emptytable'>No projects available on your account.</span>",
-                    "sLoadingRecords": "<p>Loading report...</p><img src='[@common.spinnerUrl /]' />"
+                    "sLoadingRecords": "<p>Loading report...</p><img src='"+settings.spinnerUrl+"' />"
                 },
                 "rowCallback": function (nRow, iDisplayIndex) {
                     var sumCompleted = 0;
