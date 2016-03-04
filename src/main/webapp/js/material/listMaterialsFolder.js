@@ -11,23 +11,36 @@ define(['knockout'], function (ko) {
     function ListMaterialModel() {
         var self = this;
 
-        function Row(name, type) {
+        function Row(name, typeTitle, thumbnail) {
             var self = this;
             self.name = name;
-            self.type = type;
+            self.typeTitle = typeTitle;
+            self.thumbnail = thumbnail;
         }
 
         self.rows = ko.observableArray();
 
+        self.products = undefined;
+
         self.readAjax = function(url) {
             console.log("Calling ", url);
+
             $.getJSON(url).done(function(data){
+                console.log("Got data: ", data);
+
+                //parseFolders();
+
                 var res = $.map(data.aaData, function(item) {
-                   return new Row(item.title, "lol");
+                   return new Row(item.title, item.typeTitle, item.thumbnail);
                 });
-                self.rows(res);
-               console.log("Got data: ", data);
+
+                var folders = $.map(data.folders, function(item) {
+                    //item.id, item.folders, item.name
+                    return new Row(item.name, "Folder", item.thumbnail);
+                });
+                self.rows(res.concat(folders));
             });
+
         }
 
     }
@@ -42,6 +55,7 @@ define(['knockout'], function (ko) {
 
         var model = new ListMaterialModel();
         ko.applyBindings(model);
+
         model.readAjax(settings.listUrl);
 
         console.log("model = ", model);
