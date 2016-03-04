@@ -554,6 +554,9 @@ ${cpweb_foot}
                         } else if (activityStatus == 'completed') {
                             var result = '<span class="text-success">Completed</span>';
                             return new hb.SafeString(result);
+                        } else if (activityStatus == 'notTracked') {
+                            var result = '<span class="text-success">Not Tracked</span>';
+                            return new hb.SafeString(result);
                         } else {
                             return 'Unknown statusName:' + activityStatus;
                         }
@@ -585,6 +588,9 @@ ${cpweb_foot}
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'completed') {
                             var result = '<span class="item__icon text-success pe-7s-check pe-va pe-2x pe-fw"></span>';
+                            return new hb.SafeString(result);
+                        } else if (activityStatus == 'notTracked') {
+                            var result = '';
                             return new hb.SafeString(result);
                         } else {
                             return 'Unknown statusImage:' + activityStatus;
