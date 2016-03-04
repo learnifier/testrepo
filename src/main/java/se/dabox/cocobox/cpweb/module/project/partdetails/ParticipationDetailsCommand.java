@@ -673,6 +673,7 @@ public class ParticipationDetailsCommand {
                 = new GetDatabankFacadeCommand(cycle).setFallbackToStageDatabank(true).get(project);
 
         return new MultiPageCourseCddActivityCourseFactory().
+                setAllowTemporalProgressTracking(true).
                 newActivityCourse(project, progress,
                 databankFacade, cdd);
     }
