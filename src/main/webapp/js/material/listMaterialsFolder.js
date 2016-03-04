@@ -7,6 +7,7 @@ define(['knockout'], function (ko) {
     "use strict";
 
     var exports = {};
+    var model;
 
     var Item = function(id, name, typeTitle, thumbnail) {
         var self = {};
@@ -14,7 +15,11 @@ define(['knockout'], function (ko) {
         self.name = name;
         self.typeTitle = typeTitle;
         self.thumbnail = thumbnail;
+        self.selected = ko.observable(false);
         self.selectRow = function(){
+            var s = self.selected();
+            model.updateSelected(self, !s);
+            self.selected(!s);
             console.log("Klick: ", this);
         };
         return self;
@@ -66,11 +71,30 @@ define(['knockout'], function (ko) {
         self.folders = undefined;
         self.folderHash = undefined;
 
+        self.selected = ko.observableArray();
+
+        self.updateSelected = function(item, selectedFlag) {
+            console.log("updateSelected: ", item, selectedFlag);
+            if(selectedFlag) {
+                self.selected.push(item);
+            } else {
+                var index = self.selected.indexOf(item);
+                if (index > -1) {
+                    self.selected.splice(index, 1);
+                }
+            }
+        }
+
+        self.clearSelection = function() {
+            console.log("Clearselection");
+            $.each(self.selected(), function(i, item) {
+                item.selected(false);
+            });
+            self.selected([]);
+        };
+
         self.readAjax = function(url) {
-
             $.getJSON(url).done(function(data){
-                console.log("Got data: ", data);
-
                 var folderInfo = parseFolders(data.folders);
                 self.folderHash = folderInfo.folderHash;
                 self.folders = folderInfo.folders;
@@ -85,7 +109,6 @@ define(['knockout'], function (ko) {
                 });
                 self.rows(self.folderHash[1377].folders.concat(self.folderHash[1377].materials));
             });
-
         }
 
 
@@ -99,7 +122,7 @@ define(['knockout'], function (ko) {
             editMode: false
         }, options || {});
 
-        var model = new ListMaterialModel();
+        model = new ListMaterialModel();
         ko.applyBindings(model);
 
         model.readAjax(settings.listUrl);
