@@ -786,9 +786,28 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final LangBundle bundle = getLangBundle(cycle);
 
+        List<MatFolder> folders = createFolders();
+
+        List<Long> folderIds = new ArrayList<>(folders.size()+1);
+        folderIds.add(null);
+        for (MatFolder folder : folders) {
+            addFolderIds(folderIds, folder);
+        }
+
         PdwebProductEditorUrlFactory pdwebEditorFactory = new PdwebProductEditorUrlFactory(cycle);
 
         return new DataTablesJson<Material>() {
+            @Override
+            protected void writeExtraDataEnd() throws IOException {
+                super.writeExtraDataEnd();
+
+                generator.writeArrayFieldStart("folders");
+                for (MatFolder folder : folders) {
+                    writeFolder(folder);
+                }
+                generator.writeEndArray();
+            }
+
             @Override
             protected void encodeItem(Material material) throws IOException {
                 generator.writeStringField("materialId", material.getCompositeId());
@@ -826,6 +845,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         generator.writeStringField("adminLink", adminLink);
                         generator.writeStringField("adminLinkTitle", "Administrate");
                     }
+                }
+
+
+                int hash = hash(material.getCompositeId());
+                Long folderId = folderIds.get(Math.abs(hash) % folderIds.size());
+                if (folderId == null) {
+                    generator.writeNullField("materialFolderId");
+                } else {
+                    generator.writeNumberField("materialFolderId", folderId);
                 }
             }
 
@@ -890,6 +918,30 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 }
 
                 return null;
+            }
+
+            private int hash(String key) {
+                int h;
+                return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+            }
+
+            private void writeFolder(MatFolder folder) throws IOException {
+                generator.writeStartObject();
+                if (folder.getId() == null) {
+                    generator.writeNullField("id");
+                } else {
+                    generator.writeNumberField("id", folder.getId());
+                }
+
+                generator.writeStringField("name", folder.getName());
+
+                generator.writeArrayFieldStart("folders");
+                for (MatFolder subfolder : folder.getFolders()) {
+                    writeFolder(subfolder);
+                }
+                generator.writeEndArray();
+
+                generator.writeEndObject();
             }
 
         }.encodeToStream(materials);
@@ -1262,6 +1314,42 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         public CrispAdminLinkInfo(String link, String name) {
             this.link = link;
             this.name = name;
+        }
+    }
+
+    private static List<MatFolder> createFolders() {
+        List<MatFolder> root = new ArrayList<>();
+
+        long id = 0;
+
+        MatFolder year = new MatFolder(id++, "years");
+        root.add(year);
+        year.getFolders().add(new MatFolder(id++, "January"));
+        year.getFolders().add(new MatFolder(id++, "Foobruary"));
+
+        MatFolder usr = new MatFolder(id++, "usr");
+        root.add(usr);
+        usr.getFolders().add(new MatFolder(id++, "bin"));
+        usr.getFolders().add(new MatFolder(id++, "doc"));
+        usr.getFolders().add(new MatFolder(id++, "lib"));
+
+        MatFolder home = new MatFolder(id++, "home");
+        root.add(home);
+
+        home.getFolders().add(new MatFolder(id++, "amohamed"));
+        home.getFolders().add(new MatFolder(id++, "jklang"));
+        home.getFolders().add(new MatFolder(id++, "mandersson"));
+        home.getFolders().add(new MatFolder(id++, "mborg"));
+
+        return root;
+    }
+
+
+    private static void addFolderIds(List<Long> folderIds, MatFolder folder) {
+        folderIds.add(folder.getId());
+
+        for (MatFolder matFolder : folder.getFolders()) {
+            addFolderIds(folderIds, matFolder);
         }
     }
 }
