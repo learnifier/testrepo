@@ -86,6 +86,10 @@ define(['knockout'], function (ko) {
 
         }
 
+        self.click = function(a, b, c){
+            console.log("Klick: ", this, a, b, c);
+        }
+
     }
 
     var settings;
