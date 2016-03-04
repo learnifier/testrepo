@@ -468,6 +468,11 @@ public class ParticipationDetailsCommand {
                     public boolean isOverdue() {
                         return false;
                     }
+
+                    @Override
+                    public boolean isProgressTrackable() {
+                        return true;
+                    }
                 });
             }
 
