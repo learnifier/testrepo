@@ -8,28 +8,6 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
 
     var exports = {};
 
-    function ListModel(params) {
-        var self = this;
-        this.name = params.name + "!";
-
-        self.lol = function () {
-        };
-    }
-
-    $(document).ready(function() {
-        ko.components.register('cocobox-list', {
-            viewModel: ListModel,
-            template: {element: "cocobox-list"}
-        });
-    });
-    return exports;
-});
-
-
-define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
-    "use strict";
-    var exports = {};
-    var settings;
     var model;
 
     var Item = function(id, name, typeTitle, thumbnail) {
@@ -90,14 +68,11 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
     }
 
 
-    function ListMaterialModel() {
+    function ListModel(params) {
+        model = this; // TODO: Fix this
         var self = this;
+        this.name = params.name + "!";
 
-        self.cocoboxListParams = function() {
-          return {
-              name: "A proper name"
-          }
-        };
         self.rows = ko.observableArray();
 
         self.products = undefined;
@@ -131,28 +106,68 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
             self.rows(self.folderHash[folderId].folders.concat(self.folderHash[folderId].materials));
         };
 
-        self.readAjax = function(url) {
-            $.getJSON(url).done(function(data){
-                var folderInfo = parseFolders(data.folders);
-                self.folderHash = folderInfo.folderHash;
-                self.folders = folderInfo.folders;
-                var res = $.map(data.aaData, function(item) {
-                    var r = Material(item.id, item.title, item.typeTitle, item.thumbnail);
-                    var materialFolderId  = item.materialFolderId;
-                    if(materialFolderId === null || materialFolderId === undefined) {
-                        materialFolderId = 1337;
-                    }
-                    console.log("self.folderHash[materialFolderId]", materialFolderId, self.folderHash[materialFolderId]);
-                    self.folderHash[materialFolderId].materials.push(r);
-                    return r;
-                });
-                self.showFolder(1337);
+
+        self.lol = function () {
+        };
+        params.getData().done(function(data){
+            console.log("rows: ", data.rows);
+            console.log("folders: ", data.folders);
+            var folderInfo = parseFolders(data.folders);
+            self.folderHash = folderInfo.folderHash;
+            self.folders = folderInfo.folders;
+            var res = $.map(data.rows, function(item) {
+                var r = Material(item.id, item.title, item.typeTitle, item.thumbnail);
+                var materialFolderId  = item.materialFolderId;
+                if(materialFolderId === null || materialFolderId === undefined) {
+                    materialFolderId = 1337;
+                }
+                console.log("self.folderHash[materialFolderId]", materialFolderId, self.folderHash[materialFolderId]);
+                self.folderHash[materialFolderId].materials.push(r);
+                return r;
             });
-        }
+            self.showFolder(1337);
 
-
+        });
     }
 
+    $(document).ready(function() {
+        ko.components.register('cocobox-list', {
+            viewModel: ListModel,
+            template: {element: "cocobox-list"}
+        });
+    });
+    return exports;
+});
+
+
+define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
+    "use strict";
+    var exports = {};
+    var settings;
+
+
+    function ListMaterialModel() {
+        var self = this;
+
+        self.readData = function(url) {
+            var deferred = $.Deferred();
+            $.getJSON(url).done(function(data){
+                // TODO: Handle errors
+                deferred.resolve({ rows: data.aaData, folders: data.folders});
+            });
+            return deferred.promise();
+        }
+
+        // Return parameters for cocobox-list component
+        self.cocoboxListParams = function() {
+          return {
+              editMode: settings.editMode,
+              getData: function(){
+                  return self.readData(settings.listUrl);
+              },
+          }
+        };
+    }
 
     exports.init = function(options) {
         settings = $.extend({
@@ -160,10 +175,8 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
             editMode: false
         }, options || {});
 
-        model = new ListMaterialModel();
-        ko.applyBindings(model);
+        ko.applyBindings(new ListMaterialModel());
 
-        model.readAjax(settings.listUrl);
     };
 
     return exports;

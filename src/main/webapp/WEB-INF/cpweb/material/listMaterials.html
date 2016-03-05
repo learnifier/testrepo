@@ -217,24 +217,7 @@ ${cpweb_foot}
     [#include 'listToggle.html' /]
 </div>
 
-<div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}"></div>
-
-<div data-bind="if: selected().length > 0">
-    <span><span data-bind="text: selected().length"></span> selected.</span>
-    <div class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
-    <div class="btn btn-primary" id="removemultibtn"><span class="glyphicon glyphicon-trash"></span> Remove</div>
-    <div class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-duplicate"></span> Copy</div>
-    <div  data-bind="click: clearSelection" class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-minus-sign"></span> Clear selection</div>
-</div>
-<div class="table-responsive">
-    <table class="table table-hover ccb-table dataTable no-footer">
-        <thead><th></th><th>Name</th><th>Kind</th></thead>
-        <tbody data-bind="foreach: rows">
-        <tr data-bind="style: { background: selected() ? '#9090c0' : '#ffffff' }">
-        <td data-bind="click: selectRow" class="selected material-thumbnail"><img data-bind="attr: {src: thumbnail}"></td><td data-bind="text: name, click: clickName"></td><td data-bind="text: typeTitle"></td>
-        </tr>
-        </tbody>
-    </table>
+<div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}">
 </div>
 
 <div class="table-responsive">
@@ -253,7 +236,23 @@ ${cpweb_foot}
 </div>
 
 <template id='cocobox-list'>
-    <h1 data-bind="text: name"></h1>
+    <div data-bind="if: selected().length > 0">
+        <span><span data-bind="text: selected().length"></span> selected.</span>
+        <div class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
+        <div class="btn btn-primary" id="removemultibtn"><span class="glyphicon glyphicon-trash"></span> Remove</div>
+        <div class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-duplicate"></span> Copy</div>
+        <div  data-bind="click: clearSelection" class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-minus-sign"></span> Clear selection</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover ccb-table dataTable no-footer">
+            <thead><th></th><th>Name</th><th>Kind</th></thead>
+            <tbody data-bind="foreach: rows">
+            <tr data-bind="style: { background: selected() ? '#9090c0' : '#ffffff' }">
+                <td data-bind="click: selectRow" class="selected material-thumbnail"><img data-bind="attr: {src: thumbnail}"></td><td data-bind="text: name, click: clickName"></td><td data-bind="text: typeTitle"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </template>
 
 [/@dws.skin]
