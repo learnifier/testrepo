@@ -2,7 +2,25 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define(['knockout', 'dabox-common'], function (ko) {
+define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
+
+    "use strict";
+
+    var exports = {};
+    $(document).ready(function(){
+        console.log("Gogo", ko.components.register);
+        ko.components.register('cocobox-list', {
+            viewModel: function SomeComponentViewModel(params) {
+                this.someProperty = params.something;
+            },
+            template: { element: 'cocobox-list' }
+        });
+    });
+    return exports;
+});
+
+
+define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
 
     "use strict";
 
