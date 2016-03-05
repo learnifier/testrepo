@@ -149,7 +149,7 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
     function ListMaterialModel() {
         var self = this;
 
-        self.readData = function(url) {
+        function readData(url) {
             var deferred = $.Deferred();
             $.getJSON(url).done(function(data){
                 // TODO: Handle errors
@@ -160,12 +160,19 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
 
         // Return parameters for cocobox-list component
         self.cocoboxListParams = function() {
-          return {
-              editMode: settings.editMode,
-              getData: function(){
-                  return self.readData(settings.listUrl);
-              },
-          }
+            return {
+                editMode: settings.editMode,
+                getData: function(){
+                    return readData(settings.listUrl);
+                },
+                groupOps: [{
+                    html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
+                    callback: function(items) {
+                        console.log("Remove fn on", items);
+                    }
+                }
+                ]
+            }
         };
     }
 
