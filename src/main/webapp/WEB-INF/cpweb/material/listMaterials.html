@@ -217,7 +217,8 @@ ${cpweb_foot}
     [#include 'listToggle.html' /]
 </div>
 
-<cocobox-list></cocobox-list>
+<div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}"></div>
+
 <div data-bind="if: selected().length > 0">
     <span><span data-bind="text: selected().length"></span> selected.</span>
     <div class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
@@ -252,8 +253,7 @@ ${cpweb_foot}
 </div>
 
 <template id='cocobox-list'>
-    <h1 Hej></h1>
-    Hopp
+    <h1 data-bind="text: name"></h1>
 </template>
 
 [/@dws.skin]

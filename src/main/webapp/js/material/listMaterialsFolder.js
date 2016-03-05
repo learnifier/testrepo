@@ -7,13 +7,19 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
     "use strict";
 
     var exports = {};
-    $(document).ready(function(){
-        console.log("Gogo", ko.components.register);
+
+    function ListModel(params) {
+        var self = this;
+        this.name = params.name + "!";
+
+        self.lol = function () {
+        };
+    }
+
+    $(document).ready(function() {
         ko.components.register('cocobox-list', {
-            viewModel: function SomeComponentViewModel(params) {
-                this.someProperty = params.something;
-            },
-            template: { element: 'cocobox-list' }
+            viewModel: ListModel,
+            template: {element: "cocobox-list"}
         });
     });
     return exports;
@@ -21,10 +27,9 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
 
 
 define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
-
     "use strict";
-
     var exports = {};
+    var settings;
     var model;
 
     var Item = function(id, name, typeTitle, thumbnail) {
@@ -88,6 +93,11 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
     function ListMaterialModel() {
         var self = this;
 
+        self.cocoboxListParams = function() {
+          return {
+              name: "A proper name"
+          }
+        };
         self.rows = ko.observableArray();
 
         self.products = undefined;
@@ -143,7 +153,6 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
 
     }
 
-    var settings;
 
     exports.init = function(options) {
         settings = $.extend({
@@ -155,8 +164,6 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
         ko.applyBindings(model);
 
         model.readAjax(settings.listUrl);
-
-        console.log("model = ", model);
     };
 
     return exports;
