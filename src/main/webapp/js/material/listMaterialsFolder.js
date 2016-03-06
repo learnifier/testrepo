@@ -122,6 +122,7 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
             console.log("showFolder", folderId);
             self.selectedFolder(self.folderHash[folderId]);
             self.rows(self.folderHash[folderId].folders.concat(self.folderHash[folderId].materials));
+            self.clearSelection();
         };
 
         params.getData().done(function(data){
