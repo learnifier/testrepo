@@ -10,9 +10,10 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
 
     var model;
 
-    var Item = function(id, name, typeTitle, thumbnail) {
+    var Item = function(id, parentId, name, typeTitle, thumbnail) {
         var self = {};
         self.id = id;
+        self.parentId = parentId;
         self.name = name;
         self.typeTitle = typeTitle;
         self.thumbnail = thumbnail;
@@ -26,8 +27,8 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
         return self;
     };
 
-    var Folder = function (id, name, folders) {
-        var self = Item(id, name, "Folder", "");
+    var Folder = function (id, parentId, name, folders) {
+        var self = Item(id, parentId, name, "Folder", "");
         self.folders = folders;
         self.materials = [];
 
@@ -37,8 +38,8 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
         return self;
     };
 
-    function Material(id, name, typeTitle, thumbnail) {
-        var self = Item(id, name, typeTitle, thumbnail);
+    function Material(id, parentId, name, typeTitle, thumbnail) {
+        var self = Item(id, parentId, name, typeTitle, thumbnail);
         self.name = name;
         self.typeTitle = typeTitle;
 
@@ -52,14 +53,14 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
     function parseFolders(json) {
         var folderHash = {};
 
-        function parseFoldersInner(fs) {
+        function parseFoldersInner(fs, parentId) {
             return $.map(fs, function(f){
-                var nf = Folder(f.id, f.name, parseFoldersInner(f.folders));
+                var nf = Folder(f.id, parentId, f.name, parseFoldersInner(f.folders, f.id));
                 folderHash[f.id] = nf;
                 return nf;
             });
         }
-        var nf = Folder(1337, "/", parseFoldersInner(json));
+        var nf = Folder(1337, undefined, "/", parseFoldersInner(json, 1337));
         folderHash[1337] = nf;
         return {
             folders: nf,
@@ -73,6 +74,7 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
         var self = this;
         this.name = params.name + "!";
 
+        self.selectedFolder = ko.observable();
         self.rows = ko.observableArray();
 
         self.products = undefined;
@@ -81,6 +83,21 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
         self.folderHash = undefined;
 
         self.selected = ko.observableArray();
+
+
+        self.parents = function() {
+            var f = this.selectedFolder(), a = [];
+            console.log("parents: ", f);
+            if(f) {
+                a.push(f);
+                while (f.parentId !== undefined) {
+                    f = self.folderHash[f.parentId];
+                    a.push(f);
+                }
+            }
+            console.log("And the result = ", a);
+            return a.reverse();
+        };
 
         self.updateSelected = function(item, selectedFlag) {
             if(selectedFlag) {
@@ -103,12 +120,10 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
 
         self.showFolder = function(folderId) {
             console.log("showFolder", folderId);
+            self.selectedFolder(self.folderHash[folderId]);
             self.rows(self.folderHash[folderId].folders.concat(self.folderHash[folderId].materials));
         };
 
-
-        self.lol = function () {
-        };
         params.getData().done(function(data){
             console.log("rows: ", data.rows);
             console.log("folders: ", data.folders);
@@ -116,8 +131,8 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
             self.folderHash = folderInfo.folderHash;
             self.folders = folderInfo.folders;
             var res = $.map(data.rows, function(item) {
-                var r = Material(item.id, item.title, item.typeTitle, item.thumbnail);
                 var materialFolderId  = item.materialFolderId;
+                var r = Material(item.id, materialFolderId, item.title, item.typeTitle, item.thumbnail);
                 if(materialFolderId === null || materialFolderId === undefined) {
                     materialFolderId = 1337;
                 }

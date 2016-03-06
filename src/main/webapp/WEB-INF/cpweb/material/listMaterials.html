@@ -236,6 +236,9 @@ ${cpweb_foot}
 </div>
 
 <template id='cocobox-list'>
+    <div data-bind="foreach: parents()">
+        <span data-bind="text: name"></span>
+    </div>
     <div data-bind="if: selected().length > 0">
         <span><span data-bind="text: selected().length"></span> selected.</span>
         <div class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
