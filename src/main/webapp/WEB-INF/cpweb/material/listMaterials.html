@@ -219,7 +219,26 @@ ${cpweb_foot}
 
 <div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}">
 </div>
-
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 <div class="table-responsive">
     <table id="materialstable" class="table table-hover ccb-table" width="100%">
         <thead>
@@ -237,7 +256,7 @@ ${cpweb_foot}
 
 <template id='cocobox-list'>
     <div data-bind="foreach: parents()">
-        <span data-bind="text: name, click: showFolder"></span><span> > </span>
+        <span data-bind="text: name, click: clickName"></span><span> > </span>
     </div>
     <div data-bind="if: selected().length > 0">
         <span><span data-bind="text: selected().length"></span> selected.</span>
@@ -251,7 +270,7 @@ ${cpweb_foot}
             <thead><th></th><th>Name</th><th>Kind</th></thead>
             <tbody data-bind="foreach: rows">
             <tr data-bind="style: { background: selected() ? '#9090c0' : '#ffffff' }">
-                <td data-bind="click: selectRow" class="selected material-thumbnail"><img data-bind="attr: {src: thumbnail}"></td><td data-bind="text: name, click: showFolder"></td><td data-bind="text: typeTitle"></td>
+                <td data-bind="click: selectRow" class="selected material-thumbnail"><img data-bind="attr: {src: thumbnail}"></td><td data-bind="text: name, click: clickName"></td><td data-bind="text: typeTitle"></td>
             </tr>
             </tbody>
         </table>

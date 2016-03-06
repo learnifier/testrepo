@@ -18,18 +18,10 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
         self.typeTitle = typeTitle;
         self.thumbnail = thumbnail;
         self.selected = ko.observable(false);
-        self.showFolder = function() {
-            console.log("Wtf? ", self);
-            //if(model) {
-            //    model.showFolder(id);
-            //}
-        }
-
         self.selectRow = function(){
             var s = self.selected();
             model.updateSelected(self, !s);
             self.selected(!s);
-            console.log("Klick: ", this);
         };
         return self;
     };
@@ -38,7 +30,7 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
         var self = Item(id, parentId, name, "Folder", "");
         self.folders = folders;
         self.materials = [];
-        self.showFolder = function() {
+        self.clickName = function() {
             if(model) {
                 model.showFolder(id);
             }
