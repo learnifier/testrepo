@@ -2,6 +2,12 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
+var UiLol = function () {
+    var self = this;
+
+};
+
+
 define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) {
 
     "use strict";
@@ -9,6 +15,92 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
     var exports = {};
     function ListModel(params) {
         var model = this, self = this;
+
+        this.dialogContext = ko.observable();
+
+        // ----------------- modal stuff, can this be moved??? -----------------
+
+        this.replaceKoDialog = function (templateName, data, opts) {
+            innerShowKoDialog(templateName, data, opts, false);
+        };
+
+        this.showKoDialog = function (templateName, data, opts) {
+            innerShowKoDialog(templateName, data, opts, true);
+        };
+
+        var innerShowKoDialog = function (templateName, data, opts, activate) {
+
+            if ($("#" + templateName).length === 0) {
+                alert("Knockout template with name " + templateName + " doesn't exist. Unable to show dialog");
+                return;
+            }
+            var dlgOpts = $.extend({}, opts);
+
+            if (!dlgOpts.buttons) {
+                dlgOpts.buttons = [];
+            }
+
+            if (!dlgOpts.title) {
+                dlgOpts.title = "";
+            }
+
+            //Setup default values for all buttons
+            for (var i = 0; i < dlgOpts.buttons.length; i++) {
+                var btn = dlgOpts.buttons[i];
+
+                if (!btn.extraCss) {
+                    btn.extraCss = {};
+                }
+
+                if (typeof btn.enable === "undefined") {
+                    btn.enable = true;
+                }
+
+                btn.enableFn = function (val) {
+                    if (typeof val === "function") {
+                        return val();
+                    } else {
+                        return ko.unwrap(val);
+                    }
+                };
+
+            }
+
+            var ctx = {data: data, name: templateName, opts: dlgOpts};
+
+            try {
+                model.dialogContext(ctx);
+            } catch (e) {
+                alert("Failed to activate modal " + templateName + ": " + e);
+                return;
+            }
+
+            if (activate) {
+                $("#listModal").modal();
+
+                //Use this to let transitions complete
+                $("#listModal").one("hidden.bs.modal", function () {
+                    model.dialogContext(null);
+                });
+            }
+
+        };
+
+        this.runWhenKoDialogClosed = function (fn) {
+            if ($("#listModal").length && $('#listModal').is(':visible')) {
+                $("#listModal").one("hidden.bs.modal", function () {
+                    fn();
+                });
+            } else {
+                fn();
+            }
+        };
+
+        this.hideKoDialog = function () {
+            $("#listModal").modal('hide');
+        };
+
+        // ----------------- end modal stuff ---------------------
 
         // ----------------------------------
         var Item = function(id, parentId, name, typeTitle, thumbnail) {
@@ -92,10 +184,23 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 return [];
             }
         };
-        self.folders = undefined;
         self.folderHash = undefined;
         self.selected = ko.observableArray();
 
+        self.listFolders = function() {
+            var acc = [];
+            function listFoldersInner(prefix, fs) {
+                $.each(fs, function(i, f) {
+                    var path = prefix + "/" + f.name
+                    acc.push({name: path, id: f.id})
+                    if(f.folders()) {
+                        listFoldersInner(path, f.folders());
+                    }
+                });
+            }
+            listFoldersInner("", self.folderHash[1337].folders())
+            return acc;
+        };
 
         self.parents = function() {
             var f = this.selectedFolder(), a = [];
@@ -129,7 +234,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         self.remove = function() {
             var selected = self.selected(),
-                okCount = 0, failCount = 0, msg;
+                okCount = 0, failCount = 0;
 
             if(params.removeFn) {
                 params.removeFn(selected).done(function(res){
@@ -153,6 +258,63 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         };
 
         self.move = function() {
+            var selected = self.selected();
+
+            var PickFolderModel = function() {
+                var self = this;
+
+                self.folder = ko.observable();
+                self.folders = model.listFolders();
+                self.onPick = function() {
+                    console.log("Folder was picked: ", self.folder());
+                };
+                self.selectFolder = function() {
+                    var okCount = 0, failCount = 0;
+                    if(params.moveFn) {
+                        params.moveFn(selected, this.id).done(function(res){
+                            model.clearSelection();
+                            $.each(res, function(i, r) {
+                                if(r.status === "error") {
+                                    failCount++;
+                                } else {
+                                    okCount++;
+                                    //self.selectedFolder().removeChild(r.item); // TODO: Really move
+                                }
+                            });
+                            if(okCount>0) {
+                                CCBMessengerInfo("Moved " + okCount  + " item(s)");
+                            }
+                            if(failCount>0) {
+                                CCBMessengerError("Failed to move " + failCount + " item(s).");
+                            }
+                        });
+                    }
+                };
+            };
+
+            var pickModel = new PickFolderModel();
+
+            self.showKoDialog("folderDialog", pickModel, {
+                title: "Pick a folder",
+                buttons: [{
+                    text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
+                    action: "close",
+                    extraCss: {'btn-link': true}
+                }, {
+                    text: "<span class='pe-7s-check pe-lg pe-va'></span> Move to folder",
+                    action: function(){
+                        self.hideKoDialog();
+                        console.log("Picked: ", pickModel.folder());
+                    },
+                    extraCss: {'btn-primary': true},
+                    enable: function () {
+                        console.log("Model.folder: ", model.folder);
+                        return pickModel.folder;
+                    }
+                }
+                ]
+            });
+
             console.log("Move");
         };
 
@@ -167,7 +329,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         params.getData().done(function(data){
             var folderInfo = parseFolders(data.folders);
             self.folderHash = folderInfo.folderHash;
-            self.folders = folderInfo.folders;
             $.each(data.rows, function(i, item) {
                 var materialFolderId  = item.materialFolderId;
                 var r = new Material(item.id, materialFolderId, item.title, item.typeTitle, item.thumbnail);
@@ -223,7 +384,7 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                         console.log("Remove fn on", items);
                     }
                 }],
-                moveFn: function(items, toFolder) {
+                moveFn: function(items, toFolderId) {
                     var deferred = $.Deferred();
                     window.setTimeout(function(){
                         deferred.resolve($.map(items, function(item){
