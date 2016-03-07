@@ -185,8 +185,15 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                     callback: function(items) {
                         console.log("Remove fn on", items);
                     }
+                }],
+                moveFn: function(from, to) {
+                    console.log("Moving ", from, to);
+                    return true;
+                },
+                removeFn: function(items) {
+                    console.log("Moving ", from, to);
+                    return true;
                 }
-                ]
             }
         };
     }
