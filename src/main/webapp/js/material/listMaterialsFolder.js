@@ -30,7 +30,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         Item.call(this, id, parentId, name, "Folder", "");
         self.folders = ko.observableArray(folders);
         self.materials = ko.observableArray();
-        self.clickName = function() {
+        self.clickName = function(e) {
             if(model) {
                 model.showFolder(id);
             }
