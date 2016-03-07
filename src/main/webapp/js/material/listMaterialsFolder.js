@@ -127,7 +127,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     self.selected.splice(index, 1);
                 }
             }
-        }
+        };
 
         self.clearSelection = function() {
             $.each(self.selected(), function(i, item) {
@@ -138,24 +138,28 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         self.remove = function() {
             var selected = self.selected(),
-                res = params.removeFn(selected), okCount = 0, failCount = 0, msg;
-            self.clearSelection();
-            $.each(res, function(i, r) {
-                if(r.status === "error") {
-                    failCount++;
-                } else {
-                    okCount++;
-                    self.selectedFolder().removeChild(r.item);
-                }
-            });
+                okCount = 0, failCount = 0, msg;
 
-            if(okCount>0) {
-                CCBMessengerInfo("Removed " + okCount);
+            if(params.removeFn) {
+                params.removeFn(selected).done(function(res){
+                    self.clearSelection();
+                    $.each(res, function(i, r) {
+                        if(r.status === "error") {
+                            failCount++;
+                        } else {
+                            okCount++;
+                            self.selectedFolder().removeChild(r.item);
+                        }
+                    });
+
+                    if(okCount>0) {
+                        CCBMessengerInfo("Removed " + okCount  + " item(s)");
+                    }
+                    if(failCount>0) {
+                        CCBMessengerError("Failed to remove " + failCount + " item(s).");
+                    }
+                });
             }
-            if(failCount>0) {
-                CCBMessengerError("Failed to remove " + errorCount);
-            }
-            console.log("Remove");
         };
 
         self.move = function() {
@@ -233,15 +237,24 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                     }
                 }],
                 moveFn: function(items, toFolder) {
-                    console.log("Moving ", items, toFolder);
-                    return true;
+                    return $.map(items, function(item){
+                        return ({ status: "ok", item: item});
+                    });
+                },
+                copyFn: function(items, toFolder) {
+                    return $.map(items, function(item){
+                        return ({ status: "ok", item: item});
+                    });
                 },
                 removeFn: function(items) {
-                    console.log("removeFn callback ", items);
-                    return $.map(items, function(item){
-                        console.log("Creating from ", item);
-                       return ({ status: "ok", item: item});
-                    });
+                    var deferred = $.Deferred();
+                    window.setTimeout(function(){
+                        console.log("Resolving...", items);
+                        deferred.resolve($.map(items, function(item){
+                            return ({ status: "ok", item: item });
+                        }));
+                    }, 500);
+                    return deferred.promise();
                 }
             }
         };
