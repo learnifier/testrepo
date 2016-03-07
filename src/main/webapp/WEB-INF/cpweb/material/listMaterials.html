@@ -260,9 +260,9 @@ ${cpweb_foot}
     </div>
     <div data-bind="if: selected().length > 0">
         <span><span data-bind="text: selected().length"></span> selected.</span>
-        <div class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
-        <div class="btn btn-primary" id="removemultibtn"><span class="glyphicon glyphicon-trash"></span> Remove</div>
-        <div class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-duplicate"></span> Copy</div>
+        <div data-bind="click: move" class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
+        <div data-bind="click: remove" class="btn btn-primary" id="removemultibtn"><span class="glyphicon glyphicon-trash"></span> Remove</div>
+        <div data-bind="click: copy" class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-duplicate"></span> Copy</div>
         <div  data-bind="click: clearSelection" class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-minus-sign"></span> Clear selection</div>
     </div>
     <div class="table-responsive">

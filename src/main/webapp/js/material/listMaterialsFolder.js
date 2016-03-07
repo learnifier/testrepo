@@ -2,7 +2,7 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
+define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) {
 
     "use strict";
 
@@ -35,6 +35,25 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
                 model.showFolder(id);
             }
         }
+
+        self.removeChild = function(child){
+            var a;
+            if(child instanceof Folder) {
+                a = model.selectedFolder().folders;
+            } else {
+                a = model.selectedFolder().materials;
+            }
+            var index = a.indexOf(child);
+            console.log("*** index", a, child, index);
+            if (index > -1) {
+                console.log("*** Before: ", a);
+                a.splice(index, 1);
+                console.log("*** After: ", a);
+                return true;
+            }
+            return false;
+        };
+
         return self;
     };
 
@@ -118,6 +137,38 @@ define("cocobox-list", ['knockout', 'dabox-common'], function (ko) {
             self.selected([]);
         };
 
+        self.remove = function() {
+            var selected = self.selected(),
+                res = params.removeFn(selected), okCount = 0, failCount = 0, msg;
+            self.clearSelection();
+            console.log("Remove fn", res);
+            $.each(res, function(i, r) {
+                console.log("Remove callback");
+                if(r.status === "error") {
+                    failCount++;
+                } else {
+                    okCount++;
+                    self.selectedFolder().removeChild(r.item);
+                }
+            });
+
+            if(okCount>0) {
+                CCBMessengerInfo("Removed " + okCount);
+            }
+            if(failCount>0) {
+                CCBMessengerError("Failed to remove " + errorCount);
+            }
+            console.log("Remove");
+        };
+
+        self.move = function() {
+            console.log("Move");
+        };
+
+        self.copy = function() {
+            console.log("Copy");
+        };
+
         self.showFolder = function(folderId) {
             console.log("showFolder", folderId);
             self.selectedFolder(self.folderHash[folderId]);
@@ -186,13 +237,16 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                         console.log("Remove fn on", items);
                     }
                 }],
-                moveFn: function(from, to) {
-                    console.log("Moving ", from, to);
+                moveFn: function(items, toFolder) {
+                    console.log("Moving ", items, toFolder);
                     return true;
                 },
                 removeFn: function(items) {
-                    console.log("Moving ", from, to);
-                    return true;
+                    console.log("removeFn callback ", items);
+                    return $.map(items, function(item){
+                        console.log("Creating from ", item);
+                       return ({ status: "ok", item: item});
+                    });
                 }
             }
         };
