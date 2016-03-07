@@ -11,7 +11,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
     var model;
 
     var Item = function(id, parentId, name, typeTitle, thumbnail) {
-        var self = {};
+        var self = this;
         self.id = id;
         self.parentId = parentId;
         self.name = name;
@@ -23,13 +23,13 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             model.updateSelected(self, !s);
             self.selected(!s);
         };
-        return self;
     };
 
     var Folder = function (id, parentId, name, folders) {
-        var self = Item(id, parentId, name, "Folder", "");
-        self.folders = folders;
-        self.materials = [];
+        var self = this;
+        Item.call(this, id, parentId, name, "Folder", "");
+        self.folders = ko.observableArray(folders);
+        self.materials = ko.observableArray();
         self.clickName = function() {
             if(model) {
                 model.showFolder(id);
@@ -44,28 +44,23 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 a = model.selectedFolder().materials;
             }
             var index = a.indexOf(child);
-            console.log("*** index", a, child, index);
             if (index > -1) {
-                console.log("*** Before: ", a);
                 a.splice(index, 1);
-                console.log("*** After: ", a);
                 return true;
             }
             return false;
         };
-
-        return self;
     };
 
     function Material(id, parentId, name, typeTitle, thumbnail) {
-        var self = Item(id, parentId, name, typeTitle, thumbnail);
+        var self = this;
+        Item.call(this, id, parentId, name, typeTitle, thumbnail);
         self.name = name;
         self.typeTitle = typeTitle;
 
         self.clickName = function() {
             cocobox.infoDialog("Preview", "Nice material preview here.", function(){});
         }
-        return self;
     };
 
 
@@ -74,12 +69,12 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         function parseFoldersInner(fs, parentId) {
             return $.map(fs, function(f){
-                var nf = Folder(f.id, parentId, f.name, parseFoldersInner(f.folders, f.id));
+                var nf = new Folder(f.id, parentId, f.name, parseFoldersInner(f.folders, f.id));
                 folderHash[f.id] = nf;
                 return nf;
             });
         }
-        var nf = Folder(1337, undefined, "/", parseFoldersInner(json, 1337));
+        var nf = new Folder(1337, undefined, "/", parseFoldersInner(json, 1337));
         folderHash[1337] = nf;
         return {
             folders: nf,
@@ -94,8 +89,15 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         this.name = params.name + "!";
 
         self.selectedFolder = ko.observable();
-        self.rows = ko.observableArray();
-
+        //self.rows = ko.observableArray();
+        self.rows = function(){
+            console.log("Rows: ", self, self.selectedFolder());
+            if(self.selectedFolder()) {
+                return self.selectedFolder().folders().concat(self.selectedFolder().materials());
+            } else {
+                return [];
+            }
+        };
         self.products = undefined;
 
         self.folders = undefined;
@@ -106,7 +108,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         self.parents = function() {
             var f = this.selectedFolder(), a = [];
-            console.log("parents: ", f);
             if(f) {
                 a.push(f);
                 while (f.parentId !== undefined) {
@@ -114,7 +115,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     a.push(f);
                 }
             }
-            console.log("And the result = ", a);
             return a.reverse();
         };
 
@@ -130,7 +130,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         }
 
         self.clearSelection = function() {
-            console.log("Clearselection");
             $.each(self.selected(), function(i, item) {
                 item.selected(false);
             });
@@ -141,9 +140,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             var selected = self.selected(),
                 res = params.removeFn(selected), okCount = 0, failCount = 0, msg;
             self.clearSelection();
-            console.log("Remove fn", res);
             $.each(res, function(i, r) {
-                console.log("Remove callback");
                 if(r.status === "error") {
                     failCount++;
                 } else {
@@ -172,7 +169,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         self.showFolder = function(folderId) {
             console.log("showFolder", folderId);
             self.selectedFolder(self.folderHash[folderId]);
-            self.rows(self.folderHash[folderId].folders.concat(self.folderHash[folderId].materials));
         };
 
         params.getData().done(function(data){
@@ -183,11 +179,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.folders = folderInfo.folders;
             var res = $.map(data.rows, function(item) {
                 var materialFolderId  = item.materialFolderId;
-                var r = Material(item.id, materialFolderId, item.title, item.typeTitle, item.thumbnail);
+                var r = new Material(item.id, materialFolderId, item.title, item.typeTitle, item.thumbnail);
                 if(materialFolderId === null || materialFolderId === undefined) {
                     materialFolderId = 1337;
                 }
-                console.log("self.folderHash[materialFolderId]", materialFolderId, self.folderHash[materialFolderId]);
                 self.folderHash[materialFolderId].materials.push(r);
                 return r;
             });
