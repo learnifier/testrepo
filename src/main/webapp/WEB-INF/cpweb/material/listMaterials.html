@@ -256,7 +256,8 @@ ${cpweb_foot}
 
 <template id='cocobox-list'>
     <div data-bind="foreach: parents()">
-        <span data-bind="text: name, click: clickName"></span><span> > </span>
+        <span data-bind="if: $index()>0" ><span class="glyphicon glyphicon-menu-right"></span><span data-bind="text: name, click: clickName"></span></span>
+        <span data-bind="if: $index()==0, click: clickName"><span class="glyphicon glyphicon-folder-open"></span></span>
     </div>
     <div data-bind="if: selected().length > 0">
         <span><span data-bind="text: selected().length"></span> selected.</span>
