@@ -99,15 +99,16 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 self.selected(!s);
             };
             self.remove = function() {
-                var parent;
-                if(self.parentId === null || self.parentId === undefined) {
-                    parent = model.folderHash[1337];
-                } else {
-                    parent = model.folderHash[self.parentId];
-                }
-                if(parent) {
-                    parent.removeChild(self);
-                }
+                model.removeInner([self]);
+                //var parent;
+                //if(self.parentId === null || self.parentId === undefined) {
+                //    parent = model.folderHash[1337];
+                //} else {
+                //    parent = model.folderHash[self.parentId];
+                //}
+                //if(parent) {
+                //    parent.removeChild(self);
+                //}
             };
 
             self.rename = function() {
@@ -237,7 +238,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 folderHash: folderHash
             };
         }
-        // ----------------------------------
 
         self.selectedFolder = ko.observable();
         self.rows = function(){
@@ -294,21 +294,19 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.selected([]);
         };
 
-        self.remove = function() {
-            var selected = self.selected(),
-                okCount = 0, failCount = 0;
-
-            cocobox.confirmationDialog("Remove", "Are you sure you want to remove " + selected.length + " item(s)?",
+        self.removeInner = function(items){
+            var okCount = 0, failCount = 0;
+            cocobox.confirmationDialog("Remove", "Are you sure you want to remove " + items.length + " item(s)?",
                 function(){
                     if(params.removeFn) {
-                        params.removeFn(selected).done(function(res){
+                        params.removeFn(items).done(function(res){
                             self.clearSelection();
                             $.each(res, function(i, r) {
                                 if(r.status === "error") {
                                     failCount++;
                                 } else {
                                     okCount++;
-                                    self.selectedFolder().removeChild(r.item);
+                                    self.selectedFolder().removeChild(r.item); // Should perhaps not work on selectedfolder but use parent instead?
                                 }
                             });
                             if(okCount>0) {
@@ -321,6 +319,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     }
                 },
                 function(){})
+        };
+
+        self.remove = function() {
+            self.removeInner(self.selected());
         };
 
         self.move = function() {
