@@ -99,8 +99,13 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 model.updateSelected(self, !s);
                 self.selected(!s);
             };
+
             self.remove = function() {
                 model.removeInner([self]);
+            };
+
+            self.move = function() {
+                model.moveInner([self]);
             };
 
             self.rename = function() {
@@ -115,7 +120,8 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 return [
                     {name: "Remove", action: function(item) {item.remove();}},
                     {name: "Rename", action: function(item){item.rename();}},
-                    {name: "Copy", action: function(item){item.copy();} }
+                    {name: "Copy", action: function(item){item.copy();} },
+                    {name: "Move", action: function(item){item.move();} }
                 ]
             }
         };
@@ -384,20 +390,29 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             });
         };
 
-
-
         self.move = function() {
-            var selected = self.selected();
+            self.moveInner(self.selected());
 
+        }
+
+        self.moveInner = function(items) {
             var PickFolderModel = function() {
                 var self = this;
 
                 self.folder = ko.observable();
                 self.folders = model.listFolders();
+
+
                 self.executeMove = function() {
+                    console.log("Recurse check: ", items.indexOf(self.folder()), self.folder(), items);
+                    if(items.indexOf(self.folder()) != -1) {
+                        CCBMessengerError("Can not move folder to itself.");
+                        return;
+                    }
+
                     var okCount = 0, failCount = 0;
                     if(params.moveFn) {
-                        params.moveFn(selected, self.folder().id).done(function(res){
+                        params.moveFn(items, self.folder().id).done(function(res){
                             model.clearSelection();
                             $.each(res, function(i, r) {
                                 if(r.status === "error") {
