@@ -213,9 +213,6 @@ ${cpweb_foot}
     </div>
     <h1 class="page-title">Materials</h1>
 </section>
-<div class="grid-header">
-    [#include 'listToggle.html' /]
-</div>
 
 <div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}">
 </div>
@@ -239,6 +236,9 @@ ${cpweb_foot}
 <br>
 <br>
 <br>
+<div class="grid-header">
+    [#include 'listToggle.html' /]
+</div>
 <div class="table-responsive">
     <table id="materialstable" class="table table-hover ccb-table" width="100%">
         <thead>
@@ -255,6 +255,10 @@ ${cpweb_foot}
 </div>
 
 <template id='cocobox-list'>
+    <div class="ccb-page-header__actions--right">
+        <div class="btn btn-primary" data-bind="click: createFolder"><span class="glyphicon glyphicon-plus-sign"></span> Add Folder</div>
+    </div>
+
     <ol class="breadcrumb" data-bind="foreach: parents()">
         <li><a href="#" data-bind="text: name, click: clickName"></a></li>
     </ol>

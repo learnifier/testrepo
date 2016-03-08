@@ -122,10 +122,12 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         var Folder = function (id, parentId, name, folders) {
             var self = this;
+            console.log("*** create Folder: ", id, parentId, name, folders);
             Item.call(this, id, parentId, name, "Folder", "");
             self.folders = ko.observableArray(folders);
             self.materials = ko.observableArray();
             self.clickName = function(e) {
+                console.log("Click: ", this, id);
                 model.showFolder(id);
             }
 
@@ -159,9 +161,9 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             self.path = function() {
                 if(self.parentId !== undefined) {
-                    return model.folderHash[self.parentId].path() + "/" + self.name;
+                    return model.folderHash[self.parentId].path() + "/" + self.name();
                 }
-                return "/" + self.name;
+                return "/" + self.name();
             };
 
             self.actions = function() {
@@ -292,6 +294,52 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.removeInner(self.selected());
         };
 
+        self.createFolder = function() {
+            var InputStringModel = function(title, oldVal) {
+                var self = this;
+                self.value = ko.observable(oldVal);
+                self.title = title;
+            };
+
+            var createFolder = function(name) {
+                if(params.createFolderFn) {
+                    params.createFolderFn(name, model.selectedFolder().id).done(function(r){
+                        if(r.status === "error") {
+                            CCBMessengerError("Failed to create folder.");
+                        } else {
+                            var newFolder = new Folder(r.item.id, model.selectedFolder().id, r.item.name, []);
+                            console.log("Bfore: ", model.selectedFolder().folders());
+                            console.log("Selected: ", model.selectedFolder());
+                            model.selectedFolder().folders.push(newFolder);
+                            model.folderHash[r.item.id] = newFolder;
+                            console.log("Aftr: ", model.selectedFolder().folders());
+                            CCBMessengerInfo("Created folder.");
+                        }
+                    });
+                }
+            };
+
+            var nameModel = new InputStringModel("Create Folder", "");
+
+            model.modal.show("stringDialog", nameModel, {
+                title: "Create folder",
+                buttons: [{
+                    text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
+                    action: "close",
+                    extraCss: {'btn-link': true}
+                }, {
+                    text: "<span class='pe-7s-check pe-lg pe-va'></span> Create Folder",
+                    action: function(){
+                        console.log("create, name = ", nameModel, nameModel.value());
+                        model.modal.hide();
+                        createFolder(nameModel.value());
+                    },
+                    extraCss: {'btn-primary': true}
+                }
+                ]
+            });
+        };
+
         self.renameInner = function(item) {
             var InputStringModel = function(title, oldVal) {
                 var self = this;
@@ -316,7 +364,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 }
             };
 
-
             var nameModel = new InputStringModel("Rename", item.name());
 
             model.modal.show("stringDialog", nameModel, {
@@ -336,6 +383,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 ]
             });
         };
+
 
 
         self.move = function() {
@@ -377,7 +425,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             var pickModel = new PickFolderModel();
 
-            self.showKoDialog("folderDialog", pickModel, {
+            model.modal.show("folderDialog", pickModel, {
                 title: "Move",
                 buttons: [{
                     text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
@@ -386,7 +434,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 }, {
                     text: "<span class='pe-7s-check pe-lg pe-va'></span> Move to folder",
                     action: function(){
-                        self.hideKoDialog();
+                        model.modal.hide();
                         pickModel.executeMove();
                     },
                     extraCss: {'btn-primary': true},
@@ -504,10 +552,10 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                     }, 500);
                     return deferred.promise();
                 },
-                createFolder: function (name, folderId) {
+                createFolderFn: function (name, folderId) {
                     var deferred = $.Deferred();
                     window.setTimeout(function () {
-                        deferred.resolve({status: "ok", item: item});
+                        deferred.resolve({status: "ok", item: { name: name, id: Math.floor(Math.random() * (10000 - 1000) + 1000)}});
                     }, 500);
                     return deferred.promise();
                 }
