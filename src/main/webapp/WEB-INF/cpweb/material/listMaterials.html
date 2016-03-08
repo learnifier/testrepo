@@ -284,20 +284,21 @@ ${cpweb_foot}
 
             <thead><th></th><th>Name</th><th>Kind</th></thead>
             <tbody data-bind="foreach: rows()">
-            <tr data-bind="click: selectRow, style: { background: selected() ? '#9090c0' : '#ffffff' }">
-                <td class="selected material-thumbnail">
+            <tr data-bind="style: { background: selected() ? '#9090c0' : '#ffffff' }">
+                <td data-bind="click: selectRow" class="selected material-thumbnail">
                     <img data-bind="attr: {src: thumbnail}">
                 </td>
-                <td>
+                <td data-bind="click: selectRow">
                     <span data-bind="text: name, click: clickName, clickBubble: false"></span>
                 </td>
-                <td data-bind="text: typeTitle">
+                <td data-bind="text: typeTitle, click: selectRow">
                 </td>
-                <td class=" row-actions">
+
+                <td class="row-actions">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Actions <span class="caret"></span></button>
+                        <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Actions <span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right" role="menu" data-bind="foreach: actions()">
-                            <li><a data-bind="click: action, text: name" href="#"></a></li>
+                            <li><a data-bind="text: name, click: action" href="#"></a></li>
                         </ul>
                     </div>
                 </td>
