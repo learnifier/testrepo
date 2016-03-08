@@ -201,7 +201,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         self.selected = ko.observableArray();
 
         self.listFolders = function() {
-            var acc = [];
+            var root = self.folderHash[1337], acc = [root];
             function listFoldersInner(fs) {
                 $.each(fs, function(i, f) {
                     acc.push(f);
@@ -210,7 +210,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     }
                 });
             }
-            listFoldersInner(self.folderHash[1337].folders());
+            listFoldersInner(root.folders());
             return acc;
         };
 
