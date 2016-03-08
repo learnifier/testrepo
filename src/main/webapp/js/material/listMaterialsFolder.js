@@ -2,11 +2,6 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-var UiLol = function () {
-    var self = this;
-
-};
-
 
 define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) {
 
@@ -130,11 +125,12 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             }
 
             self.removeChild = function(child){
+                console.log("Removechild", self, child);
                 var a;
                 if(child instanceof Folder) {
-                    a = model.selectedFolder().folders;
+                    a = self.folders;
                 } else {
-                    a = model.selectedFolder().materials;
+                    a = self.materials;
                 }
                 var index = a.indexOf(child);
                 if (index > -1) {
@@ -143,6 +139,22 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 }
                 return false;
             };
+
+            self.addChild = function(child){
+                console.log("Addchild", self, child);
+                var a;
+                if(child instanceof Folder) {
+                    a = self.folders;
+                } else {
+                    a = self.materials;
+                }
+                a.push(child);
+                return false;
+            };
+
+            self.path = function() {
+                return "lol/" + self.name;
+            }
         };
 
         function Material(id, parentId, name, typeTitle, thumbnail) {
@@ -189,16 +201,15 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         self.listFolders = function() {
             var acc = [];
-            function listFoldersInner(prefix, fs) {
+            function listFoldersInner(fs) {
                 $.each(fs, function(i, f) {
-                    var path = prefix + "/" + f.name
-                    acc.push({name: path, id: f.id})
+                    acc.push(f);
                     if(f.folders()) {
-                        listFoldersInner(path, f.folders());
+                        listFoldersInner(f.folders());
                     }
                 });
             }
-            listFoldersInner("", self.folderHash[1337].folders())
+            listFoldersInner(self.folderHash[1337].folders());
             return acc;
         };
 
@@ -265,20 +276,19 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
                 self.folder = ko.observable();
                 self.folders = model.listFolders();
-                self.onPick = function() {
-                    console.log("Folder was picked: ", self.folder());
-                };
-                self.selectFolder = function() {
+                self.executeMove = function() {
+                    console.log("onPick: ", selected, self.folder());
                     var okCount = 0, failCount = 0;
                     if(params.moveFn) {
-                        params.moveFn(selected, this.id).done(function(res){
+                        params.moveFn(selected, self.folder().id).done(function(res){
                             model.clearSelection();
                             $.each(res, function(i, r) {
                                 if(r.status === "error") {
                                     failCount++;
                                 } else {
                                     okCount++;
-                                    //self.selectedFolder().removeChild(r.item); // TODO: Really move
+                                    model.selectedFolder().removeChild(r.item);
+                                    self.folder().addChild(r.item);
                                 }
                             });
                             if(okCount>0) {
@@ -290,12 +300,16 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                         });
                     }
                 };
+
+                self.selectFolder = function() {
+                    self.folder(this);
+                };
             };
 
             var pickModel = new PickFolderModel();
 
             self.showKoDialog("folderDialog", pickModel, {
-                title: "Pick a folder",
+                title: "Move",
                 buttons: [{
                     text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
                     action: "close",
@@ -304,11 +318,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     text: "<span class='pe-7s-check pe-lg pe-va'></span> Move to folder",
                     action: function(){
                         self.hideKoDialog();
-                        console.log("Picked: ", pickModel.folder());
+                        pickModel.executeMove();
                     },
                     extraCss: {'btn-primary': true},
                     enable: function () {
-                        console.log("Model.folder: ", model.folder);
                         return pickModel.folder;
                     }
                 }

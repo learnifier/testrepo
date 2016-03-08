@@ -324,8 +324,8 @@ ${cpweb_foot}
                 <h4 class="modal-title">
                     Pick a folder
                 </h4>
-                <ul data-bind="foreach: folders">
-                    <li data-bind="text: name, click: $parent.selectFolder"></li>
+                <ul class="list-group" data-bind="foreach: folders">
+                    <li class="list-group-item" data-bind="text: path(), click: $parent.selectFolder, css: { active: $parent.folder() == $data }"></li>
                 </ul>
                 </ul>
                 <input type="text" class="form-control center" data-bind="textInput: folder" placeholder="Folder lol">
