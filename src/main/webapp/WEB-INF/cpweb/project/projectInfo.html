@@ -79,12 +79,12 @@
         <div class="ccb-page-header__actions">
             [#if isSubproject ]
                 <form action="${helper.urlFor('project.ProjectModule', 'overview',[project.masterProject])}" method="post">
-                    <button class="btn btn-primary btn-sm" type="button"><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
+                    <button class="btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
                 </form>
             [/#if]
             [#if project.type.ptype == 2]
                 <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
-                    <button class="btn btn-primary btn-sm" type="button"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
+                    <button class="btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
                 </form>
             [/#if]
             [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && canDeleteProject ]
