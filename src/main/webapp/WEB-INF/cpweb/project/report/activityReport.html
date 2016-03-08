@@ -10,11 +10,15 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 </script>
 <script>
-    statusNames = {
-        "notAttempted": "Not Started",
-        "incomplete": "In Progress",
-        "completed": "Completed",
-        "unknown": "Unknown"
+    var statusNames = {
+        "notAttempted": "${ctext('cpweb:extendedstatus.notAttempted')}",
+        "incomplete": "${ctext('cpweb:extendedstatus.incomplete')}",
+        "overdue": "${ctext('cpweb:extendedstatus.overdue')}",
+        "locked": "${ctext('cpweb:extendedstatus.locked')}",
+        "failed": "${ctext('cpweb:extendedstatus.failed')}",
+        "passed": "${ctext('cpweb:extendedstatus.passed')}",
+        "completed": "${ctext('cpweb:extendedstatus.completed')}",
+        "notTracked": "${ctext('cpweb:extendedstatus.notTracked')}"
     };
 
 </script>
@@ -78,7 +82,7 @@ ${cpweb_foot}
                     if (i === 0) {
                         tableColIds.push("activities." + [i] + ".progressPercent");
                     } else {
-                        tableColIds.push("activities." + [i] + ".completionStatus");
+                        tableColIds.push("activities." + [i] + ".extendedStatus");
                     }
                 };
 
@@ -90,7 +94,6 @@ ${cpweb_foot}
 
                     var renderFn;
 
-                    console.log("Definition for", i);
                     if (i === 1) {
                         renderFn = function(data) {
                             if (data === undefined) {
@@ -118,13 +121,14 @@ ${cpweb_foot}
                         "render": renderFn,
                         "createdCell": function(td, data, oData, row, col) {
                             if (oData.activities && oData.activities[col - 1] !== undefined) {
-                                if (oData.activities && oData.activities[col - 1].completionStatus == "notAttempted" ) {
+                                var status = oData.activities && oData.activities[col - 1].extendedStatus;
+                                if (status === "notAttempted" ) {
                                     $(td).addClass('text-danger');
-                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "incomplete" ) {
+                                } else if (status === "incomplete" ) {
                                     $(td).addClass('text-warning');
-                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "completed" ) {
+                                } else if (status === "completed" || status === "passed" || status === "failed") {
                                     $(td).addClass('text-success');
-                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "unknown" ) {
+                                } else if (status === "locked" || status === "notTracked") {
                                       $(td).addClass('text-muted');
                                   }
                             }

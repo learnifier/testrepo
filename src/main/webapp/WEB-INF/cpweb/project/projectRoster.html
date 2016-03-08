@@ -534,28 +534,28 @@ ${cpweb_foot}
 
 
                         if (activityStatus == 'notAttempted') {
-                            var result = '<span class="text-muted">Not started</span>';
+                            var result = '<span class="text-muted">${ctext("cpweb:extendedstatus.notAttempted")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'incomplete') {
-                            var result = '<span class="text-info">In progress</span>';
+                            var result = '<span class="text-info">${ctext("cpweb:extendedstatus.incomplete")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'overdue') {
-                            var result = '<span class="text-danger">Overdue</span>';
+                            var result = '<span class="text-danger">${ctext("cpweb:extendedstatus.overdue")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'locked') {
-                            var result = '<span class="text-muted">Locked</span>';
+                            var result = '<span class="text-muted">${ctext("cpweb:extendedstatus.locked")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'failed') {
-                            var result = '<span class="text-danger">Completed/Failed</span>';
+                            var result = '<span class="text-danger">${ctext("cpweb:extendedstatus.failed")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'passed') {
-                            var result = '<span class="text-success">Completed/Passed</span>';
+                            var result = '<span class="text-success">${ctext("cpweb:extendedstatus.passed")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'completed') {
-                            var result = '<span class="text-success">Completed</span>';
+                            var result = '<span class="text-success">${ctext("cpweb:extendedstatus.completed")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'notTracked') {
-                            var result = '<span class="text-success">Not Tracked</span>';
+                            var result = '<span class="text-success">${ctext("cpweb:extendedstatus.notTracked")}</span>';
                             return new hb.SafeString(result);
                         } else {
                             return 'Unknown statusName:' + activityStatus;

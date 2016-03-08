@@ -35,6 +35,7 @@ import se.dabox.service.common.coursedesign.activity.Activity;
 import se.dabox.service.common.coursedesign.activity.ActivityComponent;
 import se.dabox.service.common.coursedesign.activity.ActivityCourse;
 import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
+import se.dabox.service.common.coursedesign.extstatus.ExtendedStatusFactory;
 import se.dabox.service.common.coursedesign.progress.ProgressType;
 import se.dabox.service.common.coursedesign.project.GetProjectCourseDesignCommand;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
@@ -58,7 +59,9 @@ class ActivityReportBuilder implements StatusSource {
     private final CocoboxCoordinatorClient ccbcClient;
     private final ProjectMaterialCoordinatorClient pmcClient;
     private final DatabankFacade databankFacade;
-    
+    private final ExtendedStatusFactory extendedStatusFactory =
+            new ExtendedStatusFactory();
+
     private List<ProjectParticipation> participants;
     private volatile int completed;
 
@@ -116,7 +119,7 @@ class ActivityReportBuilder implements StatusSource {
         map.put("displayName", userInfo.getDisplayName());
         map.put("email", userInfo.getEmail());
         map.put("userThumbnail", userInfo.getThumbnail());
-        
+
         boolean activated = participant.isActivated();
 
         map.put("activated", activated);
@@ -192,8 +195,9 @@ class ActivityReportBuilder implements StatusSource {
             }
         }
 
-        map.put("overdue", overdue);        
+        map.put("overdue", overdue);
         map.put("progressPercent", progressPercent);
+        map.put("extendedStatus", extendedStatusFactory.statusFor(activity));
 
         return map;
     }
@@ -235,7 +239,7 @@ class ActivityReportBuilder implements StatusSource {
 
         ProductId productId
                 = ComponentUtil.getProductId(component.getBasetype(), component.getSubtype());
-        
+
         if (productId == null) {
             return null;
         }
