@@ -66,26 +66,16 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             }
 
             if (activate) {
-                $("#listModal").modal();
+                $("#listMaterialsModal").modal();
                 //Use this to let transitions complete
-                $("#listModal").one("hidden.bs.modal", function () {
+                $("#listMaterialsModal").one("hidden.bs.modal", function () {
                     model.dialogContext(null);
                 });
             }
         };
 
-        this.runWhenKoDialogClosed = function (fn) {
-            if ($("#listModal").length && $('#listModal').is(':visible')) {
-                $("#listModal").one("hidden.bs.modal", function () {
-                    fn();
-                });
-            } else {
-                fn();
-            }
-        };
-
         this.hideKoDialog = function () {
-            $("#listModal").modal('hide');
+            $("#listMaterialsModal").modal('hide');
         };
 
         // ----------------- end modal stuff ---------------------
