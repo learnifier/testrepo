@@ -280,9 +280,9 @@ ${cpweb_foot}
                 <p>Add material or subfolder now!</p>
             </div>
         </div>
-        <table data-bind="ifnot: rows().length == 0", class="table table-hover ccb-table dataTable no-footer">
+        <table data-bind="ifnot: rows().length == 0" class="table table-hover ccb-table dataTable no-footer">
 
-            <thead><th></th><th>Name</th><th>Kind</th></thead>
+            <thead><tr><th></th><th>Name</th><th>Kind</th></tr></thead>
             <tbody data-bind="foreach: rows()">
             <tr data-bind="style: { background: selected() ? '#9090c0' : '#ffffff' }">
                 <td data-bind="click: selectRow" class="selected material-thumbnail">
@@ -342,7 +342,6 @@ ${cpweb_foot}
                 </h4>
                 <ul class="list-group" data-bind="foreach: folders">
                     <li class="list-group-item" data-bind="text: path(), click: $parent.selectFolder, css: { active: $parent.folder() == $data }"></li>
-                </ul>
                 </ul>
             </div>
 

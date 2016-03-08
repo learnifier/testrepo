@@ -124,7 +124,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             self.actions = function() {
                 return [
-                    {name: "Remove", action: function(){console.log("Single folder remove");} },
+                    {name: "Remove", action: function(){console.log("Single folder remove", this);} },
                     {name: "Rename", action: function(){console.log("Single folder rename");} },
                     {name: "Copy", action: function(){console.log("Single folder copy");} }
                 ];
