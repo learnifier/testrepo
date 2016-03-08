@@ -47,8 +47,10 @@
                                               {{/if}}
                                           </li>
                                           <li class="successStatus pull-right">
-                                              {{#if successStatus }}
-                                                  <span class="row-label">Quiz/test:</span><span class="row-value">{{successStatus}}</span>
+                                              {{#if completed}}
+                                                {{#if successStatus }}
+                                                    <span class="row-label">Quiz/test:</span><span class="row-value">{{successStatus}}</span>
+                                                {{/if}}
                                               {{/if}}
                                           </li>
                                            <!-- Stacking from left from here -->
