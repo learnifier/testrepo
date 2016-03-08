@@ -93,6 +93,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.typeTitle = typeTitle;
             self.thumbnail = thumbnail;
             self.selected = ko.observable(false);
+
             self.selectRow = function(){
                 var s = self.selected();
                 model.updateSelected(self, !s);
@@ -106,11 +107,15 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
               model.renameInner(self);
             };
 
+            self.copy = function() {
+                model.copyInner(self);
+            };
+
             self.superActions = function() { // TODO: Fix inheritance model...
                 return [
                     {name: "Remove", action: function(item) {item.remove();}},
                     {name: "Rename", action: function(item){item.rename();}},
-                    {name: "Copy", action: function(item){console.log("Single folder copy");} }
+                    {name: "Copy", action: function(item){item.copy();} }
                 ]
             }
         };
@@ -393,9 +398,14 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             });
         };
 
-        self.copy = function() {
+        self.copyInner = function(items) {
             cocobox.infoDialog("Copy", "Copy is not implemented yet", function(){});
+        }
+
+        self.copy = function() {
+            self.copyInner(self.selected());
         };
+
 
         self.showFolder = function(folderId) {
             model.clearSelection();
@@ -451,46 +461,53 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
         self.cocoboxListParams = function() {
             return {
                 editMode: settings.editMode,
-                getData: function(){
+                getData: function () {
                     return readData(settings.listUrl);
                 },
                 groupOps: [{
                     html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
-                    callback: function(items) {
+                    callback: function (items) {
                         console.log("Remove fn on", items);
                     }
                 }],
-                moveFn: function(items, toFolderId) {
+                moveFn: function (items, toFolderId) {
                     var deferred = $.Deferred();
-                    window.setTimeout(function(){
-                        deferred.resolve($.map(items, function(item){
-                            return ({ status: "ok", item: item });
+                    window.setTimeout(function () {
+                        deferred.resolve($.map(items, function (item) {
+                            return ({status: "ok", item: item});
                         }));
                     }, 500);
                     return deferred.promise();
                 },
-                copyFn: function(items, toFolder) {
+                copyFn: function (items, toFolder) {
                     var deferred = $.Deferred();
-                    window.setTimeout(function(){
-                        deferred.resolve($.map(items, function(item){
-                            return ({ status: "ok", item: item });
+                    window.setTimeout(function () {
+                        deferred.resolve($.map(items, function (item) {
+                            return ({status: "ok", item: item});
                         }));
                     }, 500);
                     return deferred.promise();
                 },
-                removeFn: function(items) {
+                removeFn: function (items) {
                     var deferred = $.Deferred();
-                    window.setTimeout(function(){
-                        deferred.resolve($.map(items, function(item){
-                            return ({ status: "ok", item: item });
+                    window.setTimeout(function () {
+                        deferred.resolve($.map(items, function (item) {
+                            return ({status: "ok", item: item});
                         }));
                     }, 500);
                     return deferred.promise();
                 },
-                renameFn: function(item, name) {
+                renameFn: function (item, name) {
                     var deferred = $.Deferred();
-                    window.setTimeout(function(){
-                        deferred.resolve({ status: "ok", item: item });
+                    window.setTimeout(function () {
+                        deferred.resolve({status: "ok", item: item});
+                    }, 500);
+                    return deferred.promise();
+                },
+                createFolder: function (name, folderId) {
+                    var deferred = $.Deferred();
+                    window.setTimeout(function () {
+                        deferred.resolve({status: "ok", item: item});
                     }, 500);
                     return deferred.promise();
                 }
