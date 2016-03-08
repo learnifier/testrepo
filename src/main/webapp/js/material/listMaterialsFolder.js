@@ -153,7 +153,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             self.path = function() {
-                return "lol/" + self.name;
+                if(self.parentId !== undefined) {
+                    return model.folderHash[self.parentId].path() + "/" + self.name;
+                }
+                return "/" + self.name;
             }
         };
 
@@ -281,7 +284,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 self.folder = ko.observable();
                 self.folders = model.listFolders();
                 self.executeMove = function() {
-                    console.log("onPick: ", selected, self.folder());
                     var okCount = 0, failCount = 0;
                     if(params.moveFn) {
                         params.moveFn(selected, self.folder().id).done(function(res){
