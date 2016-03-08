@@ -122,6 +122,14 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 model.showFolder(id);
             }
 
+            self.actions = function() {
+                return [
+                    {name: "Remove", action: function(){console.log("Single folder remove");} },
+                    {name: "Rename", action: function(){console.log("Single folder rename");} },
+                    {name: "Copy", action: function(){console.log("Single folder copy");} }
+                ];
+            };
+
             self.removeChild = function(child){
                 console.log("Removechild", self, child);
                 var a;
@@ -166,7 +174,17 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             self.clickName = function() {
                 cocobox.infoDialog("Preview", "Nice material preview here.", function(){});
-            }
+            };
+
+            self.actions = function() {
+                return [
+                    {name: "Remove", action: function(){console.log("Single file remove");} },
+                    {name: "Rename", action: function(){console.log("Single file rename");} },
+                    {name: "Copy", action: function(){console.log("Single file copy");} }
+                ];
+            };
+
+
         };
 
 
