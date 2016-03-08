@@ -17,7 +17,7 @@
 
 <#assign orgName>
     ${(org.displayName)!''}
-    <#if org.clientNo??>
+    <#if (org.clientNo)??>
         <#if org.clientNo != "">
         - (${org.clientNo!""})
         </#if>
