@@ -308,17 +308,17 @@ ${cpweb_foot}
     </div>
 
     <!-- Layout selector -->
-    <div class="modal fade" id="listMaterialsModal" data-bind="if: dialogContext()">
+    <div class="modal fade" id="listMaterialsModal" data-bind="if: modal.dialogContext()">
         <div class="xmodal-dialog-full">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" data-bind="html: dialogContext().opts.title"></h4>
+                    <h4 class="modal-title" data-bind="html: modal.dialogContext().opts.title"></h4>
                 </div>
-                <div class="modal-body" data-bind="template: {name: dialogContext().name, data: dialogContext().data}">
+                <div class="modal-body" data-bind="template: {name: modal.dialogContext().name, data: modal.dialogContext().data}">
 
                 </div>
-                <div class="modal-footer" data-bind="foreach: dialogContext().opts.buttons">
+                <div class="modal-footer" data-bind="foreach: modal.dialogContext().opts.buttons">
                     <!-- ko if: action === "close" -->
                     <button type="button" class="btn" data-dismiss="modal" data-bind="html: text, css: extraCss, enable: enable">Close</button>
                     <!-- /ko -->

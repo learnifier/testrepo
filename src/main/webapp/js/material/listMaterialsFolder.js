@@ -8,15 +8,18 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
     "use strict";
 
     var exports = {};
-    function ListModel(params) {
-        var model = this, self = this;
 
-        this.dialogContext = ko.observable();
+    function Modal(element) {
+        var self = this;
 
-        // ----------------- modal stuff, should be moved -----------------
+        self.dialogContext = ko.observable();
 
-        this.showKoDialog = function (templateName, data, opts) {
+        self.show = function (templateName, data, opts) {
             innerShowKoDialog(templateName, data, opts, true);
+        };
+
+        this.hide = function () {
+            element.modal('hide');
         };
 
         var innerShowKoDialog = function (templateName, data, opts, activate) {
@@ -59,28 +62,29 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             var ctx = {data: data, name: templateName, opts: dlgOpts};
             try {
-                model.dialogContext(ctx);
+                self.dialogContext(ctx);
             } catch (e) {
                 alert("Failed to activate modal " + templateName + ": " + e);
                 return;
             }
 
             if (activate) {
-                $("#listMaterialsModal").modal();
+                element.modal();
                 //Use this to let transitions complete
-                $("#listMaterialsModal").one("hidden.bs.modal", function () {
-                    model.dialogContext(null);
+                element.one("hidden.bs.modal", function () {
+                    self.dialogContext(null);
                 });
             }
         };
 
-        this.hideKoDialog = function () {
-            $("#listMaterialsModal").modal('hide');
-        };
+    }
 
-        // ----------------- end modal stuff ---------------------
+    function ListModel(params) {
+        var model = this, self = this;
 
-        // ----------------------------------
+
+        self.modal = new Modal($("#listMaterialsModal")); // Document ready?
+
         var Item = function(id, parentId, name, typeTitle, thumbnail) {
             var self = this;
             self.id = id;
@@ -119,7 +123,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
                 var nameModel = new InputStringModel("Rename", self.name());
 
-                model.showKoDialog("stringDialog", nameModel, {
+                model.modal.show("stringDialog", nameModel, {
                     title: "Rename it",
                     buttons: [{
                         text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
@@ -128,7 +132,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     }, {
                         text: "<span class='pe-7s-check pe-lg pe-va'></span> Rename",
                         action: function(){
-                            model.hideKoDialog();
+                            model.modal.hide();
                             console.log("nameModel.value() = ", nameModel.value());
                             self.name(nameModel.value());
                         },
