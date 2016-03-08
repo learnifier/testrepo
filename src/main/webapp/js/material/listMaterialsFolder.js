@@ -327,12 +327,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 }
                 ]
             });
-
-            console.log("Move");
         };
 
         self.copy = function() {
-            console.log("Copy");
+            cocobox.infoDialog("Copy", "Copy is not implemented yet", function(){});
         };
 
         self.showFolder = function(folderId) {
