@@ -298,6 +298,20 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 };
             };
 
+            var setName = function(name) {
+                if(params.renameFn) {
+                    params.renameFn(item, name).done(function(r){
+                        if(r.status === "error") {
+                            CCBMessengerError("Failed to rename.");
+                        } else {
+                            item.name(name);
+                            CCBMessengerInfo("Rename succeeded");
+                        }
+                    });
+                }
+            };
+
+
             var nameModel = new InputStringModel("Rename", item.name());
 
             model.modal.show("stringDialog", nameModel, {
@@ -310,8 +324,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     text: "<span class='pe-7s-check pe-lg pe-va'></span> Rename",
                     action: function(){
                         model.modal.hide();
-                        console.log("nameModel.value() = ", nameModel.value());
-                        item.name(nameModel.value());
+                        setName(nameModel.value());
                     },
                     extraCss: {'btn-primary': true}
                 }
@@ -473,7 +486,15 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                         }));
                     }, 500);
                     return deferred.promise();
+                },
+                renameFn: function(item, name) {
+                    var deferred = $.Deferred();
+                    window.setTimeout(function(){
+                        deferred.resolve({ status: "ok", item: item });
+                    }, 500);
+                    return deferred.promise();
                 }
+
             }
         };
     }
