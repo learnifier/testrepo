@@ -247,25 +247,29 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             var selected = self.selected(),
                 okCount = 0, failCount = 0;
 
-            if(params.removeFn) {
-                params.removeFn(selected).done(function(res){
-                    self.clearSelection();
-                    $.each(res, function(i, r) {
-                        if(r.status === "error") {
-                            failCount++;
-                        } else {
-                            okCount++;
-                            self.selectedFolder().removeChild(r.item);
-                        }
-                    });
-                    if(okCount>0) {
-                        CCBMessengerInfo("Removed " + okCount  + " item(s)");
+            cocobox.confirmationDialog("Remove", "Are you sure you want to remove " + selected.length + " item(s)?",
+                function(){
+                    if(params.removeFn) {
+                        params.removeFn(selected).done(function(res){
+                            self.clearSelection();
+                            $.each(res, function(i, r) {
+                                if(r.status === "error") {
+                                    failCount++;
+                                } else {
+                                    okCount++;
+                                    self.selectedFolder().removeChild(r.item);
+                                }
+                            });
+                            if(okCount>0) {
+                                CCBMessengerInfo("Removed " + okCount  + " item(s)");
+                            }
+                            if(failCount>0) {
+                                CCBMessengerError("Failed to remove " + failCount + " item(s).");
+                            }
+                        });
                     }
-                    if(failCount>0) {
-                        CCBMessengerError("Failed to remove " + failCount + " item(s).");
-                    }
-                });
-            }
+                },
+                function(){})
         };
 
         self.move = function() {
