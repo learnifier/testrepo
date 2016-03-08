@@ -789,8 +789,8 @@ ${cpweb_head}
         [@genOptions group=sg level=level+1 prefix=prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"][/@genOptions]
     [/#list]
 [/#macro]
-[#macro genGroupSelect groups selectId]
-    <select id="${selectId}" style="margin-bottom: 10px; min-width:200px !important;">
+[#macro genGroupSelect groups selectId extraStyle=""]
+    <select id="${selectId}" style="${extraStyle}">
         <option value=""></option>
         [#list groups as g]
         [@genOptions group=g level=0 prefix=""][/@genOptions]
@@ -835,18 +835,18 @@ ${cpweb_head}
         </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="group">
-        <div class="row">
-            <div class="col-sm-6 col-lg-6">
-                [@genGroupSelect groups=groups selectId="addByGroup"][/@genGroupSelect]
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-6 col-lg-4">
+                    [@genGroupSelect groups=groups selectId="addByGroup" extraStyle="width: 100%;"][/@genGroupSelect]
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="form-group">
+            <div class="form-group">
+                <div class="col-sm-6 col-lg-4">
                     <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="uploadroster">
       [#include "rosterUpload.html" /]
@@ -888,7 +888,7 @@ ${cpweb_head}
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         [/@]
-        [@genGroupSelect groups=groups selectId="markByGroup"][/@genGroupSelect]
+        [@genGroupSelect groups=groups selectId="markByGroup" extraStyle="margin-bottom: 10px; min-width:200px !important;"][/@genGroupSelect]
 
 
         [#include "projectRosterCalendarActivatedSection.html" /]
