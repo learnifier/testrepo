@@ -102,7 +102,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             var self = this;
             self.id = id;
             self.parentId = parentId;
-            self.name = name;
+            self.name = ko.observable(name);
             self.typeTitle = typeTitle;
             self.thumbnail = thumbnail;
             self.selected = ko.observable(false);
@@ -124,14 +124,16 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             self.rename = function() {
-                self.name = "lol";
+                console.log("Rename: ", self);
+                console.log("Rename: ", self.name());
+                self.name("lol");
             };
 
             self.superActions = function() { // TODO: Fix inheritance model...
                 return [
                     {name: "Remove", action: function(item) {item.remove();}},
-                    {name: "Rename", action: function(){console.log("Single folder rename");} },
-                    {name: "Copy", action: function(){console.log("Single folder copy");} }
+                    {name: "Rename", action: function(item){item.rename();}},
+                    {name: "Copy", action: function(item){console.log("Single folder copy");} }
                 ]
             }
         };
@@ -188,7 +190,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         function Material(id, parentId, name, typeTitle, thumbnail) {
             var self = this;
             Item.call(this, id, parentId, name, typeTitle, thumbnail);
-            self.name = name;
             self.typeTitle = typeTitle;
 
             self.clickName = function() {
