@@ -100,48 +100,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
             self.remove = function() {
                 model.removeInner([self]);
-                //var parent;
-                //if(self.parentId === null || self.parentId === undefined) {
-                //    parent = model.folderHash[1337];
-                //} else {
-                //    parent = model.folderHash[self.parentId];
-                //}
-                //if(parent) {
-                //    parent.removeChild(self);
-                //}
             };
 
             self.rename = function() {
-                var InputStringModel = function(title, oldVal) {
-                    var self = this;
-                    self.value = ko.observable(oldVal);
-                    self.title = title;
-
-                    self.selectFolder = function() {
-                        self.folder(this);
-                    };
-                };
-
-                var nameModel = new InputStringModel("Rename", self.name());
-
-                model.modal.show("stringDialog", nameModel, {
-                    title: "Rename it",
-                    buttons: [{
-                        text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
-                        action: "close",
-                        extraCss: {'btn-link': true}
-                    }, {
-                        text: "<span class='pe-7s-check pe-lg pe-va'></span> Rename",
-                        action: function(){
-                            model.modal.hide();
-                            console.log("nameModel.value() = ", nameModel.value());
-                            self.name(nameModel.value());
-                        },
-                        extraCss: {'btn-primary': true}
-                    }
-                    ]
-                });
-
+              model.renameInner(self);
             };
 
             self.superActions = function() { // TODO: Fix inheritance model...
@@ -324,6 +286,39 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         self.remove = function() {
             self.removeInner(self.selected());
         };
+
+        self.renameInner = function(item) {
+            var InputStringModel = function(title, oldVal) {
+                var self = this;
+                self.value = ko.observable(oldVal);
+                self.title = title;
+
+                self.selectFolder = function() {
+                    self.folder(this);
+                };
+            };
+
+            var nameModel = new InputStringModel("Rename", item.name());
+
+            model.modal.show("stringDialog", nameModel, {
+                title: "Rename it",
+                buttons: [{
+                    text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
+                    action: "close",
+                    extraCss: {'btn-link': true}
+                }, {
+                    text: "<span class='pe-7s-check pe-lg pe-va'></span> Rename",
+                    action: function(){
+                        model.modal.hide();
+                        console.log("nameModel.value() = ", nameModel.value());
+                        item.name(nameModel.value());
+                    },
+                    extraCss: {'btn-primary': true}
+                }
+                ]
+            });
+        };
+
 
         self.move = function() {
             var selected = self.selected();
