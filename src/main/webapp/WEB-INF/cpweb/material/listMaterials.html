@@ -298,7 +298,7 @@ ${cpweb_foot}
                     <div class="btn-group">
                         <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Actions <span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right" role="menu" data-bind="foreach: actions()">
-                            <li><a data-bind="text: name, click: action" href="#"></a></li>
+                            <li><a data-bind="text: name, click: function(){action($parent)}" href="#"></a></li>
                         </ul>
                     </div>
                 </td>

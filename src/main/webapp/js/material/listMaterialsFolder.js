@@ -111,6 +111,29 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 model.updateSelected(self, !s);
                 self.selected(!s);
             };
+            self.remove = function() {
+                var parent;
+                if(self.parentId === null || self.parentId === undefined) {
+                    parent = model.folderHash[1337];
+                } else {
+                    parent = model.folderHash[self.parentId];
+                }
+                if(parent) {
+                    parent.removeChild(self);
+                }
+            };
+
+            self.rename = function() {
+                self.name = "lol";
+            };
+
+            self.superActions = function() { // TODO: Fix inheritance model...
+                return [
+                    {name: "Remove", action: function(item) {item.remove();}},
+                    {name: "Rename", action: function(){console.log("Single folder rename");} },
+                    {name: "Copy", action: function(){console.log("Single folder copy");} }
+                ]
+            }
         };
 
         var Folder = function (id, parentId, name, folders) {
@@ -121,14 +144,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.clickName = function(e) {
                 model.showFolder(id);
             }
-
-            self.actions = function() {
-                return [
-                    {name: "Remove", action: function(){console.log("Single folder remove", this);} },
-                    {name: "Rename", action: function(){console.log("Single folder rename");} },
-                    {name: "Copy", action: function(){console.log("Single folder copy");} }
-                ];
-            };
 
             self.removeChild = function(child){
                 console.log("Removechild", self, child);
@@ -163,7 +178,11 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     return model.folderHash[self.parentId].path() + "/" + self.name;
                 }
                 return "/" + self.name;
-            }
+            };
+
+            self.actions = function() {
+                return self.superActions();
+            };
         };
 
         function Material(id, parentId, name, typeTitle, thumbnail) {
@@ -177,11 +196,9 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             self.actions = function() {
-                return [
-                    {name: "Remove", action: function(){console.log("Single file remove");} },
-                    {name: "Rename", action: function(){console.log("Single file rename");} },
-                    {name: "Copy", action: function(){console.log("Single file copy");} }
-                ];
+                return self.superActions().concat([
+                    {name: "Edit", action: function(){console.log("Edit material");} },
+                ]);
             };
 
 
