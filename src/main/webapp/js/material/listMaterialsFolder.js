@@ -13,11 +13,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         this.dialogContext = ko.observable();
 
-        // ----------------- modal stuff, can this be moved??? -----------------
-
-        this.replaceKoDialog = function (templateName, data, opts) {
-            innerShowKoDialog(templateName, data, opts, false);
-        };
+        // ----------------- modal stuff, should be moved -----------------
 
         this.showKoDialog = function (templateName, data, opts) {
             innerShowKoDialog(templateName, data, opts, true);
@@ -62,7 +58,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             }
 
             var ctx = {data: data, name: templateName, opts: dlgOpts};
-
             try {
                 model.dialogContext(ctx);
             } catch (e) {
@@ -72,13 +67,11 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             if (activate) {
                 $("#listModal").modal();
-
                 //Use this to let transitions complete
                 $("#listModal").one("hidden.bs.modal", function () {
                     model.dialogContext(null);
                 });
             }
-
         };
 
         this.runWhenKoDialogClosed = function (fn) {
@@ -124,9 +117,36 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             self.rename = function() {
-                console.log("Rename: ", self);
-                console.log("Rename: ", self.name());
-                self.name("lol");
+                var InputStringModel = function(title, oldVal) {
+                    var self = this;
+                    self.value = ko.observable(oldVal);
+                    self.title = title;
+
+                    self.selectFolder = function() {
+                        self.folder(this);
+                    };
+                };
+
+                var nameModel = new InputStringModel("Rename", self.name());
+
+                model.showKoDialog("stringDialog", nameModel, {
+                    title: "Rename it",
+                    buttons: [{
+                        text: "<span class='pe-7s-close pe-lg pe-va'></span> Close",
+                        action: "close",
+                        extraCss: {'btn-link': true}
+                    }, {
+                        text: "<span class='pe-7s-check pe-lg pe-va'></span> Rename",
+                        action: function(){
+                            model.hideKoDialog();
+                            console.log("nameModel.value() = ", nameModel.value());
+                            self.name(nameModel.value());
+                        },
+                        extraCss: {'btn-primary': true}
+                    }
+                    ]
+                });
+
             };
 
             self.superActions = function() { // TODO: Fix inheritance model...
