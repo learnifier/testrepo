@@ -167,7 +167,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     return nf;
                 });
             }
-            var nf = new Folder(1337, undefined, "/", parseFoldersInner(json, 1337));
+            var nf = new Folder(1337, undefined, "home", parseFoldersInner(json, 1337));
             folderHash[1337] = nf;
             return {
                 folders: nf,

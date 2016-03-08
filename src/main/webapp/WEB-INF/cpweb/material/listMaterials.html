@@ -255,10 +255,9 @@ ${cpweb_foot}
 </div>
 
 <template id='cocobox-list'>
-    <div data-bind="foreach: parents()">
-        <span data-bind="if: $index()>0" ><span class="glyphicon glyphicon-menu-right"></span><span data-bind="text: name, click: clickName"></span></span>
-        <span data-bind="if: $index()==0, click: clickName"><span class="glyphicon glyphicon-folder-open"></span></span>
-    </div>
+    <ol class="breadcrumb" data-bind="foreach: parents()">
+        <li><a href="#" data-bind="text: name, click: clickName"></a></li>
+    </ol>
     <div data-bind="if: selected().length > 0">
         <span><span data-bind="text: selected().length"></span> selected.</span>
         <div data-bind="click: move" class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
@@ -294,7 +293,7 @@ ${cpweb_foot}
 
     <!-- Layout selector -->
     <div class="modal fade" id="listModal" data-bind="if: dialogContext()">
-        <div class="modal-dialog-full">
+        <div class="xmodal-dialog-full">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
