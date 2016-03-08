@@ -119,9 +119,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.folders = ko.observableArray(folders);
             self.materials = ko.observableArray();
             self.clickName = function(e) {
-                if(model) {
-                    model.showFolder(id);
-                }
+                model.showFolder(id);
             }
 
             self.removeChild = function(child){
@@ -340,6 +338,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         };
 
         self.showFolder = function(folderId) {
+            model.clearSelection();
             self.selectedFolder(self.folderHash[folderId]);
         };
 
