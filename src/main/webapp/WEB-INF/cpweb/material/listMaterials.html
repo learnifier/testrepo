@@ -206,40 +206,12 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
-<section class="ccb-page-header margin-bottom">
-    <div class="ccb-page-header__actions--right">
-        [@addAnonProd.addButton /]
-        <div class="btn btn-primary" id="addfolderbtn"><span class="glyphicon glyphicon-plus-sign"></span> Add Folder</div>
-    </div>
-    <h1 class="page-title">Materials</h1>
-</section>
-<div class="grid-header">
-    [#include 'listToggle.html' /]
-</div>
+[@addAnonProd.addButton /]
 
-<div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}">
-</div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<div class="table-responsive">
+<div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}"></div>
+
+
+<div class="table-responsive" style="margin-top: 50px;">
     <table id="materialstable" class="table table-hover ccb-table" width="100%">
         <thead>
             <tr>
@@ -255,26 +227,125 @@ ${cpweb_foot}
 </div>
 
 <template id='cocobox-list'>
-    <div data-bind="foreach: parents()">
-        <span data-bind="text: name, click: clickName"></span><span> > </span>
+<section class="ccb-page-header margin-bottom">
+    <div class="ccb-page-header__actions--right">
+        <div class="btn btn-primary" data-bind="click: createFolder"><span class="glyphicon glyphicon-plus-sign"></span> Add Folder</div>
     </div>
+    <h1 class="page-title">Materials</h1>
+</section>
+
+<section class="ccb-folder-list margin-bottom">
+    <ol class="breadcrumb" data-bind="foreach: parents()">
+        <li><a href="#" data-bind="text: name, click: clickName"></a></li>
+    </ol>
     <div data-bind="if: selected().length > 0">
-        <span><span data-bind="text: selected().length"></span> selected.</span>
-        <div class="btn btn-primary" id="movemultibtn"><span class="glyphicon glyphicon-grain"></span> Move</div>
-        <div class="btn btn-primary" id="removemultibtn"><span class="glyphicon glyphicon-trash"></span> Remove</div>
-        <div class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-duplicate"></span> Copy</div>
-        <div  data-bind="click: clearSelection" class="btn btn-primary" id="copymultibtn"><span class="glyphicon glyphicon-minus-sign"></span> Clear selection</div>
+        <div class="ccb-table-list-actions">
+            <div data-bind="click: copy" class="btn btn-primary btn-sm" id="copymultibtn"><span class="glyphicon glyphicon-duplicate"></span> Copy</div>
+            <div data-bind="click: move" class="btn btn-primary btn-sm" id="movemultibtn"><span class="glyphicon glyphicon-share"></span> Move</div>
+            <div data-bind="click: remove" class="btn btn-primary btn-sm" id="removemultibtn"><span class="glyphicon glyphicon-trash"></span> Remove</div>
+            <div  data-bind="click: clearSelection" class="btn btn-primary-outlined btn-sm" id="copymultibtn"><span class="glyphicon glyphicon-minus-sign"></span> Clear selection</div>
+            <div class="btn btn-sm"><span data-bind="text: selected().length"></span> items selected</div>
+        </div>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover ccb-table dataTable no-footer">
-            <thead><th></th><th>Name</th><th>Kind</th></thead>
-            <tbody data-bind="foreach: rows">
-            <tr data-bind="style: { background: selected() ? '#9090c0' : '#ffffff' }">
-                <td data-bind="click: selectRow" class="selected material-thumbnail"><img data-bind="attr: {src: thumbnail}"></td><td data-bind="text: name, click: clickName"></td><td data-bind="text: typeTitle"></td>
+        <div data-bind="if: rows().length == 0 && parents().length <= 1">
+            <div class="text-center">
+                <span class="pe-7s-plus pe-5x primaryColor"></span>
+                <h1>Nothing here...</h1>
+                <p>Add your first folder or material now!</p>
+            </div>
+        </div>
+        <div data-bind="if: rows().length == 0 && parents().length > 1">
+            <div class="text-center">
+                <span class="pe-7s-folder pe-5x primaryColor"></span>
+                <h1>Empty folder...</h1>
+                <p>Add material or subfolder now!</p>
+            </div>
+        </div>
+        <table data-bind="ifnot: rows().length == 0" class="table table-hover ccb-table">
+
+            <thead data-bind="ifnot: selected().length > 0" ><tr><th></th><th>Name</th><th>Kind</th><th>Updated</th><th></th></tr></thead>
+            <tbody data-bind="foreach: rows()">
+            <tr data-bind="style: { background: selected() ? '#ccc' : '' }">
+                <td data-bind="click: selectRow" class="material-thumbnail">
+                    <a class="block-link" data-bind="click: clickName, clickBubble: false" href=""><img data-bind="attr: {src: thumbnail}"></a>
+                </td>
+                <td data-bind="click: selectRow">
+                    <a data-bind="text: name, click: clickName, clickBubble: false" href=""></a>
+                </td>
+                <td data-bind="text: typeTitle, click: selectRow">
+                </td>
+                <td data-bind="click: selectRow">
+                    3 minutes ago
+                </td>
+
+                <td class="row-actions">
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Actions <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu" data-bind="foreach: actions()">
+                            <li><a data-bind="text: name, click: function(){action($parent)}" href="#"></a></li>
+                        </ul>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- Layout selector -->
+    <div class="modal fade" id="listMaterialsModal" data-bind="if: modal.dialogContext()">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" data-bind="html: modal.dialogContext().opts.title"></h4>
+                </div>
+                <div class="modal-body" data-bind="template: {name: modal.dialogContext().name, data: modal.dialogContext().data}">
+
+                </div>
+                <div class="modal-footer" data-bind="foreach: modal.dialogContext().opts.buttons">
+                    <!-- ko if: action === "close" -->
+                    <button type="button" class="btn" data-dismiss="modal" data-bind="html: text, css: extraCss, enable: enable">Close</button>
+                    <!-- /ko -->
+                    <!-- ko ifnot: action === "close" -->
+                    <button type="button" class="btn btn-primary" data-bind="click: action, html: text, css: extraCss, enable: enableFn(enable)">Save changes</button>
+                    <!-- /ko -->
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <script type="text/html" id="folderDialog">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8 center">
+                <h4 class="modal-title">
+                    Pick a destination folder:
+                </h4>
+                <ul class="list-group" data-bind="foreach: folders">
+                    <li class="list-group-item" data-bind="text: path(), click: $parent.selectFolder, css: { active: $parent.folder() == $data }"></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </script>
+
+
+    <script type="text/html" id="stringDialog">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8 center">
+                <label for="string" data-bind="text: title"></label>
+                <input type="text" class="form-control" id="string" data-bind="value: value">
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </script>
 </template>
+
 
 [/@dws.skin]
