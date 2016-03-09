@@ -236,7 +236,7 @@ ${cpweb_foot}
 
 <section class="ccb-folder-list margin-bottom">
     <ol class="breadcrumb" data-bind="foreach: parents()">
-        <li><a href="#" data-bind="text: name, click: clickName"></a></li>
+        <li><a href="#" data-bind="text: name, click: clickFolder"></a></li>
     </ol>
     <div data-bind="if: selected().length > 0">
         <div class="ccb-table-list-actions">
@@ -270,16 +270,27 @@ ${cpweb_foot}
             </tr>
             </thead>
             <tbody data-bind="foreach: rows()">
-            <tr data-bind="foreach: $parent.params.columns, style: { background: selected() ? '#ccc' : '' }">
-                <td data-bind="html: $parents[1].runFormat($parent, $data), css: cssClass"></td>
+            <tr data-bind="style: { background: selected() ? '#ccc' : '' }, click: selectRow">
+                <!-- ko foreach: $parent.params.columns -->
+                <td><span data-bind="html: $parents[1].runFormat($parent, $data), css: cssClass, click: function(){$parent.clickCell($data)}"></span></td>
+                <!-- /ko -->
+                <td class="row-actions">
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Actions <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu" data-bind="foreach: actions()">
+                            <li><a data-bind="text: name, click: function(){action($parent)}" href="#"></a></li>
+                        </ul>
+                    </div>
+                </td>
             </tr>
+            <!--
             <tr data-bind="style: { background: selected() ? '#ccc' : '' }">
                 <td data-bind="click: selectRow" class="material-thumbnail">
                     <a class="block-link" data-bind="click: clickName, clickBubble: false" href=""><img data-bind="attr: {src: thumbnail}"></a>
                 </td>
                 <td data-bind="click: selectRow">
                     <a data-bind="text: name, click: clickName, clickBubble: false" href=""></a>
-                </td>
+                </td>c
                 <td data-bind="text: typeTitle, click: selectRow">
                 </td>
                 <td data-bind="click: selectRow">
@@ -295,6 +306,7 @@ ${cpweb_foot}
                     </div>
                 </td>
             </tr>
+            -->
             </tbody>
         </table>
     </div>

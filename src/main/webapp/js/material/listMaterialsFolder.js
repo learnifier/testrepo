@@ -83,9 +83,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         var model = this, self = this;
 
         self.runFormat = function(rowData, cellConfig) {
-            console.log("runFormat this: ", this);
-            console.log("runFormat rowData: ", rowData);
-            console.log("runFormat cellConfig: ", cellConfig);
             return cellConfig.format(rowData[cellConfig.name]);
         };
         self.params = params;
@@ -138,10 +135,18 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             Item.call(this, id, parentId, name, "Folder", "");
             self.folders = ko.observableArray(folders);
             self.materials = ko.observableArray();
-            self.clickName = function(e) {
-                console.log("Click: ", this, id);
+            self.clickCell = function(cellCfg) {
+                if(cellCfg.name == model.params.nameField) { // Special case: When clicking name we change folder
+                    model.showFolder(id);
+                } else {
+                    if(cellCfg.clickFn) {
+                        cellCfg.clickFn(this);
+                    }
+                }
+            };
+            self.clickFolder = function() {
                 model.showFolder(id);
-            }
+            };
 
             self.removeChild = function(child){
                 var a;
@@ -186,8 +191,11 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             Item.call(this, id, parentId, name, typeTitle, thumbnail);
             self.typeTitle = typeTitle;
 
-            self.clickName = function() {
-                cocobox.infoDialog("Preview", "Nice material preview here.", function(){});
+            self.clickCell = function(cellCfg) {
+                console.log("Other case: ", cellCfg);
+                if(cellCfg.clickFn) {
+                    cellCfg.clickFn(this);
+                }
             };
 
             self.actions = function() {
@@ -416,8 +424,8 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     }
 
                     var okCount = 0, failCount = 0;
-                    if(self.params.moveFn) {
-                        self.params.moveFn(items, self.folder().id).done(function(res){
+                    if(model.params.moveFn) {
+                        model.params.moveFn(items, self.folder().id).done(function(res){
                             model.clearSelection();
                             $.each(res, function(i, r) {
                                 if(r.status === "error") {
@@ -520,6 +528,7 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
             var deferred = $.Deferred();
             $.getJSON(url).done(function(data){
                 // TODO: Handle errors
+                console.log("data", data);
                 deferred.resolve({ rows: data.aaData, folders: data.folders});
             });
             return deferred.promise();
@@ -533,13 +542,15 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                     return readData(settings.listUrl);
                 },
                 idField: "id", // TODO: Not used
-                nameField: "name",  // TODO: Not used
+                nameField: "name",
                 typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "", name: "thumbnail", format: function(val){return '<img src="' + val + '">'}, cssClass: "material-thumbnail"},
-                    { label: "Name", name: "name", format: function(val){return val;}, cssClass: ""},
-                    { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: ""},
-                    { label: "Updated", name: undefined, format: function(val){return "Eons ago"}, cssClass: ""},
+                    { label: "", name: "thumbnail", format: function(val){return '<img src="' + val + '">'}, cssClass: "material-thumbnail",
+                        clickFn: function(){alert("Thumbnnail lolclick")}},
+                    { label: "Name", name: "name", format: function(val){return "<a>" + val() + "</a>";}, cssClass: "block-link",
+                      clickFn: function(){alert("Material preview goes here")}},
+                    { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
+                    { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null},
                 ],
                 groupOps: [{
                     html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',

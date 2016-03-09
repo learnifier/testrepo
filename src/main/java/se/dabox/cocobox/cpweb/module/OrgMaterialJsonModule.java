@@ -51,6 +51,7 @@ import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
+import se.dabox.service.common.UserTimestamp;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.material.MaterialLink;
@@ -844,6 +845,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                     if (adminLink != null) {
                         generator.writeStringField("adminLink", adminLink);
                         generator.writeStringField("adminLinkTitle", "Administrate");
+                    }
+                    if(product.getUpdated() != null && product.getUpdated().getTimestamp() != null) {
+                        writeDateField("updated", Date.from(product.getUpdated().getTimestamp()));
                     }
                 }
 
