@@ -271,7 +271,7 @@ ${cpweb_foot}
             </thead>
             <tbody data-bind="foreach: rows()">
             <tr data-bind="foreach: $parent.params.columns, style: { background: selected() ? '#ccc' : '' }">
-                <td data-bind="html: $parents[1].runFormat($parent, $data)"></td> <!-- function(){return format($parent[name]);} -->
+                <td data-bind="html: $parents[1].runFormat($parent, $data), css: cssClass"></td>
             </tr>
             <tr data-bind="style: { background: selected() ? '#ccc' : '' }">
                 <td data-bind="click: selectRow" class="material-thumbnail">

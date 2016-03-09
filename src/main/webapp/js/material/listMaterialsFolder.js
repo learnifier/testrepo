@@ -536,10 +536,10 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                 nameField: "name",  // TODO: Not used
                 typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "Thumbnail", name: "thumbnail", format: function(val){return '<img src="' + val + '">'}, class: "material-thumbnail"},
-                    { label: "Name", name: "name", format: function(val){return val;}},
-                    { label: "Kind", name: "typeTitle", format: function(val){return val}},
-                    { label: "Updated", name: undefined, format: function(val){return "Eons ago"}},
+                    { label: "", name: "thumbnail", format: function(val){return '<img src="' + val + '">'}, cssClass: "material-thumbnail"},
+                    { label: "Name", name: "name", format: function(val){return val;}, cssClass: ""},
+                    { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: ""},
+                    { label: "Updated", name: undefined, format: function(val){return "Eons ago"}, cssClass: ""},
                 ],
                 groupOps: [{
                     html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
