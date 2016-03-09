@@ -82,6 +82,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
     function ListModel(params) {
         var model = this, self = this;
 
+        self.params = params;
 
         self.modal = new Modal($("#listMaterialsModal")); // Document ready?
 
@@ -128,7 +129,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
         var Folder = function (id, parentId, name, folders) {
             var self = this;
-            console.log("*** create Folder: ", id, parentId, name, folders);
             Item.call(this, id, parentId, name, "Folder", "");
             self.folders = ko.observableArray(folders);
             self.materials = ko.observableArray();
@@ -138,7 +138,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             }
 
             self.removeChild = function(child){
-                console.log("Removechild", self, child);
                 var a;
                 if(child instanceof Folder) {
                     a = self.folders;
@@ -154,7 +153,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             self.addChild = function(child){
-                console.log("Addchild", self, child);
                 var a;
                 if(child instanceof Folder) {
                     a = self.folders;
@@ -279,8 +277,8 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             var okCount = 0, failCount = 0;
             cocobox.confirmationDialog("Remove", "Are you sure you want to remove " + items.length + " item(s)?",
                 function(){
-                    if(params.removeFn) {
-                        params.removeFn(items).done(function(res){
+                    if(self.params.removeFn) {
+                        self.params.removeFn(items).done(function(res){
                             self.clearSelection();
                             $.each(res, function(i, r) {
                                 if(r.status === "error") {
@@ -314,17 +312,14 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             var createFolder = function(name) {
-                if(params.createFolderFn) {
-                    params.createFolderFn(name, model.selectedFolder().id).done(function(r){
+                if(self.params.createFolderFn) {
+                    self.params.createFolderFn(name, model.selectedFolder().id).done(function(r){
                         if(r.status === "error") {
                             CCBMessengerError("Failed to create folder.");
                         } else {
                             var newFolder = new Folder(r.item.id, model.selectedFolder().id, r.item.name, []);
-                            console.log("Bfore: ", model.selectedFolder().folders());
-                            console.log("Selected: ", model.selectedFolder());
                             model.selectedFolder().folders.push(newFolder);
                             model.folderHash[r.item.id] = newFolder;
-                            console.log("Aftr: ", model.selectedFolder().folders());
                             CCBMessengerInfo("Created folder.");
                         }
                     });
@@ -364,8 +359,8 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
 
             var setName = function(name) {
-                if(params.renameFn) {
-                    params.renameFn(item, name).done(function(r){
+                if(self.params.renameFn) {
+                    self.params.renameFn(item, name).done(function(r){
                         if(r.status === "error") {
                             CCBMessengerError("Failed to rename.");
                         } else {
@@ -417,8 +412,8 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     }
 
                     var okCount = 0, failCount = 0;
-                    if(params.moveFn) {
-                        params.moveFn(items, self.folder().id).done(function(res){
+                    if(self.params.moveFn) {
+                        self.params.moveFn(items, self.folder().id).done(function(res){
                             model.clearSelection();
                             $.each(res, function(i, r) {
                                 if(r.status === "error") {
@@ -481,7 +476,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             self.selectedFolder(self.folderHash[folderId]);
         };
 
-        params.getData().done(function(data){
+        self.params.getData().done(function(data){
             var folderInfo = parseFolders(data.folders);
             self.folderHash = folderInfo.folderHash;
             $.each(data.rows, function(i, item) {
@@ -529,10 +524,19 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
         // Return parameters for cocobox-list component
         self.cocoboxListParams = function() {
             return {
-                editMode: settings.editMode,
+                editMode: settings.editMode, // TODO: This is not used
                 getData: function () {
                     return readData(settings.listUrl);
                 },
+                idField: id, // TODO: Not used
+                nameField: name,  // TODO: Not used
+                typeField: type,  // TODO: Not used
+                columns: [
+                    { label: "Thumbnail", name: "thumbnail", format: function(val){return '<img src="' + val + '>'}},
+                    { label: "Name", name: "name", format: function(val){return "|" + val + "|"}},
+                    { label: "Kind", name: "type" },
+                    { label: "Updated", name: undefined, format: function(val){return "Seconds ago"}},
+                ],
                 groupOps: [{
                     html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
                     callback: function (items) {
