@@ -215,9 +215,15 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         }
 
         self.selectedFolder = ko.observable();
+        self.sortFunction = ko.observable(function(rows){ return rows.reverse()});
+
         self.rows = function(){
             if(self.selectedFolder()) {
-                return self.selectedFolder().folders().concat(self.selectedFolder().materials());
+                var a = self.selectedFolder().folders().concat(self.selectedFolder().materials());
+                if(self.sortFunction()) {
+                    return self.sortFunction()(a);
+                }
+                return a;
             } else {
                 return [];
             }
@@ -473,7 +479,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         self.showFolder = function(folderId) {
             model.clearSelection();
             self.selectedFolder(self.folderHash[folderId]);
-            self.rows(self.folderHash[folderId].folders.concat(self.folderHash[folderId].materials));
         };
 
         params.getData().done(function(data){
