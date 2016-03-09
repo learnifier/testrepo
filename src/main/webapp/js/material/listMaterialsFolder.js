@@ -82,6 +82,12 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
     function ListModel(params) {
         var model = this, self = this;
 
+        self.runFormat = function(rowData, cellConfig) {
+            console.log("runFormat this: ", this);
+            console.log("runFormat rowData: ", rowData);
+            console.log("runFormat cellConfig: ", cellConfig);
+            return cellConfig.format(rowData[cellConfig.name]);
+        };
         self.params = params;
 
         self.modal = new Modal($("#listMaterialsModal")); // Document ready?
@@ -175,7 +181,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             };
         };
 
-        function Material(id, parentId, name, typeTitle, thumbnail) {
+        var Material = function(id, parentId, name, typeTitle, thumbnail) {
             var self = this;
             Item.call(this, id, parentId, name, typeTitle, thumbnail);
             self.typeTitle = typeTitle;
@@ -189,8 +195,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                     {name: "Edit", action: function(){console.log("Edit material");} },
                 ]);
             };
-
-
         };
 
 
@@ -528,14 +532,14 @@ define(['knockout', 'dabox-common', 'cocobox-list'], function (ko) {
                 getData: function () {
                     return readData(settings.listUrl);
                 },
-                idField: id, // TODO: Not used
-                nameField: name,  // TODO: Not used
-                typeField: type,  // TODO: Not used
+                idField: "id", // TODO: Not used
+                nameField: "name",  // TODO: Not used
+                typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "Thumbnail", name: "thumbnail", format: function(val){return '<img src="' + val + '>'}},
-                    { label: "Name", name: "name", format: function(val){return "|" + val + "|"}},
-                    { label: "Kind", name: "type" },
-                    { label: "Updated", name: undefined, format: function(val){return "Seconds ago"}},
+                    { label: "Thumbnail", name: "thumbnail", format: function(val){return '<img src="' + val + '">'}, class: "material-thumbnail"},
+                    { label: "Name", name: "name", format: function(val){return val;}},
+                    { label: "Kind", name: "typeTitle", format: function(val){return val}},
+                    { label: "Updated", name: undefined, format: function(val){return "Eons ago"}},
                 ],
                 groupOps: [{
                     html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
