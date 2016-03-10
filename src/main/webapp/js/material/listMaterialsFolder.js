@@ -263,7 +263,7 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                         return '<span class="glyphicon glyphicon-sort-by-attributes-alt"></span>';
                     }
                 } else {
-                    return "";
+                    return '<span class="glyphicon glyphicon-sort"></span>';
                 }
             };
 
