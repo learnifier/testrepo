@@ -257,9 +257,15 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
 
             self.sortIcon = function(cName){
                 if(cName === sName()){
-                    return "<span>"
+                    if(index()) {
+                       return '<span class="glyphicon glyphicon-sort-by-attributes"></span>';
+                    } else {
+                        return '<span class="glyphicon glyphicon-sort-by-attributes-alt"></span>';
+                    }
+                } else {
+                    return "";
                 }
-            }
+            };
 
             self.changeSort = function (columnDef) {
                 console.log("ChangeSort: ", columnDef);
