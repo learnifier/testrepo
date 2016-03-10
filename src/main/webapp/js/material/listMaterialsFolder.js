@@ -225,50 +225,57 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         }
 
         self.selectedFolder = ko.observable();
-        self.sortFunction = ko.observable();
 
-        self.changeSort = (function() {
-            var sName = undefined, index = 0,
+
+        (function() { // Closure to keep sort state
+            var sName = ko.observable(), index = ko.observable(),
                 noSort = function (rows){return rows;},
                 sortFns = [
                     function (rows) {
                         return rows.sort(function(a, b) {
-                            if (typeof a[sName] == "function") {
-                                return a[sName]() > b[sName]() ? 1 : a[sName]() < b[sName]() ? -1 : 0;
+                            var n = sName();
+                            if (typeof a[n] == "function") {
+                                return a[n]() > b[n]() ? 1 : a[n]() < b[n]() ? -1 : 0;
                             } else {
-                                return a[sName] > b[sName] ? 1 : a[sName] < b[sName] ? -1 : 0;
+                                return a[n] > b[n] ? 1 : a[n] < b[n] ? -1 : 0;
                             }
                         });
                     },
                     function (rows) {
                         return rows.sort(function(b, a) {
-                            if (typeof a[sName] == "function") {
-                                return a[sName]() > b[sName]() ? 1 : a[sName]() < b[sName]() ? -1 : 0;
+                            var n = sName();
+                            if (typeof a[n] == "function") {
+                                return a[n]() > b[n]() ? 1 : a[n]() < b[n]() ? -1 : 0;
                             } else {
-                                return a[sName] > b[sName] ? 1 : a[sName] < b[sName] ? -1 : 0;
+                                return a[n] > b[n] ? 1 : a[n] < b[n] ? -1 : 0;
                             }
                         });
                     }
                 ];
 
-            self.sortFunction(noSort);
-            return function (columnDef) {
+            self.sortFunction = ko.observable(noSort);
+
+            self.sortIcon = function(cName){
+                if(cName === sName()){
+                    return "<span>"
+                }
+            }
+
+            self.changeSort = function (columnDef) {
                 console.log("ChangeSort: ", columnDef);
                 var cName = columnDef.name;
-                if (cName != sName) {
-                    sName = cName;
-                    index = 0;
+                if (cName != sName()) {
+                    sName(cName);
+                    index(0);
                 } else {
-                    index++;
+                    index(index()+1);
                 }
-                if (index >= sortFns.length) {
-                    sName = undefined;
-                    index = 0;
+                if (index() >= sortFns.length) {
+                    sName(undefined);
+                    index(0);
                     self.sortFunction(noSort);
-                    console.log("ChangeSort: nosort", noSort);
                 } else {
-                    console.log("ChangeSort: sort", index, sortFns[index]);
-                    self.sortFunction(sortFns[index]);
+                    self.sortFunction(sortFns[index()]);
                 }
             };
         })();
