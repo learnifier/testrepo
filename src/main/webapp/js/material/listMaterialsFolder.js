@@ -252,7 +252,6 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
                 ];
 
             self.sortFunction(noSort);
-            // TODO: Maybe switch to configuring comparators instead?
             return function (columnDef) {
                 console.log("ChangeSort: ", columnDef);
                 var cName = columnDef.name;
