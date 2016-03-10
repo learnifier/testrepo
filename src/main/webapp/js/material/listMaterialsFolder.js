@@ -225,7 +225,40 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         }
 
         self.selectedFolder = ko.observable();
-        self.sortFunction = ko.observable(function(rows){ return rows.reverse()});
+        self.sortFunction = ko.observable();
+
+        self.changeSort = (function() {
+            var lastName = undefined, index = 0,
+                noSort = function (rows) {
+                    return rows;
+                },
+                sortFns = [
+                    function (rows) {
+                        return rows.sort();
+                    },
+                    function (rows) {
+                        return rows.sort().reverse();
+                    }
+                ];
+            self.sortFunction(noSort);
+            // TODO: Maybe switch to configuring comparators instead?
+            return function (columnDef) {
+                var cName = columnDef.name;
+                if (cName != lastName) {
+                    lastName = cName;
+                    index = 0;
+                } else {
+                    index++;
+                }
+                if (index >= sortFns.length) {
+                    lastName = undefined;
+                    index = 0;
+                    self.sortFunction(noSort);
+                } else {
+                    self.sortFunction(sortFns[index]);
+                }
+            };
+        })();
 
         self.rows = function(){
             if(self.selectedFolder()) {

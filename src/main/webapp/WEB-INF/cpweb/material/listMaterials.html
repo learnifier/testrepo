@@ -266,7 +266,7 @@ ${cpweb_foot}
 
             <thead data-bind="ifnot: selected().length > 0" >
             <tr data-bind="foreach: params.columns">
-                <th data-bind="text: label"></th>
+                <th data-bind="text: label, click: function(){$parent.changeSort($data);}"></th>
             </tr>
             </thead>
             <tbody data-bind="foreach: rows()">
@@ -283,30 +283,6 @@ ${cpweb_foot}
                     </div>
                 </td>
             </tr>
-            <!--
-            <tr data-bind="style: { background: selected() ? '#ccc' : '' }">
-                <td data-bind="click: selectRow" class="material-thumbnail">
-                    <a class="block-link" data-bind="click: clickName, clickBubble: false" href=""><img data-bind="attr: {src: thumbnail}"></a>
-                </td>
-                <td data-bind="click: selectRow">
-                    <a data-bind="text: name, click: clickName, clickBubble: false" href=""></a>
-                </td>c
-                <td data-bind="text: typeTitle, click: selectRow">
-                </td>
-                <td data-bind="click: selectRow">
-                    3 minutes ago
-                </td>
-
-                <td class="row-actions">
-                    <div class="btn-group">
-                        <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Actions <span class="caret"></span></button>
-                        <ul class="dropdown-menu dropdown-menu-right" role="menu" data-bind="foreach: actions()">
-                            <li><a data-bind="text: name, click: function(){action($parent)}" href="#"></a></li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-            -->
             </tbody>
         </table>
     </div>
