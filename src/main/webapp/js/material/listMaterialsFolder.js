@@ -277,9 +277,10 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
             if(self.selectedFolder()) {
                 var a = self.selectedFolder().folders().concat(self.selectedFolder().materials());
                 if(self.sortFunction()) {
-                    return self.sortFunction()(a);
+                    var fn = self.sortFunction();
+                    return fn(self.selectedFolder().folders()).concat(fn(self.selectedFolder().materials()));
                 }
-                return a;
+                return self.selectedFolder().folders().concat(self.selectedFolder().materials());
             } else {
                 return [];
             }
