@@ -32,9 +32,9 @@ define(['knockout', 'dabox-common', 'koComponents/cocobox-list'], function (ko) 
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "", name: "thumbnail", format: function(val){return '<img src="' + val + '">'}, cssClass: "material-thumbnail",
+                    { label: "", name: "thumbnail", format: function(val){return '<a href><img src="' + val + '"></a>'}, cssClass: "material-thumbnail",
                         clickFn: function(){alert("Thumbnnail lolclick")}},
-                    { label: "Name", name: "name", format: function(val){return "<a>" + val() + "</a>";}, cssClass: "block-link",
+                    { label: "Name", name: "name", format: function(val){return "<a href>" + val() + "</a>";}, cssClass: "block-link",
                       clickFn: function(){alert("Material preview goes here")}},
                     { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null},
