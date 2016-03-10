@@ -228,33 +228,47 @@ define("cocobox-list", ['knockout', 'dabox-common', 'messenger'], function (ko) 
         self.sortFunction = ko.observable();
 
         self.changeSort = (function() {
-            var lastName = undefined, index = 0,
-                noSort = function (rows) {
-                    return rows;
-                },
+            var sName = undefined, index = 0,
+                noSort = function (rows){return rows;},
                 sortFns = [
                     function (rows) {
-                        return rows.sort();
+                        return rows.sort(function(a, b) {
+                            if (typeof a[sName] == "function") {
+                                return a[sName]() > b[sName]() ? 1 : a[sName]() < b[sName]() ? -1 : 0;
+                            } else {
+                                return a[sName] > b[sName] ? 1 : a[sName] < b[sName] ? -1 : 0;
+                            }
+                        });
                     },
                     function (rows) {
-                        return rows.sort().reverse();
+                        return rows.sort(function(b, a) {
+                            if (typeof a[sName] == "function") {
+                                return a[sName]() > b[sName]() ? 1 : a[sName]() < b[sName]() ? -1 : 0;
+                            } else {
+                                return a[sName] > b[sName] ? 1 : a[sName] < b[sName] ? -1 : 0;
+                            }
+                        });
                     }
                 ];
+
             self.sortFunction(noSort);
             // TODO: Maybe switch to configuring comparators instead?
             return function (columnDef) {
+                console.log("ChangeSort: ", columnDef);
                 var cName = columnDef.name;
-                if (cName != lastName) {
-                    lastName = cName;
+                if (cName != sName) {
+                    sName = cName;
                     index = 0;
                 } else {
                     index++;
                 }
                 if (index >= sortFns.length) {
-                    lastName = undefined;
+                    sName = undefined;
                     index = 0;
                     self.sortFunction(noSort);
+                    console.log("ChangeSort: nosort", noSort);
                 } else {
+                    console.log("ChangeSort: sort", index, sortFns[index]);
                     self.sortFunction(sortFns[index]);
                 }
             };
