@@ -41,6 +41,7 @@ ${cpweb_foot}
     });
 
     // Folder stuff
+    window.contextPath = "${contextPath}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         s.init({
 //            productDeleteCheck: "${helper.urlFor('OrgMaterialJsonModule','listProductProjects')}",
