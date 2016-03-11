@@ -39,12 +39,12 @@ define(['knockout', 'dabox-common', 'koComponents/cocobox-list'], function (ko) 
                     { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null},
                 ],
-                groupOps: [{
-                    html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
-                    callback: function (items) {
-                        console.log("Remove fn on", items);
-                    }
-                }],
+                //groupOps: [{
+                //    html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
+                //    callback: function (items) {
+                //        console.log("Remove fn on", items);
+                //    }
+                //}],
                 moveFn: function (items, toFolderId) {
                     var deferred = $.Deferred();
                     window.setTimeout(function () {
