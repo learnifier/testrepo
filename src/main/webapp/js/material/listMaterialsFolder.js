@@ -2,7 +2,7 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define(['knockout', 'dabox-common', 'koComponents/cocobox-list'], function (ko) {
+define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], function (ko) {
     "use strict";
     var exports = {};
     var settings;
@@ -21,7 +21,13 @@ define(['knockout', 'dabox-common', 'koComponents/cocobox-list'], function (ko) 
             return deferred.promise();
         }
 
+        function preview(item){
+            console.log("Item = ", item.name());
+            alert("Preview of " + item.name());
+        }
+
         // Return parameters for cocobox-list component
+
         self.cocoboxListParams = function() {
             return {
                 editMode: settings.editMode, // TODO: This is not used
@@ -33,9 +39,9 @@ define(['knockout', 'dabox-common', 'koComponents/cocobox-list'], function (ko) 
                 typeField: "type",  // TODO: Not used
                 columns: [
                     { label: "", name: "thumbnail", format: function(val){return '<a href><img src="' + val + '"></a>'}, cssClass: "material-thumbnail",
-                        clickFn: function(){alert("Thumbnnail lolclick")}},
+                        clickFn: preview},
                     { label: "Name", name: "name", format: function(val){return "<a href>" + val() + "</a>";}, cssClass: "block-link",
-                      clickFn: function(){alert("Material preview goes here")}},
+                      clickFn: preview},
                     { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null},
                 ],
