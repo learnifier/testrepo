@@ -51,14 +51,25 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                 //        console.log("Remove fn on", items);
                 //    }
                 //}],
-                moveFn: function (items, toFolderId) {
-                    var deferred = $.Deferred();
-                    window.setTimeout(function () {
-                        deferred.resolve($.map(items, function (item) {
-                            return ({status: "ok", item: item});
-                        }));
-                    }, 500);
+                moveFn: function (folders, items, toFolderId) {
+                    var deferred = $.Deferred(), res = [];
+
+                    console.log("Gogo moveFn", folders, items, toFolderId);
+                    console.log("url: ", settings.moveToFolderUrl);
+                    $.ajax({
+                        url: settings.moveToFolderUrl,
+                        data: {
+                            folderIds: folders,
+                            itemIds: items,
+                            toFolderId: toFolderId
+                        }
+                    }).done(function(res) {
+                        deferred.resolve(res);
+                    }).fail(function(jqXHR, textStatus) {
+                        deferred.reject(textStatus);
+                    });
                     return deferred.promise();
+
                 },
                 copyFn: function (items, toFolder) {
                     var deferred = $.Deferred();
@@ -100,6 +111,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
     exports.init = function(options) {
         settings = $.extend({
             listUrl: undefined,
+            moveFolderUrl: undefined,
             editMode: false
         }, options || {});
 

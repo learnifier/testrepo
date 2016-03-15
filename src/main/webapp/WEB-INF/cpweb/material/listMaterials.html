@@ -44,9 +44,8 @@ ${cpweb_foot}
     window.contextPath = "${contextPath}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         s.init({
-//            productDeleteCheck: "${helper.urlFor('OrgMaterialJsonModule','listProductProjects')}",
-//            productDelete: "${helper.urlFor('OrgMaterialJsonModule','deleteOrgProduct',[org.id])}",
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
+            moveToFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','moveToFolder',[org.id])}",
             editMode: true // TODO: Check permissions here.
         });
     });

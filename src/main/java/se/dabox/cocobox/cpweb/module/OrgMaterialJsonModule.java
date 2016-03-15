@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.text.Collator;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,11 +20,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
+import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
@@ -51,6 +55,7 @@ import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
+import se.dabox.service.common.RealmId;
 import se.dabox.service.common.UserTimestamp;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -73,6 +78,7 @@ import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequest;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
+import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
@@ -1354,6 +1360,41 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         for (MatFolder matFolder : folder.getFolders()) {
             addFolderIds(folderIds, matFolder);
+        }
+    }
+
+
+    // TODO: Adding new operations below, may want to put them into some command class
+
+    @WebAction
+    public RequestTarget onMoveToFolder(RequestCycle cycle, String strOrgId)
+            throws Exception {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+        final RealmId realmId = DwsRealmHelper.determineRequestRealmId(cycle);
+
+        final List<String> folderIds = getArray(cycle, "folderIds");
+        final List<String> itemIds = getArray(cycle, "itemIds");
+        String toFolderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "toFolderId");
+
+        getCocoboxCordinatorClient(cycle);
+        return null;
+    }
+
+    private List<String> getArray(RequestCycle cycle, String fieldName) {
+        final WebRequest request = cycle.getRequest();
+
+        final String[] vals = request.getParameterValues(fieldName + "[]");
+        final String val = request.getParameter(fieldName);
+
+        List<String> fieldValues;
+        if(val != null) {
+            return Arrays.asList(val);
+        } else if (vals != null) {
+            return new ArrayList<>(Arrays.asList(vals));
+        } else {
+            return Collections.emptyList();
         }
     }
 }
