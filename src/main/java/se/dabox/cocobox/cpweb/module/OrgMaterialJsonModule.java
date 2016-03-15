@@ -30,6 +30,7 @@ import net.unixdeveloper.druwa.ServiceRequestCycle;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.apache.commons.lang3.StringUtils;
@@ -57,8 +58,13 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.RealmId;
 import se.dabox.service.common.UserTimestamp;
+import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.InvalidTargetException;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.OrgProductClient;
+import se.dabox.service.common.ccbc.folder.FolderId;
+import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.material.MaterialLink;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
@@ -79,6 +85,7 @@ import se.dabox.service.common.ccbc.project.filter.FilterProjectRequest;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.context.DwsRealmHelper;
+import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.material.MaterialUtils;
 import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
@@ -90,6 +97,7 @@ import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
+import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
@@ -1377,9 +1385,71 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final List<String> folderIds = getArray(cycle, "folderIds");
         final List<String> itemIds = getArray(cycle, "itemIds");
         String toFolderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "toFolderId");
+        FolderId toFolderId = FolderId.valueOf(Long.valueOf(toFolderIdStr));
 
-        getCocoboxCordinatorClient(cycle);
-        return null;
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
+        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+        // {
+        // status: "ok",
+        // folders: [
+        //   { status: ok, id: 101 }
+        //   { status: error, id: 102, msg: "Paj" }
+        // ],
+        // items: [
+        //   { status: ok, id: A101 }
+        //   { status: error, id: A102, msg: "Paj" }
+        // ]
+        // }
+        Map<String, Object> map = createMap();
+        map.put("status", "OK");
+
+        List<Map<String, Object>> folders = new ArrayList<>();
+        for(String strFolderId: folderIds) {
+            final FolderId folderId = FolderId.valueOf(Long.valueOf(strFolderId));
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("id", folderId.getId());
+            try {
+                omfc.move(caller, folderId, toFolderId);
+                entry.put("status", "OK");
+            } catch (NotFoundException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Not found exception");
+            } catch (AlreadyExistsException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Name already exists in target folder");
+            } catch (InvalidTargetException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Invalid move");
+            }
+            folders.add(entry);
+        }
+        map.put("folders", folders);
+
+        List<Map<String, Object>> items = new ArrayList<>();
+        for(String strItemId: itemIds) {
+            Long id = Long.valueOf(strItemId);
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("id", id);
+            try {
+//                opc.move(caller, id, toFolderId); // TODO: Plug in real service call here.
+                entry.put("status", "OK");
+            } catch (NotFoundException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Not found exception");
+            } catch (AlreadyExistsException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Name already exists in target folder");
+            } catch (InvalidTargetException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Invalid move");
+            }
+            items.add(entry);
+        }
+        map.put("items", items);
+
+        final String reply = JsonUtils.encode(map);
+        return new JsonRequestTarget(reply);
     }
 
     private List<String> getArray(RequestCycle cycle, String fieldName) {
