@@ -41,6 +41,7 @@ import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.InvalidTargetException;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.OrgProductClient;
 import se.dabox.service.common.ccbc.folder.FolderId;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
@@ -1485,7 +1486,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", folderId.getId());
             try {
-//                getOrgMaterialFolderClient(cycle).rmdir(caller, folderId, toFolderId);
+                getOrgMaterialFolderClient(cycle).rmdir(caller, folderId);
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
@@ -1500,7 +1501,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", strItemId);
             try {
-//                opc.remove(caller, id, toFolderId); // TODO: Plug in real service call here.
+//                getOrgProductClient(cycle).deleteOrgProduct(caller, orgId, strItemId); <-- bool
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
