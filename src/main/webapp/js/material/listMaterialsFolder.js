@@ -52,10 +52,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                 //    }
                 //}],
                 moveFn: function (folders, items, toFolderId) {
-                    var deferred = $.Deferred(), res = [];
-
-                    console.log("Gogo moveFn", folders, items, toFolderId);
-                    console.log("url: ", settings.moveToFolderUrl);
+                    var deferred = $.Deferred();
                     $.ajax({
                         url: settings.moveToFolderUrl,
                         data: {
