@@ -1375,6 +1375,26 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     // TODO: Adding new operations below, may want to put them into some command class
 
     @WebAction
+    public RequestTarget onCreateFolder(RequestCycle cycle, String strOrgId)
+            throws Exception {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+        final RealmId realmId = DwsRealmHelper.determineRequestRealmId(cycle);
+
+        String folderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "folderId");
+        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
+        FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
+
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+//        omfc.mkdir(caller, folderId, name);
+        Map<String, Object> map = createMap();
+        map.put("status", "OK");
+        return new JsonRequestTarget(JsonUtils.encode(map));
+    }
+
+    @WebAction
     public RequestTarget onMoveToFolder(RequestCycle cycle, String strOrgId)
             throws Exception {
         checkOrgPermission(cycle, strOrgId);

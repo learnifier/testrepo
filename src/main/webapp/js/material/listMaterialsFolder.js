@@ -87,11 +87,13 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                     return deferred.promise();
                 },
                 createFolderFn: function (name, folderId) {
-                    var deferred = $.Deferred();
-                    window.setTimeout(function () {
-                        deferred.resolve({status: "ok", item: { name: name, id: Math.floor(Math.random() * (10000 - 1000) + 1000)}});
-                    }, 500);
-                    return deferred.promise();
+                    return $.ajax({
+                        url: settings.createFolderUrl,
+                        data: {
+                            folderId: folderId,
+                            name: name
+                        }
+                    });
                 }
 
             }

@@ -46,6 +46,7 @@ ${cpweb_foot}
         s.init({
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
             moveToFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','moveToFolder',[org.id])}",
+            createFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','createFolder',[org.id])}",
             editMode: true // TODO: Check permissions here.
         });
     });
