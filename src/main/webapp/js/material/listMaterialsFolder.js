@@ -69,7 +69,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                         url: settings.renameFolderUrl,
                         data: {
                             folderId: id,
-                            name: name
+                            name: newName
                         }
                     });
                 },
@@ -78,7 +78,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                         url: settings.renameItemUrl,
                         data: {
                             itemId: id,
-                            name: name
+                            name: newName
                         }
                     });
                 },
