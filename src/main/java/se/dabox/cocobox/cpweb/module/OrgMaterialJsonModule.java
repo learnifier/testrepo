@@ -63,6 +63,7 @@ import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequest;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
+import se.dabox.service.common.folder.FolderName;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.material.MaterialUtils;
@@ -1392,11 +1393,18 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
 
-        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
-//        omfc.mkdir(caller, folderId, name);
+        final OrgMaterialFolderClient omfc = getOrgMaterialFolderClient(cycle);
         Map<String, Object> map = createMap();
-        map.put("status", "OK");
+        try {
+            omfc.mkdir(caller, orgId, folderId, new FolderName(name));
+            map.put("status", "ok");
+        } catch(NotFoundException e) {
+            map.put("status", "error");
+            map.put("msg", "Folder not found.");
+        } catch(AlreadyExistsException e) {
+            map.put("status", "error");
+            map.put("msg", "Folder name already exists.");
+        }
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
