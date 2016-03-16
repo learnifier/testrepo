@@ -1388,8 +1388,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         FolderId toFolderId = FolderId.valueOf(Long.valueOf(toFolderIdStr));
 
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
-        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+//        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
+//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+
         // {
         // status: "ok",
         // folders: [
@@ -1410,7 +1411,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", folderId.getId());
             try {
-                omfc.move(caller, folderId, toFolderId);
+//                omfc.move(caller, folderId, toFolderId);
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
@@ -1428,9 +1429,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         List<Map<String, Object>> items = new ArrayList<>();
         for(String strItemId: itemIds) {
-            Long id = Long.valueOf(strItemId);
             Map<String, Object> entry = new HashMap<>();
-            entry.put("id", id);
+            entry.put("id", strItemId);
             try {
 //                opc.move(caller, id, toFolderId); // TODO: Plug in real service call here.
                 entry.put("status", "OK");
