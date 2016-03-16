@@ -18,6 +18,8 @@ import se.dabox.service.branding.client.BrandingClient;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
+import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
@@ -84,6 +86,12 @@ public abstract class AbstractModule {
             ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
+
+    public static OrgMaterialFolderClient getOrgMaterialFolderClient(
+            ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+    }
+
 
     public static ClientUserGroupClient getClientUserGroupClient(
             ServiceRequestCycle cycle) {

@@ -337,7 +337,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         List<Material> materials = getProjectMaterials(pmcClient, prjId, cycle);
 
-        return jsonTarget(OrgMaterialJsonModule.toJsonMaterials(cycle, strProjectId, materials, false));
+        return jsonTarget(OrgMaterialJsonModule.toJsonMaterials(cycle, strProjectId, materials, Collections.emptyMap(), Collections.emptyList(), false));
     }
 
     @WebAction

@@ -4,24 +4,6 @@
 package se.dabox.cocobox.cpweb.module;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.Collator;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -38,32 +20,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
-import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.crisp.runtime.CrispContext;
 import se.dabox.cocobox.crisp.runtime.DwsCrispContextHelper;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.converter.DateConverter;
 import se.dabox.cocosite.converter.cds.CdsUtil;
 import se.dabox.cocosite.date.DatePickerDateConverter;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.pdweb.PdwebProductEditorUrlFactory;
 import se.dabox.cocosite.product.GetProjectCompatibleProducts;
-import se.dabox.cocobox.security.permission.CocoboxPermissions;
-import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
-import se.dabox.service.common.RealmId;
-import se.dabox.service.common.UserTimestamp;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.InvalidTargetException;
 import se.dabox.service.common.ccbc.NotFoundException;
-import se.dabox.service.common.ccbc.OrgProductClient;
 import se.dabox.service.common.ccbc.folder.FolderId;
+import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.material.MaterialLink;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
@@ -84,7 +63,6 @@ import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequest;
 import se.dabox.service.common.ccbc.project.filter.FilterProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
-import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.material.MaterialUtils;
@@ -97,7 +75,6 @@ import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
-import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
@@ -116,6 +93,23 @@ import se.dabox.util.collections.OrListPredicate;
 import se.dabox.util.collections.Predicate;
 import se.dabox.util.collections.ValueUtils;
 import se.dabox.util.converter.ConversionContext;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.Collator;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -223,9 +217,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         List<Material> materials = getOrgMaterials(cycle, orgId, null, null);
 
+        final List<OrgMaterialFolder> folders = getOrgMaterialFolderClient(cycle).listFolders(orgId);
+
+        final Map<String, OrgProduct> orgProdMap = CollectionsUtil.createMap(getCocoboxCordinatorClient(cycle).listOrgProducts(orgId), OrgProduct::getProdId);
+
         boolean allowDelete = hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_DELETE_ORGMAT);
 
-        return jsonTarget(toJsonMaterials(cycle, null, materials, allowDelete));
+        return jsonTarget(toJsonMaterials(cycle, null, materials, orgProdMap, folders, allowDelete));
     }
 
     @WebAction
@@ -236,7 +234,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         List<Material> materials = getOrgMaterials(cycle, orgId, null, ProjectType.MATERIAL_LIST_PROJECT);
 
-        return jsonTarget(toJsonMaterials(cycle, null, materials, false));
+        final Map<String, OrgProduct> orgProdMap = CollectionsUtil.createMap(getCocoboxCordinatorClient(cycle).listOrgProducts(orgId), OrgProduct::getProdId);
+
+        final List<OrgMaterialFolder> folders = getOrgMaterialFolderClient(cycle).listFolders(orgId);
+
+        return jsonTarget(toJsonMaterials(cycle, null, materials, orgProdMap, folders, false));
     }
 
     @WebAction
@@ -793,6 +795,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     public static ByteArrayOutputStream toJsonMaterials(final RequestCycle cycle,
             final String strProjectId,
             final List<Material> materials,
+            final Map<String, OrgProduct> orgProds,
+            List<OrgMaterialFolder> folders,
             Boolean allowDelete) {
 
         final boolean deleteFlag = determineDeleteFlag(allowDelete);
@@ -801,13 +805,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final LangBundle bundle = getLangBundle(cycle);
 
-        List<MatFolder> folders = createFolders();
 
-        List<Long> folderIds = new ArrayList<>(folders.size()+1);
-        folderIds.add(null);
-        for (MatFolder folder : folders) {
-            addFolderIds(folderIds, folder);
-        }
+
+//        List<MatFolder> folders = createFolders();
+
+//        List<Long> folderIds = new ArrayList<>(folders.size()+1);
+//        folderIds.add(null);
+//        for (MatFolder folder : folders) {
+//            addFolderIds(folderIds, folder);
+//        }
 
         PdwebProductEditorUrlFactory pdwebEditorFactory = new PdwebProductEditorUrlFactory(cycle);
 
@@ -817,7 +823,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 super.writeExtraDataEnd();
 
                 generator.writeArrayFieldStart("folders");
-                for (MatFolder folder : folders) {
+                for (OrgMaterialFolder folder : folders) {
                     writeFolder(folder);
                 }
                 generator.writeEndArray();
@@ -863,15 +869,16 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                     if(product.getUpdated() != null && product.getUpdated().getTimestamp() != null) {
                         writeDateField("updated", Date.from(product.getUpdated().getTimestamp()));
                     }
-                }
 
-
-                int hash = hash(material.getCompositeId());
-                Long folderId = folderIds.get(Math.abs(hash) % folderIds.size());
-                if (folderId == null) {
-                    generator.writeNullField("materialFolderId");
+                    final ProductId prodId = product.getId();
+                    final OrgProduct orgProduct = orgProds.get(prodId.getId());
+                    if (orgProduct == null || orgProduct.getFolderId().getId() == null) {
+                        generator.writeNullField("materialFolderId");
+                    } else {
+                        generator.writeNumberField("materialFolderId", orgProduct.getFolderId().getId());
+                    }
                 } else {
-                    generator.writeNumberField("materialFolderId", folderId);
+                    generator.writeNullField("materialFolderId");
                 }
             }
 
@@ -943,20 +950,21 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
             }
 
-            private void writeFolder(MatFolder folder) throws IOException {
+            private void writeFolder(OrgMaterialFolder folder) throws IOException {
                 generator.writeStartObject();
                 if (folder.getId() == null) {
                     generator.writeNullField("id");
                 } else {
-                    generator.writeNumberField("id", folder.getId());
+                    generator.writeNumberField("id", folder.getId().getId());
                 }
 
                 generator.writeStringField("name", folder.getName());
 
-                generator.writeArrayFieldStart("folders");
-                for (MatFolder subfolder : folder.getFolders()) {
-                    writeFolder(subfolder);
-                }
+                // TODO: Don't think we have recursive folders any more.
+//                generator.writeArrayFieldStart("folders");
+//                for (MatFolder subfolder : folder.getFolders()) {
+//                    writeFolder(subfolder);
+//                }
                 generator.writeEndArray();
 
                 generator.writeEndObject();
