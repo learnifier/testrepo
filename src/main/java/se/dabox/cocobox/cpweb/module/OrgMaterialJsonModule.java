@@ -1380,7 +1380,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
         final long caller = LoginUserAccountHelper.getUserId(cycle);
-        final RealmId realmId = DwsRealmHelper.determineRequestRealmId(cycle);
 
         String folderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "folderId");
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
@@ -1400,7 +1399,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
         final long caller = LoginUserAccountHelper.getUserId(cycle);
-        final RealmId realmId = DwsRealmHelper.determineRequestRealmId(cycle);
 
         final List<String> folderIds = getArray(cycle, "folderIds");
         final List<String> itemIds = getArray(cycle, "itemIds");
@@ -1410,18 +1408,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 //        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
 //        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
-
-        // {
-        // status: "ok",
-        // folders: [
-        //   { status: ok, id: 101 }
-        //   { status: error, id: 102, msg: "Paj" }
-        // ],
-        // items: [
-        //   { status: ok, id: A101 }
-        //   { status: error, id: A102, msg: "Paj" }
-        // ]
-        // }
         Map<String, Object> map = createMap();
         map.put("status", "OK");
 
