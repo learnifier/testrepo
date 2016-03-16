@@ -52,21 +52,14 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                 //    }
                 //}],
                 moveFn: function (folders, items, toFolderId) {
-                    var deferred = $.Deferred();
-                    $.ajax({
+                    return $.ajax({
                         url: settings.moveToFolderUrl,
                         data: {
                             folderIds: folders,
                             itemIds: items,
                             toFolderId: toFolderId
                         }
-                    }).done(function(res) {
-                        deferred.resolve(res);
-                    }).fail(function(jqXHR, textStatus) {
-                        deferred.reject(textStatus);
                     });
-                    return deferred.promise();
-
                 },
                 copyFn: function (items, toFolder) {
                     var deferred = $.Deferred();
