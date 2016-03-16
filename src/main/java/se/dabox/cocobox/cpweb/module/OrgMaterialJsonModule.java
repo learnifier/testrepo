@@ -1393,10 +1393,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
 
-        final OrgMaterialFolderClient omfc = getOrgMaterialFolderClient(cycle);
         Map<String, Object> map = createMap();
         try {
-            omfc.mkdir(caller, orgId, folderId, new FolderName(name));
+            getOrgMaterialFolderClient(cycle).mkdir(caller, orgId, folderId, new FolderName(name));
             map.put("status", "ok");
         } catch(NotFoundException e) {
             map.put("status", "error");
@@ -1420,9 +1419,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         String toFolderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "toFolderId");
         FolderId toFolderId = FolderId.valueOf(Long.valueOf(toFolderIdStr));
 
-        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
-//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
         Map<String, Object> map = createMap();
         map.put("status", "OK");
 
@@ -1432,7 +1428,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", folderId.getId());
             try {
-//                omfc.move(caller, folderId, toFolderId);
+//                getOrgMaterialFolderClient(cycle).move(caller, folderId, toFolderId);
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
@@ -1482,9 +1478,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final List<String> folderIds = getArray(cycle, "folderIds");
         final List<String> itemIds = getArray(cycle, "itemIds");
 
-        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
-//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
         Map<String, Object> map = createMap();
         map.put("status", "OK");
 
@@ -1494,7 +1487,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", folderId.getId());
             try {
-//                omfc.rmdir(caller, folderId, toFolderId);
+//                getOrgMaterialFolderClient(cycle).rmdir(caller, folderId, toFolderId);
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
@@ -1534,8 +1527,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
 
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
-//        omfc.rename(caller, folderId, name);
+//        getOrgMaterialFolderClient(cycle).rename(caller, folderId, name);
         Map<String, Object> map = createMap();
         map.put("status", "OK");
         return new JsonRequestTarget(JsonUtils.encode(map));
