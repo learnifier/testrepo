@@ -953,20 +953,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
             private void writeFolder(OrgMaterialFolder folder) throws IOException {
                 generator.writeStartObject();
-                if (folder.getId() == null) {
+                if (folder.getId().getId() == null) {
                     generator.writeNullField("id");
                 } else {
                     generator.writeNumberField("id", folder.getId().getId());
                 }
 
                 generator.writeStringField("name", folder.getName());
-
-                // TODO: Don't think we have recursive folders any more.
-//                generator.writeArrayFieldStart("folders");
-//                for (MatFolder subfolder : folder.getFolders()) {
-//                    writeFolder(subfolder);
-//                }
-                generator.writeEndArray();
 
                 generator.writeEndObject();
             }
@@ -1391,7 +1384,12 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         String folderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "folderId");
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
-        FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
+        FolderId folderId;
+        if("0".equals(folderIdStr)) { // 0 = root in js land
+            folderId = FolderId.forRoot();
+        } else {
+            folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
+        }
 
         Map<String, Object> map = createMap();
         try {
