@@ -1375,8 +1375,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     // TODO: Adding new operations below, may want to put them into some command class
 
     @WebAction
-    public RequestTarget onCreateFolder(RequestCycle cycle, String strOrgId)
-            throws Exception {
+    public RequestTarget onCreateFolder(RequestCycle cycle, String strOrgId) {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
         final long caller = LoginUserAccountHelper.getUserId(cycle);
@@ -1456,6 +1455,91 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final String reply = JsonUtils.encode(map);
         return new JsonRequestTarget(reply);
+    }
+
+    @WebAction
+    public RequestTarget onRemoveFoldersItems(RequestCycle cycle, String strOrgId) {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+
+        final List<String> folderIds = getArray(cycle, "folderIds");
+        final List<String> itemIds = getArray(cycle, "itemIds");
+
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+//        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
+//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+        Map<String, Object> map = createMap();
+        map.put("status", "OK");
+
+        List<Map<String, Object>> folders = new ArrayList<>();
+        for(String strFolderId: folderIds) {
+            final FolderId folderId = FolderId.valueOf(Long.valueOf(strFolderId));
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("id", folderId.getId());
+            try {
+//                omfc.rmdir(caller, folderId, toFolderId);
+                entry.put("status", "OK");
+            } catch (NotFoundException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Not found exception");
+            }
+            folders.add(entry);
+        }
+        map.put("folders", folders);
+
+        List<Map<String, Object>> items = new ArrayList<>();
+        for(String strItemId: itemIds) {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("id", strItemId);
+            try {
+//                opc.remove(caller, id, toFolderId); // TODO: Plug in real service call here.
+                entry.put("status", "OK");
+            } catch (NotFoundException e) {
+                entry.put("status", "ERROR");
+                entry.put("msg", "Not found exception");
+            }
+            items.add(entry);
+        }
+        map.put("items", items);
+
+        final String reply = JsonUtils.encode(map);
+        return new JsonRequestTarget(reply);
+    }
+
+    @WebAction
+    public RequestTarget onRenameFolder(RequestCycle cycle, String strOrgId) {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+
+        String folderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "folderId");
+        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
+        FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
+
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+//        final OrgMaterialFolderClient omfc = CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
+//        omfc.rename(caller, folderId, name);
+        Map<String, Object> map = createMap();
+        map.put("status", "OK");
+        return new JsonRequestTarget(JsonUtils.encode(map));
+    }
+
+    @WebAction
+    public RequestTarget onRenameItem(RequestCycle cycle, String strOrgId) {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+
+        String folderId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "itemId");
+        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
+
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+//        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
+//        opc.rename(caller, folderId, name);
+        Map<String, Object> map = createMap();
+        map.put("status", "OK");
+        return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
     private List<String> getArray(RequestCycle cycle, String fieldName) {

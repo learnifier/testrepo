@@ -45,12 +45,6 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                     { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null},
                 ],
-                //groupOps: [{
-                //    html: '<span><span class="glyphicon glyphicon - trash"></span> Removelol</span>',
-                //    callback: function (items) {
-                //        console.log("Remove fn on", items);
-                //    }
-                //}],
                 moveFn: function (folders, items, toFolderId) {
                     return $.ajax({
                         url: settings.moveToFolderUrl,
@@ -61,30 +55,32 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                         }
                     });
                 },
-                copyFn: function (items, toFolder) {
-                    var deferred = $.Deferred();
-                    window.setTimeout(function () {
-                        deferred.resolve($.map(items, function (item) {
-                            return ({status: "ok", item: item});
-                        }));
-                    }, 500);
-                    return deferred.promise();
+                removeFn: function(folders, items) {
+                    return $.ajax({
+                        url: settings.removeFoldersItemsUrl,
+                        data: {
+                            folderIds: folders,
+                            itemIds: items
+                        }
+                    });
                 },
-                removeFn: function (items) {
-                    var deferred = $.Deferred();
-                    window.setTimeout(function () {
-                        deferred.resolve($.map(items, function (item) {
-                            return ({status: "ok", item: item});
-                        }));
-                    }, 500);
-                    return deferred.promise();
+                renameFolderFn: function (id, newName) {
+                    return $.ajax({
+                        url: settings.renameFolderUrl,
+                        data: {
+                            folderId: id,
+                            name: name
+                        }
+                    });
                 },
-                renameFn: function (item, name) {
-                    var deferred = $.Deferred();
-                    window.setTimeout(function () {
-                        deferred.resolve({status: "ok", item: item});
-                    }, 500);
-                    return deferred.promise();
+                renameItemFn: function (id, newName) {
+                    return $.ajax({
+                        url: settings.renameItemUrl,
+                        data: {
+                            itemId: id,
+                            name: name
+                        }
+                    });
                 },
                 createFolderFn: function (name, folderId) {
                     return $.ajax({
