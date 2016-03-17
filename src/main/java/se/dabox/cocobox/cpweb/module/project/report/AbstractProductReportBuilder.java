@@ -148,7 +148,7 @@ public abstract class AbstractProductReportBuilder<P> {
 
             @Override
             public ProjectData callMaterialListProject() {
-                return new ProjectData(proj, null, null);
+                return new ProjectData(proj, null, null, null);
             }
 
             @Override
@@ -157,7 +157,7 @@ public abstract class AbstractProductReportBuilder<P> {
                     LOGGER.debug(
                             "Ignoring design project {} since it doesn't have a design",
                             projectId);
-                    return new ProjectData(null, null, null);
+                    return new ProjectData(null, null, null, null);
                 }
 
                 CourseDesignDefinition cdd;
@@ -168,11 +168,14 @@ public abstract class AbstractProductReportBuilder<P> {
                     LOGGER.
                             warn("Failed to get course definition for project {}: {}",
                                     proj.getProjectId(), ex);
-                    return new ProjectData(null, null, null);
+                    return new ProjectData(null, null, null, null);
                 }
                 DatabankFacade df = new GetDatabankFacadeCommand(cycle).get(proj);
 
-                return new ProjectData(proj, cdd, df);
+                Map<Long, List<ParticipationProgress>> progressMap
+                        = ccbcClient.getProjectProgress(proj.getProjectId());
+
+                return new ProjectData(proj, cdd, df, progressMap);
             }
 
             @Override

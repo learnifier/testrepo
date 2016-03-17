@@ -30,12 +30,13 @@ import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
-import se.dabox.service.common.coursedesign.ComponentUtil;
-import se.dabox.service.common.coursedesign.activity.Activity;
+import se.dabox.service.common.coursedesign.DatabankFacade;
 import se.dabox.service.common.coursedesign.activity.ActivityComponent;
-import se.dabox.service.common.coursedesign.activity.ActivityCourse;
-import se.dabox.service.common.coursedesign.activity.CourseDesignDefinitionActivityCourseFactory;
-import se.dabox.service.common.coursedesign.progress.ProgressType;
+import se.dabox.service.common.coursedesign.activity.MultiPageActivityCourse;
+import se.dabox.service.common.coursedesign.activity.MultiPageCourseCddActivityCourseFactory;
+import se.dabox.service.common.coursedesign.extstatus.ExtendedStatus;
+import se.dabox.service.common.coursedesign.extstatus.ExtendedStatusFactory;
+import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
@@ -55,7 +56,7 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
     private long candidateProjectId;
     private Set<ProductId> candidateProductIds;
 
-    private final Map<Long, Map<String, String>> userProdStatus = new HashMap<>();
+    private final Map<Long, UserProductStatus> userProdStatus = new HashMap<>();
 
     public ProductReportBuilder(ServiceRequestCycle cycle) {
         super(cycle);
@@ -127,18 +128,19 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
             ProjectParticipation participant) {
         generateMatListCandidateProductStatusSet(projData);
 
-        UserProductStatus ups = new UserProductStatus(participant.getUserId());
+        UserProductStatus ups = userProdStatus.computeIfAbsent(participant.getUserId(),
+                UserProductStatus::new);
 
         for (ProjectProduct projectProduct : projData.projProducts) {
             Set<UUID> cids = Collections.singleton(projectProduct.getCid());
-            String status;
+            ExtendedStatus status;
 
             if (participant.getLastAccess() == null) {
-                status = "na";
-            } else if (isProductCompleted(projData, participant, cids)) {
-                status = "c";
+                status = ExtendedStatus.notAttempted;
+            } else if (isProductCompleted(participant, cids)) {
+                status = ExtendedStatus.completed;
             } else {
-                status = "ip";
+                status = ExtendedStatus.incomplete;
             }
 
             ups.addStatus(new ProductId(projectProduct.getProductId()), status);
@@ -150,58 +152,41 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
     private UserProductStatus getDesignParticipantRowData(ProjectData projData,
             ProjectParticipation participant) {
 
-        generateDesignCandidateProductStatusSet(projData);
-
-        UserProductStatus ups = new UserProductStatus(participant.getUserId());
+        UserProductStatus ups = userProdStatus.computeIfAbsent(participant.getUserId(),
+                UserProductStatus::new);
 
         Map<ProductId, Set<UUID>> pcms = projData.getDefinition().getProductCidMapSet();
+
+        MultiPageActivityCourse course = getAcitivtyCourse(projData, participant);
 
         for (Map.Entry<ProductId, Set<UUID>> entry : pcms.entrySet()) {
             Set<UUID> cids = entry.getValue();
             ProductId productId = entry.getKey();
-            if (!candidateProductIds.contains(productId)) {
-                continue;
-            }
-            String status;
 
-            if (participant.getLastAccess() == null) {
-                status = "na";
-            } else if (isProductCompleted(projData, participant, cids)) {
-                status = "c";
-            } else {
-                status = "ip";
-            }
+            for (UUID cid : cids) {
+                ActivityComponent component = course.findComponent(cid);
+                if (component == null) {
+                    continue;
+                }
 
-            ups.addStatus(productId, status);
+                ExtendedStatus status = new ExtendedStatusFactory().statusFor(component);
+                ups.addStatus(productId, status);
+            }
         }
 
         return ups;
     }
 
-    private String getBestStatus(String oldStatus, String newStatus) {
-        //Can't get better than completed
-        if ("c".equals(oldStatus)) {
-            return oldStatus;
-        } else if ("c".equals(newStatus)) {
-            return newStatus;
-        } else if ("ip".equals(oldStatus)) {
-            return oldStatus;
-        } else if ("ip".equals(newStatus)) {
-            return newStatus;
-        }
-
-        return newStatus;
-    }
 
     private List<Map<String, Object>> generateUserDataRows(
-            Map<Long, Map<String, String>> userProdStatus) {
+            Map<Long, UserProductStatus> userProdStatus) {
         List<Map<String, Object>> rows = new ArrayList<>(userProdStatus.size());
 
-        for (Map.Entry<Long, Map<String, String>> entry : userProdStatus.entrySet()) {
+        for (Map.Entry<Long, UserProductStatus> entry : userProdStatus.entrySet()) {
             Map<String, Object> row = new HashMap<>();
 
             Long userId = entry.getKey();
-            Map<String, String> prodStatusMap = entry.getValue();
+            Map<String, ExtendedStatus> prodStatusMap = entry.getValue().getProductStatusMap();
 
             prodStatusMap = onlyExistingProductsMap(prodStatusMap);
 
@@ -225,7 +210,7 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
         return rows;
     }
 
-    private boolean isProductCompleted(ProjectData projData, ProjectParticipation participant,
+    private boolean isProductCompleted(ProjectParticipation participant,
             Set<UUID> cids) {
         List<ParticipationProgress> progress;
         try {
@@ -248,10 +233,11 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
         return false;
     }
 
-    private void generateProdInfoMap(Map<Long, Map<String, String>> userProdStatus) {
+    private void generateProdInfoMap(Map<Long, UserProductStatus> userProdStatus) {
         Set<String> productIds = new HashSet<>();
-        for (Map<String, String> map : userProdStatus.values()) {
-            productIds.addAll(map.keySet());
+
+        for (UserProductStatus value : userProdStatus.values()) {
+            productIds.addAll(value.getProductStatusMap().keySet());
         }
 
         ProductDirectoryClient pdClient
@@ -267,10 +253,10 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
         }
     }
 
-    private Map<String, String> onlyExistingProductsMap(Map<String, String> prodStatusMap) {
-        Map<String, String> newMap = MapUtil.createHash(prodStatusMap.size());
+    private Map<String, ExtendedStatus> onlyExistingProductsMap(Map<String, ExtendedStatus> prodStatusMap) {
+        Map<String, ExtendedStatus> newMap = MapUtil.createHash(prodStatusMap.size());
 
-        for (Map.Entry<String, String> entry : prodStatusMap.entrySet()) {
+        for (Map.Entry<String, ExtendedStatus> entry : prodStatusMap.entrySet()) {
             String prodId = entry.getKey();
             if (prodInfoMap.containsKey(prodId)) {
                 newMap.put(prodId, entry.getValue());
@@ -282,40 +268,6 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
         }
 
         return newMap;
-    }
-
-    private void generateDesignCandidateProductStatusSet(ProjectData projData) {
-        if (candidateProjectId == projData.getProject().getProjectId()) {
-            return;
-        }
-
-        Set<ProductId> prods = new HashSet<>();
-
-        ActivityCourse course = new CourseDesignDefinitionActivityCourseFactory().newActivityCourse(
-                projData.getDefinition(), projData.getDatabankFacade(), Collections.
-                <ParticipationProgress>emptyList());
-
-        for (Activity activity : course.getActivityList()) {
-            for (ActivityComponent activityComponent : activity.getComponents()) {
-                if (activityComponent.getProgressTrackingType() == ProgressType.NONE) {
-                    continue;
-                }
-
-                if (!"material".equals(activityComponent.getBasetype())) {
-                    continue;
-                }
-
-                ProductId prid = ComponentUtil.getProductId(activityComponent.getBasetype(),
-                        activityComponent.getSubtype());
-                if (prid != null) {
-                    prods.add(prid);
-                }
-            }
-        }
-
-        candidateProjectId = projData.getProject().getProjectId();
-        candidateProductIds = prods;
-
     }
 
     private void generateMatListCandidateProductStatusSet(ProjectData projData) {
@@ -374,28 +326,6 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
             return null;
         }
 
-        Map<String, String> upsMap = userProdStatus.get(row.getUserId());
-        if (upsMap == null) {
-            upsMap = new HashMap<>();
-            userProdStatus.put(row.getUserId(), upsMap);
-        }
-
-        for (Map.Entry<String, String> entry : row.getProductStatusMap().entrySet()) {
-            String productId = entry.getKey();
-            String newStatus = entry.getValue();
-
-            String oldStatus = upsMap.get(productId);
-
-            if (oldStatus == null) {
-                upsMap.put(productId, newStatus);
-            } else {
-                String bestStatus = getBestStatus(oldStatus, newStatus);
-                if (!bestStatus.equals(oldStatus)) {
-                    upsMap.put(productId, bestStatus);
-                }
-            }
-        }
-
         return null;
     }
 
@@ -407,6 +337,25 @@ public class ProductReportBuilder extends AbstractProductReportBuilder<UserProdu
 
         jsonResponse.put("aaData", generateUserDataRows(userProdStatus));
         jsonResponse.put("products", prodInfoMap);
+    }
+
+    private MultiPageActivityCourse getAcitivtyCourse(ProjectData projData,
+            ProjectParticipation participant) {
+
+        OrgProject project = projData.getProject();
+        List<ParticipationProgress> progress =
+                projData.getProgressMap().getOrDefault(participant.getParticipationId(),
+                        Collections.emptyList());
+
+        DatabankFacade databank = projData.getDatabankFacade();
+
+        CourseDesignDefinition cdd = projData.getDefinition();
+
+        MultiPageActivityCourse course
+                = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress, databank,
+                        cdd);
+
+        return course;
     }
 
 }

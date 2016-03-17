@@ -1,6 +1,7 @@
 [#ftl strip_text="true" /]
 
 [#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+[#import "/report/include/extendedStatusMap.ftl" as esMap /]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
@@ -12,12 +13,14 @@ ${cpweb_foot}
     $(document).ready(function() {
         require(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tableTools', 'dabox-common', 'dabox-jquery'], function(lr) {
 
+            var statusNames = [@esMap.langKeyMap /];
+
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
             var tableJSON = [];
-            var sumDataIP = ['In Progress'];
-            var sumDataNA = ['Not Accessed'];
-            var sumDataC = ['Completed'];
+            var sumDataIP = [statusNames.incomplete];
+            var sumDataNA = [statusNames.notAttempted];
+            var sumDataC = [statusNames.completed];
 
             lr.guiLongRun('${helper.urlFor("report.ReportJsonModule","productReport",[org.id])}', {
                 type: 'GET',
@@ -85,16 +88,23 @@ ${cpweb_foot}
                         "data": tableColIds[i],
                         "defaultContent": "",
                         "createdCell": function(nTd, sData, oData, iRow, iCol) {
-                            if (sData == 'c') {
+                            if (sData === 'completed') {
                                 sumDataC[iCol] = sumDataC[iCol] + 1;
-                                $(nTd).text('Completed').addClass('c');
-                            } else if (sData == 'ip') {
+                                $(nTd).addClass('c');
+                            } else if (sData === 'incomplete') {
                                 sumDataIP[iCol] = sumDataIP[iCol] + 1;
-                                $(nTd).text('In progress').addClass('ip');
-                            } else if (sData == 'na') {
+                                $(nTd).addClass('ip');
+                            } else if (sData === 'notAttempted') {
                                 sumDataNA[iCol] = sumDataNA[iCol] + 1;
-                                $(nTd).text('Not accessed').addClass('na');
+                                $(nTd).addClass('na');
                             }
+
+                            var txt = statusNames[sData];
+                            //Make sure we always have a value set
+                            if (txt) {
+                                $(nTd).text(txt);
+                            }
+
                         }
                     });
                 }

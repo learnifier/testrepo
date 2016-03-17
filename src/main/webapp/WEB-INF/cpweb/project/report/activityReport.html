@@ -3,6 +3,7 @@
 [#import "../projectInfo.html" as pInfo /]
 
 [#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+[#import "/report/include/extendedStatusMap.ftl" as esMap /]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
@@ -10,16 +11,7 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 </script>
 <script>
-    var statusNames = {
-        "notAttempted": "${ctext('cpweb:extendedstatus.notAttempted')}",
-        "incomplete": "${ctext('cpweb:extendedstatus.incomplete')}",
-        "overdue": "${ctext('cpweb:extendedstatus.overdue')}",
-        "locked": "${ctext('cpweb:extendedstatus.locked')}",
-        "failed": "${ctext('cpweb:extendedstatus.failed')}",
-        "passed": "${ctext('cpweb:extendedstatus.passed')}",
-        "completed": "${ctext('cpweb:extendedstatus.completed')}",
-        "notTracked": "${ctext('cpweb:extendedstatus.notTracked')}"
-    };
+    var statusNames = [@esMap.langKeyMap /];
 
 </script>
 <script>
@@ -29,7 +21,7 @@ ${cpweb_foot}
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
-            var tableColSumTitle = ["Completed"];
+            var tableColSumTitle = [statusNames.completed];
             var tableJSON = [];
 
             lr.guiLongRun('${reportJsonUrl}', {
