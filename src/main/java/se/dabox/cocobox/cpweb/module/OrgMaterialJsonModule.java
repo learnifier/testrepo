@@ -40,6 +40,7 @@ import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.InvalidTargetException;
+import se.dabox.service.common.ccbc.NotEmptyException;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.OrgProductClient;
 import se.dabox.service.common.ccbc.folder.FolderId;
@@ -1432,7 +1433,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }
 
         Map<String, Object> map = createMap();
-        map.put("status", "OK");
+        map.put("status", "ok");
 
         List<Map<String, Object>> folders = new ArrayList<>();
         for(String strFolderId: folderIds) {
@@ -1441,15 +1442,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             entry.put("id", folderId.getId());
             try {
                 getOrgMaterialFolderClient(cycle).move(caller, folderId, toFolderId);
-                entry.put("status", "OK");
+                entry.put("status", "ok");
             } catch (NotFoundException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Not found exception");
             } catch (AlreadyExistsException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Name already exists in target folder");
             } catch (InvalidTargetException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Invalid move");
             }
             folders.add(entry);
@@ -1464,15 +1465,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                 getCocoboxCordinatorClient(cycle).updateOrgProduct(
                         new UpdateOrgProductRequestBuilder(caller, orgId).setFolderId(toFolderId)
                                 .createUpdateOrgProductRequest());
-                entry.put("status", "OK");
+                entry.put("status", "ok");
             } catch (NotFoundException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Not found exception");
             } catch (AlreadyExistsException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Name already exists in target folder");
             } catch (InvalidTargetException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Invalid move");
             }
             items.add(entry);
@@ -1493,7 +1494,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final List<String> itemIds = getArray(cycle, "itemIds");
 
         Map<String, Object> map = createMap();
-        map.put("status", "OK");
+        map.put("status", "ok");
 
         List<Map<String, Object>> folders = new ArrayList<>();
         for(String strFolderId: folderIds) {
@@ -1502,9 +1503,12 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             entry.put("id", folderId.getId());
             try {
                 getOrgMaterialFolderClient(cycle).rmdir(caller, folderId);
-                entry.put("status", "OK");
+                entry.put("status", "ok");
+            } catch(NotEmptyException e) {
+                entry.put("status", "error");
+                entry.put("msg", "Only empty folders can be deleted.");
             } catch (NotFoundException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Not found exception");
             }
             folders.add(entry);
@@ -1517,9 +1521,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             entry.put("id", strItemId);
             try {
 //                getOrgProductClient(cycle).deleteOrgProduct(caller, orgId, strItemId); <-- bool
-                entry.put("status", "OK");
+                entry.put("status", "ok");
             } catch (NotFoundException e) {
-                entry.put("status", "ERROR");
+                entry.put("status", "error");
                 entry.put("msg", "Not found exception");
             }
             items.add(entry);
@@ -1543,7 +1547,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         getOrgMaterialFolderClient(cycle).rename(caller, folderId, new FolderName(name));
         Map<String, Object> map = createMap();
-        map.put("status", "OK");
+        map.put("status", "ok");
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
@@ -1561,7 +1565,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         Map<String, Object> map = createMap();
         map.put("status", "error");
         map.put("msg", "Rename on material not implemented yet");
-//        map.put("status", "OK");
+//        map.put("status", "ok");
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
