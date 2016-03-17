@@ -46,5 +46,22 @@
         return false;
     }
 
+    function editItemById(productId){
+
+        CcbAnonymousProductUpload.open(function(pid) {
+            if (pid) {
+                //everything fine, reload page to make product show up in the list
+                window.location.href=window.location.href;
+            } else {
+                //do nothing
+            }
+        }, {
+            scope: "O${org.id?c}",
+            productId: productId
+        });
+        return false;
+    }
+
+
 </script>
 [/#macro]
