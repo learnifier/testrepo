@@ -41,7 +41,7 @@ ${cpweb_foot}
     });
 
     // Folder stuff
-    window.contextPath = "${contextPath}";
+    window.cocoboxCdn = "${cocoboxCdn}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         s.init({
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
