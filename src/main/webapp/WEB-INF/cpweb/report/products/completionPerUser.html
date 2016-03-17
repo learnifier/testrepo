@@ -11,7 +11,7 @@ ${cpweb_foot}
 <script>
 
     $(document).ready(function() {
-        require(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tableTools', 'dabox-common', 'dabox-jquery'], function(lr) {
+        require(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dataTables-tableTools', 'dabox-common'], function(lr) {
 
             var statusNames = [@esMap.langKeyMap /];
 
@@ -33,7 +33,6 @@ ${cpweb_foot}
                 success: function(data) {
                     extractCols(data.products);
                     renderColDefs();
-                    console.log(productCols);
                     calculateSummary(data.aaData);
                     renderSummary(data.aaData.length, data.products);
                     initializeTable(data.aaData, data.products);
@@ -158,7 +157,7 @@ ${cpweb_foot}
                         });
                     },
                     "initComplete": function() {
-                        //$('[data-toggle="tooltip"]').tooltip();
+                        $('[data-toggle="tooltip"]').tooltip();
                         $('#r_product_completion_filter input').attr('placeholder', 'Search report');
                     }
                 });
