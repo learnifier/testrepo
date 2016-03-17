@@ -1557,10 +1557,11 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
 
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        final OrgProductClient opc = CacheClients.getClient(cycle, OrgProductClient.class);
-//        opc.rename(caller, folderId, name);
+//        ccbc.updateOrgMaterial(new UpdateOrgProductRequestBuilder(caller, orgId).setName(name).createUpdateOrgProductRequest());
         Map<String, Object> map = createMap();
-        map.put("status", "OK");
+        map.put("status", "error");
+        map.put("msg", "Rename on material not implemented yet");
+//        map.put("status", "OK");
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
