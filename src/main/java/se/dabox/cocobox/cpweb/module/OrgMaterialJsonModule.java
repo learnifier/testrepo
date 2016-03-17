@@ -1526,7 +1526,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
 
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        getOrgMaterialFolderClient(cycle).rename(caller, folderId, name);
+        getOrgMaterialFolderClient(cycle).rename(caller, folderId, new FolderName(name));
         Map<String, Object> map = createMap();
         map.put("status", "OK");
         return new JsonRequestTarget(JsonUtils.encode(map));
