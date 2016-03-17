@@ -90,8 +90,8 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                             name: name
                         }
                     });
-                }
-
+                },
+                editOrgMatUrl: settings.editOrgMatUrl
             }
         };
     }
@@ -100,7 +100,13 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
         settings = $.extend({
             listUrl: undefined,
             moveFolderUrl: undefined,
-            editMode: false
+            createFolderUrl: undefined,
+            removeFoldersItemsUrl: undefined,
+            renameFolderUrl: undefined,
+            renameItemUrl: undefined,
+            editOrgMatUrl: undefined,
+            editMode: true // TODO: Check permissions here.
+
         }, options || {});
 
         ko.applyBindings(new ListMaterialModel());
