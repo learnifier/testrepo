@@ -1421,8 +1421,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final List<String> folderIds = getArray(cycle, "folderIds");
         final List<String> itemIds = getArray(cycle, "itemIds");
-        String toFolderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "toFolderId");
-        FolderId toFolderId = FolderId.valueOf(Long.valueOf(toFolderIdStr));
+        final String toFolderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "toFolderId");
+        final FolderId toFolderId;
+        if("0".equals(toFolderIdStr)) {
+            toFolderId = FolderId.forRoot();
+        } else {
+            toFolderId = FolderId.valueOf(Long.valueOf(toFolderIdStr));
+        }
 
         Map<String, Object> map = createMap();
         map.put("status", "OK");
@@ -1433,7 +1438,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", folderId.getId());
             try {
-//                getOrgMaterialFolderClient(cycle).move(caller, folderId, toFolderId);
+                getOrgMaterialFolderClient(cycle).move(caller, folderId, toFolderId);
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
