@@ -960,6 +960,12 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                     generator.writeNumberField("id", folder.getId().getId());
                 }
 
+                if (folder.getParentId().getId() == null) {
+                    generator.writeNullField("parentId");
+                } else {
+                    generator.writeNumberField("parentId", folder.getParentId().getId());
+                }
+
                 generator.writeStringField("name", folder.getName());
 
                 generator.writeEndObject();
