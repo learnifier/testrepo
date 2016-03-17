@@ -17,6 +17,8 @@ ${cpweb_foot}
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
+            //Product ids in column order
+            var productCols = [];
             var tableJSON = [];
             var sumDataIP = [statusNames.incomplete];
             var sumDataNA = [statusNames.notAttempted];
@@ -31,8 +33,10 @@ ${cpweb_foot}
                 success: function(data) {
                     extractCols(data.products);
                     renderColDefs();
-                    initializeTable(data.aaData, data.products);
+                    console.log(productCols);
+                    calculateSummary(data.aaData);
                     renderSummary(data.aaData.length, data.products);
+                    initializeTable(data.aaData, data.products);
                 }
             });
 
@@ -40,13 +44,12 @@ ${cpweb_foot}
                 for (var product in products) {
                     tableColTitles.push(products[product]['title']);
                     tableColIds.push('productStatus.' + products[product]['id']);
+                    productCols.push(products[product]['id']);
                     sumDataIP.push(0);
                     sumDataNA.push(0);
                     sumDataC.push(0);
-                }
-                ;
-            }
-            ;
+                };
+            };
 
             function completionRateCalc(i, sumDataNA, sumDataIP, sumDataC) {
                 if (i > 0 && sumDataC > 0) {
@@ -69,15 +72,34 @@ ${cpweb_foot}
             }
             function renderSummary(itemCount) {
                 for (var i = 0; i < tableColTitles.length; i++) {
-                    $('#r_product_completion #not_started').append("<td>" + sumDataNA[i] + "</td>");
-                    $('#r_product_completion #in_progress').append("<td>" + sumDataIP[i] + "</td>");
-                    $('#r_product_completion #completed').append("<td>" + sumDataC[i] + "</td>");
-                    $('#r_product_completion #completion_rate').append("<td>" + completionRateCalc(i, sumDataNA[i], sumDataIP[i], sumDataC[i]) + "</td>");
-                    $('#r_product_completion #reach').append("<td>" + reachCalc(i, itemCount, sumDataNA[i], sumDataIP[i], sumDataC[i]) + "</td>");
+                    $('#not_started').append("<td>" + sumDataNA[i] + "</td>");
+                    $('#in_progress').append("<td>" + sumDataIP[i] + "</td>");
+                    $('#completed').append("<td>" + sumDataC[i] + "</td>");
+                    $('#completion_rate').append("<td>" + completionRateCalc(i, sumDataNA[i], sumDataIP[i], sumDataC[i]) + "</td>");
+                    $('#reach').append("<td>" + reachCalc(i, itemCount, sumDataNA[i], sumDataIP[i], sumDataC[i]) + "</td>");
                 }
                 ;
+            };
+
+            function calculateSummary(data) {
+                for(var i=0;i<data.length;i++) {
+                    var userRow = data[i];
+                    for(var iCol=0;iCol<productCols.length;iCol++) {
+                        if (!(productCols[iCol] in userRow.productStatus)) {
+                            continue;
+                        }
+
+                        var status = userRow.productStatus[productCols[iCol]];
+                        if (status === 'completed' || status === 'passed' || status === 'failed') {
+                            sumDataC[1+iCol] = sumDataC[1+iCol] + 1;
+                        } else if (status === 'incomplete') {
+                            sumDataIP[1+iCol] = sumDataIP[1+iCol] + 1;
+                        } else if (status === 'notAttempted') {
+                            sumDataNA[1+iCol] = sumDataNA[1+iCol] + 1;
+                        }
+                    }
+                }
             }
-            ;
 
             function renderColDefs() {
                 for (var i = 0; i < tableColTitles.length; i++) {
@@ -88,7 +110,7 @@ ${cpweb_foot}
                         "data": tableColIds[i],
                         "defaultContent": "",
                         "createdCell": function(nTd, sData, oData, iRow, iCol) {
-                            if (sData === 'completed') {
+                            if (sData === 'completed' || sData === 'passed' || sData === 'failed') {
                                 sumDataC[iCol] = sumDataC[iCol] + 1;
                                 $(nTd).addClass('c');
                             } else if (sData === 'incomplete') {
@@ -131,16 +153,12 @@ ${cpweb_foot}
                     },
                     "headerCallback": function(nHead, aData, iStart, iEnd, aiDisplay) {
                         var headings = $('th', nHead);
-
-                        //log(headings);
-
                         $.each(headings, function(key, element) {
-                            //log(element);
                             $(element).css('max-width', $(element).css('width'));
                         });
                     },
                     "initComplete": function() {
-                        $('[data-toggle="tooltip"]').tooltip();
+                        //$('[data-toggle="tooltip"]').tooltip();
                         $('#r_product_completion_filter input').attr('placeholder', 'Search report');
                     }
                 });
