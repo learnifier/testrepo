@@ -93,11 +93,6 @@ public abstract class AbstractModule {
         return CacheClients.getClient(cycle, OrgMaterialFolderClient.class);
     }
 
-    public static OrgProductClient getOrgProductClient(
-            ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, OrgProductClient.class);
-    }
-
     public static ClientUserGroupClient getClientUserGroupClient(
             ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, ClientUserGroupClient.class);

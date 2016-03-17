@@ -56,6 +56,8 @@ import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.org.UpdateOrgProductLinkRequest;
+import se.dabox.service.common.ccbc.org.UpdateOrgProductRequest;
+import se.dabox.service.common.ccbc.org.UpdateOrgProductRequestBuilder;
 import se.dabox.service.common.ccbc.product.ProductInUseException;
 import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -1459,7 +1461,9 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", strItemId);
             try {
-//                opc.move(caller, id, toFolderId); // TODO: Plug in real service call here.
+                getCocoboxCordinatorClient(cycle).updateOrgProduct(
+                        new UpdateOrgProductRequestBuilder(caller, orgId).setFolderId(toFolderId)
+                                .createUpdateOrgProductRequest());
                 entry.put("status", "OK");
             } catch (NotFoundException e) {
                 entry.put("status", "ERROR");
