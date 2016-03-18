@@ -42,10 +42,8 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.InvalidTargetException;
 import se.dabox.service.common.ccbc.NotEmptyException;
 import se.dabox.service.common.ccbc.NotFoundException;
-import se.dabox.service.common.ccbc.OrgProductClient;
 import se.dabox.service.common.ccbc.folder.FolderId;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
-import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.material.MaterialLink;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
@@ -57,7 +55,6 @@ import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.org.OrgProductLink;
 import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.org.UpdateOrgProductLinkRequest;
-import se.dabox.service.common.ccbc.org.UpdateOrgProductRequest;
 import se.dabox.service.common.ccbc.org.UpdateOrgProductRequestBuilder;
 import se.dabox.service.common.ccbc.product.ProductInUseException;
 import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
@@ -881,6 +878,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
                         generator.writeNullField("materialFolderId");
                     } else {
                         generator.writeNumberField("materialFolderId", orgProduct.getFolderId().getId());
+                        generator.writeNumberField("orgProductId", orgProduct.getOrgProductId());
                     }
                 } else {
                     generator.writeNullField("materialFolderId");
@@ -1273,7 +1271,12 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
     private long getOrgProdId(CocoboxCoordinatorClient cocoboxCordinatorClient, MiniOrgInfo orgUnit,
             String productId) {
-        List<OrgProduct> orgProducts = cocoboxCordinatorClient.listOrgProducts(orgUnit.getId());
+        return getOrgProdId(cocoboxCordinatorClient, orgUnit.getId(), productId);
+    }
+
+    private long getOrgProdId(CocoboxCoordinatorClient cocoboxCordinatorClient, Long orgId,
+                              String productId) {
+        List<OrgProduct> orgProducts = cocoboxCordinatorClient.listOrgProducts(orgId);
 
         for (OrgProduct orgProduct : orgProducts) {
             if (orgProduct.getProdId().equals(productId)) {
@@ -1281,7 +1284,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             }
         }
 
-        throw new IllegalStateException("Unable to find orgprodid for "+productId+" in "+orgUnit.getId());
+        throw new IllegalStateException("Unable to find orgprodid for "+productId+" in "+orgId);
     }
 
     private List<Product> getOrgMatProducts(RequestCycle cycle, List<OrgProduct> orgProds) {
@@ -1462,8 +1465,10 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", strItemId);
             try {
+                Long orgProdId = getOrgProdId(getCocoboxCordinatorClient(cycle), orgId,
+                        strItemId);
                 getCocoboxCordinatorClient(cycle).updateOrgProduct(
-                        new UpdateOrgProductRequestBuilder(caller, orgId).setFolderId(toFolderId)
+                        new UpdateOrgProductRequestBuilder(caller, orgProdId).setFolderId(toFolderId)
                                 .createUpdateOrgProductRequest());
                 entry.put("status", "ok");
             } catch (NotFoundException e) {
