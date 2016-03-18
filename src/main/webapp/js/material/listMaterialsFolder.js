@@ -21,11 +21,6 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
             return deferred.promise();
         }
 
-        function preview(item){
-            console.log("Item = ", item.name());
-            alert("Preview of " + item.name());
-        }
-
         // Return parameters for cocobox-list component
 
         self.cocoboxListParams = function() {
@@ -39,9 +34,9 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                 typeField: "type",  // TODO: Not used
                 columns: [
                     { label: "", name: "thumbnail", format: function(val){return '<a href><img src="' + val + '"></a>'},
-                        cssClass: "material-thumbnail", clickFn: preview},
+                        cssClass: "material-thumbnail", clickFn: null},
                     { label: "Name", name: "name", format: function(val){return "<a href>" + val() + "</a>";},
-                        cssClass: "", clickFn: preview},
+                        cssClass: "", clickFn: null},
                     { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null}
                 ],
