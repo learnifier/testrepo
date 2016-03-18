@@ -41,7 +41,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                     { label: "", name: "thumbnail", format: function(val){return '<a href><img src="' + val + '"></a>'},
                         cssClass: "material-thumbnail", clickFn: preview},
                     { label: "Name", name: "name", format: function(val){return "<a href>" + val() + "</a>";},
-                        cssClass: "block-link", clickFn: preview},
+                        cssClass: "", clickFn: preview},
                     { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null}
                 ],

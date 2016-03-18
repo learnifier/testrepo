@@ -36,10 +36,16 @@ ${cpweb_foot}
 [@addAnonProd.addScript /]
 [/#assign]
 
-
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
-[@addAnonProd.addButton /]
+<section class="ccb-page-header margin-bottom">
+    <div class="ccb-page-header__actions--right">
+        [@addAnonProd.addButton /]
+    </div>
+    <h1 class="page-title">Materials</h1>
+</section>
+
+
 
 <div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}"></div>
 
