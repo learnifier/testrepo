@@ -100,7 +100,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                         if (item.anonymous) {
                             actions.push({
                                 html: "Edit", action: function () {
-                                    editItemById(item.id); // Ugly global here...
+                                    editItemById(item.id); // Ugly global spotted here...
                                 }
                             });
                         }
