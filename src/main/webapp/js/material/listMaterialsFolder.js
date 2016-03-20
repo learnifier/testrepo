@@ -86,7 +86,8 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                         }
                     });
                 },
-                editOrgMatUrl: settings.editOrgMatUrl
+                editOrgMatUrl: settings.editOrgMatUrl,
+                folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg"
             }
         };
     }
