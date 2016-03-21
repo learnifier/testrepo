@@ -129,8 +129,42 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', '
 
     $(document).ready(function(){
         $(".add-material-ng").click(function(){
-            $("#iframeLab").attr('src', settings.iframeLabUrl);
+            $("#iframeLab").attr('src', settings.iframeLabUrl).show();
             console.log($("#iframeLab"));
+
+            function receiveMessage(event) {
+                var origin = event.origin || event.originalEvent.origin;
+                if (origin !== window.location.origin) // Ok to use window.location.origin?
+                    return;
+                console.log("Got message", event);
+                var data;
+                try {
+                    data = JSON.parse(event.data);
+                } catch(err) {
+                    return;
+                }
+
+                if(data.service === "addProducts") {
+                    if(data.command === "add") {
+                        if(data.products instanceof Array) {
+                            data.products.forEach(function(prod){
+                                console.log("Adding product: ", prod.id);
+                            });
+                        }
+                        close();
+                    }
+                    if(data.command === "close") {
+                        close();
+                    }
+                }
+            }
+            function close() {
+                $("#iframeLab").attr('src', 'javascript:void(0);').hide(); // TODO: Set src, clear html?
+                window.removeEventListener("message", receiveMessage);
+            }
+
+            window.addEventListener("message", receiveMessage, false);
+
         });
     });
     return exports;

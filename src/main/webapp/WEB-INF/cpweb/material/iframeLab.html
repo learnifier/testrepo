@@ -6,11 +6,35 @@ ${cpweb_foot}
     $('#menu-library').addClass('subMenuExpanded');
     $('#menu-library-materials').addClass('active');
 </script>
+<script>
+    function sendResult(command, data) {
+        var msg = Object.assign(
+                {
+                    service: "addProducts",
+                    command: command
+                },
+                data);
+        parent.postMessage(JSON.stringify(msg), window.location.origin);  // Is this ok?
+    }
+    $("#close").click(function() {
+        sendResult("close");
+    });
+    $("#add").click(function() {
+        sendResult("add", {
+                    products: [
+                        {id: "C123"},
+                        {id: "C42"}
+                    ]
+                }
+        );
+    });
+</script>
 [/#assign]
-
 
 [@dws.skin skin="bootstrap_barebone" earlycss=earlycss foot=foot title="Cool stuff here"]
 
 <h1>Add material lab</h1>
 
+<button id="add">Add some products</button>
+<button id="close">Close</button>
 [/@dws.skin]
