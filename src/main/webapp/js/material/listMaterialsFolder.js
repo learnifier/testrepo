@@ -2,7 +2,7 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], function (ko) {
+define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', 'es6-shim'], function (ko) {
     "use strict";
     var exports = {};
     var settings;
@@ -112,7 +112,7 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
     }
 
     exports.init = function(options) {
-        settings = $.extend({
+        settings = Object.assign({
             listUrl: undefined,
             moveFolderUrl: undefined,
             createFolderUrl: undefined,
@@ -121,13 +121,17 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
             renameItemUrl: undefined,
             editOrgMatUrl: undefined,
             editMode: true // TODO: Check permissions here.
-
-        }, options || {});
+        }, options);
 
         ko.applyBindings(new ListMaterialModel());
 
     };
 
+    $(document).ready(function(){
+        $(".add-material-ng").click(function(){
+           alert("go");
+        });
+    });
     return exports;
 
 });
