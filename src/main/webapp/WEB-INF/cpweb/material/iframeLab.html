@@ -1,0 +1,16 @@
+[#ftl strip_text="true" /]
+
+[#assign foot]
+${cpweb_foot}
+<script>
+    $('#menu-library').addClass('subMenuExpanded');
+    $('#menu-library-materials').addClass('active');
+</script>
+[/#assign]
+
+
+[@dws.skin skin="bootstrap_barebone" earlycss=earlycss foot=foot title="Cool stuff here"]
+
+<h1>Add material lab</h1>
+
+[/@dws.skin]

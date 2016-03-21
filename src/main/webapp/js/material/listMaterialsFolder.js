@@ -129,7 +129,8 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', '
 
     $(document).ready(function(){
         $(".add-material-ng").click(function(){
-           alert("go");
+            $("#iframeLab").attr('src', settings.iframeLabUrl);
+            console.log($("#iframeLab"));
         });
     });
     return exports;
