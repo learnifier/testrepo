@@ -25,7 +25,8 @@ ${cpweb_foot}
             renameFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','renameFolder',[org.id])}",
             renameItemUrl: "${helper.urlFor('OrgMaterialJsonModule','renameItem',[org.id])}",
             editOrgMatUrl: "${helper.urlFor('material.MaterialModule','edit',[org.id])}",
-            addProductUrl: "${helper.urlFor('material.MaterialModule', 'iframeLab',[org.id])}",
+            addProductUrl: "${dwsrt.config['pdweb.baseurl']}aprodnew/iframeLab?scope=O${org.id?c}",
+//            addProductUrl: "${helper.urlFor('material.MaterialModule', 'iframeLab',[org.id])}",
             editMode: true // TODO: Check permissions here.
         });
     });

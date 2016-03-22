@@ -114,15 +114,4 @@ public class MaterialModule extends AbstractWebAuthModule {
         }
         return orgmat;
     }
-
-    @WebAction
-    public RequestTarget onIframeLab(RequestCycle cycle, String strOrgId) {
-        checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_EDIT_ORGMAT);
-        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-        Map<String, Object> map = createMap();
-//        map.put("origin", cycle.getRequest().getServerRequestUrl().toString());
-        map.put("org", org);
-
-        return new FreemarkerRequestTarget("/material/iframeLab.html", map);
-    }
 }
