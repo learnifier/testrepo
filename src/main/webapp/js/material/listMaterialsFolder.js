@@ -2,61 +2,7 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define('CcbImodal', ['es6-shim'], function(){
-    "use strict";
-
-    function CcbImodal(options) {
-        this.settings = Object.assign({
-            serviceName: undefined,
-            addProductUrl: undefined,
-            callbacks: undefined,
-            modalClass: undefined
-        }, options);
-    }
-
-    CcbImodal.prototype.open = function() {
-        this._iframe = $('<iframe width="100%" style="background:#ffffff;opacity:1.0;z-index:10000;color:#000000;display: none;height: 100%;position:fixed; top:0px; left:0px; bottom:0px; right:0px;" id="iframeLab"></iframe>').appendTo(document.body);
-        if(this.settings.modalClass) {
-            this._iframe.addClass(this.settings.modalClass);
-        }
-        this._iframe.attr('src', this.settings.addProductUrl).show();
-
-        this._receiveMessage = this._receiveMessageInner.bind(this);
-        window.addEventListener("message", this._receiveMessage, false);
-    };
-
-    CcbImodal.prototype._receiveMessageInner = function(event) {
-        var origin = event.origin || event.originalEvent.origin;
-        if (origin !== window.location.origin) // Ok to use window.location.origin?
-            return;
-        var data;
-        try {
-            data = JSON.parse(event.data);
-        } catch(err) {
-            return;
-        }
-
-        if(data.service === this.settings.serviceName) {
-            if(this.settings.callbacks[data.command]) {
-                this.settings.callbacks[data.command](data);
-            }
-            if(data.command === "add") {
-                this.close();
-            }
-            if(data.command === "close") {
-                this.close();
-            }
-        }
-    };
-
-    CcbImodal.prototype.close = function(){
-        this._iframe.remove();
-        window.removeEventListener("message", this._receiveMessage); // Does this work with bind?
-    };
-    return CcbImodal;
-});
-
-define(['knockout', 'CcbImodal', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', 'es6-shim'], function (ko, CcbImodal) {
+define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', 'es6-shim'], function (ko, ccbImodal) {
     "use strict";
     var exports = {};
     var settings;
@@ -181,7 +127,7 @@ define(['knockout', 'CcbImodal', 'dabox-common', 'cocobox/ko-components/list/coc
 
     $(document).ready(function(){
         $(".add-material-ng").click(function(){
-            var imodal = new CcbImodal({
+            var imodal = new ccbImodal.Server({
                 serviceName: "addProducts",
                 addProductUrl: settings.addProductUrl,
                 callbacks: {

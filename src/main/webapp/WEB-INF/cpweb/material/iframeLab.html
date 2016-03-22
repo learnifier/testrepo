@@ -7,27 +7,31 @@ ${cpweb_foot}
     $('#menu-library-materials').addClass('active');
 </script>
 <script>
-    function sendResult(command, data) {
-        var msg = Object.assign(
-                {
-                    service: "addProducts",
-                    command: command
-                },
-                data);
-        parent.postMessage(JSON.stringify(msg), window.location.origin);  // Is this ok?
-    }
-    $("#close").click(function() {
-        sendResult("close");
+    require(['cocobox/ccb-imodal', 'es6-shim'], function (ccbImodal) {
+        "use strict";
+        var exports = {};
+
+        var ccbImodalClient = new ccbImodal.Client({
+            serviceName: "addProducts"
+        });
+
+        $("#close").click(function() {
+            ccbImodalClient.close();
+        });
+        $("#add").click(function() {
+            ccbImodalClient.send("add", {
+                        products: [
+                            {id: "C123"},
+                            {id: "C42"}
+                        ]
+                    }
+            );
+            ccbImodalClient.close();
+        });
+
+        return exports;
     });
-    $("#add").click(function() {
-        sendResult("add", {
-                    products: [
-                        {id: "C123"},
-                        {id: "C42"}
-                    ]
-                }
-        );
-    });
+
 </script>
 [/#assign]
 
