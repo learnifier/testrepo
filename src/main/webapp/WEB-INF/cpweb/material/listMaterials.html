@@ -25,7 +25,7 @@ ${cpweb_foot}
             renameFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','renameFolder',[org.id])}",
             renameItemUrl: "${helper.urlFor('OrgMaterialJsonModule','renameItem',[org.id])}",
             editOrgMatUrl: "${helper.urlFor('material.MaterialModule','edit',[org.id])}",
-            iframeLabUrl: "${helper.urlFor('material.MaterialModule', 'iframeLab',[org.id])}",
+            addProductUrl: "${helper.urlFor('material.MaterialModule', 'iframeLab',[org.id])}",
             editMode: true // TODO: Check permissions here.
         });
     });
@@ -46,7 +46,5 @@ ${cpweb_foot}
 </section>
 
 <div data-bind="component: { name: 'cocobox-list', params: cocoboxListParams()}"></div>
-
-<iframe width="100%" style="background: #ffffff; opacity:1.0;z-index:10000;color:#000000;display: none;height: 100%;position:fixed; top:0px; left:0px; bottom:0px; right:0px;" id="iframeLab"></iframe>
 
 [/@dws.skin]

@@ -2,7 +2,61 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', 'es6-shim'], function (ko) {
+define('CcbImodal', ['es6-shim'], function(){
+    "use strict";
+
+    function CcbImodal(options) {
+        this.settings = Object.assign({
+            serviceName: undefined,
+            addProductUrl: undefined,
+            callbacks: undefined,
+            modalClass: undefined
+        }, options);
+    }
+
+    CcbImodal.prototype.open = function() {
+        this._iframe = $('<iframe width="100%" style="background:#ffffff;opacity:1.0;z-index:10000;color:#000000;display: none;height: 100%;position:fixed; top:0px; left:0px; bottom:0px; right:0px;" id="iframeLab"></iframe>').appendTo(document.body);
+        if(this.settings.modalClass) {
+            this._iframe.addClass(this.settings.modalClass);
+        }
+        this._iframe.attr('src', this.settings.addProductUrl).show();
+
+        this._receiveMessage = this._receiveMessageInner.bind(this);
+        window.addEventListener("message", this._receiveMessage, false);
+    };
+
+    CcbImodal.prototype._receiveMessageInner = function(event) {
+        var origin = event.origin || event.originalEvent.origin;
+        if (origin !== window.location.origin) // Ok to use window.location.origin?
+            return;
+        var data;
+        try {
+            data = JSON.parse(event.data);
+        } catch(err) {
+            return;
+        }
+
+        if(data.service === this.settings.serviceName) {
+            if(this.settings.callbacks[data.command]) {
+                this.settings.callbacks[data.command](data);
+            }
+            if(data.command === "add") {
+                this.close();
+            }
+            if(data.command === "close") {
+                this.close();
+            }
+        }
+    };
+
+    CcbImodal.prototype.close = function(){
+        this._iframe.remove();
+        window.removeEventListener("message", this._receiveMessage); // Does this work with bind?
+    };
+    return CcbImodal;
+});
+
+define(['knockout', 'CcbImodal', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', 'es6-shim'], function (ko, CcbImodal) {
     "use strict";
     var exports = {};
     var settings;
@@ -122,51 +176,30 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', '
             editOrgMatUrl: undefined,
             editMode: true // TODO: Check permissions here.
         }, options);
-
         ko.applyBindings(new ListMaterialModel());
-
     };
 
     $(document).ready(function(){
         $(".add-material-ng").click(function(){
-            $("#iframeLab").attr('src', settings.iframeLabUrl).show();
-            console.log($("#iframeLab"));
-
-            function receiveMessage(event) {
-                var origin = event.origin || event.originalEvent.origin;
-                if (origin !== window.location.origin) // Ok to use window.location.origin?
-                    return;
-                console.log("Got message", event);
-                var data;
-                try {
-                    data = JSON.parse(event.data);
-                } catch(err) {
-                    return;
-                }
-
-                if(data.service === "addProducts") {
-                    if(data.command === "add") {
+            var imodal = new CcbImodal({
+                serviceName: "addProducts",
+                addProductUrl: settings.addProductUrl,
+                callbacks: {
+                    "add": function (data) {
                         if(data.products instanceof Array) {
                             data.products.forEach(function(prod){
-                                console.log("Adding product: ", prod.id);
+                                console.log("*** main: Adding product: ", prod.id);
                             });
                         }
-                        close();
-                    }
-                    if(data.command === "close") {
-                        close();
+                        console.log("*** main: Add: ", data);
+                    },
+                    "close": function(data) {
+                        console.log("*** main: Close");
                     }
                 }
-            }
-            function close() {
-                $("#iframeLab").attr('src', 'javascript:void(0);').hide(); // TODO: Set src, clear html?
-                window.removeEventListener("message", receiveMessage);
-            }
-
-            window.addEventListener("message", receiveMessage, false);
-
+            });
+            imodal.open();
         });
     });
     return exports;
-
 });
