@@ -142,7 +142,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     "close": function(data) {
                         console.log("*** main: Close");
                     }
-                }
+                },
+                modalClass: "add-product-iframe"
             });
             imodal.open();
         });
