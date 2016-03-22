@@ -11,22 +11,22 @@ ${cpweb_foot}
         "use strict";
         var exports = {};
 
-        var ccbImodalClient = new ccbImodal.Client({
+        var imodalClient = new ccbImodal.Client({
             serviceName: "addProducts"
         });
 
         $("#close").click(function() {
-            ccbImodalClient.close();
+            imodalClient.close();
         });
         $("#add").click(function() {
-            ccbImodalClient.send("add", {
+            imodalClient.send("add", {
                         products: [
                             {id: "C123"},
                             {id: "C42"}
                         ]
                     }
             );
-            ccbImodalClient.close();
+            imodalClient.close();
         });
 
         return exports;
