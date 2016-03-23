@@ -1406,7 +1406,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         Map<String, Object> map = createMap();
         try {
-            getOrgMaterialFolderClient(cycle).mkdir(caller, orgId, folderId, new FolderName(name));
+            final OrgMaterialFolder newFolder = getOrgMaterialFolderClient(cycle).mkdir(caller, orgId, folderId, new FolderName(name));
+            map.put("id", newFolder.getId().getId());
             map.put("status", "ok");
         } catch(NotFoundException e) {
             map.put("status", "error");
@@ -1570,7 +1571,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         Map<String, Object> map = createMap();
         map.put("status", "error");
         map.put("msg", "Rename on material not implemented yet");
-//        map.put("status", "ok");
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
@@ -1580,7 +1580,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final String[] vals = request.getParameterValues(fieldName + "[]");
         final String val = request.getParameter(fieldName);
 
-        List<String> fieldValues;
         if(val != null) {
             return Arrays.asList(val);
         } else if (vals != null) {
