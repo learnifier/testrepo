@@ -15,13 +15,20 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
             var deferred = $.Deferred();
             $.getJSON(url).done(function(data){
                 // TODO: Handle errors
-                console.log("data", data);
                 deferred.resolve({ rows: data.aaData, folders: data.folders});
             });
             return deferred.promise();
         }
 
         // Return parameters for cocobox-list component
+
+        function decorateLink(isLink, html) {
+            if(isLink) {
+                return "<a href>" + html + "</a>";
+            } else {
+                return html;
+            }
+        }
 
         self.cocoboxListParams = function() {
             return {
@@ -33,12 +40,12 @@ define(['knockout', 'dabox-common', 'cocobox/ko-components/list/cocobox-list'], 
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "", name: "thumbnail", format: function(val){return '<a href><img src="' + val + '"></a>'},
+                    { label: "", name: "thumbnail", format: function(item){return decorateLink(item.typeTitle==="Folder", '<img src="' + item.thumbnail + '">')},
                         cssClass: "material-thumbnail", clickFn: null},
-                    { label: "Name", name: "name", format: function(val){return "<a href>" + val() + "</a>";},
+                    { label: "Name", name: "name", format: function(item){return decorateLink(item.typeTitle==="Folder", item.name())},
                         cssClass: "", clickFn: null},
-                    { label: "Kind", name: "typeTitle", format: function(val){return val}, cssClass: "", clickFn: null},
-                    { label: "Updated", name: "updated", format: function(val){return val}, cssClass: "", clickFn: null}
+                    { label: "Kind", name: "typeTitle", format: function(item){return item.typeTitle}, cssClass: "", clickFn: null},
+                    { label: "Updated", name: "updated", format: function(item){return item.updated}, cssClass: "", clickFn: null}
                 ],
                 moveFn: function (folders, items, toFolderId) {
                     return $.ajax({
