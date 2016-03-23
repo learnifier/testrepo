@@ -25,7 +25,7 @@ ${cpweb_foot}
             renameFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','renameFolder',[org.id])}",
             renameItemUrl: "${helper.urlFor('OrgMaterialJsonModule','renameItem',[org.id])}",
             editOrgMatUrl: "${helper.urlFor('material.MaterialModule','edit',[org.id])}",
-            addProductUrl: "${dwsrt.config['pdweb.baseurl']}aprodnew/iframeLab?scope=O${org.id?c}",
+            addProductUrl: "${dwsrt.config['pdweb.baseurl']}aprodnew/createMaterial?scope=O${org.id?c}",
             editMode: true // TODO: Check permissions here.
         });
     });
@@ -41,7 +41,8 @@ ${cpweb_foot}
     <div class="ccb-page-header__actions--right">
         [@addAnonProd.addButton /]
     </div>
-    <div class="add-material-ng btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Material NG</div>
+    <div class="add-material-ng-video btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Video</div>
+    <div class="add-material-ng-quiz btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Quiz</div>
     <h1 class="page-title">Materials</h1>
 </section>
 

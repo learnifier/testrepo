@@ -125,27 +125,35 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         ko.applyBindings(new ListMaterialModel());
     };
 
-    $(document).ready(function(){
-        $(".add-material-ng").click(function(){
-            var imodal = new ccbImodal.Server({
-                serviceName: "addProducts",
-                addProductUrl: settings.addProductUrl,
-                callbacks: {
-                    "add": function (data) {
-                        if(data.products instanceof Array) {
-                            data.products.forEach(function(prod){
-                                console.log("*** main: Adding product: ", prod.id);
-                            });
-                        }
-                        console.log("*** main: Add: ", data);
-                    },
-                    "close": function(data) {
-                        console.log("*** main: Close");
+    function openCreateMaterial(url, type) {
+        var imodal = new ccbImodal.Server({
+            serviceName: "addProducts",
+            addProductUrl: url + "&type=" + type,
+            callbacks: {
+                "add": function (data) {
+                    if(data.products instanceof Array) {
+                        data.products.forEach(function(prod){
+                            console.log("*** main: Adding product: ", prod.id);
+                        });
                     }
+                    console.log("*** main: Add: ", data);
                 },
-                modalClass: "add-product-iframe"
-            });
-            imodal.open();
+                "close": function(data) {
+                    console.log("*** main: Close");
+                }
+            },
+            modalClass: "add-product-iframe"
+        });
+        imodal.open();
+    }
+
+    $(document).ready(function(){
+
+        $(".add-material-ng-video").click(function(){
+            openCreateMaterial(settings.addProductUrl, "video");
+        });
+        $(".add-material-ng-quiz").click(function(){
+            openCreateMaterial(settings.addProductUrl, "quiz");
         });
     });
     return exports;
