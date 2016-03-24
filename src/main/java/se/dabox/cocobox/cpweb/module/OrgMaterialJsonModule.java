@@ -808,16 +808,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
 
         final LangBundle bundle = getLangBundle(cycle);
 
-
-
-//        List<MatFolder> folders = createFolders();
-
-//        List<Long> folderIds = new ArrayList<>(folders.size()+1);
-//        folderIds.add(null);
-//        for (MatFolder folder : folders) {
-//            addFolderIds(folderIds, folder);
-//        }
-
         PdwebProductEditorUrlFactory pdwebEditorFactory = new PdwebProductEditorUrlFactory(cycle);
 
         return new DataTablesJson<Material>() {
