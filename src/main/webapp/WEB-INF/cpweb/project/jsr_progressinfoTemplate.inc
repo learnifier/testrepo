@@ -2,7 +2,10 @@
 
 <div>
 {{#pages}}
-  <h5 class="page-title">{{title}}</h5>
+  <div>
+    <span class="pull-right" style="font-size: 0.8em; color: #999;">Activity/Quiz Completion</span>
+    <h5 class="page-title">{{title}}</h5>
+  </div>
     <div class="table-responsive">
         <table class="table table-hover ccb-table ToggleDrop" width="100%" id="rosterDetails">
             <tbody>
@@ -43,16 +46,17 @@
                                           </li>
                                           <li class="score pull-right">
                                               {{#if scoreStr}}
-                                                  <span class="row-label">Score:</span><span class="row-value">{{scoreStr}}</span>
+                                                  <span class="row-label"> Quiz Score:</span><span class="row-value">{{scoreStr}}</span>
                                               {{/if}}
                                           </li>
+                                          <!-- Removing as duplicate info as passed/failed now is part of extendedStatus
                                           <li class="successStatus pull-right">
                                               {{#if completed}}
                                                 {{#if successStatus }}
                                                     <span class="row-label">Quiz/test:</span><span class="row-value">{{successStatus}}</span>
                                                 {{/if}}
                                               {{/if}}
-                                          </li>
+                                          </li> -->
                                            <!-- Stacking from left from here -->
                                           <li class="componentThumbnail pull-left">
                                               <img src="{{thumbnail}}">
