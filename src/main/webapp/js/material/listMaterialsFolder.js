@@ -11,6 +11,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
     function ListMaterialModel() {
         var self = this;
 
+        self.api = null;
+
         function readData(url) {
             var deferred = $.Deferred();
             $.getJSON(url).done(function(data){
@@ -113,8 +115,36 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                         }
                     }
                     return actions;
+                },
+                setApi: function(api){
+                    self.api = api;
                 }
             }
+        };
+        function openCreateMaterial(url, type) {
+            var imodal = new ccbImodal.Server({
+                serviceName: "addProducts",
+                addProductUrl: url + "&type=" + type,
+                callbacks: {
+                    "add": function (data) {
+                        if(data.products instanceof Array) {
+                            data.products.forEach(function(prod){
+                                console.log("*** main: Adding product: ", prod.id);
+                            });
+                        }
+                        console.log("*** main: Add: ", data);
+                    },
+                    "close": function(data) {
+                        console.log("*** main: Close");
+                    }
+                },
+                modalClass: "add-product-iframe"
+            });
+            imodal.open();
+        }
+
+        self.addMaterial = function(type) {
+            openCreateMaterial(settings.addProductUrl, type);
         };
     }
 
@@ -132,36 +162,5 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         ko.applyBindings(new ListMaterialModel());
     };
 
-    function openCreateMaterial(url, type) {
-        var imodal = new ccbImodal.Server({
-            serviceName: "addProducts",
-            addProductUrl: url + "&type=" + type,
-            callbacks: {
-                "add": function (data) {
-                    if(data.products instanceof Array) {
-                        data.products.forEach(function(prod){
-                            console.log("*** main: Adding product: ", prod.id);
-                        });
-                    }
-                    console.log("*** main: Add: ", data);
-                },
-                "close": function(data) {
-                    console.log("*** main: Close");
-                }
-            },
-            modalClass: "add-product-iframe"
-        });
-        imodal.open();
-    }
-
-    $(document).ready(function(){
-
-        $(".add-material-ng-video").click(function(){
-            openCreateMaterial(settings.addProductUrl, "video");
-        });
-        $(".add-material-ng-quiz").click(function(){
-            openCreateMaterial(settings.addProductUrl, "quiz");
-        });
-    });
     return exports;
 });
