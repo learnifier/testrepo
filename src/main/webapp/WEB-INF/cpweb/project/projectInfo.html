@@ -22,16 +22,6 @@
 
     [/@]
 
-    require(['dabox-common'], function() {
-    cocobox.ajaxForm("#deleteprojectform", function(data) {
-    if (data.location) {
-    window.location = data.location;
-    } else {
-    cocobox.infoDialog('Delete project','You need to delete all participants to be able to delete the project.');
-    }
-    });
-    });
-
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     })
@@ -89,7 +79,7 @@
             [/#if]
             [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && canDeleteProject ]
                 <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
-                    <button class="btn btn-primary-outlined btn-sm" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                    <button class="btn btn-primary-outlined btn-sm" type="button" id="deletePrjBtn"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
             [/#if]
 
