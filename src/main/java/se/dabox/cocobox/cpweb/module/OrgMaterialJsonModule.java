@@ -72,7 +72,6 @@ import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.common.proddir.CocoboxProductUtil;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
-import se.dabox.service.common.proddir.UpdateProductRequest;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
 import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
@@ -80,6 +79,7 @@ import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactor
 import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductDimension;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductPredicates;
 import se.dabox.service.proddir.data.ProductTypeId;
@@ -1539,14 +1539,13 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         final Product product = orgPdc.getProduct(itemIdStr);
         Map<String, Object> map = createMap();
 
-        if(product.isOrgUnitProduct() && product.getOwnerOrgUnitId() == orgId) {
-
-            // TODO: Experiment
-//            final Map<String, OrgProduct> orgProdMap = CollectionsUtil.createMap(getCocoboxCordinatorClient(cycle).listOrgProducts(orgId), OrgProduct::getProdId);
-//            final OrgProduct orgProduct = orgProdMap.get(itemIdStr);
-
+        if(product.isOrgUnitProduct() && product.getOwnerOrgUnitId().equals(orgId)) {
             Product p = product.copy();
             p.setTitle(name);
+            final List<ProductDimension> dimensions = p.getDimensions();
+            if(dimensions.size() == 1) {
+                dimensions.get(0).setFieldValue("webtitle", name);
+            }
             orgPdc.updateProduct(caller, p);
             map.put("status", "ok");
         } else {
