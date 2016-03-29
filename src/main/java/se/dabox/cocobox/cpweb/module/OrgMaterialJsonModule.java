@@ -1526,8 +1526,15 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             Map<String, Object> entry = new HashMap<>();
             entry.put("id", strItemId);
             try {
-//                getOrgProductClient(cycle).deleteOrgProduct(caller, orgId, strItemId); <-- bool
-                entry.put("status", "ok");
+                final ProductDirectoryClient orgPdc = getProductDirectoryClient(cycle);
+                final Product product = orgPdc.getProduct(strItemId);
+                if(product.isOrgUnitProduct() && product.getOwnerOrgUnitId() == orgId) {
+                    orgPdc.deleteProduct(caller, strItemId);
+                    entry.put("status", "ok");
+                } else {
+                    entry.put("status", "error");
+                    entry.put("msg", "Permission denied.");
+                }
             } catch (NotFoundException e) {
                 entry.put("status", "error");
                 entry.put("msg", "Not found exception");
