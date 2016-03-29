@@ -12,12 +12,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         var self = this;
 
         self.api = null;
-
-        self.initialized = function() {
-            console.log("Initialized...");
-            return false;
-        };
-
+        
         function readData(url) {
             var deferred = $.Deferred();
             $.getJSON(url).done(function(data){
