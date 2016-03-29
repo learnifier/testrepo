@@ -72,6 +72,7 @@ import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.common.proddir.CocoboxProductUtil;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
+import se.dabox.service.common.proddir.UpdateProductRequest;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
 import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
@@ -1350,43 +1351,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         }
     }
 
-    private static List<MatFolder> createFolders() {
-        List<MatFolder> root = new ArrayList<>();
-
-        long id = 0;
-
-        MatFolder year = new MatFolder(id++, "years");
-        root.add(year);
-        year.getFolders().add(new MatFolder(id++, "January"));
-        year.getFolders().add(new MatFolder(id++, "Foobruary"));
-
-        MatFolder usr = new MatFolder(id++, "usr");
-        root.add(usr);
-        usr.getFolders().add(new MatFolder(id++, "bin"));
-        usr.getFolders().add(new MatFolder(id++, "doc"));
-        usr.getFolders().add(new MatFolder(id++, "lib"));
-
-        MatFolder home = new MatFolder(id++, "home");
-        root.add(home);
-
-        home.getFolders().add(new MatFolder(id++, "amohamed"));
-        home.getFolders().add(new MatFolder(id++, "jklang"));
-        home.getFolders().add(new MatFolder(id++, "mandersson"));
-        home.getFolders().add(new MatFolder(id++, "mborg"));
-
-        return root;
-    }
-
-
-    private static void addFolderIds(List<Long> folderIds, MatFolder folder) {
-        folderIds.add(folder.getId());
-
-        for (MatFolder matFolder : folder.getFolders()) {
-            addFolderIds(folderIds, matFolder);
-        }
-    }
-
-
     // TODO: Adding new operations below, may want to put them into some command class
 
     @WebAction
@@ -1556,8 +1520,6 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         String folderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "folderId");
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         FolderId folderId = FolderId.valueOf(Long.valueOf(folderIdStr));
-
-        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         getOrgMaterialFolderClient(cycle).rename(caller, folderId, new FolderName(name));
         Map<String, Object> map = createMap();
         map.put("status", "ok");
@@ -1570,14 +1532,27 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
         final long caller = LoginUserAccountHelper.getUserId(cycle);
 
-        String folderId = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "itemId");
+        String itemIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "itemId");
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
 
-        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        ccbc.updateOrgMaterial(new UpdateOrgProductRequestBuilder(caller, orgId).setName(name).createUpdateOrgProductRequest());
+        final ProductDirectoryClient orgPdc = getProductDirectoryClient(cycle);
+        final Product product = orgPdc.getProduct(itemIdStr);
         Map<String, Object> map = createMap();
-        map.put("status", "error");
-        map.put("msg", "Rename on material not implemented yet");
+
+        if(product.isOrgUnitProduct() && product.getOwnerOrgUnitId() == orgId) {
+
+            // TODO: Experiment
+//            final Map<String, OrgProduct> orgProdMap = CollectionsUtil.createMap(getCocoboxCordinatorClient(cycle).listOrgProducts(orgId), OrgProduct::getProdId);
+//            final OrgProduct orgProduct = orgProdMap.get(itemIdStr);
+
+            Product p = product.copy();
+            p.setTitle(name);
+            orgPdc.updateProduct(caller, p);
+            map.put("status", "ok");
+        } else {
+            map.put("status", "error");
+            map.put("msg", "Permission denied.");
+        }
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
