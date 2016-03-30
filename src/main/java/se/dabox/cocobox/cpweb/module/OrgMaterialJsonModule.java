@@ -1390,8 +1390,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
         final long caller = LoginUserAccountHelper.getUserId(cycle);
 
-        final List<String> folderIds = getArray(cycle, "folderIds");
-        final List<String> itemIds = getArray(cycle, "itemIds");
+        final List<String> folderIds = getParameterList(cycle, "folderIds");
+        final List<String> itemIds = getParameterList(cycle, "itemIds");
         final String toFolderIdStr = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "toFolderId");
         final FolderId toFolderId;
         if("0".equals(toFolderIdStr)) {
@@ -1460,8 +1460,8 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
         final long caller = LoginUserAccountHelper.getUserId(cycle);
 
-        final List<String> folderIds = getArray(cycle, "folderIds");
-        final List<String> itemIds = getArray(cycle, "itemIds");
+        final List<String> folderIds = getParameterList(cycle, "folderIds");
+        final List<String> itemIds = getParameterList(cycle, "itemIds");
 
         Map<String, Object> map = createMap();
         map.put("status", "ok");
@@ -1555,7 +1555,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         return new JsonRequestTarget(JsonUtils.encode(map));
     }
 
-    private List<String> getArray(RequestCycle cycle, String fieldName) {
+    private List<String> getParameterList(RequestCycle cycle, String fieldName) {
         final WebRequest request = cycle.getRequest();
 
         final String[] vals = request.getParameterValues(fieldName + "[]");

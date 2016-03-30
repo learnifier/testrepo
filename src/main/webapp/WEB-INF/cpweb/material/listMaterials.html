@@ -41,9 +41,9 @@ ${cpweb_foot}
     <div class="ccb-page-header__actions--right">
         [@addAnonProd.addButton /]
     </div>
-    <div data-bind="click: function(){addMaterial('text');}" class="add-material-ng-text btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Text</div>
-    <div data-bind="click: function(){addMaterial('video');}" class="add-material-ng-video btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Video</div>
-    <div data-bind="click: function(){addMaterial('quiz');}" class="add-material-ng-quiz btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Quiz</div>
+    <div data-bind="click: function(){addMaterial(['text']);}" class="add-material-ng-text btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Text</div>
+    <div data-bind="click: function(){addMaterial(['video', 'text']);}" class="add-material-ng-video btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Video</div>
+    <div data-bind="click: function(){addMaterial(['quiz', 'text', 'video']);}" class="add-material-ng-quiz btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Quiz</div>
     <h1 class="page-title">Materials</h1>
 </section>
 
