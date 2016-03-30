@@ -14,6 +14,11 @@ ${cpweb_foot}
 <script>
     $('#menu-library').addClass('subMenuExpanded');
     $('#menu-library-materials').addClass('active');
+    
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    
 
     window.cocoboxCdn = "${cocoboxCdn}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
@@ -44,23 +49,23 @@ ${cpweb_foot}
               <i class="pe-7s-plus pe-va pe-fw"></i> Add Content <i class="pe-7s-angle-down pe-va pe-fw"></i>
           </button>
           <ul class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
-            <li><h4 class="text-center">UPLOAD</h4></li>
-            <li data-bind="click: function(){addMaterial(['upload-audio']);}"><a href="#"><i class="pe-7s-volume pe-va pe-2x pe-fw primarycolor"></i> Audio</a></li>
-            <li data-bind="click: function(){addMaterial(['upload-file']);}"><a href="#"><i class="pe-7s-news-paper pe-va pe-2x pe-fw primarycolor"></i> Document</a></li>
-            <li data-bind="click: function(){addMaterial(['upload-image']);}"><a href="#"><i class="pe-7s-photo pe-va pe-2x pe-fw pe-fw primarycolor"></i> Image</a></li>
-            <li data-bind="click: function(){addMaterial(['upload-scorm']);}"><a href="#"><i class="pe-7s-monitor pe-va pe-2x pe-fw primarycolor"></i> Scorm (AICC/Tin Can)</a></li>
-            <li data-bind="click: function(){addMaterial(['upload-video']);}"><a href="#"><i class="pe-7s-video pe-va pe-2x pe-fw pe-fw primarycolor"></i> Video</a></li>
-            <li data-bind="click: function(){addMaterial(['upload-generic']);}"><a href="#">Quick upload...</a></li>
+            <li><h4 class="text-center primaryColor">UPLOAD</h4></li>
+            <li data-bind="click: function(){addMaterial(['upload-audio']);}"><a href="#"><i class="pe-7s-volume pe-va pe-2x pe-fw"></i> Audio</a></li>
+            <li data-bind="click: function(){addMaterial(['upload-file']);}"><a href="#"><i class="pe-7s-news-paper pe-va pe-2x pe-fw"></i> Document</a></li>
+            <li data-bind="click: function(){addMaterial(['upload-image']);}"><a href="#"><i class="pe-7s-photo pe-va pe-2x pe-fw pe-fw"></i> Image</a></li>
+            <li data-bind="click: function(){addMaterial(['upload-scorm']);}"><a href="#"><i class="pe-7s-monitor pe-va pe-2x pe-fw"></i> Scorm (AICC/Tin Can)</a></li>
+            <li data-bind="click: function(){addMaterial(['upload-video']);}"><a href="#"><i class="pe-7s-video pe-va pe-2x pe-fw pe-fw"></i> Video</a></li>
+            <li data-bind="click: function(){addMaterial(['upload-generic']);}" class="text-center" data-toggle="tooltip" data-placement="bottom" title="Upload different file types together at once"><a href="#"><small><em><i class="pe-7s-rocket pe-va pe-lg pe-fw pe-fw primaryColor"></i> Quick upload...</small></em></a></li>
             <li role="separator" class="divider"></li>
-            <li><h4 class="text-center">CREATE</h4></li>
-            <li data-bind="click: function(){addMaterial(['create-text']);}"><a href="#"><i class="pe-7s-note pe-va pe-2x pe-fw primarycolor"></i> Text/HTML</a></li>
-            <li data-bind="click: function(){addMaterial(['create-survey']);}"><a href="#"><i class="pe-7s-help1 pe-va pe-2x pe-fw primarycolor"></i> Survey</a></li>
-            <li data-bind="click: function(){addMaterial(['create-quiz']);}"><a href="#"><i class="pe-7s-target pe-va pe-2x pe-fw primarycolor"></i> Quiz</a></li>
+            <li><h4 class="text-center primaryColor">CREATE</h4></li>
+            <li data-bind="click: function(){addMaterial(['create-text']);}"><a href="#"><i class="pe-7s-note pe-va pe-2x pe-fw"></i> Text/HTML</a></li>
+            <li data-bind="click: function(){addMaterial(['create-survey']);}"><a href="#"><i class="pe-7s-help1 pe-va pe-2x pe-fw"></i> Survey</a></li>
+            <li data-bind="click: function(){addMaterial(['create-quiz']);}"><a href="#"><i class="pe-7s-target pe-va pe-2x pe-fw"></i> Quiz</a></li>
             <li role="separator" class="divider"></li>
-            <li><h4 class="text-center">INTERNET/LINK</h4></li>
-            <li data-bind="click: function(){addMaterial(['create-youtube']);}"><a href="#">YouTube</a></li>
+            <li><h4 class="text-center primaryColor">INTERNET/LINK</h4></li>
+            <li><span data-bind="click: function(){addMaterial(['create-youtube']);}">YouTube</span>, <span data-bind="click: function(){addMaterial(['create-quiz']);}" href="#">TED Talks</span></li>
             <li role="separator" class="divider"></li>
-            <li><h4 class="text-center">APPS/INTEGRATIONS</h4></li>
+            <li><h4 class="text-center primaryColor">APPS/INTEGRATIONS</h4></li>
             <li><a href="#">Rebox</a></li>
           </ul>
         </div>        
