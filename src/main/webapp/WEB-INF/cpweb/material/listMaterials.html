@@ -14,11 +14,11 @@ ${cpweb_foot}
 <script>
     $('#menu-library').addClass('subMenuExpanded');
     $('#menu-library-materials').addClass('active');
-    
+
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     })
-    
+
 
     window.cocoboxCdn = "${cocoboxCdn}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
@@ -34,6 +34,16 @@ ${cpweb_foot}
             editMode: true // TODO: Check permissions here.
         });
     });
+
+    require(['../cocobox/vfs/vfs'], function(vfsModule) {
+        var vfs = new vfsModule.VFS("${helper.urlFor('material.LibraryVfsModule','vfs',[org.id])}/")
+
+        vfs.list("/").then(function(data) {
+            console.log("Listing from VFS", data);
+        }).catch(function(err) {
+            console.log("Failed to get directory listing from VFS", err);
+        });
+    })
 
 </script>
 
@@ -68,7 +78,7 @@ ${cpweb_foot}
             <li><h4 class="text-center primaryColor">APPS/INTEGRATIONS</h4></li>
             <li class="text-center"><span>Rebox</span>, <span>Booth</span>, <span>Challenge</span>, <span>Team Invite</span></li>
           </ul>
-        </div>        
+        </div>
     </div>
     <h1 class="page-title">Materials</h1>
 </section>
