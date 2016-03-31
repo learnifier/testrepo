@@ -6,32 +6,64 @@ ${cpweb_foot}
     $('#menu-reports').addClass('active');
 </script>
 <script>
-    $(document).ready(function() {
-        require(['dataTables-bootstrap'], function() {
-        var oTable = $('#listreports').dataTable({
-            "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
-            "paging": false,
-            "order": [[0,'asc']],
-            "initComplete": function() {
-                $('#listreports_filter input').attr('placeholder', 'Search reports');
-            },
-            "columnDefs": [ 
-                {
-                    "targets": [ 0 ],
-                    "width": "70%",
-                    "data": "name"
+    $(document).ready(function () {
+        require(['dataTables-bootstrap'], function () {
+            var oTable = $('#listreports').dataTable({
+                "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "paging": false,
+                "order": [[0, 'asc']],
+                "initComplete": function () {
+                    $('#listreports_filter input').attr('placeholder', 'Search reports');
+                },
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "width": "70%",
+                        "data": "name"
+                    }
+                ],
+                "pagingType": "full_numbers",
+                "language": {
+                    "search": "",
+                    "zeroRecords": "No reports your query",
+                    "loadingRecords": "<p>Loading reports...</p><img src='[@common.spinnerUrl /]' />"
                 }
-            ],
-            "pagingType": "full_numbers",
-            "language": {
-                "search": "",
-                "zeroRecords": "No reports your query",
-                "loadingRecords": "<p>Loading reports...</p><img src='[@common.spinnerUrl /]' />"
+            });
+        });
+    });
+
+</script>
+
+<script>
+    require(['../cocobox/vfs/vfs'],
+    /**
+     *
+     * @param {cocobox/vfs} vfsModule
+     * @returns {undefined}
+     *
+     */
+    function (vfsModule) {
+
+        var vfs = new vfsModule.VFS("http://jk1.dabox.se:9000/cpweb/vfs/${org.id?c}");
+
+        vfs.list("/").then(function (data) {
+            console.log("folder content", data);
+        }).catch(function(err){
+            if (err instanceof vfsModule.PathNotFoundError) {
+                console.log("Path not found");
+            } else {
+                console.log("Failed to list path");
+                return err;
             }
         });
+
+        vfs.exec("/p-1552", "preview", {"hello": "world"}).then(function(previewData) {
+            console.log("Preview data", previewData);
+        }).catch(function (err) {
+            console.log("Failed to execute preview op :(", err);
         });
-    } );
-                
+    });
+
 </script>
 
 
