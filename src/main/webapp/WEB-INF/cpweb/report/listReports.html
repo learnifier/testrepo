@@ -44,20 +44,31 @@ ${cpweb_foot}
      */
     function (vfsModule) {
 
-        var vfs = new vfsModule.VFS("http://jk1.dabox.se:9000/cpweb/vfs/${org.id?c}");
+        var vfs = new vfsModule.VFS("${contextPath}/vfs/${org.id?c}");
 
         vfs.list("/").then(function (data) {
-            console.log("folder content", data);
+            console.log("folder content for /", data);
         }).catch(function(err){
-            if (err instanceof vfsModule.PathNotFoundError) {
-                console.log("Path not found");
+            if (err.name === "PathNotFoundError") {
+                console.log("Path not found", err);
             } else {
                 console.log("Failed to list path");
                 return err;
             }
         });
 
-        vfs.exec("/p-1552", "preview", {"hello": "world"}).then(function(previewData) {
+        vfs.list("/hoj").then(function (data) {
+            console.log("folder content", data);
+        }).catch(function(err){
+            if (err.name === "PathNotFoundError") {
+                console.log("Path not found", err);
+            } else {
+                console.log("Failed to list path");
+                return err;
+            }
+        });
+
+        vfs.exec("/p-1522", "preview").then(function(previewData) {
             console.log("Preview data", previewData);
         }).catch(function (err) {
             console.log("Failed to execute preview op :(", err);
