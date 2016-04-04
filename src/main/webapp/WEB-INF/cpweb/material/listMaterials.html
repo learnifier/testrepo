@@ -52,8 +52,11 @@ ${cpweb_foot}
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
+
+
 <section class="ccb-page-header margin-bottom">
     <div class="ccb-page-header__actions--right">
+        [#if portalSecurity.hasPermission("CP_CREATE_PROJECT_MATERIAL")]
         <div class="btn-group">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="pe-7s-plus pe-va pe-fw"></i> Add Content <i class="pe-7s-angle-down pe-va pe-fw"></i>
@@ -103,6 +106,7 @@ ${cpweb_foot}
             <li class="text-center"><span>Rebox</span>, <span>Booth</span>, <span>Challenge</span>, <span>Team Invite</span></li>
           </ul>
         </div>
+        [/#if]
     </div>
     <h1 class="page-title">Materials</h1>
 </section>
