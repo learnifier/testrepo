@@ -5,6 +5,8 @@ package se.dabox.cocobox.cpweb.module;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebRequest;
@@ -32,9 +34,15 @@ import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.context.DwsRealmHelper;
+import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.login.client.LoginService;
 import se.dabox.service.login.client.LoginServiceImpl;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
+import se.dabox.service.proddir.data.ProductType;
+import se.dabox.service.proddir.data.ProductTypeId;
+import se.dabox.service.proddir.data.ProductTypes;
+
+import static org.apache.xmlbeans.XmlBeans.getTitle;
 
 /**
  *
@@ -135,6 +143,12 @@ public class CpMainModule extends AbstractWebAuthModule {
         map.put("addLinkCreditsFormLink", cycle.
                 urlFor(ProductMaterialJsonModule.class, "addCredits", strOrgId));
 
+
+        ProductTypes types = getProductDirectoryClient(cycle).listTypes();
+        final Map<String, String> productTypes = types.getProductTypes().stream().collect(Collectors.toMap(
+                p -> p.getId().getId(),
+                ProductType::getTitle));
+        map.put("productTypes",  productTypes);
         return new FreemarkerRequestTarget("/material/listMaterials.html", map);
     }
 
