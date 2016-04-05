@@ -38,6 +38,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 getData: function () {
                     return readData(settings.listUrl);
                 },
+                vfs: settings.vfs,
                 idField: "id", // TODO: Not used
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
@@ -160,6 +161,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
 
     exports.init = function(options) {
         settings = Object.assign({
+            vfs: undefined,
             listUrl: undefined,
             moveFolderUrl: undefined,
             createFolderUrl: undefined,
