@@ -43,7 +43,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "", name: "thumbnail", format: function(item){return decorateLink(item.typeTitle==="Folder", '<img src="' + item.thumbnail + '">')},
+                    { label: "", name: "thumbnail", format: function(item){return decorateLink(item.typeTitle==="Folder", '<img src="' + item.thumbnail() + '">')},
                         cssClass: "material-thumbnail", clickFn: null},
                     { label: "Name", name: "name", format: function(item){return decorateLink(item.typeTitle==="Folder", item.name())},
                         cssClass: "", clickFn: null},
