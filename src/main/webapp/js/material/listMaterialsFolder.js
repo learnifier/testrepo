@@ -123,15 +123,15 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             }
         };
         function openCreateMaterial(url, types) {
-            var folderId = self.api.currentFolderId();
+            var folderPath = self.api.currentFolderPath();
 
             types.map(function(type){
                url += "&type[]=" + type;
             });
 
             console.log("url: ", url);
-            if(folderId) { // Can be 0 which means false
-                url += "&folder=" + folderId;
+            if(folderPath) { // Can be 0 which means false
+                url += "&folder=" + folderPath;
             }
             var imodal = new ccbImodal.Server({
                 serviceName: "addProducts",
