@@ -35,9 +35,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         self.cocoboxListParams = function() {
             return {
                 editMode: settings.editMode, // TODO: This is not used
-                getData: function () {
-                    return readData(settings.listUrl);
-                },
                 vfs: settings.vfs,
                 idField: "id", // TODO: Not used
                 nameField: "name",
