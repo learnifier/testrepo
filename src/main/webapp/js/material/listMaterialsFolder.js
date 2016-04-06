@@ -87,15 +87,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                         }
                     });
                 },
-                createFolderFn: function (name, folderId) {
-                    return $.ajax({
-                        url: settings.createFolderUrl,
-                        data: {
-                            folderId: folderId,
-                            name: name
-                        }
-                    });
-                },
                 editOrgMatUrl: settings.editOrgMatUrl,
                 folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg",
                 itemActions: function(item) {
