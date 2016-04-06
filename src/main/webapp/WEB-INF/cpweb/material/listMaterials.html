@@ -21,8 +21,10 @@ ${cpweb_foot}
 
 
     window.cocoboxCdn = "${cocoboxCdn}";
-    require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+    require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}", "../cocobox/vfs/vfs"], function(s, vfsModule) {
+        var vfs = new vfsModule.VFS("${helper.urlFor('material.LibraryVfsModule','vfs',[org.id])}/");
         s.init({
+            vfs: vfs,
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
             moveToFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','moveToFolder',[org.id])}",
             createFolderUrl: "${helper.urlFor('OrgMaterialJsonModule','createFolder',[org.id])}",
@@ -35,15 +37,14 @@ ${cpweb_foot}
         });
     });
 
-    require(['../cocobox/vfs/vfs'], function(vfsModule) {
-        var vfs = new vfsModule.VFS("${helper.urlFor('material.LibraryVfsModule','vfs',[org.id])}/")
-
-        vfs.list("/").then(function(data) {
-            console.log("Listing from VFS", data);
-        }).catch(function(err) {
-            console.log("Failed to get directory listing from VFS", err);
-        });
-    })
+//    require(['../cocobox/vfs/vfs'], function(vfsModule) {
+//
+//        vfs.list("/").then(function(data) {
+//            console.log("Listing from VFS", data);
+//        }).catch(function(err) {
+//            console.log("Failed to get directory listing from VFS", err);
+//        });
+//    })
 
 </script>
 
@@ -51,8 +52,6 @@ ${cpweb_foot}
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
-
-
 
 <section class="ccb-page-header margin-bottom">
     <div class="ccb-page-header__actions--right">

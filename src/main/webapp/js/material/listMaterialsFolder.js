@@ -38,11 +38,12 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 getData: function () {
                     return readData(settings.listUrl);
                 },
+                vfs: settings.vfs,
                 idField: "id", // TODO: Not used
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
                 columns: [
-                    { label: "", name: "thumbnail", format: function(item){return decorateLink(item.typeTitle==="Folder", '<img src="' + item.thumbnail + '">')},
+                    { label: "", name: "thumbnail", format: function(item){return decorateLink(item.typeTitle==="Folder", '<img src="' + item.thumbnail() + '">')},
                         cssClass: "material-thumbnail", clickFn: null},
                     { label: "Name", name: "name", format: function(item){return decorateLink(item.typeTitle==="Folder", item.name())},
                         cssClass: "", clickFn: null},
@@ -122,15 +123,15 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             }
         };
         function openCreateMaterial(url, types) {
-            var folderId = self.api.currentFolderId();
+            var folderPath = self.api.currentFolderPath();
 
             types.map(function(type){
                url += "&type[]=" + type;
             });
 
             console.log("url: ", url);
-            if(folderId) { // Can be 0 which means false
-                url += "&folder=" + folderId;
+            if(folderPath) { // Can be 0 which means false
+                url += "&folder=" + folderPath;
             }
             var imodal = new ccbImodal.Server({
                 serviceName: "addProducts",
@@ -160,6 +161,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
 
     exports.init = function(options) {
         settings = Object.assign({
+            vfs: undefined,
             listUrl: undefined,
             moveFolderUrl: undefined,
             createFolderUrl: undefined,
