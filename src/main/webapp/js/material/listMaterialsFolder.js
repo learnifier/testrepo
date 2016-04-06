@@ -50,43 +50,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     { label: "Kind", name: "typeTitle", format: function(item){return item.typeTitle}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(item){return item.updated}, cssClass: "", clickFn: null}
                 ],
-                moveFn: function (folders, items, toFolderId) {
-                    return $.ajax({
-                        url: settings.moveToFolderUrl,
-                        data: {
-                            folderIds: folders,
-                            itemIds: items,
-                            toFolderId: toFolderId
-                        }
-                    });
-                },
-                removeFn: function(folders, items) {
-                    return $.ajax({
-                        url: settings.removeFoldersItemsUrl,
-                        data: {
-                            folderIds: folders,
-                            itemIds: items
-                        }
-                    });
-                },
-                renameFolderFn: function (id, newName) {
-                    return $.ajax({
-                        url: settings.renameFolderUrl,
-                        data: {
-                            folderId: id,
-                            name: newName
-                        }
-                    });
-                },
-                renameItemFn: function (id, newName) {
-                    return $.ajax({
-                        url: settings.renameItemUrl,
-                        data: {
-                            itemId: id,
-                            name: newName
-                        }
-                    });
-                },
                 editOrgMatUrl: settings.editOrgMatUrl,
                 folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg",
                 itemActions: function(item) {
