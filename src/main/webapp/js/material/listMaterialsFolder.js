@@ -11,7 +11,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
     function ListMaterialModel() {
         var self = this;
 
-        self.api = null;
+        self.cocoboxListApi = ko.observable();
 
         function decorateLink(isLink, html) {
             if(isLink) {
@@ -45,12 +45,12 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 },
                 folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg",
                 setApi: function(api){
-                    self.api = api;
+                    self.cocoboxListApi(api);
                 }
             }
         };
         function openCreateMaterial(url, types) {
-            var folderPath = self.api.currentFolderPath();
+            var folderPath = self.cocoboxListApi().currentFolderPath();
 
             types.map(function(type){
                url += "&type[]=" + type;
@@ -86,8 +86,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         };
 
         self.addFolder = function() {
-            if(self.api) {
-                self.api.addFolder();
+            if(self.cocoboxListApi()) {
+                self.cocoboxListApi().addFolder();
             }
         };
     }
