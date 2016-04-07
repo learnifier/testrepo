@@ -70,10 +70,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                                 console.log("*** main: Adding product: ", prod.id);
                             });
                         }
-                        console.log("*** main: Add: ", data);
                     },
                     "close": function(data) {
-                        console.log("*** main: Close");
                     }
                 },
                 modalClass: "add-product-iframe"
