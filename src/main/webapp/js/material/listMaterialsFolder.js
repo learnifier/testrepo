@@ -12,17 +12,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         var self = this;
 
         self.api = null;
-        
-        function readData(url) {
-            var deferred = $.Deferred();
-            $.getJSON(url).done(function(data){
-                // TODO: Handle errors
-                deferred.resolve({ rows: data.aaData, folders: data.folders});
-            });
-            return deferred.promise();
-        }
-
-        // Return parameters for cocobox-list component
 
         function decorateLink(isLink, html) {
             if(isLink) {
@@ -94,6 +83,12 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
 
         self.addMaterial = function(type) {
             openCreateMaterial(settings.addProductUrl, type);
+        };
+
+        self.addFolder = function() {
+            if(self.api) {
+                self.api.addFolder();
+            }
         };
     }
 
