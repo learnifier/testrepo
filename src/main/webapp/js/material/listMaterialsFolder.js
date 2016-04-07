@@ -21,6 +21,13 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             }
         }
 
+        function lookupType(type) {
+            if(type === "DIRECTORY") {
+                return "Folder";
+            }
+            return "Material";
+        }
+
         self.cocoboxListParams = function() {
             return {
                 editMode: settings.editMode, // TODO: This is not used
@@ -28,14 +35,33 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 idField: "id", // TODO: Not used
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
-                columns: [
-                    { label: "", name: "thumbnail", format: function(item){return decorateLink(item.typeTitle==="Folder", '<img src="' + item.thumbnail() + '">')},
-                        cssClass: "material-thumbnail", clickFn: null},
-                    { label: "Name", name: "name", format: function(item){return decorateLink(item.typeTitle==="Folder", item.name())},
-                        cssClass: "", clickFn: null},
-                    { label: "Kind", name: "typeTitle", format: function(item){return item.typeTitle}, cssClass: "", clickFn: null},
-                    { label: "Updated", name: "updated", format: function(item){return item.updated}, cssClass: "", clickFn: null}
-                ],
+                columns: [{
+                    label: "",
+                    name: "thumbnail",
+                    value: function(item){return item.thumbnail()},
+                    format: function(val, item){return decorateLink(item.file.type==="DIRECTORY", '<img src="' + val + '">')},
+                    cssClass: "material-thumbnail",
+                    clickFn: null
+                }, {
+                    label: "Name",
+                    name: "name",
+                    value: function(item){return item.file.displayName},
+                    format: function(val, item){return decorateLink(item.file.type==="DIRECTORY", val)},
+                    cssClass: "",
+                    clickFn: null
+                }, {
+                    label: "Kind",
+                    name: "typeTitle",
+                    value: function(item){return lookupType(item.file.type)},
+                    cssClass: "",
+                    clickFn: null
+                }, {
+                    label: "Updated",
+                    name: "updated",
+                    value: function(item){return ""},
+                    cssClass: "",
+                    clickFn: null
+                }],
                 vfsActions: {
                     preview: { html: '<span class="glyphicon glyphicon-grain"></span> Preview' },
                     edit: { html: '<span class="glyphicon glyphicon-grain"></span> Edit' },
