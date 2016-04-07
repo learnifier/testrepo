@@ -47,18 +47,21 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     name: "name",
                     value: function(item){return item.file.displayName},
                     format: function(val, item){return decorateLink(item.file.type==="DIRECTORY", val)},
+                    sortable: true,
                     cssClass: "",
                     clickFn: null
                 }, {
                     label: "Kind",
                     name: "typeTitle",
                     value: function(item){return lookupType(item.file.type)},
+                    sortable: true,
                     cssClass: "",
                     clickFn: null
                 }, {
                     label: "Updated",
                     name: "updated",
-                    value: function(item){return ""},
+                    value: function(item){return ""}, // TODO: Need something to sort on from vfs here.
+                    sortable: true,
                     cssClass: "",
                     clickFn: null
                 }],
