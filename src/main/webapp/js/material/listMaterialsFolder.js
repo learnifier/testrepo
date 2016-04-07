@@ -47,27 +47,14 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     { label: "Kind", name: "typeTitle", format: function(item){return item.typeTitle}, cssClass: "", clickFn: null},
                     { label: "Updated", name: "updated", format: function(item){return item.updated}, cssClass: "", clickFn: null}
                 ],
-                editOrgMatUrl: settings.editOrgMatUrl,
-                folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg",
-                itemActions: function(item) {
-                    var actions = [];
-                    if (item.editorUrl) {
-                        actions.push({
-                            html: "Edit", action: function () {
-                                window.open(item.editorUrl, '_blank');
-                            }
-                        });
-                    } else {
-                        if (item.anonymous) {
-                            actions.push({
-                                html: "Edit", action: function () {
-                                    editItemById(item.id); // Ugly global spotted here...
-                                }
-                            });
-                        }
-                    }
-                    return actions;
+                vfsActions: {
+                    preview: { html: '<span class="glyphicon glyphicon-grain"></span> Preview' },
+                    edit: { html: '<span class="glyphicon glyphicon-grain"></span> Edit' },
+                    remove: { html: '<span class="glyphicon glyphicon-trash"></span> Delete' },
+                    rename: { html: '<span class="glyphicon glyphicon-pencil"></span> Rename' },
+                    move: { html: '<span class="glyphicon glyphicon-share"></span> Move' }
                 },
+                folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg",
                 setApi: function(api){
                     self.api = api;
                 }
