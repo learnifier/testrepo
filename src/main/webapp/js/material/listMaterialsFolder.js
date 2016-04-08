@@ -98,6 +98,20 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                             data.products.forEach(function(prod){
                                 console.log("*** main: Adding product: ", prod.id);
                             });
+                            self.cocoboxListApi().refresh();
+                        }
+                    },
+                    "addAndEdit": function (data) {
+                        var editId = null;
+                        if(data.products instanceof Array) {
+                            // Should only get one product here, but edit last one in case something breaks.
+                            data.products.forEach(function(prod){
+                                console.log("*** main: Adding product: ", prod.id);
+                                editId = prod.id;
+                            });
+                            if(editId) {
+                                self.cocoboxListApi().refreshAndEdit(editId);
+                            }
                         }
                     },
                     "close": function(data) {
