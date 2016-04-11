@@ -28,6 +28,14 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             return "Material";
         }
 
+        function chdir(item) {
+            if (item.chdir) {
+                item.chdir();
+                return true;
+            }
+            return false;
+        }
+
         self.cocoboxListParams = function() {
             return {
                 editMode: settings.editMode, // TODO: This is not used
@@ -41,7 +49,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     value: function(item){return item.thumbnail()},
                     format: function(val, item){return decorateLink(item.file.type==="DIRECTORY", '<img src="' + val + '">')},
                     cssClass: "material-thumbnail",
-                    clickFn: null
+                    clickFn: chdir
                 }, {
                     label: "Name",
                     name: "name",
@@ -49,7 +57,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     format: function(val, item){return decorateLink(item.file.type==="DIRECTORY", val)},
                     sortable: true,
                     cssClass: "",
-                    clickFn: null
+                    clickFn: chdir
                 }, {
                     label: "Kind",
                     name: "typeTitle",
