@@ -21,10 +21,15 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             }
         }
 
-        function lookupType(type) {
-            if(type === "DIRECTORY") {
+        function lookupType(file) {
+            if(file.type === "DIRECTORY") {
                 return "Folder";
             }
+
+            if ("fileType" in file.attributes) {
+                return file.attributes["fileType"];
+            }
+
             return "Material";
         }
 
@@ -61,7 +66,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 }, {
                     label: "Kind",
                     name: "typeTitle",
-                    value: function(item){return lookupType(item.file.type)},
+                    value: function(item){return lookupType(item.file)},
                     sortable: true,
                     cssClass: "",
                     clickFn: null
