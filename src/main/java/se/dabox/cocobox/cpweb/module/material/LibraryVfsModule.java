@@ -11,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.vfs.Filespace;
+import se.dabox.cocobox.vfs.Path;
 import se.dabox.cocobox.vfs.factory.CurrentUserFilespaceFactory;
 import se.dabox.cocobox.vfs.jsonvfs.JsonVfsWebAction;
+import se.dabox.cocobox.vfs.orgfolder.GrantedOrgFolderFilesystem;
 import se.dabox.cocobox.vfs.orgfolder.OrgFolderFilesystem;
 import se.dabox.cocosite.freemarker.util.CdnUtils;
 import se.dabox.cocosite.org.MiniOrgInfo;
@@ -41,6 +43,13 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
         CurrentUserFilespaceFactory filespaceFactory = new CurrentUserFilespaceFactory(rootFs);
         filespaceFactory.setDefaultUnknownThumbnailUrl(CdnUtils.getResourceUrl(
                 "/cocobox/img/producttypes/folder.svg"));
+
+        GrantedOrgFolderFilesystem grantedFs = new GrantedOrgFolderFilesystem(orgUnit.getId());
+        grantedFs.setRootThumbnailUrl(CdnUtils.getResourceUrl(
+                "/cocobox/img/producttypes/dollarfolder.svg"));
+        grantedFs.setRootDisplayName("Purchased");
+
+        filespaceFactory.mount(Path.valueOf("/purchased"), grantedFs);
 
         return filespaceFactory.newInstance();
     }
