@@ -80,7 +80,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     rename: { html: '<span class="glyphicon glyphicon-pencil"></span> Rename' },
                     move: { html: '<span class="glyphicon glyphicon-share"></span> Move' }
                 },
-                folderThumbnail: window.cocoboxCdn + "/cocobox/img/producttypes/folder.svg",
                 setApi: function(api){
                     self.cocoboxListApi(api);
                 }
