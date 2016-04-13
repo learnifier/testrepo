@@ -22,7 +22,7 @@ ${cpweb_foot}
 
     window.cocoboxCdn = "${cocoboxCdn}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}", "../cocobox/vfs/vfs"], function(s, vfsModule) {
-        var vfs = new vfsModule.VFS("${helper.urlFor('material.LibraryVfsModule','vfs',[org.id])}/");
+        var vfs = new vfsModule.VFS("${helper.urlFor('material.LibraryVfsModule','vfs',[org.id])}");
         s.init({
             vfs: vfs,
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
