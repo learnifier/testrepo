@@ -23,6 +23,7 @@ ${cpweb_foot}
     window.cocoboxCdn = "${cocoboxCdn}";
     require(["${contextPath}/js/material/listMaterialsFolder.js?${cycle.application.formattedStartTime.base36String}", "../cocobox/vfs/vfs"], function(s, vfsModule) {
         var vfs = new vfsModule.VFS("${helper.urlFor('material.LibraryVfsModule','vfs',[org.id])}");
+        console.log(vfs);
         s.init({
             vfs: vfs,
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
@@ -81,20 +82,25 @@ ${cpweb_foot}
             [/#if]
             <li role="separator" class="divider"></li>
             <li><h4 class="text-center primaryColor">INTERNET/LINK</h4></li>
-            <li class="text-center"><span data-bind="click: function(){addMaterial(['create-youtube']);}">Web page</span>,
+            <li class="text-center">
+                
                 [#if productTypes['youtubevideo']??]
-                  <span data-bind="click: function(){addMaterial(['create-youtube']);}">YouTube</span>,
+                  <a href data-bind="click: function(){addMaterial(['create-youtube']);}">YouTube</a>
                 [/#if]
-                [#if productTypes['tedtalk']??]
-                  <span data-bind="click: function(){addMaterial(['create-tedtalk']);}" href="#">TED Talks</span>,
-                [/#if]
-                [#if productTypes['vimeo2video']??]
-                  <span data-bind="click: function(){addMaterial(['create-youtube']);}" href="#">Vimeo</span>
-                [/#if]
+                [#--if productTypes['youtubevideo']??--]
+                  <!--<a data-bind="click: function(){addMaterial(['create-youtube']);}">Web page</a>-->
+                [#--/#if--]
+                [#--if productTypes['tedtalk']??--]
+                  <!--<span data-bind="click: function(){addMaterial(['create-tedtalk']);}" href="#">TED Talks</span>,-->
+                [#--/#if--]
+                [#--if productTypes['vimeo2video']??--]
+                  <!--<span data-bind="click: function(){addMaterial(['create-youtube']);}" href="#">Vimeo</span>-->
+                [#--/#if--]
             </li>
+            <!--
             <li role="separator" class="divider"></li>
             <li><h4 class="text-center primaryColor">APPS/INTEGRATIONS</h4></li>
-            <li class="text-center"><span>Rebox</span>, <span>Booth</span>, <span>Challenge</span>, <span>Team Invite</span></li>
+            <li class="text-center"><span>Rebox</span>, <span>Booth</span>, <span>Challenge</span>, <span>Team Invite</span></li>-->
           </ul>
         </div>
         [/#if]
