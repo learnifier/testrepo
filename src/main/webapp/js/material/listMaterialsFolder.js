@@ -68,22 +68,22 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     name: "typeTitle",
                     value: function(item){return lookupType(item.file)},
                     sortable: true,
-                    cssClass: "",
+                    cssClass: "material-kind",
                     clickFn: null
                 }, {
                     label: "Updated",
                     name: "updated",
                     value: function(item){return ""}, // TODO: Need something to sort on from vfs here.
                     sortable: true,
-                    cssClass: "",
+                    cssClass: "material-updated",
                     clickFn: null
                 }],
                 vfsActions: {
                     preview: { html: '<span class="glyphicon glyphicon-grain"></span> Preview' },
-                    edit: { html: '<span class="glyphicon glyphicon-grain"></span> Edit' },
-                    remove: { html: '<span class="glyphicon glyphicon-trash"></span> Delete' },
                     rename: { html: '<span class="glyphicon glyphicon-pencil"></span> Rename' },
-                    move: { html: '<span class="glyphicon glyphicon-share"></span> Move' }
+                    edit: { html: '<span class="glyphicon glyphicon-grain"></span> Edit' },
+                    move: { html: '<span class="glyphicon glyphicon-share"></span> Move' },
+                    remove: { html: '<span class="glyphicon glyphicon-trash"></span> Delete' }
                 },
                 setApi: function(api){
                     self.cocoboxListApi(api);
