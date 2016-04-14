@@ -79,9 +79,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     clickFn: null
                 }],
                 vfsActions: {
-                    preview: { html: '<span class="glyphicon glyphicon-grain"></span> Preview' },
+                    preview: { html: '<span class="glyphicon glyphicon-eye-open"></span> Preview' },
                     rename: { html: '<span class="glyphicon glyphicon-pencil"></span> Rename' },
-                    edit: { html: '<span class="glyphicon glyphicon-grain"></span> Edit' },
+                    edit: { html: '<span class="glyphicon glyphicon-edit"></span> Edit' },
                     move: { html: '<span class="glyphicon glyphicon-share"></span> Move' },
                     remove: { html: '<span class="glyphicon glyphicon-trash"></span> Delete' }
                 },
