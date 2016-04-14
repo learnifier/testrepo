@@ -100,9 +100,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
     private RequestTarget innerVerifyNewDesign(final RequestCycle cycle, String strProjectId,
             final boolean primary) {
-        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-
-        final OrgProject project = ccbc.getProject(Long.valueOf(strProjectId));
+        final OrgProject project = getProject(cycle, strProjectId);
 
         checkPermission(cycle, project);
 
@@ -151,7 +149,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             boolean autoCall) {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
-        OrgProject project = ccbc.getProject(Long.valueOf(strProjectId));
+        OrgProject project = getProject(cycle, strProjectId);
 
         checkPermission(cycle, project);
 
