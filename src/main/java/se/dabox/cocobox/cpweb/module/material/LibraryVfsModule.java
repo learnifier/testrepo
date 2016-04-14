@@ -44,12 +44,12 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
         filespaceFactory.setDefaultUnknownThumbnailUrl(CdnUtils.getResourceUrl(
                 "/cocobox/img/producttypes/folder.svg"));
 
-        GrantedOrgFolderFilesystem grantedFs = new GrantedOrgFolderFilesystem(orgUnit.getId());
-        grantedFs.setRootThumbnailUrl(CdnUtils.getResourceUrl(
-                "/cocobox/img/producttypes/dollarfolder.svg"));
-        grantedFs.setRootDisplayName("Purchased");
-
-        filespaceFactory.mount(Path.valueOf("/purchased"), grantedFs);
+//        GrantedOrgFolderFilesystem grantedFs = new GrantedOrgFolderFilesystem(orgUnit.getId());
+//        grantedFs.setRootThumbnailUrl(CdnUtils.getResourceUrl(
+//                "/cocobox/img/producttypes/dollarfolder.svg"));
+//        grantedFs.setRootDisplayName("Purchased");
+//
+//        filespaceFactory.mount(Path.valueOf("/purchased"), grantedFs);
 
         return filespaceFactory.newInstance();
     }
