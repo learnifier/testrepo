@@ -109,8 +109,14 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                         if(data.products instanceof Array) {
                             data.products.forEach(function(prod){
                                 console.log("*** main: Adding product: ", prod.id);
+                                if(folderPath != "/") {
+                                    $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (data) {
+                                        console.log("*** resolved: ", data);
+                                    });
+                                }
                             });
                             self.cocoboxListApi().refresh();
+
                         }
                     },
                     "addAndEdit": function (data) {
