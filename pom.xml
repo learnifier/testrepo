@@ -207,45 +207,6 @@
 
     <build>
         <finalName>cpweb</finalName>
-        <plugins>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>yuicompressor-maven-plugin</artifactId>
-                <version>1.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compress</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>se.dabox.maven.plugin</groupId>
-                <artifactId>combiner-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>combine</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputFile>js/cpweb-all.js</outputFile>
-                    <files>
-                        <file>
-                            <name>js/cpweb-min.js</name>
-                            <developmentName>js/cpweb.js</developmentName>
-                        </file>
-                        <file>
-                            <name>js/project/projectGraphs-min.js</name>
-                            <developmentName>js/project/projectGraphs.js</developmentName>
-                        </file>
-                    </files>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <properties>
