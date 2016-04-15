@@ -36,43 +36,45 @@ ${cpweb_foot}
 
     var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
-    cpweb.editable($('#language .editable-content'),
-    $('#language .edit '),
-    function(value){},
-    {'type': 'select',
-        'url': settingsUrl,
-        'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
-        'pk': 'locale',
-        'value': "${prj.locale.toLanguageTag()}"
-    });
+    require(['${contextPath}/js/cpweb.js'], function() {
+        cpweb.editable($('#language .editable-content'),
+        $('#language .edit '),
+        function(value){},
+        {'type': 'select',
+            'url': settingsUrl,
+            'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
+            'pk': 'locale',
+            'value': "${prj.locale.toLanguageTag()}"
+        });
 
-    cpweb.editable($('#country .editable-content'),
-    $('#country .edit '),
-    function(value){},
-    {type: 'select',
-        'url': settingsUrl,
-        'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
-        'pk': 'country',
-        'value': "${prj.country.toLanguageTag()}"
-    });
+        cpweb.editable($('#country .editable-content'),
+        $('#country .edit '),
+        function(value){},
+        {type: 'select',
+            'url': settingsUrl,
+            'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
+            'pk': 'country',
+            'value': "${prj.country.toLanguageTag()}"
+        });
 
-    cpweb.editable($('#timezone .editable-content'),
-    $('#timezone .edit '),
-    function(value){},
-    {type: 'select',
-        'url': settingsUrl,
-        'source': "${helper.urlFor('project.ProjectJsonModule','listTimeZones',[prj.projectId])}",
-        'pk': 'timezone',
-        'value': "${prj.timezone.ID?js_string}"
-    });
+        cpweb.editable($('#timezone .editable-content'),
+        $('#timezone .edit '),
+        function(value){},
+        {type: 'select',
+            'url': settingsUrl,
+            'source': "${helper.urlFor('project.ProjectJsonModule','listTimeZones',[prj.projectId])}",
+            'pk': 'timezone',
+            'value': "${prj.timezone.ID?js_string}"
+        });
 
-    cpweb.editable($('#expiration .editable-content'),
-    $('#expiration .edit '),
-    function(value){},
-    {type: 'text',
-        'url': settingsUrl,
-        'pk': 'participationexpiration',
-        'value': "${((prj.defaultParticipationExpiration/86400000)?c)!''}"
+        cpweb.editable($('#expiration .editable-content'),
+        $('#expiration .edit '),
+        function(value){},
+        {type: 'text',
+            'url': settingsUrl,
+            'pk': 'participationexpiration',
+            'value': "${((prj.defaultParticipationExpiration/86400000)?c)!''}"
+        });
     });
 
 

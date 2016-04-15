@@ -16,10 +16,11 @@
 [@bsform._onreadyJavascript]
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-    cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
-    cpweb.editable($('#project-usertitle'), $('#project-usertitle x'), function(value){}, {});
-    cpweb.editable($('#project-userdesc'), $('#project-userdesc x'), function(value){}, {});
-
+    require(['${contextPath}/js/cpweb.js'], function() {
+        cpweb.editable($('#project-name .editable-content'), $('#project-name .editable-control'), function(value){}, {});
+        cpweb.editable($('#project-usertitle'), $('#project-usertitle x'), function(value){}, {});
+        cpweb.editable($('#project-userdesc'), $('#project-userdesc x'), function(value){}, {});
+    });
     [/@]
 
     require(['dabox-common'], function() {
@@ -34,7 +35,7 @@
 
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
-    })    
+    })
 
 [/@bsform._onreadyJavascript]
 
@@ -51,7 +52,7 @@
                 <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>
         [#elseif isSubproject ]
                 <h1 class="page-title" id="project-name">${projectName?xml}</h1>
-        [#else]	
+        [#else]
             <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
             <ul class="page-created-updated__wrapper list-inline">
                 <li>
@@ -66,7 +67,7 @@
                 <li>
                     <p class="page-updated-label">Learner Portal Name</p>
                     <p class="page-updated"><span id="project-usertitle" data-url="${projectSettingUrl}" data-pk="usertitle">${(prj.userTitle?xml)!''}</span></p>
-                </li>                
+                </li>
             </ul>
             <ul class="page-created-updated__wrapper list-inline">
                 <li>
@@ -97,7 +98,7 @@
     </div>
 </section>
 
-	
+
     [#if project.stageDesignId??]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <div id="incomplete_dd" class="alert alert-warning" role="alert">
@@ -118,7 +119,7 @@
         <ul class="nav nav-underline">
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
-            
+
             [#--
             [#if project.type.ptype == 2 && !isIdproject(prj)]
                 <li class="[#if selected == 'info']active[/#if]"><a href="${helper.urlFor('ProjectModule','details',[project.projectId])}"><span>Info</span></a></li>
@@ -140,7 +141,7 @@
             <li class="[#if selected == 'schedule']active[/#if]"><a href="${helper.urlFor('ProjectModule','task',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.schedule' /]</span></a></li>
             [/@]
             [/#if]
-                        
+
             <li class="[#if selected == 'reports']active[/#if]"><a href="${helper.urlFor('ProjectModule','reports',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.reports' /]</span></a></li>
 
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]

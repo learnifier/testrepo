@@ -23,6 +23,7 @@
 </#assign>
 
 <#assign cpweb_foot>
+    <script>var cpweb = cpweb || {};</script>
 </#assign>
 
 <#macro localeLanguage locale>${locale.getDisplayLanguage(resp.locale)?cap_first}</#macro>

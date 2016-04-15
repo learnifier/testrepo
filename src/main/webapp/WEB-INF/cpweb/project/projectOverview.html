@@ -7,7 +7,9 @@
 ${cpweb_foot}
 <script>
     $('#menu-projects').addClass('active');
-            require(['Chart'], function() {
+</script>
+<script>
+    require(['Chart','${contextPath}/js/project/projectGraphs.js'], function() {
             var chartAnimation = false;
                     if (Modernizr.canvas === true) {
             chartAnimation = true;
@@ -171,6 +173,7 @@ ${cpweb_head}
 [@bsform._onreadyJavascript]
 
 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+require(['${contextPath}/js/cpweb.js'], function() {
 cpweb.editable($('#project-desc .editable-content'), $('#project-desc .editable-control'), function(value){}, {type: 'textarea'});
 cpweb.editable($('#project-usertitle .editable-content'), $('#project-usertitle .editable-control'), function(value){});
 cpweb.editable($('#project-userdesc .editable-content'), $('#project-userdesc .editable-control'), function(value){}, {type: 'textarea'});
@@ -185,6 +188,7 @@ source: [
 }
 );
 
+});
 [/@]
 [/@bsform._onreadyJavascript]
 
