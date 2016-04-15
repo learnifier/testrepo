@@ -377,7 +377,10 @@ ${cpweb_foot}
         };
 
 
-        cpweb.registerListform($("#projectrosterform").first());
+        require(['${contextPath}/js/cpweb.js'], function() {
+            cpweb.registerListform($("#projectrosterform").first());
+        });
+
         $('#listprojects_filter input').attr('placeholder', 'Search for projects');
 
         $.fn.clearForm = function() {
