@@ -73,7 +73,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 }, {
                     label: "Updated",
                     name: "updated",
-                    value: function(item){return ""}, // TODO: Need something to sort on from vfs here.
+                    value: function(item){return item.file.modified && item.file.modified.shortstr ? item.file.modified.shortstr : ""},
                     sortable: true,
                     cssClass: "material-updated",
                     clickFn: null
