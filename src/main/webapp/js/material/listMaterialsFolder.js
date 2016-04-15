@@ -91,7 +91,31 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             }
         };
         function openCreateMaterial(url, types) {
+
+            function createAndMove(prod){
+                return new Promise(function(resolve, reject) {
+                    $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (prod) {
+                        if(folderPath != "/") {
+                            settings.vfs.rename(prod.path, folderPath).then(function () {
+                                resolve(folderPath + prod.path);
+                            }).catch(function (e) {
+                                reject(e);
+                            });
+                        } else {
+                            resolve(prod.path);
+                        }
+                    });
+                });
+            }
+
+            function createAndMoveMulti(prods){
+                return Promise.all(prods.map(function(prod){
+                    return createAndMove(prod)
+                }));
+            }
+
             var folderPath = self.cocoboxListApi().currentFolderPath();
+
 
             types.map(function(type){
                url += "&type[]=" + type;
@@ -104,20 +128,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     "add": function (data) {
                         var ps;
                         if(data.products instanceof Array) {
-                            ps = data.products.map(function(prod){
-                                return new Promise(function(resolve, reject) {
-                                    if(folderPath != "/") {
-                                        $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (prod) {
-                                            settings.vfs.rename(prod.path, folderPath).then(function(){
-                                                resolve();
-                                            }).catch(function(e){
-                                                reject(e);
-                                            });
-                                        });
-                                    }
-                                });
-                            });
-                            Promise.all(ps).then(function(){
+                            createAndMoveMulti(data.products).then(function(){
                                 self.cocoboxListApi().refresh();
                             }).catch(function(e){
                                 self.cocoboxListApi().refresh();
@@ -127,16 +138,14 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                         }
                     },
                     "addAndEdit": function (data) {
-                        var editId = null;
-                        if(data.products instanceof Array) {
-                            // Should only get one product here, but edit last one in case something breaks.
-                            data.products.forEach(function(prod){
-                                console.log("*** main: Adding product: ", prod.id);
-                                editId = prod.id;
+                        console.log("in AddAndEdit", data);
+                        // Prdocuts is a list, but with at most one member
+                        if(data.products instanceof Array && data.products.length > 0) {
+                            console.log("in AddAndEdit #2", data.products[0]);
+                            createAndMove(data.products[0]).then(function (prodPath) {
+                                console.log("in AddAndEdit #3", prodPath);
+                                self.cocoboxListApi().runOp(prodPath, "edit");
                             });
-                            if(editId) {
-                                self.cocoboxListApi().refreshAndEdit(editId);
-                            }
                         }
                     },
                     "close": function(data) {
