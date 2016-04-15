@@ -98,9 +98,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             });
 
             console.log("url: ", url);
-            if(folderPath) { // Can be 0 which means false
-                url += "&folder=" + folderPath;
-            }
+            // if(folderPath) { // Can be 0 which means false
+            //     url += "&folder=" + folderPath;
+            // }
             var imodal = new ccbImodal.Server({
                 serviceName: "addProducts",
                 url: url,
