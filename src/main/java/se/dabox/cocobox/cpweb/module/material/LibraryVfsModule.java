@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -30,13 +29,13 @@ import se.dabox.cocobox.vfs.orgfolder.GrantedOrgFolderFilesystem;
 import se.dabox.cocobox.vfs.orgfolder.OrgFolderFilesystem;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.freemarker.util.CdnUtils;
+import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.folder.FolderId;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.org.OrgProduct;
-import se.dabox.service.common.json.JsonUtils;
 import se.dabox.util.collections.CollectionsUtil;
 
 /**
@@ -55,9 +54,14 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
     public RequestTarget onVfs(RequestCycle cycle, String strOrgId, String command) {
         checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_VIEW_PRODUCTS);
 
-        return new JsonVfsWebAction(LOGGER,
-                () -> createFilespace(cycle, strOrgId)).
-                run(cycle, command);
+        final JsonVfsWebAction vfsAction
+                = new JsonVfsWebAction(LOGGER,
+                        () -> createFilespace(cycle, strOrgId));
+
+        vfsAction.setLocale(CocositeUserHelper.getRequestUserLocale(cycle));
+        vfsAction.setZoneId(CocositeUserHelper.getZoneId(cycle));
+
+        return vfsAction.run(cycle, command);
     }
 
     /**
