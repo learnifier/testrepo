@@ -97,26 +97,33 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                url += "&type[]=" + type;
             });
 
-            console.log("url: ", url);
-            // if(folderPath) { // Can be 0 which means false
-            //     url += "&folder=" + folderPath;
-            // }
             var imodal = new ccbImodal.Server({
                 serviceName: "addProducts",
                 url: url,
                 callbacks: {
                     "add": function (data) {
+                        var ps;
                         if(data.products instanceof Array) {
-                            data.products.forEach(function(prod){
-                                console.log("*** main: Adding product: ", prod.id);
-                                if(folderPath != "/") {
-                                    $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (data) {
-                                        console.log("*** resolved: ", data);
-                                    });
-                                }
+                            ps = data.products.map(function(prod){
+                                return new Promise(function(resolve, reject) {
+                                    if(folderPath != "/") {
+                                        $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (prod) {
+                                            settings.vfs.rename(prod.path, folderPath).then(function(x){
+                                                resolve();
+                                            }).catch(function(e){
+                                                reject(e);
+                                            });
+                                        });
+                                    }
+                                });
                             });
-                            self.cocoboxListApi().refresh();
-
+                            Promise.all(ps).then(function(){
+                                self.cocoboxListApi().refresh();
+                            }).catch(function(e){
+                                self.cocoboxListApi().refresh();
+                                console.log("Error moving products: ", e);
+                                CCBMessengerError("There was a problem moving a newly created product. Your new product may be in the home folder.");
+                            });
                         }
                     },
                     "addAndEdit": function (data) {
