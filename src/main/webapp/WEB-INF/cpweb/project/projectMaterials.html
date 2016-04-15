@@ -338,7 +338,13 @@ ${cpweb_foot}
                     [@bsform.select name="materialId" class="form-control" tabindex="1"]
                     <option value=""></option>
                     [#list materials?sort_by("title") as mat]
-                    [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@bsform.option]
+                    [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]
+                        [#if mat.product??]
+                            ${mat.product.title?xhtml}[#if !mat.product.anonymous && security.isBoAdmin()] (${mat.product.id?xhtml})[/#if]
+                        [#else]
+                            ${mat.title?xhtml}
+                        [/#if]
+                    [/@bsform.option]
                     [/#list]
                     [/@bsform.select]
 
