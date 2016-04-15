@@ -108,7 +108,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                                 return new Promise(function(resolve, reject) {
                                     if(folderPath != "/") {
                                         $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (prod) {
-                                            settings.vfs.rename(prod.path, folderPath).then(function(x){
+                                            settings.vfs.rename(prod.path, folderPath).then(function(){
                                                 resolve();
                                             }).catch(function(e){
                                                 reject(e);
