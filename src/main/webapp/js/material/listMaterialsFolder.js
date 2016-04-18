@@ -180,6 +180,10 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 self.cocoboxListApi().addFolder();
             }
         };
+
+        self.canWriteFolder = function() {
+            return self.cocoboxListApi() && self.cocoboxListApi().canWriteFolder();
+        };
     }
 
     exports.init = function(options) {

@@ -50,9 +50,9 @@ ${cpweb_foot}
 <section class="ccb-page-header margin-bottom">
     <div class="ccb-page-header__actions--right">
         [#if portalSecurity.hasPermission("CP_CREATE_ORGMAT")]
-        <div class="btn btn-primary" data-bind="click: addFolder"><span class="glyphicon glyphicon-plus-sign"></span> Add Folder</div>
+        <button class="btn btn-primary" data-bind="click: addFolder, enable: canWriteFolder()"><span class="glyphicon glyphicon-plus-sign"></span> Add Folder</button>
         <div class="btn-group">
-          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bind="enable: canWriteFolder()">
               <i class="glyphicon glyphicon-plus-sign"></i> Add Materials <span class="caret"></span>
           </button>
           <ul class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
