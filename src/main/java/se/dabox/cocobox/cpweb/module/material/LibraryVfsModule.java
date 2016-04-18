@@ -157,7 +157,7 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
                 = CollectionsUtil.createMap(folders, f -> f.getId());
 
         List<String> segments = new ArrayList<>();
-        segments.add(OrgFolderFilesystem.PRODUCT_PREFIX + orgProd.getProdId());
+        segments.add(OrgFolderFilesystem.PRODUCT_PREFIX + orgProd.getOrgProductId());
 
         for (FolderId id = orgProd.getFolderId(); !id.equals(FolderId.forRoot());) {
             OrgMaterialFolder parent = folderMap.get(id);
