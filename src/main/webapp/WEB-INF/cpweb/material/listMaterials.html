@@ -34,7 +34,8 @@ ${cpweb_foot}
             renameItemUrl: "${helper.urlFor('OrgMaterialJsonModule','renameItem',[org.id])}",
             editOrgMatUrl: "${helper.urlFor('material.MaterialModule','edit',[org.id])}",
             addProductUrl: "${dwsrt.config['pdweb-folders.baseurl']}aprodnew/createProduct?scope=O${org.id?c}",
-            resolveProdId: "${helper.urlFor('material.LibraryVfsModule','resolveProduct',[org.id])}",
+            resolveIdToVfs: "${helper.urlFor('material.LibraryVfsModule','resolveProduct',[org.id])}",
+            postDeleteErrorUrl: "${helper.urlFor('OrgMaterialJsonModule', 'listProductProjects')}",
             editMode: true // TODO: Check permissions here.
         });
     });

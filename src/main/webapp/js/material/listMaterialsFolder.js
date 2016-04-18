@@ -85,6 +85,24 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     move: { html: '<span class="glyphicon glyphicon-share"></span> Move' },
                     remove: { html: '<span class="glyphicon glyphicon-trash"></span> Delete' }
                 },
+                postDeleteErrorAction: function(file) {
+                    var prodId, url;
+
+                    if(item.file.attributes) {
+                        prodId = item.file.attributes.productId;
+                        url = settings.postDeleteErrorUrl + "?productId=" + prodId;
+                        $.ajax(url).done(function(data){
+                            if(data.projects) {
+                                var msg = "Unable to delete product. It is used in the following project(s):\n\n" +
+                                    data.projects.map(function (p) {
+                                        return '"' + p.name + '"';
+                                    }).join("\n");
+                                cocobox.errorDialog("Unable to delete", msg, function () {
+                                });
+                            }
+                        });
+                    }
+                },
                 setApi: function(api){
                     self.cocoboxListApi(api);
                 }
@@ -94,7 +112,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
 
             function createAndMove(prod){
                 return new Promise(function(resolve, reject) {
-                    $.ajax(settings.resolveProdId + "?productId=" + prod.id).done(function (prod) {
+                    $.ajax(settings.resolveIdToVfs + "?productId=" + prod.id).done(function (prod) {
                         if(folderPath != "/") {
                             settings.vfs.rename(prod.path, folderPath).then(function () {
                                 resolve(folderPath + prod.path);
@@ -138,12 +156,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                         }
                     },
                     "addAndEdit": function (data) {
-                        console.log("in AddAndEdit", data);
-                        // Prdocuts is a list, but with at most one member
+                        // Products is a list, but with at most one member
                         if(data.products instanceof Array && data.products.length > 0) {
-                            console.log("in AddAndEdit #2", data.products[0]);
                             createAndMove(data.products[0]).then(function (prodPath) {
-                                console.log("in AddAndEdit #3", prodPath);
                                 self.cocoboxListApi().runOp(prodPath, "edit");
                             });
                         }
