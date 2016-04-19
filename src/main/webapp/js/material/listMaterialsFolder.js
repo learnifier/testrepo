@@ -193,7 +193,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             addProductUrl: undefined,
             resolveIdToVfs: undefined,
             postDeleteErrorUrl: undefined,
-            editMode: true // TODO: Check permissions here.
+            editMode: true,
         }, options);
         ko.applyBindings(new ListMaterialModel());
     };
