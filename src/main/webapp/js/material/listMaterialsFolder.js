@@ -88,9 +88,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 },
                 postDeleteErrorAction: function(file) {
                     var prodId, url;
-
-                    if(item.file.attributes) {
-                        prodId = item.file.attributes.productId;
+                    if(file.attributes) {
+                        prodId = file.attributes.productId;
                         url = settings.postDeleteErrorUrl + "?productId=" + prodId;
                         $.ajax(url).done(function(data){
                             if(data.projects) {
