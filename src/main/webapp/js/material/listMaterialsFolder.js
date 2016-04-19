@@ -190,12 +190,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         settings = Object.assign({
             vfs: undefined,
             listUrl: undefined,
-            moveFolderUrl: undefined,
-            createFolderUrl: undefined,
-            removeFoldersItemsUrl: undefined,
-            renameFolderUrl: undefined,
-            renameItemUrl: undefined,
-            editOrgMatUrl: undefined,
+            addProductUrl: undefined,
+            resolveIdToVfs: undefined,
+            postDeleteErrorUrl: undefined,
             editMode: true // TODO: Check permissions here.
         }, options);
         ko.applyBindings(new ListMaterialModel());
