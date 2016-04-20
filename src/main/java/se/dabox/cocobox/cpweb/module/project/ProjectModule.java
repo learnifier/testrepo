@@ -307,7 +307,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                     = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class).
                     getParticipationProgress(participationId);
         } catch (NotFoundException notFoundException) {
-            Collections.emptyList();
+            progress = Collections.emptyList();
         }
 
         DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
