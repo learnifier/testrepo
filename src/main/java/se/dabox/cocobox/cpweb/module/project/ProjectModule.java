@@ -3,6 +3,10 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -15,11 +19,17 @@ import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.coursebuilder.initdata.CourseBuilderActivationLink;
 import se.dabox.cocobox.coursebuilder.initdata.InitData;
 import se.dabox.cocobox.coursebuilder.initdata.InitDataBuilder;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.account.ChangePassword;
-import se.dabox.cocobox.cpweb.formdata.project.*;
+import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
+import se.dabox.cocobox.cpweb.formdata.project.AddMemberForm;
+import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
+import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
+import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
+import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
@@ -35,13 +45,23 @@ import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
 import se.dabox.cocosite.selfreg.GetProjectSelfRegLink;
 import se.dabox.cocosite.upweb.linkaction.ImpersonateParticipationLinkAction;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
-import se.dabox.cocosite.upweb.linkaction.cpreview.*;
+import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
+import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectDatabankSource;
+import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
-import se.dabox.service.common.ccbc.project.*;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
+import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.ProjectParticipation;
+import se.dabox.service.common.ccbc.project.ProjectParticipationState;
+import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
+import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
+import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectProductMaterialHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
@@ -63,12 +83,6 @@ import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.ValueUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import se.dabox.cocobox.coursebuilder.initdata.CourseBuilderActivationLink;
 
 /**
  *
@@ -129,29 +143,6 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new FreemarkerRequestTarget("/project/projectRoster.html", map);
     }
 
-
-    @WebAction
-    public RequestTarget onKevin(RequestCycle cycle, String projectId) {
-        OrgProject project =
-                getProject(cycle, projectId);
-
-        checkPermission(cycle, project);
-        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
-
-        Map<String, Object> map = createMap();
-
-        map.put("formsess", getValidationSession(AddMemberForm.class, cycle));
-
-        map.put("rosterformsess", getValidationSession(UploadRosterForm.class, cycle));
-        map.put("uploadRosterFormLink", cycle.urlFor(ProjectModificationModule.class,
-                ProjectModificationModule.UPLOAD_ROSTER_ACTION,
-                projectId));
-        addCommonMapValues(map, project, cycle);
-        initSelfReg(cycle, project, map);
-
-        return new FreemarkerRequestTarget("/project/kevin.html", map);
-    }
-    
     @WebAction
     public RequestTarget onDetails(RequestCycle cycle, String projectId) {
         OrgProject project =
@@ -166,7 +157,7 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         return new FreemarkerRequestTarget("/project/projectDetails.html", map);
     }
-    
+
 
     public void initSelfReg(RequestCycle cycle, OrgProject project, Map<String,Object> map) {
         checkPermission(cycle, project);
@@ -283,6 +274,10 @@ public class ProjectModule extends AbstractProjectWebModule {
     /**
      * Shows technical information about the user
      *
+     * @param cycle
+     * @param projectId
+     * @param strParticipationId
+     * @return
      */
     @WebAction
     public RequestTarget onRaps(RequestCycle cycle, String projectId, String strParticipationId) {
@@ -312,12 +307,12 @@ public class ProjectModule extends AbstractProjectWebModule {
                     = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class).
                     getParticipationProgress(participationId);
         } catch (NotFoundException notFoundException) {
-            Collections.emptyList();
+            progress = Collections.emptyList();
         }
 
         DatabankFacade databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
         CourseDesignDefinition cdd = new GetProjectCourseDesignCommand(cycle).forProject(project);
-        
+
         ProjectParticipationState state
                 = getCocoboxCordinatorClient(cycle).getParticipationState(participationId);
 
@@ -527,7 +522,7 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         map.put("formsess", getValidationSession(AddTaskForm.class, cycle));
         map.put("templateLists", getLists(cycle, mailBucket));
-        addCommonMapValues(map, project, cycle);        
+        addCommonMapValues(map, project, cycle);
 
         return new FreemarkerRequestTarget("/project/projectSchedule.html", map);
     }
@@ -607,7 +602,7 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         return new FreemarkerRequestTarget("/project/projectReports.html", map);
     }
-    
+
     @WebAction
     public RequestTarget onEdit(RequestCycle cycle, String projectId) {
         throw new UnsupportedOperationException("Not supported anymore");
@@ -650,7 +645,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 part.getParticipationId());
 
         String url = LinkActionUrlHelper.getUrl(cycle, action);
-        
+
         return new RedirectUrlRequestTarget(url);
     }
 
@@ -674,7 +669,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         if (!action.isValid()) {
             throw new IllegalStateException("CoursePreviewLinkAction is not setup correctly");
         }
-        
+
         String url = LinkActionUrlHelper.getUrl(cycle, action);
 
         return new RedirectUrlRequestTarget(url);
@@ -799,5 +794,5 @@ public class ProjectModule extends AbstractProjectWebModule {
         UpdateDesignRequest udr = new UpdateDesignRequest(designId, userId, mutator.toXmlString());
         cdClient.updateDesign(udr);
     }
-    
+
 }

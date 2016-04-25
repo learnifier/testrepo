@@ -23,16 +23,6 @@
     });
     [/@]
 
-    require(['dabox-common'], function() {
-    cocobox.ajaxForm("#deleteprojectform", function(data) {
-    if (data.location) {
-    window.location = data.location;
-    } else {
-    cocobox.infoDialog('Delete project','You need to delete all participants to be able to delete the project.');
-    }
-    });
-    });
-
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     })
@@ -80,17 +70,17 @@
         <div class="ccb-page-header__actions">
             [#if isSubproject ]
                 <form action="${helper.urlFor('project.ProjectModule', 'overview',[project.masterProject])}" method="post">
-                    <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
+                    <button class="btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
                 </form>
             [/#if]
             [#if project.type.ptype == 2]
                 <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
-                    <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
+                    <button class="btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
                 </form>
             [/#if]
             [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && canDeleteProject ]
                 <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
-                    <button class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                    <button class="btn btn-primary-outlined btn-sm" type="button" id="deletePrjBtn"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
             [/#if]
 
@@ -102,14 +92,14 @@
     [#if project.stageDesignId??]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <div id="incomplete_dd" class="alert alert-warning" role="alert">
-                <h2>Activate Your Updated Course Design</h2>
+                <h2>Publish Your Updated Course Design</h2>
                 <p>Your updated course design <span class="imp">will not be available to participants </span>until you have clicked the button below and entered any required information.</p>
 
                 [#if !prj.invitePossible]
-                <p><span class="imp">You cannot invite participants until you have activated the course design.</span></p>
+                <p><span class="imp">You cannot invite participants until you have published the course design.</span></p>
                 [/#if]
                 <form action="${helper.urlFor('project.VerifyProjectDesignModule','verifyNewDesign',[project.projectId])}" method="post">
-                    <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-flash"></span> Activate Course Design Now</button>
+                    <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-flash"></span> Publish Course Design Now</button>
                 </form>
             </div>
         [/@]

@@ -12,6 +12,7 @@ import se.dabox.cocobox.security.role.CocoboxRoleUtil;
 import se.dabox.dws.client.JacksonHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.context.DwsRealmHelper;
@@ -40,7 +41,14 @@ public class ActivateNewProjectAdmin {
         this.userId = JacksonHelper.getLong(map, "userId");
     }
 
-    public String getTargetUrl() {
+    /**
+     * Activate role and return first access url
+     *
+     * @return An url to redirect the admin
+     *
+     * @throws NotFoundException Thrown if the project doesn't exist
+     */
+    public String getTargetUrl() throws NotFoundException {
         activateUserRoles();
         activateOrgRole();
         sendWelcomeMail();
@@ -116,15 +124,19 @@ public class ActivateNewProjectAdmin {
 
     /**
      * Activate an organization role so the user appear in under the client
-     * 
+     *
      */
     private void activateOrgRole() {
         long projectId = JacksonHelper.getLong(map, ProjectRoleAdminTokenGenerator.FIELD_PROJECT_ID);
-        
+
         CocoboxCoordinatorClient ccbc = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
         OrgProject prj = ccbc.getProject(projectId);
-        
+
+        if (prj == null) {
+            throw new NotFoundException(Long.toString(projectId));
+        }
+
         new AddMissingClientAccessRole(cycle).addOrgUnitAccess(userId, prj.getOrgId());
     }
 

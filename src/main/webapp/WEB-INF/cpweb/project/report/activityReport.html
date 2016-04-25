@@ -3,6 +3,7 @@
 [#import "../projectInfo.html" as pInfo /]
 
 [#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+[#import "/report/include/extendedStatusMap.ftl" as esMap /]
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
@@ -10,12 +11,7 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 </script>
 <script>
-    statusNames = {
-        "notAttempted": "Not Started",
-        "incomplete": "In Progress",
-        "completed": "Completed",
-        "unknown": "Unknown"
-    };
+    var statusNames = [@esMap.langKeyMap /];
 
 </script>
 <script>
@@ -25,7 +21,7 @@ ${cpweb_foot}
 
             var tableColTitles = ["Name"];
             var tableColIds = ["displayName"];
-            var tableColSumTitle = ["Completed"];
+            var tableColSumTitle = [statusNames.completed];
             var tableJSON = [];
 
             lr.guiLongRun('${reportJsonUrl}', {
@@ -43,7 +39,7 @@ ${cpweb_foot}
                       renderColDefs(activityCount);
                       initializeTable(data.aaData);
                     } else {
-                      $('#r_project_activity').html($('<td class="errormessage">').text('There are no activities to report on in this project. Please, add an activty and come back to generate this report.'));
+                      $('#r_project_activity').html($('<td class="errormessage">').text('There are no activities to report on in this project. Please, add an activity and come back to generate this report.'));
                     }
                 }
             });
@@ -78,7 +74,7 @@ ${cpweb_foot}
                     if (i === 0) {
                         tableColIds.push("activities." + [i] + ".progressPercent");
                     } else {
-                        tableColIds.push("activities." + [i] + ".completionStatus");
+                        tableColIds.push("activities." + [i] + ".extendedStatus");
                     }
                 };
 
@@ -90,7 +86,6 @@ ${cpweb_foot}
 
                     var renderFn;
 
-                    console.log("Definition for", i);
                     if (i === 1) {
                         renderFn = function(data) {
                             if (data === undefined) {
@@ -118,13 +113,14 @@ ${cpweb_foot}
                         "render": renderFn,
                         "createdCell": function(td, data, oData, row, col) {
                             if (oData.activities && oData.activities[col - 1] !== undefined) {
-                                if (oData.activities && oData.activities[col - 1].completionStatus == "notAttempted" ) {
+                                var status = oData.activities && oData.activities[col - 1].extendedStatus;
+                                if (status === "notAttempted" ) {
                                     $(td).addClass('text-danger');
-                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "incomplete" ) {
+                                } else if (status === "incomplete" ) {
                                     $(td).addClass('text-warning');
-                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "completed" ) {
+                                } else if (status === "completed" || status === "passed" || status === "failed") {
                                     $(td).addClass('text-success');
-                                } else if (oData.activities && oData.activities[col - 1].completionStatus == "unknown" ) {
+                                } else if (status === "locked" || status === "notTracked") {
                                       $(td).addClass('text-muted');
                                   }
                             }

@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.user;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
@@ -15,8 +16,10 @@ import se.dabox.cocobox.cpweb.module.core.AbstractModule;
 import se.dabox.cocobox.cpweb.module.project.role.ActivateNewProjectAdmin;
 import se.dabox.cocosite.branding.GetRealmBrandingId;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.messagepage.GenericMessagePageFactory;
 import se.dabox.coocbox.user.emaillink.enhancer.UserLinkEnhancerFactory;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.role.ProjectRoleAdminTokenGenerator;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.LoginService;
@@ -65,7 +68,7 @@ public class AdminRegistrationModule extends AbstractModule {
 
         String loginUrl = CacheClients.getClient(cycle, LoginService.class).
                 autoLogin(userId, url, true, CocoSiteConstants.DEFAULT_LOGIN_SKIN, brandingId);
-        
+
         return new RedirectUrlRequestTarget(loginUrl);
     }
 
@@ -98,7 +101,15 @@ public class AdminRegistrationModule extends AbstractModule {
 
     private String activateProjectAdmin(RequestCycle cycle, String id,
             Map<String, ?> map) {
-        return new ActivateNewProjectAdmin(cycle, id, map).getTargetUrl();
+        try {
+            return new ActivateNewProjectAdmin(cycle, id, map).getTargetUrl();
+        } catch (NotFoundException nfe) {
+            RequestTarget page
+                    = GenericMessagePageFactory.newNotFoundPage().withMessageText("Project not found: "
+                            + nfe.getMessage()).build();
+
+            throw new RetargetException(page);
+        }
     }
 
     private void processUserEnhacements(RequestCycle cycle) {

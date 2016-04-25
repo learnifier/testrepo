@@ -16,18 +16,41 @@ ${cpweb_foot}
 
 <h3>Page ${page_index} (enabled: ${page.enabled?c})</h3>
 
-<p>Title: ${(page.title?xhtml)!''}</p>
-<p>Text: ${(page.text?xhtml)!''}</p>
+<dl class="dl-horizontal">
+    <dt>Enabled</dt>
+    <dd>${(page.enabled?c)!''}</dd>
+    <dt>Title</dt>
+    <dd>${(page.title?xhtml)!''}</dd>
+    <dt>Text</dt>
+    <dd>${(page.text?xhtml)!''}</dd>
+
+</dl>
 
     [#list page.activityList as act]
         <h4>Activity ${act.index}</h4>
-        <p>Container type: ${(act.activityContainerType?xhtml)!''}</p>
-        <p>Enabled: ${(act.enabled?c)!''}</p>
-        <p>Completed: ${(act.completed?c)!''}</p>
-        <p>Visible: ${(act.visible?c)!''}</p>
-        <p>Overdue: ${(act.overdue?c)!''}</p>
-        <p>Success: ${(act.successStatus)!''}</p>
-        <p>Tracking type: ${(act.progressTrackingType)!''}</p>
+
+        <dl class="dl-horizontal">
+            <dt>Container type</dt>
+            <dd>${(act.activityContainerType?xhtml)!''}</dd>
+            <dt>Enabled</dt>
+            <dd>${(act.enabled?c)!''}</dd>
+            <dt>Visible</dt>
+            <dd>${(act.visible?c)!''}</dd>
+            <dt>Completed</dt>
+            <dd>${(act.completed?c)!''}</dd>
+            <dt>Success status</dt>
+            <dd>${(act.successStatus)!''}</dd>
+            <dt>Completion status</dt>
+            <dd>${(act.completionStatus)!''}</dd>
+            <dt>Overdue</dt>
+            <dd>${(act.overdue?c)!''}</dd>
+            <dt>Tracking type</dt>
+            <dd>${(act.progressTrackingType)!''}</dd>
+            <dt>Title</dt>
+            <dd>${(act.title?xhtml)!''}</dd>
+            <dt>Description</dt>
+            <dd>${(act.description?xhtml)!''}</dd>
+        </dl>
 
         <h5>Primary component</h5>
         [#if (act.primaryComponent??)]
@@ -89,5 +112,64 @@ ${cpweb_foot}
         [#return /]
     [/#if]
 
-    type=${comp.type}, cid=${comp.cid}, completed=${comp.completed?c}, tracking=${comp.progressTrackingType}, due=${comp.dueDateInfo}, title=${(comp.properties.title?xhtml)!''}
+    <table class="table table-striped table-bordered table-condensed" >
+        <tbody>
+            <tr>
+                <td>cid</td>
+                <td>${(comp.cid)!''}</td>
+            </tr>
+            <tr>
+                <td>type</td>
+                <td>${(comp.type)!''}</td>
+            </tr>
+            <tr>
+                <td>enabled</td>
+                <td>${(comp.enabled?c)!''}</td>
+            </tr>
+            <tr>
+                <td>completed</td>
+                <td>${(comp.completed?c)!''}</td>
+            </tr>
+            <tr>
+                <td>completionStatus</td>
+                <td>${(comp.completionStatus)!''}</td>
+            </tr>
+            <tr>
+                <td>successStatus</td>
+                <td>${(comp.successStatus)!''}</td>
+            </tr>
+            <tr>
+                <td>progressTrackingType</td>
+                <td>${(comp.progressTrackingType)!''}</td>
+            </tr>
+            <tr>
+                <td>completeByDate</td>
+                <td>${(comp.completeByDate?datetime)!''}</td>
+            </tr>
+            <tr>
+                <td>completedDate</td>
+                <td>${(comp.completedDate?datetime)!''}</td>
+            </tr>
+            <tr>
+                <td>dueDateInfo</td>
+                <td>${(comp.dueDateInfo)!''}</td>
+            </tr>
+            <tr>
+                <td>progressTrackable</td>
+                <td>${(comp.progressTrackable?c)!''}</td>
+            </tr>
+            <tr>
+                <td>children</td>
+                <td>
+                    [#if comp.children?? && comp.children?size > 0]
+                        [#list comp.children as child]
+                           [@dumpComponent child /]
+                        [/#list]
+                    [#else]
+                     None
+                    [/#if]
+                </td>
+            </tr>
+        </tbody>
+    </table>
 [/#macro]

@@ -96,9 +96,15 @@ ${cpweb_foot}
     <input type="hidden" id="delUserId" name="userId" />
     <input type="hidden" id="delRole" name="role" />
 </form>
+
+<script>
+        require(['${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function() {
+            //Do nothing
+        });
+</script>
 [#if prj.type.ptype == 2 && dwsrt.hasFeature('flirt') ]
 <script>
-    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}', '${contextPath}/js/project/projectCommon.js?${cycle.application.formattedStartTime.base36String}'], function(f) {
+    require(['${dwsrt.config["apiweb.baseurl"]}js/flirt.js?_ts=${cycle.application.formattedStartTime.base36String}&userLocale=${userLocale.toLanguageTag()?xhtml}'], function(f) {
         f.startSingleFlirt('${prj.newsFlirtId}', {
             bubbleColor: '${(brandingPackage.getMetadataImageColor("cpNavColor"))!""}',
             templates: {

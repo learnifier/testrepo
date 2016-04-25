@@ -163,8 +163,16 @@ ${cpweb_foot}
                 "ajax": "${helper.urlFor('project.ProjectJsonModule','projectMaterials',[prj.projectId])}"
             });
 
-            $("#addMaterial").submit(function () {
-                var form = $(this);
+            $("#addMaterialBtn").click(function (e) {
+                var form = $("#addMaterial");
+
+                if(e.preventDefault){
+                    e.preventDefault();
+                }
+
+                if (!$("#materialId").val()) {
+                    return;
+                }
 
                 //Disable button and activate longop dialog
                 var longOpDlg = cocobox.longOp("Adding product", "Adding product");
@@ -175,7 +183,7 @@ ${cpweb_foot}
                 var hideLoadingIndicators = function() {
                     longOpDlg.abort();
                     $("button", this).attr("disabled");
-                }
+                };
 
                 cocobox.ajaxPost(url, {
                     data: {materialId: $("#materialId").val()}
@@ -330,11 +338,17 @@ ${cpweb_foot}
                     [@bsform.select name="materialId" class="form-control" tabindex="1"]
                     <option value=""></option>
                     [#list materials?sort_by("title") as mat]
-                    [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]${mat.title?xhtml}[/@bsform.option]
+                    [@bsform.option value=(mat.nativeSystem+'|'+mat.id)]
+                        [#if mat.product??]
+                            ${mat.product.title?xhtml}[#if !mat.product.anonymous && security.isBoAdmin()] (${mat.product.id?xhtml})[/#if]
+                        [#else]
+                            ${mat.title?xhtml}
+                        [/#if]
+                    [/@bsform.option]
                     [/#list]
                     [/@bsform.select]
 
-                    <button type="submit" class="btn btn-primary">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
+                    <button type="button" id="addMaterialBtn" class="btn btn-primary">[@dws.txt key="cpweb.project.addmaterial.action" /]</button>
                 </div>
                 <div class="col-md-6">
                     <label for="addprojmat">[@dws.txt key="cpweb.project.uploadmaterial.label" /]</label>

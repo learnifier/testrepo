@@ -161,7 +161,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         }
 
         try {
-            
+
             addMember(cycle, prj, form.getMemberfirstname(), form.getMemberlastname(), form.
                     getMemberemail());
         } catch (ValidationFailureException vfe) {
@@ -502,7 +502,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
         checkPermission(cycle, prj);
         checkProjectPermission(cycle, prj, CocoboxPermissions.CP_ASSIGN_PROJECT_ROLE);
 
-        long caller = LoginUserAccountHelper.getCurrentCaller();        
+        long caller = LoginUserAccountHelper.getCurrentCaller();
 
         ProjectUserRoleModification mod = new ProjectUserRoleModification(caller, prjId, userId,
                 roleId);
@@ -632,7 +632,7 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                                     email);
                     final UserAccountService uaClient
                             = Clients.getClient(cycle, UserAccountService.class);
-                    
+
                     try {
                         ua = uaClient.createBasicUserAccount(create);
                     } catch (AlreadyExistsException ex) {
@@ -647,25 +647,25 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                     }
                     long userId = ua.getUserId();
                     uaClient.addUserRole(userId, CocoboxSecurityConstants.USER_ROLE);
-                    
+
                     uaClient.updateUserProfileValue(userId,
                             CocoboxUserAccount.PROFILE_COCOBOX,
                             CocoboxUserAccount.LOCALE,
                             prj.getLocale().toLanguageTag());
-                    
+
                     final OrganizationDirectoryClient odc
                             = Clients.getClient(cycle, OrganizationDirectoryClient.class);
-                    
+
                     final long orgId = prj.getOrgId();
                     final OrgUnitInfo oui = odc.getOrgUnitInfo(orgId);
                     if(oui.isHome()) {
                         uaClient.setOrganization(userId, orgId);
                     }
                 }
-                
+
                 long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
                 ccbcClient.newProjectParticipant(caller, prj.getProjectId(), ua.getUserId());
-                
+
                 return null;
             }
         };

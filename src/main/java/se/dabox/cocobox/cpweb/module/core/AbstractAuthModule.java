@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.module.core;
 import java.util.Locale;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
+import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import se.dabox.cocobox.security.user.UserPermissionFetcher;
 import se.dabox.cocosite.branding.GetOrgBrandingCommand;
 import se.dabox.cocosite.infocache.InfoCacheHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.messagepage.GenericMessagePageFactory;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.user.MiniUserAccountHelperContext;
 import se.dabox.service.branding.client.Branding;
@@ -165,7 +167,11 @@ public abstract class AbstractAuthModule extends AbstractModule {
         if (miniOrg == null) {
             String msg = String.format("Invalid org unit: %s", strOrgId);
             LOGGER.warn(msg);
-            throw new RetargetException(new ErrorCodeRequestTarget(404, msg));
+
+            RequestTarget page
+                = GenericMessagePageFactory.newNotFoundPage().withMessageText(msg).build();
+
+            throw new RetargetException(page);
         }
 
         return miniOrg;
@@ -234,7 +240,11 @@ public abstract class AbstractAuthModule extends AbstractModule {
         if (orgUnit == null) {
             String msg = "Organization not found: " + orgId;
             LOGGER.warn(msg);
-            throw new IllegalStateException(msg);
+
+            RequestTarget page
+                = GenericMessagePageFactory.newNotFoundPage().withMessageText(msg).build();
+
+            throw new RetargetException(page);
         }
 
         checkOrgPermission(cycle, orgId);
@@ -242,20 +252,23 @@ public abstract class AbstractAuthModule extends AbstractModule {
         return orgUnit;
     }
 
-//    @Override
-//    protected OrgUnitInfo getOrg(RequestCycle cycle, Long orgId) {
-//        return securedGetOrganization(cycle, orgId);
-//    }
-
     private void throwInvalidOrgId(String strOrgId) throws IllegalStateException {
         String msg = "Invalid organization id specified: " + strOrgId;
         LOGGER.warn(msg);
-        throw new IllegalStateException(msg);
+
+        RequestTarget page
+                = GenericMessagePageFactory.newNotFoundPage().withMessageText(msg).build();
+
+        throw new RetargetException(page);
     }
 
     protected void handleAccessDenied(RequestCycle cycle, String msg) {
         LOGGER.error("Access denied: {}", msg);
-        throw new RetargetException(new ErrorCodeRequestTarget(403, msg));
+
+        RequestTarget page
+                = GenericMessagePageFactory.newSecurityPage().withMessageText(msg).build();
+
+        throw new RetargetException(page);
     }
 
     private boolean isInvalidOrgId(String strOrgId) {

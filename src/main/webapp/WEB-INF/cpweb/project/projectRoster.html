@@ -454,7 +454,7 @@ ${cpweb_foot}
                 formatSelection: function(opt){return opt.text.trim()}
                 // formatResult is templateSelection in 4.0
             });
-            $("#group button[type=submit]").on('click', function (ev) {
+            $("#addByGroupBtn").on('click', function (ev) {
                 var cugId = $("#group select").val()
                         , cugName = $("#group select option:selected").text()
                         , infoUrl = "${helper.urlFor('project.ProjectJsonModule','groupInfo', [prj.projectId?c])}/" + cugId;
@@ -478,6 +478,8 @@ ${cpweb_foot}
                 }).fail(function (jqxhr, textStatus, error) {
                     console.error("Could not look up group id " + cugId + ". " + textStatus + ", " + error);
                 });
+
+                return false;
             });
 
             // "Mark by group"
@@ -537,28 +539,28 @@ ${cpweb_foot}
 
 
                         if (activityStatus == 'notAttempted') {
-                            var result = '<span class="text-muted">Not started</span>';
+                            var result = '<span class="text-muted">${ctext("cpweb:extendedstatus.notAttempted")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'incomplete') {
-                            var result = '<span class="text-info">In progress</span>';
+                            var result = '<span class="text-info">${ctext("cpweb:extendedstatus.incomplete")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'overdue') {
-                            var result = '<span class="text-danger">Overdue</span>';
+                            var result = '<span class="text-danger">${ctext("cpweb:extendedstatus.overdue")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'locked') {
-                            var result = '<span class="text-muted">Locked</span>';
+                            var result = '<span class="text-muted">${ctext("cpweb:extendedstatus.locked")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'failed') {
-                            var result = '<span class="text-danger">Completed/Failed</span>';
+                            var result = '<span class="text-danger">${ctext("cpweb:extendedstatus.failed")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'passed') {
-                            var result = '<span class="text-danger">Completed/Passed</span>';
+                            var result = '<span class="text-success">${ctext("cpweb:extendedstatus.passed")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'completed') {
-                            var result = '<span class="text-success">Completed</span>';
+                            var result = '<span class="text-success">${ctext("cpweb:extendedstatus.completed")}</span>';
                             return new hb.SafeString(result);
                         } else if (activityStatus == 'notTracked') {
-                            var result = '<span class="text-success">Not Tracked</span>';
+                            var result = '<span class="text-success">${ctext("cpweb:extendedstatus.notTracked")}</span>';
                             return new hb.SafeString(result);
                         } else {
                             return 'Unknown statusName:' + activityStatus;
@@ -792,8 +794,8 @@ ${cpweb_head}
         [@genOptions group=sg level=level+1 prefix=prefix + "&nbsp;&nbsp;&nbsp;&nbsp;"][/@genOptions]
     [/#list]
 [/#macro]
-[#macro genGroupSelect groups selectId]
-    <select id="${selectId}" style="margin-bottom: 10px; min-width:200px !important;">
+[#macro genGroupSelect groups selectId extraStyle=""]
+    <select id="${selectId}" style="${extraStyle}">
         <option value=""></option>
         [#list groups as g]
         [@genOptions group=g level=0 prefix=""][/@genOptions]
@@ -838,18 +840,18 @@ ${cpweb_head}
         </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="group">
-        <div class="row">
-            <div class="col-sm-6 col-lg-6">
-                [@genGroupSelect groups=groups selectId="addByGroup"][/@genGroupSelect]
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="form-group">
-                    <button type="submit" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-6 col-lg-4">
+                    [@genGroupSelect groups=groups selectId="addByGroup" extraStyle="width: 100%;"][/@genGroupSelect]
                 </div>
             </div>
-        </div>
+            <div class="form-group">
+                <div class="col-sm-6 col-lg-4">
+                    <button id="addByGroupBtn" type="button" tabindex="100" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> [@dws.txt key='form.action.addmembersbygroup' /]</button>
+                </div>
+            </div>
+        </form>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="uploadroster">
       [#include "rosterUpload.html" /]
@@ -891,7 +893,7 @@ ${cpweb_head}
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_ROSTER"]
         <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#projectrosterform'), 'delete', '${ctext("cpweb.project.roster.delete.title")?js_string}', '${ctext("cpweb.project.roster.delete.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         [/@]
-        [@genGroupSelect groups=groups selectId="markByGroup"][/@genGroupSelect]
+        [@genGroupSelect groups=groups selectId="markByGroup" extraStyle="margin-bottom: 10px; min-width:200px !important;"][/@genGroupSelect]
 
 
         [#include "projectRosterCalendarActivatedSection.html" /]
