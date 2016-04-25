@@ -48,6 +48,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 idField: "id", // TODO: Not used
                 nameField: "name",
                 typeField: "type",  // TODO: Not used
+                filterTypes: undefined,
+                groupOps: true,
+                folderSelectable: true,
                 columns: [{
                     label: "",
                     name: "thumbnail",
