@@ -52,45 +52,39 @@ ${cpweb_foot}
           <ul class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
             <li><h4 class="text-center primaryColor">UPLOAD</h4></li>
             [#if productTypes['audiofile']??]
-              <li data-bind="click: function(){addMaterial(['upload-audio']);}"><a href="#"><i class="pe-7s-volume pe-va pe-2x pe-fw"></i> Audio</a></li>
+              <li data-bind="click: function(){addMaterial(['audioplayer']);}"><a href="#"><i class="pe-7s-volume pe-va pe-2x pe-fw"></i> Audio</a></li>
             [/#if]
             [#if productTypes['file']??]
-              <li data-bind="click: function(){addMaterial(['upload-file']);}"><a href="#"><i class="pe-7s-news-paper pe-va pe-2x pe-fw"></i> Document</a></li>
+              <li data-bind="click: function(){addMaterial(['file']);}"><a href="#"><i class="pe-7s-news-paper pe-va pe-2x pe-fw"></i> Document</a></li>
             [/#if]
             [#if productTypes['image']??]
-              <li data-bind="click: function(){addMaterial(['upload-image']);}"><a href="#"><i class="pe-7s-photo pe-va pe-2x pe-fw"></i> Image</a></li>
+              <li data-bind="click: function(){addMaterial(['image']);}"><a href="#"><i class="pe-7s-photo pe-va pe-2x pe-fw"></i> Image</a></li>
             [/#if]
             [#if productTypes['scorm']??]
-              <li data-bind="click: function(){addMaterial(['upload-scorm']);}"><a href="#"><i class="pe-7s-monitor pe-va pe-2x pe-fw"></i> Scorm (AICC/Tin Can)</a></li>
+              <li data-bind="click: function(){addMaterial(['scorm']);}"><a href="#"><i class="pe-7s-monitor pe-va pe-2x pe-fw"></i> Scorm (AICC/Tin Can)</a></li>
             [/#if]
             [#if productTypes['videofile']??]
-            <li data-bind="click: function(){addMaterial(['upload-video']);}"><a href="#"><i class="pe-7s-video pe-va pe-2x pe-fw"></i> Video</a></li>
+            <li data-bind="click: function(){addMaterial(['vimeo2video']);}"><a href="#"><i class="pe-7s-video pe-va pe-2x pe-fw"></i> Video</a></li>
             [/#if]
-            <li data-bind="click: function(){addMaterial(['upload-generic']);}" class="text-center" data-toggle="tooltip" data-placement="bottom" title="Upload different file types together at once"><a href="#"><small><em><i class="pe-7s-rocket pe-va pe-lg pe-fw primaryColor"></i> Quick upload...</small></em></a></li>
+            <li data-bind="click: function(){addMaterial(['generic']);}" class="text-center" data-toggle="tooltip" data-placement="bottom" title="Upload different file types together at once"><a href="#"><small><em><i class="pe-7s-rocket pe-va pe-lg pe-fw primaryColor"></i> Quick upload...</small></em></a></li>
             <li role="separator" class="divider"></li>
             <li><h4 class="text-center primaryColor">CREATE</h4></li>
-            <li data-bind="click: function(){addMaterial(['create-text']);}"><a href="#"><i class="pe-7s-note pe-va pe-2x pe-fw"></i> Text/HTML</a></li>
+            <li data-bind="click: function(){addMaterial(['htmlsnippet']);}"><a href="#"><i class="pe-7s-note pe-va pe-2x pe-fw"></i> Text/HTML</a></li>
             [#if productTypes['scorequiz']??]
-              <li data-bind="click: function(){addMaterial(['create-survey']);}"><a href="#"><i class="pe-7s-help1 pe-va pe-2x pe-fw"></i> Survey</a></li>
+              <li data-bind="click: function(){addMaterial(['scorequiz']);}"><a href="#"><i class="pe-7s-help1 pe-va pe-2x pe-fw"></i> Survey</a></li>
             [/#if]
             [#if productTypes['quiz']??]
-              <li data-bind="click: function(){addMaterial(['create-quiz']);}"><a href="#"><i class="pe-7s-target pe-va pe-2x pe-fw"></i> Quiz</a></li>
+              <li data-bind="click: function(){addMaterial(['quiz']);}"><a href="#"><i class="pe-7s-target pe-va pe-2x pe-fw"></i> Quiz</a></li>
             [/#if]
             <li role="separator" class="divider"></li>
             <li><h4 class="text-center primaryColor">INTERNET/LINK</h4></li>
             <li class="text-center">
                 
                 [#if productTypes['youtubevideo']??]
-                  <a href data-bind="click: function(){addMaterial(['create-youtube']);}">YouTube</a>
+                  <a href data-bind="click: function(){addMaterial(['youtubevideo']);}">YouTube</a>
                 [/#if]
-                [#--if productTypes['youtubevideo']??--]
-                  <!--<a data-bind="click: function(){addMaterial(['create-youtube']);}">Web page</a>-->
-                [#--/#if--]
                 [#--if productTypes['tedtalk']??--]
-                  <!--<span data-bind="click: function(){addMaterial(['create-tedtalk']);}" href="#">TED Talks</span>,-->
-                [#--/#if--]
-                [#--if productTypes['vimeo2video']??--]
-                  <!--<span data-bind="click: function(){addMaterial(['create-youtube']);}" href="#">Vimeo</span>-->
+                  <!--<span data-bind="click: function(){addMaterial(['tedtalk']);}" href="#">TED Talks</span>,-->
                 [#--/#if--]
             </li>
             <!--
