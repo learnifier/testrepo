@@ -164,7 +164,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         Map<String, Object> map = createMap();
 
-        List<Product> projectProducts = getProjectProducts(cycle, project);
+        List<Product> projectProducts = getProjectStageProducts(cycle, project);
 
         final List<ExtraProductConfig> extraConfig
                 = new ProductsExtraConfigFactory(cycle, org.getId()).
@@ -178,7 +178,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         map.put("productValueSource",
                 new ProductsValueSource(userLocale, extraConfig));
         map.put("prj", project);
-        
+
         return new FreemarkerRequestTarget(
                 "/project/stage/stageProductExtraSettings.html", map);
     }
@@ -189,7 +189,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, project.getOrgId());
         checkPermission(cycle, project);
 
-        List<Product> projectProducts = getProjectProducts(cycle, project);
+        List<Product> projectProducts = getProjectStageProducts(cycle, project);
 
         final List<ExtraProductConfig> extraConfig
                 = new ProductsExtraConfigFactory(cycle, org.getId()).
@@ -856,11 +856,12 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
                 "cocobox.cpweb.googlemaps", Boolean.TRUE);
     }
 
-    private List<Product> getProjectProducts(RequestCycle cycle, OrgProject project) {
+    private List<Product> getProjectStageProducts(RequestCycle cycle, OrgProject project) {
         ProjectMaterialCoordinatorClient pmcClient
                 = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
 
         List<ProjectProduct> projProds = pmcClient.getProjectProducts(project.getProjectId());
+        projProds = CollectionsUtil.sublist(projProds, p-> !p.isActivated());
         List<String> productIds
                 = CollectionsUtil.transformList(projProds, ProjectProduct::getProductId);
 
