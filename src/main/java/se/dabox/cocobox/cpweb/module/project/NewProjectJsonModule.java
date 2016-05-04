@@ -5,13 +5,6 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -20,19 +13,27 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
-import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.coursedesign.BucketCourseDesignInfo;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
+import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Predicate;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  *
