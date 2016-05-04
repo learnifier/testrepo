@@ -41,6 +41,7 @@ import se.dabox.service.common.ccbc.project.InDesignProjectProductException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectProductException;
+import se.dabox.service.common.ccbc.project.material.AddProjectProductRequest;
 import se.dabox.service.common.ccbc.project.material.CanDeleteProjectProductResponse;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
@@ -190,16 +191,6 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
                 NavigationUtil.toProjectMaterialPageUrl(cycle, prjId)));
         }
 
-        if (productNeedsConfiguration(cycle, prj.getOrgId(), productId)) {
-            Map<String,Object> map = new HashMap<>();
-            map.put("url", cycle.
-                    urlFor(ProjectModule.class, "addProjectProductWithSettings", Long.
-                            toString(prjId), productId));
-            map.put("modal", Boolean.TRUE);
-
-            return jsonTarget(map);
-        }
-
         innerAddProduct(cycle, prjId, productId, null);
 
         return jsonTarget(Collections.singletonMap("url",
@@ -211,7 +202,9 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
             throws IllegalStateException, JsonErrorMessageException {
         LangBundle bundle = getLangBundle(cycle);
         try {
-            getProjectMaterialCoordinatorClient(cycle).addProjectProduct(prjId, productId, settings);
+            AddProjectProductRequest addReq = new AddProjectProductRequest(prjId, productId,
+                    settings, Boolean.TRUE);
+            getProjectMaterialCoordinatorClient(cycle).addProjectProduct(addReq);
         } catch (AllocatedCreditsProjectProductException ex) {
 
             throw new JsonErrorMessageException(ERROR_TITLE,
@@ -283,14 +276,6 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
         String localeStr = CocositeUserHelper.getUserLocale(cycle).toString();
 
         return lsClient.getLangBundleSafe(CocoSiteConstants.DEFAULT_LANG_BUNDLE, localeStr, true);
-    }
-
-    private boolean productNeedsConfiguration(RequestCycle cycle, long orgId, String productId) {
-
-        ProjectConfigResponse response = new GetCrispProjectProductConfig(cycle, orgId, productId).
-                get();
-
-        return response != null && response.isMandatoryItemsAvailable();
     }
 
     private boolean alreadyHasProduct(RequestCycle cycle, OrgProject prj, String productId) {
