@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +29,6 @@ import net.unixdeveloper.druwa.formbean.validation.ValidationConstraint;
 import net.unixdeveloper.druwa.formbean.validation.ValidationError;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.CpwebConstants;
@@ -39,9 +37,8 @@ import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.SettingsFormInputProcessor;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
-import se.dabox.cocobox.crisp.response.config.ProjectConfigItem;
-import se.dabox.cocobox.crisp.response.config.ProjectConfigType;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
@@ -313,23 +310,13 @@ public class NewProjectModule extends AbstractWebAuthModule {
 
         WebRequest req = cycle.getRequest();
 
-        Map<String, Map<String, String>> productsMap = new HashMap<>();
+        final List<ExtraProductConfig> extraConfigList = nps.getExtraConfig();
 
-        for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
-            String prefix = extraConfig.getFormPrefix();
-
-            Map<String, String> map = new HashMap<>();
-
-            addExtraSettingsValues(req, map, prefix,
-                    extraConfig.getProjectConfig().getItems());
-            addExtraSettingsValues(req, map, prefix,
-                    extraConfig.getProjectConfig().getAdvancedItems());
-
-            productsMap.put(extraConfig.getProductId(), map);
-        }
+        Map<String, Map<String, String>> productsMap = new SettingsFormInputProcessor().
+                processFormInput(extraConfigList, req);
 
         //Everything is valid(!)
-        for (ExtraProductConfig extraConfig : nps.getExtraConfig()) {
+        for (ExtraProductConfig extraConfig : extraConfigList) {
             final Map<String, String> settingsMap = productsMap.get(extraConfig.getProductId());
             extraConfig.setSettings(settingsMap);
         }
@@ -808,22 +795,4 @@ public class NewProjectModule extends AbstractWebAuthModule {
         return false;
     }
 
-    private void addExtraSettingsValues(WebRequest req, Map<String, String> map, String prefix,
-            List<ProjectConfigItem> items) {
-        for (ProjectConfigItem item : items) {
-            String val = req.getParameter(prefix + item.getId());
-
-            if (StringUtils.isBlank(val) && item.getType() == ProjectConfigType.toggle) {
-                val = "false";
-            }
-
-            if (StringUtils.isBlank(val) && !item.isOptional()) {
-                //TODO: Create custom exception
-                throw new IllegalArgumentException();
-            }
-
-            //TODO: Validate the input
-            map.put(item.getId(), StringUtils.trimToNull(val));
-        }
-    }
 }

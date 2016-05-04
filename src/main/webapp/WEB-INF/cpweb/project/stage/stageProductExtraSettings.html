@@ -9,7 +9,7 @@
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
-<form method="POST" action="">
+<form method="POST" action="${cycle.urlFor('project.VerifyProjectDesignModule','doStage',[prj.projectId?c])}">
     [@crispSettings.settingsList extraConfig /]
 
      <br /><br />

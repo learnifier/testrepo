@@ -41,6 +41,7 @@ import se.dabox.cocobox.cpweb.module.project.details.RelativeEnableDatabankUpdat
 import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductsExtraConfigFactory;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.SettingsFormInputProcessor;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
@@ -155,11 +156,10 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         return innerUpdateNewDesign(cycle, strProjectId, false);
     }
 
-    @WebAction()
+    @WebAction
     public RequestTarget onProductSettings(RequestCycle cycle, String strProjectId) {
         final OrgProject project = getProject(cycle, strProjectId);
         MiniOrgInfo org = secureGetMiniOrg(cycle, project.getOrgId());
-
         checkPermission(cycle, project);
 
         Map<String, Object> map = createMap();
@@ -177,9 +177,28 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         map.put("productNameMap", new ProductNameMapFactory().create(extraConfig));
         map.put("productValueSource",
                 new ProductsValueSource(userLocale, extraConfig));
-
+        map.put("prj", project);
+        
         return new FreemarkerRequestTarget(
                 "/project/stage/stageProductExtraSettings.html", map);
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onDoStage(RequestCycle cycle, String strProjectId) {
+        final OrgProject project = getProject(cycle, strProjectId);
+        MiniOrgInfo org = secureGetMiniOrg(cycle, project.getOrgId());
+        checkPermission(cycle, project);
+
+        List<Product> projectProducts = getProjectProducts(cycle, project);
+
+        final List<ExtraProductConfig> extraConfig
+                = new ProductsExtraConfigFactory(cycle, org.getId()).
+                        getExtraConfigItems(projectProducts);
+
+        Map<String, Map<String, String>> productsMap = new SettingsFormInputProcessor().
+                processFormInput(extraConfig, cycle.getRequest());
+
+        return null;
     }
 
     private RequestTarget innerUpdateNewDesign(RequestCycle cycle, String strProjectId,
