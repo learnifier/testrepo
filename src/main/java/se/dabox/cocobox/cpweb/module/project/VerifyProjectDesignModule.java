@@ -46,10 +46,11 @@ import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
-import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.cddb.DatabankDateConverter;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
@@ -237,6 +238,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
                     }
                 } else if (dataType == DataType.URL) {
                     try {
+                        //Used for validation
                         new URI(fValue);
                     } catch (URISyntaxException ex) {
                         errorFields.add(fFieldName);
@@ -374,7 +376,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         CourseDesignClient cdc = getCourseDesign(cycle);
 
-        long userId = LoginUserAccountHelper.getUserId(cycle);
+        long userId = LoginUserAccountHelper.getCurrentCaller(cycle);
 
         Long designId = project.getDesignId();
 
@@ -395,16 +397,19 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         CourseDesignInfo info = getCourseInfo(cycle, designId);
 
-        UpdateProjectRequest upr = new UpdateProjectRequest(project.getProjectId(), project.
-                getName(), project.getLocale(), userId, project.getCountry(), project.getTimezone(),
-                designId, null, databankId, null, project.getNote(), project.getInvitePassword(),
-                project.getInviteLimit(), project.isInvitePossible(),
-                info.getUserTitle(),
-                info.getUserDescription(),
-                project.isAutoIcal(),
-                project.isSocial());
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+        UpdateProjectRequestBuilder reqBuilder
+                = new UpdateProjectRequestBuilder(caller, project.getProjectId());
 
-        getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
+        reqBuilder.setDesignId(designId);
+        reqBuilder.setStageDesignId(null);
+        reqBuilder.setMasterDatabank(databankId);
+        reqBuilder.setStageDatabank(null);
+        reqBuilder.setUserDescription(info.getUserDescription());
+        reqBuilder.setUserTitle(info.getUserTitle());
+
+        UpdateProjectRequest updateReq = reqBuilder.createUpdateProjectRequest();
+        getCocoboxCordinatorClient(cycle).updateOrgProject(updateReq);
 
         if (oldMasterDatabank != null) {
             try {
