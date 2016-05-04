@@ -274,7 +274,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         final GetProjectAdministrativeName projectNameHelper = new GetProjectAdministrativeName(
                 cycle);
-
+        
         ByteArrayOutputStream stream =
                 new JsonEncoding(format) {
                     @Override
@@ -337,8 +337,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         List<Material> materials = getProjectMaterials(pmcClient, prjId, cycle);
 
-        return jsonTarget(OrgMaterialJsonModule.toJsonMaterials(cycle, strProjectId, materials,
-                Collections.emptyMap(), Collections.emptyList(), false));
+        return jsonTarget(OrgMaterialJsonModule.toJsonMaterials(cycle, strProjectId, materials, Collections.emptyMap(), Collections.emptyList(), false));
     }
 
     @WebAction
@@ -534,7 +533,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(map);
     }
-
+    
     @WebAction
     public RequestTarget onSetProgressVisibility(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
@@ -602,7 +601,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(map);
     }
-
+    
     @WebAction
     public RequestTarget onListCountries(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
