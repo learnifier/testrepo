@@ -4,7 +4,6 @@
  */
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
-import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -54,6 +53,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 import java.util.List;
 import java.util.Map;
+import net.unixdeveloper.druwa.DruwaApplication;
 
 /**
  *
