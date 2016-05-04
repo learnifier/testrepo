@@ -21,12 +21,12 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
-import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.coursedesign.BucketCourseDesignInfo;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
+import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.ParamUtil;
 

@@ -4,6 +4,7 @@
  */
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
+import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import se.dabox.cocobox.cpweb.formdata.design.EditDesignSettingsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
-import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
