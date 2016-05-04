@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,9 @@ import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
-import se.dabox.cocobox.cpweb.state.ErrorState;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ProductsExtraConfigFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
-import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
-import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocosite.druwa.CocoSiteConfKey;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
@@ -58,9 +56,7 @@ import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductTypes;
-import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.ParamUtil;
-import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -330,34 +326,10 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
     private List<ExtraProductConfig> getExtraConfigItems(RequestCycle cycle, NewProjectSession nps) {
 
-        final List<ExtraProductConfig> configList = new ArrayList<>();
-
         List<Product> products
                 = getProjectProducts(cycle, nps);
 
-        List<Product> crispProducts
-                = CollectionsUtil.sublist(products, p -> ProductUtils.isCrispProduct(p));
-
-        for (Product product : crispProducts) {
-            
-            ProjectConfigResponse response = null;
-            try {
-                response = new GetCrispProjectProductConfig(cycle, orgId,
-                        product.getId().getId()).get();
-            } catch (CrispException crispException) {
-                ErrorState state = new ErrorState(orgId, product, crispException, null);
-                throw new RetargetException(NavigationUtil.getIntegrationErrorPage(
-                        cycle, state));
-            }
-
-            if (response == null || response.isEmpty()) {
-                continue;
-            }
-
-            configList.add(new ExtraProductConfig(product.getId().getId(), response));
-        }
-
-        return configList;
+        return new ProductsExtraConfigFactory(cycle, orgId).getExtraConfigItems(products);
     }
 
     private boolean missingExtraParameters(RequestCycle cycle, NewProjectSession nps) {

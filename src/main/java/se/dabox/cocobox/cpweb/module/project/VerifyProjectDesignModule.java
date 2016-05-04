@@ -20,10 +20,12 @@ import java.util.UUID;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
+import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,7 +38,11 @@ import se.dabox.cocobox.cpweb.module.project.details.ExtendedComponentFieldName;
 import se.dabox.cocobox.cpweb.module.project.details.FieldSetCreator;
 import se.dabox.cocobox.cpweb.module.project.details.RelativeDateDatabankUpdater;
 import se.dabox.cocobox.cpweb.module.project.details.RelativeEnableDatabankUpdater;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ProductsExtraConfigFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -44,11 +50,13 @@ import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
+import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.cddb.DatabankDateConverter;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
+import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
@@ -70,6 +78,7 @@ import se.dabox.service.common.coursedesign.v1.DataType;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
+import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.proddir.data.Product;
@@ -144,6 +153,33 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
     @WebAction(methods = HttpMethod.POST)
     public RequestTarget onUpdateNewDesign(RequestCycle cycle, String strProjectId) {
         return innerUpdateNewDesign(cycle, strProjectId, false);
+    }
+
+    @WebAction()
+    public RequestTarget onProductSettings(RequestCycle cycle, String strProjectId) {
+        final OrgProject project = getProject(cycle, strProjectId);
+        MiniOrgInfo org = secureGetMiniOrg(cycle, project.getOrgId());
+
+        checkPermission(cycle, project);
+
+        Map<String, Object> map = createMap();
+
+        List<Product> projectProducts = getProjectProducts(cycle, project);
+
+        final List<ExtraProductConfig> extraConfig
+                = new ProductsExtraConfigFactory(cycle, org.getId()).
+                        getExtraConfigItems(projectProducts);
+
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
+        map.put("org", org);
+        map.put("extraConfig", extraConfig);
+        map.put("productNameMap", new ProductNameMapFactory().create(extraConfig));
+        map.put("productValueSource",
+                new ProductsValueSource(userLocale, extraConfig));
+
+        return new FreemarkerRequestTarget(
+                "/project/stage/stageProductExtraSettings.html", map);
     }
 
     private RequestTarget innerUpdateNewDesign(RequestCycle cycle, String strProjectId,
@@ -373,6 +409,14 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
     }
 
     private void upstage(RequestCycle cycle, OrgProject project) {
+        String url = cycle.urlFor(VerifyProjectDesignModule.class,
+                "productSettings",
+                Long.toString(project.getProjectId()));
+
+        throw new RetargetException(new RedirectUrlRequestTarget(url));
+    }
+
+    private void OldUpstage(RequestCycle cycle, OrgProject project) {
 
         CourseDesignClient cdc = getCourseDesign(cycle);
 
@@ -791,5 +835,21 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
     private Boolean isGoogleMapsEnabled(RequestCycle cycle) {
         return DwsRealmHelper.getRealmConfiguration(cycle).getBooleanValue(
                 "cocobox.cpweb.googlemaps", Boolean.TRUE);
+    }
+
+    private List<Product> getProjectProducts(RequestCycle cycle, OrgProject project) {
+        ProjectMaterialCoordinatorClient pmcClient
+                = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
+
+        List<ProjectProduct> projProds = pmcClient.getProjectProducts(project.getProjectId());
+        List<String> productIds
+                = CollectionsUtil.transformList(projProds, ProjectProduct::getProductId);
+
+        ProductDirectoryClient pdClient = getProductDirectoryClient(cycle);
+
+        List<Product> products = pdClient.getProducts(productIds);
+        ProductTypeUtil.setTypes(pdClient, products);
+
+        return products;
     }
 }

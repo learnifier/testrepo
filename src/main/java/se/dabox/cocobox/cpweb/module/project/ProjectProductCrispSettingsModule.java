@@ -3,6 +3,8 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;

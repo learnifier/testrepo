@@ -1,14 +1,13 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.util;
+package se.dabox.cocobox.cpweb.module.project.productconfig;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
-import se.dabox.cocobox.cpweb.module.project.ExtraProductConfig;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.proddir.data.Product;
@@ -25,7 +24,8 @@ public class ProductNameMapFactory {
     }
 
     public Map<String,String> create(List<ExtraProductConfig> extraConfig) {
-        Set<String> productIds = CollectionsUtil.transform(extraConfig, c -> c.getProductId());
+        Set<String> productIds = CollectionsUtil.transform(extraConfig,
+                ExtraProductConfig::getProductId);
 
         return createMap(productIds);
     }

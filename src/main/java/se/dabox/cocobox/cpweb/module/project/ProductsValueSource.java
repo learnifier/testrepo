@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import java.text.DateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;

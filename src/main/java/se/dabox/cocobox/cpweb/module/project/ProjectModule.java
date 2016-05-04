@@ -3,6 +3,8 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +35,7 @@ import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
-import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.role.CocoboxRoleUtil;

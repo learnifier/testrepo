@@ -68,6 +68,7 @@ import java.util.stream.Collectors;
 import se.dabox.cocosite.webmessage.WebMessage;
 import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
+import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 
 /**

@@ -14,7 +14,7 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebSession;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
-import se.dabox.cocobox.cpweb.module.project.ExtraProductConfig;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import se.dabox.util.ParamUtil;
 
 /**

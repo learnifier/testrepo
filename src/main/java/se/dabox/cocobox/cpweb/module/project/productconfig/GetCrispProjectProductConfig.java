@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.project;
+package se.dabox.cocobox.cpweb.module.project.productconfig;
 
 import java.util.Locale;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -39,21 +39,21 @@ public class GetCrispProjectProductConfig {
     private final String productId;
     private final ProjectDetails project;
 
-    GetCrispProjectProductConfig(RequestCycle cycle, long orgId, String productId) {
+    public GetCrispProjectProductConfig(RequestCycle cycle, long orgId, String productId) {
         this.cycle = cycle;
         this.orgId = orgId;
         this.productId = productId;
         this.project = null;
     }
 
-    GetCrispProjectProductConfig(RequestCycle cycle, ProjectDetails project, String productId) {
+    public GetCrispProjectProductConfig(RequestCycle cycle, ProjectDetails project, String productId) {
         this.cycle = cycle;
         this.project = project;
         this.orgId = project.getOrgId();
         this.productId = productId;
     }
 
-    ProjectConfigResponse get() {
+    public ProjectConfigResponse get() {
 
         ProductDirectoryClient pdClient = getProductDirectoryClient(cycle);
         Product product = ProductFetchUtil.getExistingProduct(pdClient, productId);

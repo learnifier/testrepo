@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.project;
+package se.dabox.cocobox.cpweb.module.project.productconfig;
 
 import java.io.Serializable;
 import java.util.Map;

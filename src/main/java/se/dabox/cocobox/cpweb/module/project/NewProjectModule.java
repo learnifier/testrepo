@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
-import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.crisp.response.config.ProjectConfigItem;
 import se.dabox.cocobox.crisp.response.config.ProjectConfigType;
@@ -730,7 +731,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
         return CollectionsUtil.transformListNotNull(list, (String item) -> {
             try {
                 String[] split = MaterialUtils.splitCompositeId(item);
-                
+
                 if (split[0].equals(OrgMaterialConstants.NATIVE_SYSTEM)) {
                     return Long.parseLong(split[1]);
                 }
@@ -749,7 +750,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
         return CollectionsUtil.transformListNotNull(list, (String item) -> {
             try {
                 String[] split = MaterialUtils.splitCompositeId(item);
-                
+
                 if (split[0].equals(ProductMaterialConstants.NATIVE_SYSTEM)) {
                     return split[1];
                 }
