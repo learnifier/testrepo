@@ -4,9 +4,6 @@
  */
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
-import java.util.List;
-import java.util.Map;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -26,11 +23,10 @@ import se.dabox.cocobox.coursebuilder.initdata.InitDataBuilder;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.design.EditDesignSettingsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.branding.GetOrgBrandingIdCommand;
 import se.dabox.cocosite.coursedesign.CourseDesignThumbnail;
-import se.dabox.cocosite.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.upweb.linkaction.LinkActionUrlHelper;
 import se.dabox.cocosite.upweb.linkaction.cpreview.CoursePreviewLinkAction;
 import se.dabox.cocosite.upweb.linkaction.cpreview.DirectCddSource;
@@ -43,7 +39,9 @@ import se.dabox.service.common.coursedesign.BucketCourseDesignInfo;
 import se.dabox.service.common.coursedesign.CopyDesignRequest;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
+import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.service.common.coursedesign.UpdateDesignRequest;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
@@ -51,6 +49,9 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
 import se.dabox.service.common.duration.DurationString;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  *
