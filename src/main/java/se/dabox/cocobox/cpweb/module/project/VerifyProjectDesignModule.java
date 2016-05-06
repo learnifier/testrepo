@@ -60,6 +60,7 @@ import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
+import se.dabox.service.common.ccbc.project.publish.PublishProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
@@ -197,6 +198,19 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         Map<String, Map<String, String>> productsMap = new SettingsFormInputProcessor().
                 processFormInput(extraConfig, cycle.getRequest());
+
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+        PublishProjectRequestBuilder reqBuilder = new PublishProjectRequestBuilder(caller, project.
+                getProjectId());
+        reqBuilder.setDesignId(project.getDesignId());
+        reqBuilder.setStageDesignId(project.getStageDesignId());
+
+        for (Map.Entry<String, Map<String, String>> entry : productsMap.entrySet()) {
+            ProductId pid = new ProductId(entry.getKey());
+            reqBuilder.addProductSettings(pid, entry.getValue());
+        }
+
+        getCocoboxCordinatorClient(cycle).publishProject(reqBuilder.build());
 
         return null;
     }
