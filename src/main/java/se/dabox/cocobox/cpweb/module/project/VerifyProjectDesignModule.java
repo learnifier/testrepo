@@ -45,6 +45,9 @@ import se.dabox.cocobox.cpweb.module.project.productconfig.SettingsFormInputProc
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -171,6 +174,10 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
                 = new ProductsExtraConfigFactory(cycle, org.getId()).
                         getExtraConfigItems(projectProducts);
 
+        if (extraConfig.isEmpty()) {
+            return onDoStage(cycle, strProjectId);
+        }
+
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
 
         map.put("org", org);
@@ -212,7 +219,10 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         getCocoboxCordinatorClient(cycle).publishProject(reqBuilder.build());
 
-        return null;
+        WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Publishing started",
+                WebMessageType.info));
+
+        return NavigationUtil.toProjectPage(project.getProjectId());
     }
 
     private RequestTarget innerUpdateNewDesign(RequestCycle cycle, String strProjectId,

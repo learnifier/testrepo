@@ -3,8 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
-import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +33,8 @@ import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
+import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
@@ -63,9 +63,9 @@ import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
-import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectProductMaterialHelper;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.DatabankFacade;
@@ -606,11 +606,6 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     @WebAction
-    public RequestTarget onEdit(RequestCycle cycle, String projectId) {
-        throw new UnsupportedOperationException("Not supported anymore");
-    }
-
-    @WebAction
     public RequestTarget onCrispAdmin(RequestCycle cycle, String strProjectId, String productId) {
         long prjId = Long.valueOf(strProjectId);
 
@@ -710,15 +705,13 @@ public class ProjectModule extends AbstractProjectWebModule {
             }
         }
 
-        ccbc.updateOrgProject(new UpdateProjectRequest(project.getProjectId(), project.getName(),
-                project.getLocale(), userId, project.getCountry(), project.getTimezone(), project.
-                getDesignId(), project.getStageDesignId(), project.getMasterDatabank(),
-                stageDatabank, project.getNote(), project.getInvitePassword(), project.
-                getInviteLimit(), project.isInvitePossible(), project.getUserTitle(), project.
-                getUserDescription(),project.isAutoIcal(), project.isSocial()));
+        UpdateProjectRequestBuilder reqBuilder = new UpdateProjectRequestBuilder(userId, project.
+                getProjectId());
+        reqBuilder.setStageDesignId(stageId);
+        reqBuilder.setStageDatabank(stageDatabank);
+        reqBuilder.setUnstaged(true);
 
-        project.setStageDatabank(stageDatabank);
-
+        getCocoboxCordinatorClient(cycle).updateOrgProject(reqBuilder.createUpdateProjectRequest());
 
         return stageId;
     }
