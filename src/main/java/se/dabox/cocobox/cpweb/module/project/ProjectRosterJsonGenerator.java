@@ -90,7 +90,7 @@ class ProjectRosterJsonGenerator {
 
         final Map<Long, UserAccount> uaMap =
                 CollectionsUtil.createMap(users, UserAccountTransformers.getUserIdTransformer());
-        
+
         Locale locale = CocositeUserHelper.getUserLocale(cycle);
 
         final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
@@ -125,7 +125,7 @@ class ProjectRosterJsonGenerator {
                 writeDateField("firstEmail", item.getFirstMail());
                 writeDateField("lastEmail", item.getLastMail());
                 writeDateField("firstAccess", item.getFirstAccess(), dateTimeFormat);
-                
+
                 writeDateField("lastAccess", item.getLastAccess(), dateTimeFormat);
                 if (item.getLastAccess() != null) {
                     String isoDate = DateFormatters.JQUERYAGO_FORMAT.format(item.getLastAccess());
@@ -149,6 +149,7 @@ class ProjectRosterJsonGenerator {
 
                 g.writeBooleanField("inError", item.isInError());
                 g.writeBooleanField("activated", item.isActivated());
+                g.writeBooleanField("activationPending", item.isActivationPending());
                 final String strParticipationId = Long.toString(item.getParticipationId());
 
                 String detailsUrl = cycle.urlFor(ParticipationJsonModule.class,
@@ -306,7 +307,7 @@ class ProjectRosterJsonGenerator {
                 ProjectRosterJsonGenerator.this.cdd = getCourseDesign();
                 ProjectRosterJsonGenerator.this.databankFacade =
                         getDatabankFacade();
-                        
+
             }
 
             @Override
@@ -383,7 +384,7 @@ class ProjectRosterJsonGenerator {
     }
 
     private List<ParticipationProgress> getParticipationProgress(long participationId) {
-        
+
         if (progressMap == null) {
             progressMap = getCocobocCordinatorClient().getProjectProgress(project.
                     getProjectId());
