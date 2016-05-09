@@ -164,7 +164,9 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     "width": "15%",
                     "data": function (row, type, set) {
                         if (!row.lastEmailDisplay) {
-                            if (row.sending) {
+                            if (row.activationPending) {
+                                row.lastEmailDisplay = "<img src='" + participationActivationSpinnerUrl + "'/> Activating";
+                            } else if (row.sending) {
                                 row.lastEmailDisplay = "Sending..."
                             } else if (row.bounced) {
                                 row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '"><strong>Bounced back</strong></a>';
@@ -188,6 +190,9 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                 {
                     "targets": [5],
                     "data": function (row, type, set) {
+                        if (row.activationPending) {
+                            return "";
+                        }
                         if (!row.lastAccessDisplay) {
                             if (row.lastAccess) {
                                 row.lastAccessDisplay = '<abbr data-toggle="tooltip" class="timeago" title="' + row.lastAccessAgo + '">' + row.lastAccessStr + '</abbr>';
@@ -211,13 +216,17 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     },
                     "createdCell": function (td, cellData, rowData, row, col) {
                         $('.timeago', td).timeago();
-                        $('[data-toggle="tooltip"]', td).tooltip()
+                        $('[data-toggle="tooltip"]', td).tooltip();
                     }
                 },
                 {
+                    //Status column
                     "targets": [6],
                     "width": "120px",
                     "data": function (row, type, set) {
+                        if (row.activationPending) {
+                            return "";
+                        }
                         if (!row.statusDisplay && row.activated) {
                             row.statusDisplay = '<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + row.status + '" aria-valuemin="0" aria-valuemax="100" style="width:' + row.status + '%;">' + row.status + '%</div</div>';
                         } else if (!row.statusDisplay && !row.activated) {
@@ -237,6 +246,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     }
                 },
                 {
+                    //Participant menu column
                     "targets": [7],
                     "orderable": false,
                     "width": "80px",
@@ -264,7 +274,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
             "sAjaxSource": projectRosterUrl,
             "oLanguage": {
                 "sEmptyTable": "<span class='emptytable'>The roster is empty. Add a participant above to get started. </span>",
-                "sLoadingRecords": "<p>Loading roster...</p><img src='"+spinnerUrl+"' />"
+                "sLoadingRecords": "<p>Loading roster...</p><img src='" + spinnerUrl + "' />"
             }
         });
 

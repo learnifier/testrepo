@@ -73,6 +73,7 @@ ${cpweb_foot}
     var listGroupMembersUrl = "${helper.urlFor('project.ProjectJsonModule','listGroupMembers', [prj.projectId?c])}/";
     var permissionEditProjectRoster = ${projectSecurity.hasPermission("CP_EDIT_PROJECT_ROSTER")?c};
     var spinnerUrl = "[@common.spinnerUrl /]";
+    var participationActivationSpinnerUrl = "${contextPath}/img/participationActivation.gif";
 
     var rapsUrl;
     [#if security.userAccount.superUser]
