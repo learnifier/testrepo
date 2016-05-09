@@ -31,9 +31,10 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     return nRow;
                 }
             },
-            "initComplete": function () {
+            "initComplete": function (settings, json) {
                 log('DataTables has finished its initialisation.');
                 toggleAllCheck();
+                refreshLoop(json);
             },
             "columnDefs": [
                 {
@@ -281,6 +282,14 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                 "sLoadingRecords": "<p>Loading roster...</p><img src='" + spinnerUrl + "' />"
             }
         });
+
+        var refreshLoop = function(json) {
+            console.log("Refresh loop json", json);
+
+            //$.each(json.aaData);
+
+
+        };
 
         $(document).on('change', 'input.rowcb[type=checkbox]', function () {
             return cpweb.rowcbChange(this);
