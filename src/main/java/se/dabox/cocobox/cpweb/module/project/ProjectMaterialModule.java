@@ -3,7 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,7 @@ import se.dabox.cocobox.cpweb.formdata.project.AddMaterialForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
 import se.dabox.cocobox.crisp.response.config.ProjectConfigItem;
 import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
 import se.dabox.cocobox.crisp.runtime.CrispException;
