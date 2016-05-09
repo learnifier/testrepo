@@ -10,8 +10,10 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
             "lengthMenu": [[20, 50, 100, 1000, -1], [20, 50, 100, 1000, "All"]],
             "pageLength": 100,
             "order": [[2, 'asc']],
+            "deferRender": true,
             "createdRow": function (nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
-                if (oObj.inError) {
+                console.log("Create row");
+                if (oObj.inError && !oObj.activationPending) {
                     $(nRow).addClass('error');
                     $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
                     return nRow;
@@ -74,14 +76,15 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     }
                 },
                 {
+                    //Activation error column
                     "targets": [1],
                     "orderable": false,
                     "width": "25px",
                     "data": function (row, type, set) {
                         if (!row.iconDisplay) {
-                            if (row.inError) {
+                            if (row.inError && !row.activationPending) {
                                 var msg = row.errorMsg;
-                                if (msg == null) {
+                                if (!msg) {
                                     msg = 'Participation error reason is not known';
                                 }
 
@@ -252,8 +255,9 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     "width": "80px",
                     "data": function (row, type, set) {
                         if (!row.actionsDisplay) {
-                            row.impersonateAllowed = impersonateEnabled && row.activated;
+                            row.impersonateAllowed = impersonateEnabled && row.activated && !row.inError;
                             row.moveAllowed = moveEnabled && !row.inError;
+                            row.showLinkAllowed = row.activated && !row.inError;
                             var html = rosterCellActionTemplate(row);
                             row.actionsDisplay = html;
                         }
