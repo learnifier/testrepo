@@ -4,9 +4,12 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RetargetException;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
@@ -21,6 +24,7 @@ import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.GetIdProjectProductIdCommand;
 import se.dabox.cocosite.project.UpdateRecentProjectList;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
@@ -29,8 +33,12 @@ import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
+import se.dabox.service.common.ccbc.project.publish.PublishTaskTypeFactory;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductFetchUtil;
+import se.dabox.service.common.scheduler.SchedulerServiceClient;
+import se.dabox.service.common.scheduler.TaskInfo;
+import se.dabox.service.common.scheduler.filter.TaskFilterBuilder;
 import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
@@ -91,6 +99,8 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         map.put("isDesignDetailsAvailable", isDesignDetailsAvailable(project));
 
         map.put("projectName", new GetProjectAdministrativeName(cycle).getName(project));
+
+        map.put("isPublishing", isPublishing(project));
 
     }
 
@@ -236,5 +246,18 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
                 return false;
             }
         });
+    }
+
+    private Boolean isPublishing(OrgProject project) {
+        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+        SchedulerServiceClient scheduler = CacheClients.getClient(cycle,
+                SchedulerServiceClient.class);
+
+        TaskFilterBuilder filterBuilder = new TaskFilterBuilder();
+        filterBuilder.addType(PublishTaskTypeFactory.forProject(project.getProjectId()));
+
+        List<TaskInfo> tasks = scheduler.listTasks(filterBuilder.build());
+
+        return !tasks.isEmpty();
     }
 }

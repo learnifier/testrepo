@@ -89,7 +89,11 @@
 </section>
 
 
-    [#if project.unstaged]
+    [#if isPublishing]
+        <div id="incomplete_dd" class="alert alert-warning" role="alert">
+            Publishing underway
+        </div>
+    [#elseif project.unstaged]
         [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <div id="incomplete_dd" class="alert alert-warning" role="alert">
                 <h2>Publish Your Updated Course Design</h2>
