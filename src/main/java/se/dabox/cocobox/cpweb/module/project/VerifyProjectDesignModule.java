@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.Blank;
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.details.DateTimeFormatter;
 import se.dabox.cocobox.cpweb.module.project.details.ExtendedComponentFieldName;
 import se.dabox.cocobox.cpweb.module.project.details.FieldSetCreator;
@@ -50,7 +49,6 @@ import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
@@ -61,8 +59,6 @@ import se.dabox.service.common.ccbc.project.cddb.DatabankDateConverter;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
-import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
-import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.ccbc.project.publish.PublishProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
@@ -78,7 +74,6 @@ import se.dabox.service.common.coursedesign.reldate.RelativeDateErrorException;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
-import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.DataType;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
@@ -459,63 +454,6 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         throw new RetargetException(new RedirectUrlRequestTarget(url));
     }
 
-    private void OldUpstage(RequestCycle cycle, OrgProject project) {
-
-        CourseDesignClient cdc = getCourseDesign(cycle);
-
-        long userId = LoginUserAccountHelper.getCurrentCaller(cycle);
-
-        Long designId = project.getDesignId();
-
-        boolean newDesign = false;
-        if (project.getStageDesignId() != null) {
-            String techInfo = CpDesignTechInfo.createLiveTechInfo(project.getProjectId());
-            designId = cdc.copyDesign(project.getStageDesignId(), userId, techInfo);
-            newDesign = true;
-        }
-
-        Long oldMasterDatabank = null;
-        Long databankId = project.getMasterDatabank();
-
-        if (project.getStageDatabank() != null) {
-            databankId = project.getStageDatabank();
-            oldMasterDatabank = project.getMasterDatabank();
-        }
-
-        CourseDesignInfo info = getCourseInfo(cycle, designId);
-
-        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
-        UpdateProjectRequestBuilder reqBuilder
-                = new UpdateProjectRequestBuilder(caller, project.getProjectId());
-
-        reqBuilder.setDesignId(designId);
-        reqBuilder.setStageDesignId(null);
-        reqBuilder.setMasterDatabank(databankId);
-        reqBuilder.setStageDatabank(null);
-        reqBuilder.setUserDescription(info.getUserDescription());
-        reqBuilder.setUserTitle(info.getUserTitle());
-
-        UpdateProjectRequest updateReq = reqBuilder.createUpdateProjectRequest();
-        getCocoboxCordinatorClient(cycle).updateOrgProject(updateReq);
-
-        if (oldMasterDatabank != null) {
-            try {
-                getCocoboxCordinatorClient(cycle).deleteDatabank(userId, oldMasterDatabank);
-            } catch (NotFoundException nfe) {
-                LOGGER.info("Old databank didn't exist: {}", oldMasterDatabank);
-            }
-        }
-
-        if (newDesign) {
-            //Remove both
-
-            removeDesign(cycle, userId, project.getDesignId());
-            removeDesign(cycle, userId, project.getStageDesignId());
-        }
-
-        getCocoboxCordinatorClient(cycle).syncProjectState(project.getProjectId());
-    }
-
     private void saveDatabank(RequestCycle cycle, CocoboxCoordinatorClient ccbc, OrgProject project,
             Set<DatabankEntry> databank) {
 
@@ -583,14 +521,6 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         return CacheClients.getClient(cycle, CourseDesignClient.class);
     }
 
-    private void removeDesign(RequestCycle cycle, long userId, Long designId) {
-        if (designId == null) {
-            return;
-        }
-
-        getCourseDesign(cycle).removeDesign(userId, designId);
-    }
-
     private static DataType getDatabankFieldType(final String cid, final String name,
             final Map<String, Set<ExtendedComponentFieldName>> fieldMapSet) {
 
@@ -638,15 +568,6 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
      */
     public static String componentFieldName(String cid, String fieldName) {
         return 'f' + cid + '_' + fieldName;
-    }
-
-    private CourseDesignInfo getCourseInfo(RequestCycle cycle, Long designId) {
-        CourseDesignClient cdClient = getCourseDesign(cycle);
-
-        CourseDesign design = cdClient.getDesign(designId);
-        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-
-        return cdd.getInfo();
     }
 
     private void processAutoIcalChanges(RequestCycle cycle, OrgProject project) {
