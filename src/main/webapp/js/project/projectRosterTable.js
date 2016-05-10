@@ -1,3 +1,5 @@
+/* global participationActivationSpinnerUrl, cpwebMainJs, cpwebProjectCommon, projectRosterUrl, spinnerUrl, impersonateEnabled, moveEnabled, rapsUrl, impersonateLink, cocobox, cpweb, permissionEditProjectRoster, groupInfoUrl, addMembersByGroupUrl, listGroupMembersUrl */
+
 define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox-icheck', cpwebProjectCommon, cpwebMainJs], function (hb) {
     "use strict";
 
@@ -5,32 +7,36 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
         var source = $("#roster-cell-action-template").html();
         var rosterCellActionTemplate = hb.compile(source);
         var cbCounter = 0;
+
+        var createRowCallback = function (nRow, oObj) {
+            $(nRow).removeClass("error inactive unverified expired");
+
+            if (oObj.inError && !oObj.activationPending) {
+                $(nRow).addClass('error');
+                $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
+                return nRow;
+            } else if (!oObj.activated) {
+                $(nRow).addClass('inactive');
+                $(nRow).find('.name').css('opacity', '0.6');
+                return nRow;
+            } else if (oObj.verificationStatus === 'UNVERIFIED') {
+                $(nRow).addClass('unverified');
+                $(nRow).attr('title', 'The email address has not been verified.');
+                return nRow;
+            } else if (oObj.expired) {
+                $(nRow).attr('title', 'This participation has expired');
+                $(nRow).addClass('expired');
+                return nRow;
+            }
+        };
+
         window.oTable = $('#projectroster').dataTable({
             "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>><"row"<"col-sm-12"l>>',
             "lengthMenu": [[20, 50, 100, 1000, -1], [20, 50, 100, 1000, "All"]],
             "pageLength": 100,
             "order": [[2, 'asc']],
             "deferRender": true,
-            "createdRow": function (nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
-                console.log("Create row");
-                if (oObj.inError && !oObj.activationPending) {
-                    $(nRow).addClass('error');
-                    $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
-                    return nRow;
-                } else if (!oObj.activated) {
-                    $(nRow).addClass('inactive');
-                    $(nRow).find('.name').css('opacity', '0.6');
-                    return nRow;
-                } else if (oObj.verificationStatus == 'UNVERIFIED') {
-                    $(nRow).addClass('unverified');
-                    $(nRow).attr('title', 'The email address has not been verified.');
-                    return nRow;
-                } else if (oObj.expired) {
-                    $(nRow).attr('title', 'This participation has expired');
-                    $(nRow).addClass('expired');
-                    return nRow;
-                }
-            },
+            "createdRow": createRowCallback,
             "initComplete": function (settings, json) {
                 log('DataTables has finished its initialisation.');
                 toggleAllCheck();
@@ -41,17 +47,17 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     "targets": [0],
                     "data": function (row, type, val, meta) {
                         var hiddenString = $("input[name=__ids]").val(); // TODO: Handle multiple datatables
-                        var allValues = hiddenString == "" ? [] : hiddenString.split(',');
+                        var allValues = (!hiddenString) ? [] : hiddenString.split(',');
 
                         if (type === 'set') {
                             if (val === true) {
-                                if (jQuery.inArray(String(row.id), allValues) == -1) {
+                                if ($.inArray(String(row.id), allValues) === -1) {
                                     allValues.push(row.id);
                                 }
                             } else {
                                 //Remove state
                                 var index = jQuery.inArray(String(row.id), allValues);
-                                if (index != -1) {
+                                if (index !== -1) {
                                     allValues.splice(index, 1);
                                 }
                             }
@@ -65,7 +71,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     "width": "24px",
                     "render": function (data, type, row, meta) {
                         var ids = $("input[name=__ids]").val().split(","),
-                                checked = (jQuery.inArray(String(row.id), ids) !== -1),
+                                checked = ($.inArray(String(row.id), ids) !== -1),
                                 cbId = "memberCb" + cbCounter,
                                 html = '<div><input id="' + cbId + '" type="checkbox" class="rowcb" data-rowid="' + row.id + '"' + (checked ? " checked" : "") + ' /></div>';
                         var $toProcess = $(html);
@@ -171,7 +177,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                             if (row.activationPending) {
                                 row.lastEmailDisplay = "<img src='" + participationActivationSpinnerUrl + "'/> Activating";
                             } else if (row.sending) {
-                                row.lastEmailDisplay = "Sending..."
+                                row.lastEmailDisplay = "Sending...";
                             } else if (row.bounced) {
                                 row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '"><strong>Bounced back</strong></a>';
                             } else {
@@ -283,12 +289,70 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
             }
         });
 
+
+        /**
+         * Checks if the json data contains participants with activationPending flag set
+         * and schedules a json refresh it happens.
+         *
+         * @param {type} json
+         * @returns {undefined}
+         */
         var refreshLoop = function(json) {
-            console.log("Refresh loop json", json);
+            var pending = 0;
+            $.each(json.aaData, function() {
+                if (this.activationPending) {
+                    pending++;
+                }
+            });
 
-            //$.each(json.aaData);
+            if (pending) {
+                setTimeout(function() {
+                    refreshRoster();
+                }, 2000);
+            }
+        };
 
+        /**
+         * Starts a ajax fetch of the roster and then updates all rows that are set with the
+         * activationPending flag and then calls refreshLoop. If a ajax error occur this
+         * method silently stops and no further looping will occur.
+         *
+         * @returns {undefined}
+         */
+        var refreshRoster = function() {
+            $.get(projectRosterUrl).success(function(data) {
 
+                //Create a map based on the id:s
+                var map = {};
+                $.each(data.aaData, function() {
+                    map[this.id] = this;
+                });
+
+                var updated = false;
+                oTable.DataTable().rows().every(function() {
+                    if (!this.data().activationPending) {
+                        return;
+                    }
+
+                    var rowId = this.data().id;
+
+                    if (rowId in map) {
+                        this.data(map[rowId]);
+
+                        var tr = this.node();
+                        if (tr) {
+                            createRowCallback(tr, this.data());
+                        }
+                        updated = true;
+                    }
+                });
+
+                if (updated) {
+                    oTable.DataTable().draw();
+                }
+
+                refreshLoop(data);
+            });
         };
 
         $(document).on('change', 'input.rowcb[type=checkbox]', function () {
@@ -335,9 +399,9 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
         $.fn.clearForm = function () {
             return this.each(function () {
                 var type = this.type, tag = this.tagName.toLowerCase();
-                if (tag == "form")
+                if (tag === "form")
                     return $(":input", this).clearForm();
-                if (type == "text" || type == "email")
+                if (type === "text" || type === "email")
                     this.value = "";
             });
         };
@@ -359,13 +423,13 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     if (oldBefore) {
                         oldBefore();
                     }
-                }
+                };
 
                 handler.success = function () {
                     longOp.abort();
 
                     oldSuccess.apply(this, arguments);
-                }
+                };
 
                 $("#uploadRoster").ajaxForm(handler);
             });
@@ -403,7 +467,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                 placeholder: "Select a group",
                 allowClear: true,
                 formatSelection: function (opt) {
-                    return opt.text.trim()
+                    return opt.text.trim();
                 }
                 // formatResult is templateSelection in 4.0
             });
@@ -415,7 +479,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     return;
                 }
                 $.getJSON(infoUrl).done(function (data) {
-                    if (data.members == 0) {
+                    if (data.members === 0) {
                         cocobox.infoDialog("Add members", "There are no members in this group.");
                     } else {
                         cocobox.confirmationDialogYesNo("Add members", "Add " + data.members + " members from the group " + cugName + " to the project?", function () {
@@ -440,7 +504,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                 placeholder: "Select members in group",
                 allowClear: true,
                 formatSelection: function (opt) {
-                    return opt.text.trim()
+                    return opt.text.trim();
                 }
                 // formatResult is templateSelection in 4.0
             }).change(function () {
