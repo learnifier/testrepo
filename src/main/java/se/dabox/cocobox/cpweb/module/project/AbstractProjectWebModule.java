@@ -16,6 +16,7 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirectoryClient;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
 import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.project.ProjectPermissionCheck;
@@ -248,16 +249,7 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         });
     }
 
-    private Boolean isPublishing(OrgProject project) {
-        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
-        SchedulerServiceClient scheduler = CacheClients.getClient(cycle,
-                SchedulerServiceClient.class);
-
-        TaskFilterBuilder filterBuilder = new TaskFilterBuilder();
-        filterBuilder.addType(PublishTaskTypeFactory.forProject(project.getProjectId()));
-
-        List<TaskInfo> tasks = scheduler.listTasks(filterBuilder.build());
-
-        return !tasks.isEmpty();
+    protected boolean isPublishing(OrgProject project) {
+        return new IsProjectPublishingCommand().isPublishing(project);
     }
 }

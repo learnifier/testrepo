@@ -23,12 +23,16 @@ import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
 import se.dabox.cocobox.cpweb.module.project.productconfig.GetCrispProjectProductConfig;
+import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
 import se.dabox.cocobox.crisp.response.config.ProjectConfigItem;
 import se.dabox.cocobox.crisp.response.config.ProjectConfigResponse;
 import se.dabox.cocobox.crisp.runtime.CrispException;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.dws.client.langservice.LangService;
 import se.dabox.service.client.ApiRequestFailedException;
@@ -126,6 +130,13 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
             OrgProject prj,
             String productId) {
 
+        if (new IsProjectPublishingCommand().isPublishing(prj)) {
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(
+                    "Unable to remove materials while publishing", WebMessageType.error));
+
+            return defaultRemoveMaterialPostAction(cycle, prj);
+        }
+
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
 
         try {
@@ -152,6 +163,10 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
         }
 
 
+        return defaultRemoveMaterialPostAction(cycle, prj);
+    }
+
+    private RequestTarget defaultRemoveMaterialPostAction(final RequestCycle cycle, OrgProject prj) {
         Map<String, String> map = new HashMap<>();
         map.put("status", "OK");
         map.put("location", NavigationUtil.toProjectMaterialPageUrl(cycle, prj.getProjectId()));
@@ -172,11 +187,7 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
             //Ignore if this happens
         }
 
-        Map<String, String> map = new HashMap<>();
-        map.put("status", "OK");
-        map.put("location", NavigationUtil.toProjectMaterialPageUrl(cycle, prj.getProjectId()));
-
-        return jsonTarget(map);
+        return defaultRemoveMaterialPostAction(cycle, prj);
     }
 
     private RequestTarget onAddProjectProduct(final RequestCycle cycle,
@@ -186,7 +197,13 @@ public class ProjectMaterialModule extends AbstractJsonAuthModule {
 
         final long prjId = prj.getProjectId();
 
-        if (alreadyHasProduct(cycle, prj, productId)) {
+        if (new IsProjectPublishingCommand().isPublishing(prj)) {
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(
+                    "Unable to add materials while publishing", WebMessageType.error));
+
+            return jsonTarget(Collections.singletonMap("url",
+                NavigationUtil.toProjectMaterialPageUrl(cycle, prjId)));
+        } else if (alreadyHasProduct(cycle, prj, productId)) {
             return jsonTarget(Collections.singletonMap("url",
                 NavigationUtil.toProjectMaterialPageUrl(cycle, prjId)));
         }
