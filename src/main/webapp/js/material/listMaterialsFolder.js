@@ -147,7 +147,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 url: url,
                 callbacks: {
                     "add": function (data) {
-                        var ps;
                         if(data.products instanceof Array) {
                             createAndMoveMulti(data.products).then(function(){
                                 self.cocoboxListApi().refresh();
