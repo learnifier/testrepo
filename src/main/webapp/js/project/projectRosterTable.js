@@ -75,10 +75,14 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                                 cbId = "memberCb" + cbCounter,
                                 html = '<div><input id="' + cbId + '" type="checkbox" class="rowcb" data-rowid="' + row.id + '"' + (checked ? " checked" : "") + ' /></div>';
                         var $toProcess = $(html);
-                        $toProcess.icheck({
-                            checkboxClass: 'icheckbox_square-red',
-                            radioClass: 'iradio_square-red'
-                        });
+                        try {
+                            $toProcess.icheck({
+                                checkboxClass: 'icheckbox_square-red',
+                                radioClass: 'iradio_square-red'
+                            });
+                        } catch (e) {
+                            console.log("icheck error. Ignoring it");
+                        }
                         return $toProcess.html();
                     }
                 },
@@ -441,14 +445,6 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                 oTable.api().cell(ri, 0).data(checked);
             });
         });
-
-        function runiCheck(cell) {
-            $('input', cell).icheck({
-                checkboxClass: 'icheckbox_square-red',
-                radioClass: 'iradio_square-red'
-            });
-        }
-        ;
 
         function toggleAllCheck() {
 
