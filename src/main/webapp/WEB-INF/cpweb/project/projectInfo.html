@@ -73,6 +73,15 @@
                     <button class="btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-chevron-left"></span> Back to parent project</button>
                 </form>
             [/#if]
+            [#if prj.type.ptype == 2]
+                [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_COURSEDESIGN"]
+                <div id="cp-project-editdesign">
+                    <form action="${helper.urlFor('ProjectModule','gotoDesignBuilder',[prj.projectId])}" method="post">
+                        <button class="delete btn btn-primary btn-sm"><span>Edit Design</span></button>
+                    </form>
+                </div>
+                [/@]
+            [/#if]
             [#if project.type.ptype == 2]
                 <form action="${helper.urlFor('ProjectModule','previewDesign',[prj.projectId])}" method="post" target="_blank">
                     <button class="btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-eye-open"></span> Preview</button>
@@ -83,7 +92,6 @@
                     <button class="btn btn-primary-outlined btn-sm" type="button" id="deletePrjBtn"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
             [/#if]
-
         </div>
     </div>
 </section>
