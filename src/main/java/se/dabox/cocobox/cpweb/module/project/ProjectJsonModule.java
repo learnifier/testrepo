@@ -57,7 +57,6 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.RecentList;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
-import se.dabox.util.collections.Transformer;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
@@ -65,10 +64,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
 import se.dabox.cocosite.webmessage.WebMessage;
 import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
-import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 
 /**
@@ -275,7 +274,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         final GetProjectAdministrativeName projectNameHelper = new GetProjectAdministrativeName(
                 cycle);
-        
+
         ByteArrayOutputStream stream =
                 new JsonEncoding(format) {
                     @Override
@@ -534,7 +533,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(map);
     }
-    
+
     @WebAction
     public RequestTarget onSetProgressVisibility(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
@@ -602,7 +601,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(map);
     }
-    
+
     @WebAction
     public RequestTarget onListCountries(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
@@ -674,18 +673,34 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(response);
     }
 
+    @WebAction
+    public RequestTarget onProjectStatus(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkPermission(cycle, prj, strProjectId);
+
+        boolean publishing = new IsProjectPublishingCommand().isPublishing(prj);
+
+        String status = "normal";
+
+        if (publishing) {
+            status = "publishing";
+        } else if (prj.isUnstaged()) {
+            status = "unstaged";
+        }
+
+        return jsonTarget(Collections.singletonMap("status", status));
+    }
+
     private byte[] toTaskJson(
             final RequestCycle cycle,
             final List<ProjectTask> task, List<MailTemplate> mailTemplates,
             final OrgProject project) {
 
         final Map<Long, MailTemplate> templateMap = CollectionsUtil.createMap(mailTemplates,
-                new Transformer<MailTemplate, Long>() {
-                    @Override
-                    public Long transform(MailTemplate obj) {
-                        return obj.getId();
-                    }
-                });
+                MailTemplate::getId);
 
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
                 DateFormat.MEDIUM,
