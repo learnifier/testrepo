@@ -101,8 +101,8 @@
 </section>
 
 
-    <div id="cp-project-publishing" class="alert alert-warning ${isPublishing?then('','hidden')}" role="alert">
-        Publishing underway
+    <div id="cp-project-publishing" class="${isPublishing?then('','hidden')}" role="alert">
+        <i class="pe-7s-refresh-2 pe-va pe-lg pe-spin"></i> Publishing course...
     </div>
 
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]

@@ -179,7 +179,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     "data": function (row, type, set) {
                         if (!row.lastEmailDisplay) {
                             if (row.activationPending) {
-                                row.lastEmailDisplay = "<img src='" + participationActivationSpinnerUrl + "'/> Activating";
+                                row.lastEmailDisplay = "<i class='pe-7s-refresh-2 pe-va pe-spin'></i> Publishing course...";
                             } else if (row.sending) {
                                 row.lastEmailDisplay = "Sending...";
                             } else if (row.bounced) {
