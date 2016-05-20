@@ -33,6 +33,7 @@ import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
+import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
 import se.dabox.cocobox.cpweb.module.util.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.state.ErrorState;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
@@ -50,6 +51,9 @@ import se.dabox.cocosite.upweb.linkaction.cpreview.PreviewParticipationSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectCddSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.ProjectDatabankSource;
 import se.dabox.cocosite.upweb.linkaction.cpreview.RealProjectSource;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -400,6 +404,13 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         checkPermission(cycle, project);
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT_COURSEDESIGN);
+
+        if (new IsProjectPublishingCommand().isPublishing(project)) {
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(
+                    "Unable to edit design while publishing", WebMessageType.error));
+
+            return NavigationUtil.toProjectSecondaryData(cycle, project);
+        }
 
         long designId;
 

@@ -79,7 +79,7 @@ ${cpweb_foot}
                 "pageLength": 100,
                 "order": [[2, 'asc']],
                 "createdRow": function(nRow, oObj, iDisplayIndex, iDisplayIndexFull) {
-                    if (oObj.inError) {
+                    if (oObj.inError && !oObj.activationPending) {
                         $(nRow).addClass('error');
                         $(nRow).find('td').css('background', 'rgba(255,0,0,0.1)');
                         return nRow;
@@ -148,7 +148,7 @@ ${cpweb_foot}
                         "width": "25px",
                         "data" : function(row, type, set) {
                             if (!row.iconDisplay) {
-                                if (row.inError) {
+                                if (row.inError && !row.activationPending) {
                                     var msg = row.errorMsg;
                                     if (msg == null) {
                                         msg = 'Participation error reason is not known';
@@ -235,6 +235,8 @@ ${cpweb_foot}
                             if (!row.lastEmailDisplay) {
                                 if (row.sending) {
                                     row.lastEmailDisplay = "Sending..."
+                                } else if (row.activationPending) {
+                                    row.lastEmailDisplay = "Activating..."
                                 } else if (row.bounced) {
                                     row.lastEmailDisplay = '<a href="#" onclick="showBounceInfo(' + row.id + '); return false" class="text-danger" title="' + row.lastEmailStr + '"><strong>Bounced back</strong></a>';
                                 } else {
