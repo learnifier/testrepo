@@ -89,25 +89,23 @@
 </section>
 
 
-    [#if isPublishing]
-        <div id="incomplete_dd" class="alert alert-warning" role="alert">
-            Publishing underway
-        </div>
-    [#elseif project.unstaged]
-        [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-            <div id="incomplete_dd" class="alert alert-warning" role="alert">
-                <h2>Publish Your Updated Course Design</h2>
-                <p>Your updated course design <span class="imp">will not be available to participants </span>until you have clicked the button below and entered any required information.</p>
+    <div id="cp-project-publishing" class="alert alert-warning ${isPublishing?then('show','hidden')}" role="alert">
+        Publishing underway
+    </div>
 
-                [#if !prj.invitePossible]
-                <p><span class="imp">You cannot invite participants until you have published the course design.</span></p>
-                [/#if]
-                <form action="${helper.urlFor('project.VerifyProjectDesignModule','verifyNewDesign',[project.projectId])}" method="post">
-                    <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-flash"></span> Publish Course Design Now</button>
-                </form>
-            </div>
-        [/@]
-    [/#if]
+    [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+        <div id="cp-project-stage" class="alert alert-warning ${(!isPublishing && project.unstaged)?then('show','hidden')}" role="alert">
+            <h2>Publish Your Updated Course Design</h2>
+            <p>Your updated course design <span class="imp">will not be available to participants </span>until you have clicked the button below and entered any required information.</p>
+
+            [#if !prj.invitePossible]
+            <p><span class="imp">You cannot invite participants until you have published the course design.</span></p>
+            [/#if]
+            <form action="${helper.urlFor('project.VerifyProjectDesignModule','verifyNewDesign',[project.projectId])}" method="post">
+                <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-flash"></span> Publish Course Design Now</button>
+            </form>
+        </div>
+    [/@]
     <div class="xaffixContainer">
     <nav data-spy="xaffix" data-offset-top="0" data-offset-bottom="10" id="xmyAffix">
         <ul class="nav nav-underline">
