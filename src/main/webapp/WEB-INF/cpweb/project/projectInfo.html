@@ -101,10 +101,6 @@
 </section>
 
 
-    <div id="cp-project-publishing" class="${isPublishing?then('','hidden')}" role="alert">
-        <i class="pe-7s-refresh-2 pe-va pe-lg pe-spin"></i> Publishing course...
-    </div>
-
     [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
         <div id="cp-project-stage" class="alert alert-warning ${(!isPublishing && project.unstaged)?then('','hidden')}" role="alert">
             <h2>Publish Your Updated Course Design</h2>
