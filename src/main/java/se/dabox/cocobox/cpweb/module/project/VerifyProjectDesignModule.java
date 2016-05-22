@@ -50,6 +50,7 @@ import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.cddb.DatabankDateConverter;
 import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
@@ -371,6 +372,10 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
     }
 
     private void upstage(RequestCycle cycle, OrgProject project) {
+        if (isPublishing(project)) {
+            LOGGER.warn("Publishing in progress, not doing anything");
+            return;
+        }
 
         CourseDesignClient cdc = getCourseDesign(cycle);
 
@@ -405,6 +410,12 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
                 project.isSocial());
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
+
+        UpdateProjectRequestBuilder reqBuilder = new UpdateProjectRequestBuilder(userId, project.
+                getProjectId());
+        reqBuilder.setUnstaged(false);
+
+        getCocoboxCordinatorClient(cycle).updateOrgProject(reqBuilder.createUpdateProjectRequest());
 
         if (oldMasterDatabank != null) {
             try {
