@@ -68,6 +68,7 @@ import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.ccbc.project.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.material.ProjectProductMaterialHelper;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.DatabankFacade;
@@ -728,6 +729,11 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         project.setStageDatabank(stageDatabank);
 
+        UpdateProjectRequestBuilder reqBuilder = new UpdateProjectRequestBuilder(userId, project.
+                getProjectId());
+        reqBuilder.setUnstaged(true);
+
+        ccbc.updateOrgProject(reqBuilder.createUpdateProjectRequest());
 
         return stageId;
     }
