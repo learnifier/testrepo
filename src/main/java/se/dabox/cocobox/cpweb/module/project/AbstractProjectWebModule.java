@@ -100,6 +100,7 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         map.put("isDesignDetailsAvailable", isDesignDetailsAvailable(project));
 
         map.put("projectName", new GetProjectAdministrativeName(cycle).getName(project));
+        map.put("isPublishing", isPublishing(project));
 
         map.put("isPublishing", isPublishing(project));
 

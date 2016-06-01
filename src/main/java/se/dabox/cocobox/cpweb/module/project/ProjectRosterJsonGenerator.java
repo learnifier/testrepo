@@ -148,6 +148,7 @@ class ProjectRosterJsonGenerator {
                 g.writeStringField("participationLink", participationLink);
 
                 g.writeBooleanField("inError", item.isInError());
+                g.writeBooleanField("activationPending", item.isActivationPending());
                 g.writeBooleanField("activated", item.isActivated());
                 g.writeBooleanField("activationPending", item.isActivationPending());
                 final String strParticipationId = Long.toString(item.getParticipationId());

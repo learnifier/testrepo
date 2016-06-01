@@ -4,10 +4,12 @@
 package se.dabox.cocobox.cpweb.module.project.report;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
+import se.dabox.util.collections.Transformer;
 
 /**
  *
@@ -64,6 +67,10 @@ class ActivityReportBuilder implements StatusSource {
 
     private List<ProjectParticipation> participants;
     private volatile int completed;
+    private volatile String statusMessage;
+
+    private final Transformer<Long,List<ParticipationProgress>> progressFactory;
+    private Map<Long, List<ParticipationProgress>> progressData;
 
     public ActivityReportBuilder(ServiceRequestCycle cycle, OrgProject project, Locale userLocale) {
         ParamUtil.required(cycle, "cycle");
@@ -82,15 +89,21 @@ class ActivityReportBuilder implements StatusSource {
         pmcClient = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
 
         databankFacade = new GetDatabankFacadeCommand(cycle).get(project);
+
+        progressFactory = this::getParticipationProgress;
     }
 
     byte[] getReport() {
-        participants
-                = ccbcClient.listProjectParticipations(project.getProjectId());
+        statusMessage = "Loading participation information";
+        loadParticipationData();
+        refreshCrispInformation();
+        loadProgressInformation();
 
         List<Map<String, Object>> rows = new ArrayList<>(participants.size());
 
+        completed = 0;
         for (ProjectParticipation participant : participants) {
+            statusMessage = "Generating report";
             Map<String, Object> row = getParticipantRowData(participant);
             if (row != null) {
                 rows.add(row);
@@ -103,6 +116,15 @@ class ActivityReportBuilder implements StatusSource {
 
         String jsonString = JsonUtils.encodePretty(retval);
         return jsonString.getBytes(DwsConstants.UTF8_CHARSET);
+    }
+
+    private void loadParticipationData() throws NotFoundException {
+        participants
+                = ccbcClient.listProjectParticipations(project.getProjectId());
+
+        //Prime user info details
+        Set<Long> userIds = CollectionsUtil.transform(participants, ProjectParticipation::getUserId);
+        icHelper.getMiniUserInfos(userIds);
     }
 
     private Map<String, Object> getParticipantRowData(ProjectParticipation participant) {
@@ -129,9 +151,7 @@ class ActivityReportBuilder implements StatusSource {
         }
 
         List<ParticipationProgress> progress
-                = ccbcClient.getParticipationProgress(participant.getParticipationId());
-
-
+                = progressFactory.transform(participant.getParticipationId());
 
         ActivityCourse activityCourse
                 = new MultiPageCourseCddActivityCourseFactory().newActivityCourse(project, progress,
@@ -301,6 +321,35 @@ class ActivityReportBuilder implements StatusSource {
             return null;
         }
 
-        return new Status((long) participants.size(), (long) completed);
+        return new Status(statusMessage, (long) participants.size(), (long) completed);
+    }
+
+    private void refreshCrispInformation() {
+        completed = 0;
+
+        for (ProjectParticipation participant : participants) {
+            statusMessage = String.format("Fetching status information for %s", icHelper.
+                    getUserDisplayName(participant.getUserId()));
+            GetParticipationCrispProductStatusRequest req
+                    = new GetParticipationCrispProductStatusRequest(participant.getParticipationId());
+            req.setFetchMode(FetchMode.DIRECT);
+            try {
+                pmcClient.getParticipationCrispProductStatus(req);
+            } catch (NotFoundException nfe) {
+                LOGGER.warn("Participation not available (participation id {})", participant.
+                        getParticipationId());
+            } catch (Exception ex) {
+                LOGGER.warn("Failed to get fresh information for participation {}", participant, ex);
+            }
+            completed++;
+        }
+    }
+
+    private void loadProgressInformation() {
+        progressData = ccbcClient.getProjectProgress(project.getProjectId());
+    }
+
+    private List<ParticipationProgress> getParticipationProgress(long participationId) {
+        return progressData.getOrDefault(participationId, Collections.emptyList());
     }
 }

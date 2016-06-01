@@ -5,13 +5,6 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -33,6 +26,14 @@ import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Predicate;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  *

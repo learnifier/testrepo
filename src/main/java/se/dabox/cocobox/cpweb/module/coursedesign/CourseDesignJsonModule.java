@@ -4,15 +4,6 @@
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.Collator;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -29,6 +20,16 @@ import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.ParamUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.Collator;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  *
