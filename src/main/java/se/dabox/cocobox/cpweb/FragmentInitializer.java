@@ -23,8 +23,8 @@ public class FragmentInitializer {
         HashMap<String, String> fragParams = new HashMap<>();
         fragParams.put("baseurl", cycle.getRequest().getContextUrl().toString()+'/');
         fragParams.put("userid", getUserId(cycle));
-        fragParams.put("locale", CocositeUserHelper.getUserLocale(cycle).toString());
-        
+        fragParams.put("locale", CocositeUserHelper.getUserLocale(cycle).toLanguageTag());
+
         String strOrgId = Long.toString(orgId);
         fragParams.put("orgId", strOrgId);
 
