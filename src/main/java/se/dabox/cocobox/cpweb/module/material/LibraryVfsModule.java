@@ -138,7 +138,9 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
                 "/cocobox/img/producttypes/dollarfolder.svg"));
         grantedFs.setRootDisplayName("Purchased");
 
-        filespaceFactory.mount(Path.valueOf("/purchased"), grantedFs);
+        if (grantedFs.isGrantedProductsAvailable()) {
+            filespaceFactory.mount(Path.valueOf("/purchased"), grantedFs);
+        }
 
         return filespaceFactory.newInstance();
     }
