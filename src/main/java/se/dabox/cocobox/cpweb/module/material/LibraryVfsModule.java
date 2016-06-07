@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -32,6 +33,7 @@ import se.dabox.cocosite.freemarker.util.CdnUtils;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.DwsDevelopmentMode;
 import se.dabox.service.common.ccbc.folder.FolderId;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
@@ -53,6 +55,15 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onVfs(RequestCycle cycle, String strOrgId, String command) {
         checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_VIEW_PRODUCTS);
+
+        if (DwsDevelopmentMode.isDevelopmentMode()) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ex) {
+                java.util.logging.Logger.getLogger(LibraryVfsModule.class.getName()).
+                        log(Level.SEVERE, null, ex);
+            }
+        }
 
         final JsonVfsWebAction vfsAction
                 = new JsonVfsWebAction(LOGGER,
