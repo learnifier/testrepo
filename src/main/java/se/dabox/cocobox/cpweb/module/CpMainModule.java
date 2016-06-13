@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,10 +29,12 @@ import se.dabox.cocobox.cpweb.formdata.account.ChangePassword;
 import se.dabox.cocobox.cpweb.formdata.material.AddLinkCreditsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocobox.cpweb.module.deeplink.ProductMaterialJsonModule;
+import se.dabox.cocobox.cpweb.module.report.ReportEntry;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.common.ccbc.ProjectStatus;
+import se.dabox.service.common.ccbc.mail.GetOrgProjectMailVariables;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
@@ -83,7 +86,7 @@ public class CpMainModule extends AbstractWebAuthModule {
 
         return new FreemarkerRequestTarget("/home.html", map);
     }
-    
+
     @WebAction
     @WebActionMountpoint("/search")
     public RequestTarget onSearch(RequestCycle cycle, String id) {
@@ -167,7 +170,7 @@ public class CpMainModule extends AbstractWebAuthModule {
 
         return new FreemarkerRequestTarget("/material/gridMaterials.html", map);
     }
-    
+
     @WebAction
     public RequestTarget onIsoGridMaterials(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -183,8 +186,8 @@ public class CpMainModule extends AbstractWebAuthModule {
 
         return new FreemarkerRequestTarget("/material/isotoped-gridMaterials.html", map);
     }
-    
-    
+
+
     @WebAction
     public RequestTarget onListProdDeeplinks(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -213,9 +216,9 @@ public class CpMainModule extends AbstractWebAuthModule {
                 urlFor(ProductMaterialJsonModule.class, "addCredits", strOrgId));
 
         return new FreemarkerRequestTarget("/deeplink/listOrgMatDeeplinks.html", map);
-    }    
-    
-    
+    }
+
+
     @WebAction
     public RequestTarget onListProjects(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -249,9 +252,25 @@ public class CpMainModule extends AbstractWebAuthModule {
     public RequestTarget onListReports(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
+        List<ReportEntry> reports = new ArrayList<>();
+        if (hasOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_VIEW_ACCOUNTBALANCE)) {
+            reports.add(new ReportEntry("Credit balances", cycle.urlFor("report.ReportModule",
+                    "creditStatus", strOrgId)));
+        }
+
+        reports.add(new ReportEntry("Project status overview", cycle.urlFor("report.ReportModule",
+                "projectStatus", strOrgId)));
+
+        reports.add(new ReportEntry("Product completion", cycle.urlFor("report.ReportModule",
+                "productCompletion", strOrgId)));
+
+        List<ReportEntry> challengeReports = new GetChallengeReports(cycle).forOrgUnit(org.getId());
+        reports.addAll(challengeReports);
+
         Map<String, Object> map = createMap();
 
         map.put("org", org);
+        map.put("reports", reports);
 
         return new FreemarkerRequestTarget("/report/listReports.html", map);
     }
@@ -356,5 +375,5 @@ public class CpMainModule extends AbstractWebAuthModule {
             }
         }
     }
-    
+
 }

@@ -15,7 +15,7 @@ ${cpweb_foot}
             "initComplete": function() {
                 $('#listreports_filter input').attr('placeholder', 'Search reports');
             },
-            "columnDefs": [ 
+            "columnDefs": [
                 {
                     "targets": [ 0 ],
                     "width": "70%",
@@ -31,7 +31,7 @@ ${cpweb_foot}
         });
         });
     } );
-                
+
 </script>
 
 
@@ -49,17 +49,11 @@ ${cpweb_foot}
             </tr>
         </thead>
         <tbody>
-            [@portalSecurity.permissionBlock permission="CP_VIEW_ACCOUNTBALANCE"]
+            [#list reports as report]
             <tr>
-                <td><a href="${helper.urlFor('report.ReportModule','creditStatus', [org.id])}">Credit balances</a></td>
+                <td><a href="${report.link}">${report.name?xml}</a></td>
             </tr>
-            [/@]
-            <tr>
-                <td><a href="${helper.urlFor('report.ReportModule','projectStatus', [org.id])}">Project status overview</a></td>
-            </tr>
-            <tr>
-                <td><a href="${helper.urlFor('report.ReportModule','productCompletion', [org.id])}">Product completion</a></td>
-            </tr>
+            [/#list]
         </tbody>
     </table>
 </div>
