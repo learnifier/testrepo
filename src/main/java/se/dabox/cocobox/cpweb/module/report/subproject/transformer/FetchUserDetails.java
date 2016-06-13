@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.report.subproject;
+package se.dabox.cocobox.cpweb.module.report.subproject.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import se.dabox.util.collections.ListUtil;
  *
  * @author Jerker Klang (jerker.klang@learnifier.com)
  */
-class FetchUserDetails implements Factory<List<SubprojectParticipant>> {
+public class FetchUserDetails implements Factory<List<SubprojectParticipant>> {
 
     private final StatusHolder statusHolder;
     private final Factory<List<SubprojectParticipant>> backend;

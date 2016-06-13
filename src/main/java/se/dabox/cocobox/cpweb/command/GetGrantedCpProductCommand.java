@@ -14,8 +14,10 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
+import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Transformer;
 
@@ -39,7 +41,7 @@ public class GetGrantedCpProductCommand implements Transformer<ProductId, Produc
         CocoboxCoordinatorClient ccbc
                 = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
-        productFetcher = pdClient::getProduct;
+        productFetcher = (id) -> ProductFetchUtil.getProduct(pdClient, id);
         orgProductsFetcher = ccbc::listOrgProducts;
     }
 

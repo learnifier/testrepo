@@ -9,10 +9,17 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import net.unixdeveloper.druwa.DruwaApplication;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import se.dabox.cocobox.cpweb.module.report.StatusHolder;
+import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchExtendedActivityStatus;
+import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchOrgProjectParticipants;
+import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchProjectNames;
+import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchUserDetails;
+import se.dabox.cocobox.cpweb.module.report.subproject.transformer.SubprojectParticipant;
+import se.dabox.service.common.RealmBackgroundCallable;
 import se.dabox.service.common.ajaxlongrun.Status;
 import se.dabox.service.common.ajaxlongrun.StatusSource;
 import se.dabox.service.proddir.data.Product;
@@ -22,8 +29,8 @@ import se.dabox.util.collections.Factory;
  *
  * @author Jerker Klang (jerker.klang@learnifier.com)
  */
-public class OrgSubprojectReport implements Callable<DeferredFileOutputStream>, StatusSource,
-        StatusHolder {
+public class OrgSubprojectReport extends RealmBackgroundCallable<DeferredFileOutputStream>
+        implements StatusSource, StatusHolder {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -33,13 +40,14 @@ public class OrgSubprojectReport implements Callable<DeferredFileOutputStream>, 
     private final long orgId;
     private volatile Status status;
 
-    public OrgSubprojectReport(long orgId, Product product) {
+    public OrgSubprojectReport(DruwaApplication app, long orgId, Product product) {
+        super(app);
         this.orgId = orgId;
         this.product = product;
     }
 
     @Override
-    public DeferredFileOutputStream call() throws IOException {
+    protected DeferredFileOutputStream callInCycle(ServiceRequestCycle cycle) throws IOException {
         Factory<List<SubprojectParticipant>> participantListFactory = createFactory();
 
         List<SubprojectParticipant> list = participantListFactory.create();
@@ -74,7 +82,7 @@ public class OrgSubprojectReport implements Callable<DeferredFileOutputStream>, 
                 (p, name) -> p.setMasterProjectName(name));
 
         participantListFactory = new FetchExtendedActivityStatus(this, participantListFactory);
-        
+
         return participantListFactory;
     }
 

@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.report.subproject;
+package se.dabox.cocobox.cpweb.module.report.subproject.transformer;
 
 import se.dabox.service.common.coursedesign.extstatus.ExtendedStatus;
 
@@ -9,11 +9,11 @@ import se.dabox.service.common.coursedesign.extstatus.ExtendedStatus;
  *
  * @author Jerker Klang (jerker.klang@learnifier.com)
  */
-class ActivityExtendedStatus {
+class ReportActivityExtendedStatus {
     private final String title;
     private final ExtendedStatus extendedStatus;
 
-    public ActivityExtendedStatus(String title, ExtendedStatus extendedStatus) {
+    public ReportActivityExtendedStatus(String title, ExtendedStatus extendedStatus) {
         this.title = title;
         this.extendedStatus = extendedStatus;
     }

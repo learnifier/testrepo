@@ -31,6 +31,7 @@ import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.messagepage.GenericMessagePageFactory;
 import se.dabox.service.common.DwsConstants;
+import se.dabox.service.common.RealmBackgroundCallable;
 import se.dabox.service.common.ajaxlongrun.AjaxJob;
 import se.dabox.service.common.ajaxlongrun.AppAjaxLongOp;
 import se.dabox.service.common.ajaxlongrun.AppBackgroundAjaxLongOp;
@@ -196,7 +197,7 @@ public class ReportJsonModule extends AbstractJsonAuthModule {
         return new AppBackgroundAjaxLongOp<DeferredFileOutputStream,OrgSubprojectReport>() {
             @Override
             public OrgSubprojectReport createBackgroundTask() {
-                return new OrgSubprojectReport(product);
+                return new OrgSubprojectReport(cycle.getApplication(), orgId, product);
             }
 
             @Override

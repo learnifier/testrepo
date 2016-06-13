@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.report.subproject;
+package se.dabox.cocobox.cpweb.module.report.subproject.transformer;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,7 @@ public class SubprojectParticipant {
     private Long masterProject;
     private String masterProjectName;
 
-    private List<ActivityExtendedStatus> activity = Collections.emptyList();
+    private List<ReportActivityExtendedStatus> activity = Collections.emptyList();
 
     public SubprojectParticipant(long participationId, long projectId, long userId) {
         this.participationId = participationId;
@@ -69,11 +69,11 @@ public class SubprojectParticipant {
         this.masterProjectName = masterProjectName;
     }
 
-    public List<ActivityExtendedStatus> getActivity() {
+    public List<ReportActivityExtendedStatus> getActivity() {
         return activity;
     }
 
-    public void setActivity(List<ActivityExtendedStatus> activity) {
+    public void setActivity(List<ReportActivityExtendedStatus> activity) {
         this.activity = activity;
     }
 

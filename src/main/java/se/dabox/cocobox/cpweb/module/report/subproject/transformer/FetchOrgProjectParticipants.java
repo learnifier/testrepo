@@ -1,8 +1,9 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.report.subproject;
+package se.dabox.cocobox.cpweb.module.report.subproject.transformer;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
@@ -48,10 +49,21 @@ public class FetchOrgProjectParticipants implements Factory<List<SubprojectParti
         CocoboxCoordinatorClient ccbc
                 = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
-        ListParticipationResponse resp
-                = ccbc.listProjectParticipations(reqBuilder.createFilterParticipationRequest());
+        List<SubprojectParticipant> retlist = new ArrayList<>();
+        while (true) {
+            reqBuilder.withAfterKey(afterKey);
+            ListParticipationResponse resp
+                    = ccbc.listProjectParticipations(reqBuilder.createFilterParticipationRequest());
 
-        return toReportObjects(resp.getParticipations());
+            retlist.addAll(toReportObjects(resp.getParticipations()));
+            if (resp.isMoreAvailable()) {
+                afterKey = resp.getAfterKey();
+            } else {
+                break;
+            }
+        }
+
+        return retlist;
     }
 
     private List<SubprojectParticipant> toReportObjects(List<ProjectParticipation> participations) {

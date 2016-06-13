@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.report.subproject;
+package se.dabox.cocobox.cpweb.module.report.subproject.transformer;
 
 import java.util.ArrayList;
 import java.util.List;

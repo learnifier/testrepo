@@ -1,8 +1,9 @@
 /*
  * (c) Dabox AB 2015 All Rights Reserved
  */
-package se.dabox.cocobox.cpweb.module.report.subproject;
+package se.dabox.cocobox.cpweb.module.report.subproject.transformer;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import net.unixdeveloper.druwa.DruwaService;
@@ -75,7 +76,9 @@ public class FetchExtendedActivityStatus implements Factory<List<SubprojectParti
                 true).get(project);
 
         participants.forEach((subp) -> {
-            processParticipant(project, databank, cdd, progress.get(subp.getParticipationId()), subp);
+            List<ParticipationProgress> progressData
+                    = progress.getOrDefault(subp.getParticipationId(), Collections.emptyList());
+            processParticipant(project, databank, cdd, progressData, subp);
         });
 
         processed += participants.size();
@@ -94,7 +97,7 @@ public class FetchExtendedActivityStatus implements Factory<List<SubprojectParti
             ExtendedStatus status = new ExtendedStatusFactory().statusFor(a);
             String name = a.getTitle();
 
-            return new ActivityExtendedStatus(name, status);
+            return new ReportActivityExtendedStatus(name, status);
         }));
     }
 
