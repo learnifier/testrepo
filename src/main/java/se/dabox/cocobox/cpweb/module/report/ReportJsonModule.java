@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.report;
 
+import se.dabox.cocobox.cpweb.module.report.subproject.OrgSubprojectReport;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -11,10 +12,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import net.unixdeveloper.druwa.ContentType;
+import net.unixdeveloper.druwa.DruwaInternalIOException;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.DeferredFileOutputStream;
 import se.dabox.cocobox.cpweb.command.GetGrantedCpProductCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
@@ -23,14 +29,17 @@ import se.dabox.cocobox.cpweb.module.project.report.ProductReportBuilder;
 import se.dabox.cocobox.cpweb.module.project.report.ProjectReportModule;
 import se.dabox.service.common.ajaxlongrun.StatusCallable;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.messagepage.GenericMessagePageFactory;
 import se.dabox.service.common.DwsConstants;
 import se.dabox.service.common.ajaxlongrun.AjaxJob;
 import se.dabox.service.common.ajaxlongrun.AppAjaxLongOp;
+import se.dabox.service.common.ajaxlongrun.AppBackgroundAjaxLongOp;
 import se.dabox.service.common.ajaxlongrun.FutureAjaxJob;
 import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.ccbc.report.ParticipationReport;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.service.common.proddir.CocoboxProductTypeConstants;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -163,6 +172,50 @@ public class ReportJsonModule extends AbstractJsonAuthModule {
             protected RequestTarget completeResponse(RequestCycle cycle, AjaxJob<byte[]> job) {
                 byte[] data = job.getResult();
                 return jsonTarget(data);
+            }
+
+        }.process(cycle);
+    }
+
+    @WebAction
+    public RequestTarget onChallengeReport(final RequestCycle cycle, String strOrgId, String productId) {
+        checkOrgPermission(cycle, strOrgId);
+
+        long orgId = Long.parseLong(strOrgId);
+
+        final Product product
+                = new GetGrantedCpProductCommand(orgId).transform(new ProductId(productId));
+
+        if (!product.getProductType().isInstance(CocoboxProductTypeConstants.CHALLENGE)) {
+            String msg = String.format("Product is not a challenge: %s", productId);
+            RequestTarget page
+                    = GenericMessagePageFactory.newErrorPage().withMessageText(msg).build();
+            throw new RetargetException(page);
+        }
+
+        return new AppBackgroundAjaxLongOp<DeferredFileOutputStream,OrgSubprojectReport>() {
+            @Override
+            public OrgSubprojectReport createBackgroundTask() {
+                return new OrgSubprojectReport(product);
+            }
+
+            @Override
+            protected RequestTarget completeResponse(RequestCycle cycle,
+                    AjaxJob<DeferredFileOutputStream> job) {
+
+                DeferredFileOutputStream file = job.getResult();
+                try {
+                    cycle.getResponse().setContentType(ContentType.APPLICATION_JSON);
+                    try {
+                        file.writeTo(cycle.getResponse().getOutputStream());
+                    } catch (IOException ex) {
+                        throw new DruwaInternalIOException(ex);
+                    }
+                } finally {
+                    FileUtils.deleteQuietly(file.getFile());
+                }
+
+                return null;
             }
 
         }.process(cycle);

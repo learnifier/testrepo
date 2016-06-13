@@ -71,7 +71,7 @@ public class GetGrantedCpProductCommand implements Transformer<ProductId, Produc
         if (matches == 0) {
             String text = String.format("Product not found in organization: %s", productId);
             RequestTarget page
-                    = GenericMessagePageFactory.newNotFoundPage().withActionText(text).build();
+                    = GenericMessagePageFactory.newNotFoundPage().withMessageText(text).build();
             throw new RetargetException(page);
         }
 
@@ -79,7 +79,7 @@ public class GetGrantedCpProductCommand implements Transformer<ProductId, Produc
         if (product == null) {
             String text = String.format("Product not found: %s", productId);
             RequestTarget page
-                    = GenericMessagePageFactory.newNotFoundPage().withActionText(text).build();
+                    = GenericMessagePageFactory.newNotFoundPage().withMessageText(text).build();
             throw new RetargetException(page);
         }
 
