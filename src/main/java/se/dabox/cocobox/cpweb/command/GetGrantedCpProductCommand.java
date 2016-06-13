@@ -64,6 +64,13 @@ public class GetGrantedCpProductCommand implements Transformer<ProductId, Produc
      */
     @Override
     public @Nonnull Product transform(ProductId productId) throws RetargetException {
+        if (productId == null) {
+            String text = String.format("Product not specified: (null)");
+            RequestTarget page
+                    = GenericMessagePageFactory.newNotFoundPage().withMessageText(text).build();
+            throw new RetargetException(page);
+        }
+
         List<OrgProduct> orgProducts = orgProductsFetcher.transform(orgId);
 
         final String strProductId = productId.getId();

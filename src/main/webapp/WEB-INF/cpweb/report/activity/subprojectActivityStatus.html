@@ -1,0 +1,60 @@
+[#ftl strip_text="true" /]
+
+[#import "/se/dabox/services/dwsfu/commonDatatables.ftl" as cdt /]
+[#import "/report/include/extendedStatusMap.ftl" as esMap /]
+
+[#assign cpweb_foot ]
+
+<script>
+    $('#menu-reports').addClass('active');
+</script>
+<script>
+    require(['${contextPath}/js/report/activity/subprojectActivityStatus.js?${cycle.application.formattedStartTime.base36String}'], function(page) {
+        page.init({
+            'jsonUrl': "${jsonUrl?js_string}",
+            'statusNames': [@esMap.langKeyMap /]
+        });
+    });
+</script>
+[/#assign]
+
+[#assign cpweb_head ]
+${cpweb_head}
+
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=orgName]
+
+<article id="reportoverview">
+
+    <section class="ccb-page-header">
+        <div class="ccb-page-header__info">
+            <p class="page-title-label">Report</p>
+            <h1 class="page-title">Project status overview</h1>
+        </div>
+        <div class="ccb-page-header__details">
+            <ul>
+                <li><span class="row-label">Description</span><span class="row-setting">This report gives provides an overview of the completion status for all projects. You can drill down in each project by clicking on it.</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <div id="r_table" class="table-responsive">
+        <table class="table table-condensed table-hover ccb-table" width="100%" id="r_report">
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tr>
+                <td id="pbar"></td>
+            </tr>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+</article>
+
+
+[/@dws.skin]
+

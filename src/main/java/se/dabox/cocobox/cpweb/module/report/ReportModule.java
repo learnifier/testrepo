@@ -11,10 +11,12 @@ import net.unixdeveloper.druwa.annotation.DefaultWebAction;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
+import se.dabox.cocobox.cpweb.command.GetGrantedCpProductCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 
 /**
  *
@@ -53,7 +55,7 @@ public class ReportModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Product product = getProductDirectoryClient(cycle).getProduct(strProdId);
-       
+
         Map<String, Object> map = createMap();
         map.put("org", org);
         map.put("product", product);
@@ -65,7 +67,7 @@ public class ReportModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Product product = getProductDirectoryClient(cycle).getProduct(strProdId);
-       
+
         Map<String, Object> map = createMap();
         map.put("org", org);
         map.put("product", product);
@@ -78,7 +80,7 @@ public class ReportModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Product product = getProductDirectoryClient(cycle).getProduct(strProdId);
-       
+
         Map<String, Object> map = createMap();
         map.put("org", org);
         map.put("product", product);
@@ -91,7 +93,7 @@ public class ReportModule extends AbstractWebAuthModule {
 
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Product product = getProductDirectoryClient(cycle).getProduct(strProdId);
-       
+
         Map<String, Object> map = createMap();
         map.put("org", org);
         map.put("product", product);
@@ -119,5 +121,20 @@ public class ReportModule extends AbstractWebAuthModule {
         map.put("org", org);
 
         return new FreemarkerRequestTarget("/report/products/completionPerUser.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onSubprojectStatus(RequestCycle cycle, String strOrgId, String strProductId) {
+
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+
+        ProductId productId = strProductId == null ? null : new ProductId(strProductId);
+        new GetGrantedCpProductCommand(org.getId()).transform(productId);
+
+        Map<String, Object> map = createMap();
+        map.put("org", org);
+        map.put("jsonUrl", cycle.urlFor(ReportJsonModule.class, "subprojectStatus", strOrgId, strProductId));
+
+        return new FreemarkerRequestTarget("/report/activity/subprojectActivityStatus.html", map);
     }
 }

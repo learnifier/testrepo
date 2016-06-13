@@ -15,8 +15,6 @@ import se.dabox.service.common.ajaxlongrun.Status;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.login.client.UserAccount;
-import se.dabox.service.login.client.UserAccountService;
 import se.dabox.util.Holder;
 import se.dabox.util.collections.BiProcessor;
 import se.dabox.util.collections.CollectionsUtil;

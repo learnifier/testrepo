@@ -179,7 +179,7 @@ public class ReportJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onChallengeReport(final RequestCycle cycle, String strOrgId, String productId) {
+    public RequestTarget onSubprojectStatus(final RequestCycle cycle, String strOrgId, String productId) {
         checkOrgPermission(cycle, strOrgId);
 
         long orgId = Long.parseLong(strOrgId);
