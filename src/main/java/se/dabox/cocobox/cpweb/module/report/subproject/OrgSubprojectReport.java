@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import se.dabox.cocobox.cpweb.module.report.StatusHolder;
 import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchExtendedActivityStatus;
+import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchMasterProjectId;
 import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchOrgProjectParticipants;
 import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchProjectNames;
 import se.dabox.cocobox.cpweb.module.report.subproject.transformer.FetchUserDetails;
@@ -73,6 +74,8 @@ public class OrgSubprojectReport extends RealmBackgroundCallable<DeferredFileOut
     private Factory<List<SubprojectParticipant>> createFactory() {
         Factory<List<SubprojectParticipant>> participantListFactory
                 = new FetchOrgProjectParticipants(this, orgId, product.getId());
+
+        participantListFactory = new FetchMasterProjectId(this, participantListFactory);
 
         participantListFactory = new FetchUserDetails(this, participantListFactory);
 

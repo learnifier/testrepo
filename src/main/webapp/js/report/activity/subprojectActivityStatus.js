@@ -4,6 +4,8 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common'],
     var exports = {};
 
     var extStatusLabels;
+    var projectUrl;
+
     var colCount = 0;
     var colDefs = [
         {
@@ -19,7 +21,12 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common'],
         {
             "targets": [colCount++],
             "data": "masterProjectName",
-            "title": "Project"
+            "title": "Project",
+            "createdCell": function(td, data, rowData) {
+                var a = $("<a/>", {"href": projectUrl + rowData.masterProject, "target": "_blank"});
+                a.append(data);
+                $(td).html(a);
+            }
         }
     ];
 
@@ -64,6 +71,7 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common'],
             "data": null,
             "title": activity.title,
             "defaultContent": "",
+            "order": [[0, 'asc']],
             "render": function(data) {
                 if (cacheName in data) {
                     return extStatusLabels[data[cacheName]];
@@ -96,6 +104,7 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common'],
 
     exports.init = function (opts) {
         extStatusLabels = opts.statusNames;
+        projectUrl = opts.projectUrl;
 
         longrun.guiLongRun(opts.jsonUrl, {
             progressTarget: "#pbar",

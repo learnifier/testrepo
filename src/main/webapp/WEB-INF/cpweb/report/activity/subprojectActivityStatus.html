@@ -12,6 +12,7 @@
     require(['${contextPath}/js/report/activity/subprojectActivityStatus.js?${cycle.application.formattedStartTime.base36String}'], function(page) {
         page.init({
             'jsonUrl': "${jsonUrl?js_string}",
+            'projectUrl': "${helper.urlFor('ProjectModule','overview')}/",
             'statusNames': [@esMap.langKeyMap /]
         });
     });
