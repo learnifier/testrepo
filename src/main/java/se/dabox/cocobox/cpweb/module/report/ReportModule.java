@@ -4,6 +4,7 @@
  */
 package se.dabox.cocobox.cpweb.module.report;
 
+import java.util.Collections;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -15,6 +16,8 @@ import se.dabox.cocobox.cpweb.command.GetGrantedCpProductCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 
@@ -129,11 +132,16 @@ public class ReportModule extends AbstractWebAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         ProductId productId = strProductId == null ? null : new ProductId(strProductId);
-        new GetGrantedCpProductCommand(org.getId()).transform(productId);
+        Product product = new GetGrantedCpProductCommand(org.getId()).transform(productId);
+
+        MaterialListFactory factory
+                = new MaterialListFactory(cycle, CocositeUserHelper.getUserLocale(cycle));
+        factory.addProducts(Collections.singletonList(product));
 
         Map<String, Object> map = createMap();
         map.put("org", org);
         map.put("jsonUrl", cycle.urlFor(ReportJsonModule.class, "subprojectStatus", strOrgId, strProductId));
+        map.put("material", factory.getList().get(0));
 
         return new FreemarkerRequestTarget("/report/activity/subprojectActivityStatus.html", map);
     }

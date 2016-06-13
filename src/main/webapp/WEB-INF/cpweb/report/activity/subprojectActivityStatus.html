@@ -30,12 +30,12 @@ ${cpweb_head}
 
     <section class="ccb-page-header">
         <div class="ccb-page-header__info">
-            <p class="page-title-label">Report</p>
-            <h1 class="page-title">Project status overview</h1>
+            <p class="page-title-label">Status Report</p>
+            <h1 class="page-title">${material.title?xml}</h1>
         </div>
         <div class="ccb-page-header__details">
             <ul>
-                <li><span class="row-label">Description</span><span class="row-setting">This report gives provides an overview of the completion status for all projects. You can drill down in each project by clicking on it.</span></li>
+                <li><span class="row-label">Description</span><span class="row-setting"></span></li>
             </ul>
         </div>
     </section>
@@ -46,11 +46,13 @@ ${cpweb_head}
                 <tr>
                 </tr>
             </thead>
-            <tr>
-                <td id="pbar"></td>
-            </tr>
             <tbody>
+                <tr>
+                    <td id="pbar"></td>
+                </tr>
             </tbody>
+            <tfoot>
+            </tfoot>
         </table>
     </div>
 
