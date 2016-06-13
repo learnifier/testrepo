@@ -15,6 +15,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import se.dabox.cocobox.cpweb.command.GetGrantedCpProductCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCocoboxCordinatorClient;
 import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getProductDirectoryClient;
@@ -33,6 +34,7 @@ import se.dabox.service.common.ccbc.report.ParticipationReport;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.json.DataTablesJson;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.Predicate;
@@ -175,7 +177,7 @@ public class ReportJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.parseLong(strOrgId);
 
         Product product
-                = ProductFetchUtil.getExistingProduct(getProductDirectoryClient(cycle), productId);
+                = new GetGrantedCpProductCommand(orgId).transform(new ProductId(productId));
 
         String linkPrefix = cycle.urlFor(ProjectReportModule.class,
                 ProjectReportModule.ACTION_ACTIVITYREPORT);
