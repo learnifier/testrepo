@@ -56,15 +56,6 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
     public RequestTarget onVfs(RequestCycle cycle, String strOrgId, String command) {
         checkOrgPermission(cycle, strOrgId, CocoboxPermissions.CP_VIEW_PRODUCTS);
 
-        if (DwsDevelopmentMode.isDevelopmentMode()) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                java.util.logging.Logger.getLogger(LibraryVfsModule.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
-        }
-
         final JsonVfsWebAction vfsAction
                 = new JsonVfsWebAction(LOGGER,
                         () -> createFilespace(cycle, strOrgId));
