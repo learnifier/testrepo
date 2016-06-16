@@ -113,6 +113,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
+import se.dabox.service.common.proddir.search.ProductSearch;
+import se.dabox.service.common.proddir.search.StrictProductSearch;
 
 /**
  *
@@ -321,19 +324,20 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
 
         List<OrgProduct> orgProds = Collections.emptyList();
+        List<Product> products = Collections.emptyList();
 
         if (hasOrgPermission(cycle, orgId, CocoboxPermissions.CP_LIST_ORGMATS)) {
-                orgProds = getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
+            orgProds = getCocoboxCordinatorClient(cycle).listOrgProducts(orgId);
+            products = getOrgProducts(cycle, orgId, null, null);
+            products = CollectionsUtil.sublist(products, (p) -> p.isOrgUnitProduct());
         }
 
-        final long userId = LoginUserAccountHelper.getUserId(cycle);
-        final String basetype = getConfValue(cycle, CocoSiteConstants.PRODUCT_BASETYPE);
-        List<Product> matchingProducts = getProductDirectoryClient(cycle).searchProducts(userId,
-                term, basetype);
+        ProductSearch searcher = new StrictProductSearch(term);
+        List<Product> searchResult = searcher.search(products);
 
-        List<Product> products = filterGrantedProducts(matchingProducts, orgProds);
+        cycle.setAttribute("skipZeroBalanceProducts", false);
 
-        return processProducts(cycle, products, orgId, orgProds, strOrgId);
+        return processProducts(cycle, searchResult, orgId, orgProds, strOrgId);
     }
 
     private static List<Product> getGrantedProducts(RequestCycle cycle, List<OrgProduct> orgProds) {
@@ -1166,7 +1170,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     }
 
     public static List<Product> getOrgProducts(final RequestCycle cycle, final long orgId,
-            OrgProject project, ProjectType projectType) {
+            @Nullable OrgProject project, @Nullable ProjectType projectType) {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         List<Product> products = getGrantedProducts(cycle, ccbc.listOrgProducts(orgId));
@@ -1306,10 +1310,16 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
     private List<Product> maybeFilterZeroBalanceProducts(RequestCycle cycle,
             Map<String, AccountBalance> balances, List<Product> products) {
 
-        String strParam = ValueUtils.coalesce(cycle.getRequest().getParameter("zero"), "true");
-        boolean includeZeroBalanceProducts = Boolean.valueOf(strParam);
+        boolean skipZeroBalanceProducts;
+        Boolean cycleParam = cycle.getAttribute("skipZeroBalanceProducts");
+        if (cycleParam == null) {
+            String strParam = ValueUtils.coalesce(cycle.getRequest().getParameter("zero"), "true");
+            skipZeroBalanceProducts = Boolean.valueOf(strParam);
+        } else {
+            skipZeroBalanceProducts = cycleParam;
+        }
 
-        if (includeZeroBalanceProducts) {
+        if (skipZeroBalanceProducts) {
             return filterZeroBalanceProducts(balances, products);
         }
 
