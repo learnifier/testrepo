@@ -130,10 +130,12 @@
             [/@]
             [/#if]
 
-            [#if project.type.ptype == 1 || project.type.ptype == 2]
-            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
-            <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
-            [/@]
+            [#if !dwsrt.hasFeature("altcbweb")]
+                [#if project.type.ptype == 1 || project.type.ptype == 2]
+                [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_MATERIAL"]
+                <li class="[#if selected == 'materials']active[/#if]"><a href="${helper.urlFor('ProjectModule','materials',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.materials' /]</span></a></li>
+                [/@]
+                [/#if]
             [/#if]
 
             [#if !isIdproject(prj)]
