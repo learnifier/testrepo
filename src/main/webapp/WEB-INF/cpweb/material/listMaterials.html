@@ -27,7 +27,7 @@ ${cpweb_foot}
         s.init({
             vfs: vfs,
             listUrl: "${helper.urlFor('OrgMaterialJsonModule','listMats',[org.id])}",
-            addProductUrl: "${dwsrt.config['pdweb-folders.baseurl']}aprodnew/createProduct?scope=O${org.id?c}",
+            addProductUrl: "${dwsrt.config['pdweb.baseurl']}aprodnew/createProduct?scope=O${org.id?c}",
             resolveIdToVfs: "${helper.urlFor('material.LibraryVfsModule','resolveProduct',[org.id])}",
             postDeleteErrorUrl: "${helper.urlFor('OrgMaterialJsonModule', 'listProductProjects')}",
             editMode: true // TODO: Check permissions here.
@@ -79,7 +79,7 @@ ${cpweb_foot}
             <li role="separator" class="divider"></li>
             <li><h4 class="text-center primaryColor">INTERNET/LINK</h4></li>
             <li class="text-center">
-                
+
                 [#if productTypes['youtubevideo']??]
                   <a href data-bind="click: function(){addMaterial(['youtubevideo']);}">YouTube</a>
                 [/#if]
