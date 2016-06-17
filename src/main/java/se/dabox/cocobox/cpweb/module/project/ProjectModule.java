@@ -448,6 +448,8 @@ public class ProjectModule extends AbstractProjectWebModule {
                 new GetOrgBrandingIdCommand(cycle).forOrg(project.getOrgId());
 
         String backUrl = NavigationUtil.toProjectPageUrl(cycle, project.getProjectId());
+        String publishUrl = cycle.urlFor(VerifyProjectDesignModule.class,
+                VerifyProjectDesignModule.ACTION_VERIFY_NEW_DESIGN, projectId);
 
         legacyDesignTitleHandling(cycle, project, designId);
 
@@ -460,7 +462,7 @@ public class ProjectModule extends AbstractProjectWebModule {
                 designId,
                 project.getProjectId(),
                 backUrl,
-                project.getSubtype()).createInitData();
+                project.getSubtype()).setPublishUrl(publishUrl).createInitData();
 
         String confKey = ProjectTypeUtil.callSubtype(project, new ProjectSubtypeCallable<String>() {
             public static final String ALT = "cbweb-alt.baseurl";
