@@ -75,8 +75,8 @@ import se.dabox.service.common.proddir.ProductTypeUtil;
 import se.dabox.service.common.proddir.filter.DeeplinkProductFilter;
 import se.dabox.service.common.proddir.material.ProductMaterial;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
-import se.dabox.service.common.proddir.material.StandardThumbnailGeneratorFactory;
-import se.dabox.service.common.proddir.material.ThumbnailGeneratorFactory;
+import se.dabox.service.common.proddir.material.thumbnail.StandardThumbnailGeneratorFactory;
+import se.dabox.service.common.proddir.material.thumbnail.ThumbnailGeneratorFactory;
 import se.dabox.service.proddir.data.FieldValue;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductDimension;
@@ -665,9 +665,7 @@ public class OrgMaterialJsonModule extends AbstractJsonAuthModule {
             final Map<String, Long> orgProdIdMap,
             final Set<Product> deeplinkSet) {
 
-        final String cdnUrl = getConfValue(cycle, "contentrepo.cocoboxpub.puburl");
-
-        final ThumbnailGeneratorFactory factory = new StandardThumbnailGeneratorFactory(cdnUrl);
+        final ThumbnailGeneratorFactory factory = new StandardThumbnailGeneratorFactory();
 
         final Map<Long, List<OrgProductLink>> productLinkMap = getProductLinkMap(cycle,
                 orgProdIdMap.values());
