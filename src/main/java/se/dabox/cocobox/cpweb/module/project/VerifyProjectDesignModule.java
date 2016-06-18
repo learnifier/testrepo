@@ -20,7 +20,6 @@ import java.util.UUID;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
@@ -62,6 +61,8 @@ import se.dabox.service.common.ccbc.project.cddb.DatabankEntry;
 import se.dabox.service.common.ccbc.project.cddb.StandardDatabankEntry;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.publish.PublishProjectRequestBuilder;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.ComponentDataValue;
 import se.dabox.service.common.coursedesign.ComponentFieldName;
@@ -373,17 +374,7 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
 
         //Do not use the ccbc validator. That doesn't work since the relative events get demoted
         //to non mandatory fields which break the requirement to set date
-        upstage(cycle, project);
-        processAutoIcalChanges(cycle, project);
-
-        WebModuleRedirectRequestTarget target = NavigationUtil.
-                toProjectSecondaryData(cycle, project);
-
-        if (autoCall) {
-            target.setExtraTargetParameterString("auto=t");
-        }
-
-        return target;
+        return upstage(cycle, project);
     }
 
     private RequestTarget configureDataPage(RequestCycle cycle, OrgProject project,
@@ -460,12 +451,12 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
         return resp;
     }
 
-    private void upstage(RequestCycle cycle, OrgProject project) {
+    private RedirectUrlRequestTarget upstage(RequestCycle cycle, OrgProject project) {
         String url = cycle.urlFor(VerifyProjectDesignModule.class,
                 "productSettings",
                 Long.toString(project.getProjectId()));
 
-        throw new RetargetException(new RedirectUrlRequestTarget(url));
+        return new RedirectUrlRequestTarget(url);
     }
 
     private void saveDatabank(RequestCycle cycle, CocoboxCoordinatorClient ccbc, OrgProject project,
@@ -484,6 +475,12 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             databankId = ccbc.createCopyDatabank(LoginUserAccountHelper.getUserId(cycle), project.
                     getMasterDatabank());
             project.setStageDatabank(databankId);
+
+            long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+            UpdateProjectRequest updateReq
+                    = new UpdateProjectRequestBuilder(caller, project.getProjectId()).
+                    setStageDatabank(databankId).setUnstaged(true).createUpdateProjectRequest();
+            getCocoboxCordinatorClient(cycle).updateOrgProject(updateReq);
         } else {
             databankId = project.getStageDatabank();
         }
