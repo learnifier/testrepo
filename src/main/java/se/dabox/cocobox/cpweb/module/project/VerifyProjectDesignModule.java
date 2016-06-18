@@ -47,7 +47,9 @@ import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.cocosite.webmessage.WebMessage;
 import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
+import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.CcbcErrorCodes;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -212,10 +214,22 @@ public class VerifyProjectDesignModule extends AbstractProjectWebModule {
             reqBuilder.addProductSettings(pid, entry.getValue());
         }
 
-        getCocoboxCordinatorClient(cycle).publishProject(reqBuilder.build());
+        try {
+            getCocoboxCordinatorClient(cycle).publishProject(reqBuilder.build());
 
-        WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Publishing started",
-                WebMessageType.info));
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(
+                    "Publishing started",
+                    WebMessageType.info));
+
+        } catch (DwsServiceErrorCodeException codeEx) {
+            if (codeEx.getErrorCode() == CcbcErrorCodes.INVALID_STATE) {
+                WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage(
+                    "Unable to publish changes as this moment",
+                    WebMessageType.error));
+            } else {
+                throw codeEx;
+            }
+        }
 
         return NavigationUtil.toProjectPage(project.getProjectId());
     }
