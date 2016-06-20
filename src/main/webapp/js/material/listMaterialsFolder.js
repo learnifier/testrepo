@@ -158,10 +158,13 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                         }
                     },
                     "addAndEdit": function (data) {
+                        var win;
                         // Products is a list, but with at most one member
                         if(data.products instanceof Array && data.products.length > 0) {
+                            win = window.open('', "_blank");
                             createAndMove(data.products[0]).then(function (prodPath) {
-                                self.cocoboxListApi().runOp(prodPath, "edit");
+                                self.cocoboxListApi().refresh();
+                                self.cocoboxListApi().runOp(prodPath, "edit", win);
                             });
                         }
                     },
