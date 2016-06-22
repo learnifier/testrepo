@@ -51,10 +51,10 @@ ${cpweb_foot}
           </button>
           <ul class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
             <li><h4 class="text-center primaryColor">UPLOAD</h4></li>
-            [#if productTypes['audiofile']??]
+            [#if productTypes['audioplayer']??]
               <li data-bind="click: function(){addMaterial(['audioplayer']);}"><a href="#"><i class="pe-7s-volume pe-va pe-2x pe-fw"></i> Audio</a></li>
             [/#if]
-            [#if productTypes['file']??]
+            [#if productTypes['genericfile']??]
               <li data-bind="click: function(){addMaterial(['file']);}"><a href="#"><i class="pe-7s-news-paper pe-va pe-2x pe-fw"></i> Document</a></li>
             [/#if]
             [#if productTypes['image']??]
@@ -63,7 +63,7 @@ ${cpweb_foot}
             [#if productTypes['scorm']??]
               <li data-bind="click: function(){addMaterial(['scorm']);}"><a href="#"><i class="pe-7s-monitor pe-va pe-2x pe-fw"></i> Scorm (AICC/Tin Can)</a></li>
             [/#if]
-            [#if productTypes['videofile']??]
+            [#if productTypes['vimeo2video']??]
             <li data-bind="click: function(){addMaterial(['vimeo2video']);}"><a href="#"><i class="pe-7s-video pe-va pe-2x pe-fw"></i> Video</a></li>
             [/#if]
             <li data-bind="click: function(){addMaterial(['generic']);}" class="text-center" data-toggle="tooltip" data-placement="bottom" title="Upload different file types together at once"><a href="#"><small><em><i class="pe-7s-rocket pe-va pe-lg pe-fw primaryColor"></i> Quick upload...</small></em></a></li>
