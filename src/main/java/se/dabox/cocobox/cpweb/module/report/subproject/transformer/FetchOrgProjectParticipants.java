@@ -44,6 +44,11 @@ public class FetchOrgProjectParticipants implements Factory<List<SubprojectParti
         reqBuilder.withInError(false);
         reqBuilder.withProjectProduct(productId);
 
+        //We want to always get all participants for the organization we are in. Otherwise
+        //it will come out as an empty report for demo orgs for example (JK).
+        reqBuilder.withIncludeDemoOrgUnits(true);
+        reqBuilder.withIncludeDisabledOrgUnits(true);
+
         String afterKey = null;
         final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
         CocoboxCoordinatorClient ccbc
