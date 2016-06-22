@@ -198,7 +198,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             postDeleteErrorUrl: undefined,
             editMode: true,
         }, options);
-        ko.applyBindings(new ListMaterialModel());
+        ko.applyBindings(new ListMaterialModel(), $("#pagewrapper").get(0));
     };
 
     return exports;
