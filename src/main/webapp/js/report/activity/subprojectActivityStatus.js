@@ -1,4 +1,4 @@
-define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common'], function (longrun) {
+define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 'dataTables-buttons'], function (longrun) {
     "use strict";
 
     var exports = {};
@@ -46,9 +46,12 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common'],
 
         $("#r_report tbody").empty();
         $("#r_report").dataTable({
-            "dom": '<"row"<"col-sm-12"W>><"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>><"row"<"col-sm-12"l>>',
+            "dom": '<"row"<"col-sm-12"W>><"row"<"col-sm-6"f>><"row"<"col-sm-6"B>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>><"row"<"col-sm-12"l>>',
             "lengthMenu": [[10, 20, 50, 100, 1000, -1], [10, 20, 50, 100, 1000, "All"]],
             "pageLength": 10,
+            buttons: [
+                    'copy', 'excel', 'csv', 'pdf', 'print', 'colvis'
+            ],
             "deferRender": true,
             "data": data.list,
             "columnDefs": colDefs,
