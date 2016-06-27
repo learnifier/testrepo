@@ -3,7 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.course;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -18,7 +17,6 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;

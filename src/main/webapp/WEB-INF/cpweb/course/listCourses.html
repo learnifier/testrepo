@@ -5,10 +5,12 @@
     <script>
         $('#menu-courses').addClass('active');
 
-        var listCoursesAjaxSource = "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}";
-
-        require(["${contextPath}/js/project/listCourses.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-           //No initialization needed
+        require(["${contextPath}/js/course/listCourses.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+            s.init({
+                listCoursesAjaxSource: "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}",
+                newProjectUrl:  "${helper.urlFor('project.NewProjectModule','setup',[org.id])}",
+                spinnerUrl: "[@common.spinnerUrl /]"
+            });
         });
 
     </script>
@@ -35,8 +37,7 @@
             <tr>
                 <th></th>
                 <th>Course Name</th>
-                <th></th>
-                <th></th>
+                <th>Categories</th>
             </tr>
         </thead>
         <tbody>
