@@ -1,0 +1,119 @@
+[
+    {
+        "id": "chicken1",
+        "name": "Me and my chicken - Stockholm June",
+        "language": "sv",
+        "info": {
+            "description": "We go out and sound like chicken in Observatorielunden.",
+            "blurb": "Only for real birdlovers",
+            "trainer": [
+                {
+                    "name": "Dr Zoidberg",
+                    "thumbnail": "http://orig09.deviantart.net/fb31/f/2012/119/b/7/zoidberg_trace_by_deepfry3-d4y0wlc.png",
+                    "title": "Trainer"
+                }
+            ],
+            "dates": [
+                {
+                    "starts": "2016-06-24T12:00:00.000+0200",
+                    "ends": "2016-07-24T23:59:59.000+0200"
+                }
+            ],
+            "places": [
+                {
+                    "name": "Gnarly Burger",
+                    "location": "Gnarly Burger, Roslagsgatan, Stockholm, Sweden",
+                    "googlemaps": "https://www.google.se/maps/place/Gnarly+Burger/@59.3466509,18.0577577,17z/data=!4m5!3m4!1s0x0000000000000000:0xa504aa45f4e9215d!8m2!3d59.3466507!4d18.0599517?hl=en"
+                }
+            ]
+        },
+        "cost": {
+            "amount": "500.00",
+            "currency": "SEK"
+        },
+        "visibility": {
+            "show": true,
+            "mode": "visible",
+            "starts": "2016-06-01T00:00:00.000+0200",
+            "ends": "2016-07-01T00:00:00.000+0200"
+        },
+        "enrollment": {
+            "minimum": {
+                "show": true,
+                "amount": 1
+            },
+            "maximum": {
+                "show": true,
+                "amount": 20
+            },
+            "current": {
+                "show": true,
+                "amount": 20
+            },
+            "waitinglist": true,
+            "mode": "direct",
+            "starts": "2016-05-01T00:00:00.000+0200",
+            "ends": "2016-08-20T00:00:00.000+0200"
+        },
+        "disenrollment": {
+            "mode": "direct",
+            "starts": "2016-05-01T00:00:00.000+0200",
+            "ends": "2016-08-20T00:00:00.000+0200"
+        },
+        "participants": {
+            "individuals": {
+                "show": true,
+                "showPicture": true
+            }
+        },
+        "self": {
+            "enrollmentStatus": "unenrolled"
+        }
+    },
+    {
+        "id": "chicken2",
+        "name": "Me and my chicken - 北京 July",
+        "language": "zh",
+        "info": {
+            "description": "Kung Pao Chicken"
+        },
+        "cost": {
+        },
+        "visibility": {
+            "show": true,
+            "mode": "visible"
+        },
+        "enrollment": {
+            "minimum": {
+                "show": true,
+                "amount": null
+            },
+            "maximum": {
+                "show": false,
+                "amount": null
+            },
+            "current": {
+                "show": false,
+                "amount": 0
+            },
+            "waitinglist": true,
+            "mode": "direct",
+            "starts": null,
+            "ends": null
+        },
+        "disenrollment": {
+            "mode": "direct",
+            "starts": null,
+            "ends": null
+        },
+        "participants": {
+            "individuals": {
+                "show": false,
+                "showPicture": true
+            }
+        },
+        "self": {
+            "enrollmentStatus": "unenrolled"
+        }
+    }
+]

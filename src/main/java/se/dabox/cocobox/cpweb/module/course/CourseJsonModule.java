@@ -3,21 +3,23 @@
  */
 package se.dabox.cocobox.cpweb.module.course;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.common.ccbc.project.OrgProjectPredicates;
-import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
-import se.dabox.util.collections.CollectionsUtil;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,8 +49,28 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 
 //        ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects);
 
-        return jsonTarget(Collections.singletonMap("courses", Collections.emptyMap()));
+        // Temp
+//        public RequestTarget onCourses(RequestCycle cycle) throws JsonProcessingException, IOException {
+
+            String file = "/coursecatalog/courses.json";
+
+            final URL res = this.getClass().getResource(file);
+
+            byte[] data
+                    = IOUtils.toByteArray(res);
+
+            return json(data);
+        // end temp
+//        return jsonTarget(Collections.singletonMap("courses", Collections.emptyMap()));
     }
+
+    private RequestTarget json(byte[] data) { // Temporary test function
+        JsonRequestTarget target = AbstractCocositeJsModule.jsonTarget(data);
+        target.allowCrossDomain(true);
+
+        return target;
+    }
+
 
     @WebAction
     public RequestTarget onCourseInfo(RequestCycle cycle, String strCourseId)

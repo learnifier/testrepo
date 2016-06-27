@@ -1,0 +1,23 @@
+[
+    {
+        "id": "k1",
+        "name": "Chicken Behaviour and Welfare",
+        "description": "This course explains the general principles of chicken behaviour and welfare, and the behavioural and physiological indicators that can be used to assess welfare in chickens kept in hobby flocks through to commercial farms. The focus is primarily on laying hens and meat chickens (broilers) although many of the principles are relevant to other types of poultry. The course is likely to be of interest to people who own chickens as pets or keep a small hobby flock, commercial egg and chicken meat producers, veterinarians and vet nurses. <br/><br/>Learning Objectives: at the end of this course, you will be able to -<br/>- Describe avian sensory perception and motivation<br/>- Explain the main behaviour patterns of poultry<br/>- Define welfare and explain the bases of welfare standards<br/>- Assess chicken welfare, using behavioural and physiological means<br/>- Understand common welfare problems of chickens<br/><br/>This course is taught by staff from Scotland's Rural College (SRUC), University of Glasgow, and St David's Poultry Team.<br/><br/>You can follow us on Twitter!  #chickenmooc<br/><br/>© University of Edinburgh and Scotland's Rural College 2016 CC BY",
+        "categories": ["c05", "c04"],
+        "thumbnail": "http://www.mypetchicken.com/images/product_images/Popup/MyPetChicken-Harness.jpg"
+    },
+    {
+        "id": "k2",
+        "name": "Dog Emotion and Cognition",
+        "description": "Dog Emotion and Cognition will introduce you to the exciting new study of dog psychology, what the latest discoveries tell us about how dogs think and feel about us, and how we can use this new knowledge to further strengthen our relationship with our best friends.",
+        "categories": ["c05"],
+        "thumbnail": "http://r.ddmcdn.com/s_f/o_1/cx_633/cy_0/cw_1725/ch_1725/w_720/APL/uploads/2014/11/too-cute-doggone-it-video-playlist.jpg"
+    },
+    {
+        "id": "k3",
+        "name": "An Introduction to Interactive Programming in Python (Part 1)",
+        "description": "This two-part course is designed to help students with very little or no computing background learn the basics of building simple interactive applications. Our language of choice, Python, is an easy-to learn, high-level computer language that is used in many of the computational courses offered on Coursera. To make learning Python easy, we have developed a new browser-based programming environment that makes developing interactive applications in Python simple. These applications will involve windows whose contents are graphical and respond to buttons, the keyboard and the mouse.<br/><br/>In part 1 of this course, we will introduce the basic elements of programming (such as expressions, conditionals, and functions) and then use these elements to create simple interactive applications such as a digital stopwatch.  Part 1 of this class will culminate in building a version of the classic arcade game \"Pong\".  <br/><br/>Recommended Background - A knowledge of high school mathematics is required. While the class is designed for students with no prior programming experience, some beginning programmers have viewed the class as being fast-paced. For students interested in some light preparation prior to the start of class, we recommend a self-paced Python learning site such as codecademy.com. <iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/YgtL4S7Hrwo\" frameborder=\"0\" allowfullscreen></iframe>",
+        "categories": ["c01"],
+        "thumbnail": "https://ee5817f8e2e9a2e34042-3365e7f0719651e5b8d0979bce83c558.ssl.cf5.rackcdn.com/python.png"
+    }
+]

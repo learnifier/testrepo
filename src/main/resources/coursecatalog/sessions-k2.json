@@ -1,0 +1,144 @@
+[
+    {
+        "id": "dog1",
+        "name": "Jönköping",
+        "language": "sv",
+        "info": {
+            "description": "Du kommer förstå din hund till HUNDra",
+            "blurb": "Woof woof",
+            "trainer": [
+                {
+                    "name": "Fry",
+                    "thumbnail": "http://i0.kym-cdn.com/entries/icons/facebook/000/006/026/futuramafry.jpg",
+                    "title": "Cast member"
+                }
+            ],
+            "dates": [
+                {
+                    "starts": "2016-07-01T14:00:00.000+0200",
+                    "ends": "2016-07-01T20:00:00.000+0200"
+                }
+            ],
+            "places": [
+                {
+                    "name": "Pizzerian",
+                    "location": "Pizzeria Prima, Jönköping, Sweden",
+                    "googlemaps": "https://www.google.se/maps/place/Pizzeria+Prima+i+J%C3%B6nk%C3%B6ping+AB/@57.7586357,14.1570272,13z/data=!4m8!1m2!2m1!1zcGl6emVyaWEgasO2bmvDtnBpbmc!3m4!1s0x465a6d95c23defcf:0xfcc4d89ee9bb4263!8m2!3d57.7816174!4d14.1784039?hl=en"
+                }
+            ]
+        },
+        "cost": {
+            "amount": "2500.00",
+            "currency": "SEK"
+        },
+        "visibility": {
+            "show": true,
+            "mode": "visible",
+            "starts": "2016-06-01T00:00:00.000+0200",
+            "ends": "2016-07-15T00:00:00.000+0200"
+        },
+        "enrollment": {
+            "minimum": {
+                "show": false,
+                "amount": 1
+            },
+            "maximum": {
+                "show": true,
+                "amount": 10
+            },
+            "current": {
+                "show": true,
+                "amount": 3
+            },
+            "waitinglist": false,
+            "mode": "direct",
+            "starts": null,
+            "ends": "2016-06-28T00:00:00.000+0200"
+        },
+        "disenrollment": {
+            "mode": "direct",
+            "starts": null,
+            "ends": "2016-06-28T00:00:00.000+0200"
+        },
+        "participants": {
+            "individuals": {
+                "show": false,
+                "showPicture": true
+            }
+        },
+        "self": {
+            "enrollmentStatus": "enrolled"
+        }
+    },
+    {
+        "id": "dog2",
+        "name": "Jönköping",
+        "language": "sv",
+        "info": {
+            "description": "Du kommer förstå din hund till HUNDra",
+            "blurb": "Woof woof",
+            "trainer": [
+                {
+                    "name": "Fry",
+                    "thumbnail": "http://i0.kym-cdn.com/entries/icons/facebook/000/006/026/futuramafry.jpg",
+                    "title": "Cast member"
+                }
+            ],
+            "dates": [
+                {
+                    "starts": "2016-08-01T14:00:00.000+0200",
+                    "ends": "2016-08-01T20:00:00.000+0200"
+                }
+            ],
+            "places": [
+                {
+                    "name": "Pizzerian",
+                    "location": "Pizzeria Prima, Jönköping, Sweden",
+                    "googlemaps": "https://www.google.se/maps/place/Pizzeria+Prima+i+J%C3%B6nk%C3%B6ping+AB/@57.7586357,14.1570272,13z/data=!4m8!1m2!2m1!1zcGl6emVyaWEgasO2bmvDtnBpbmc!3m4!1s0x465a6d95c23defcf:0xfcc4d89ee9bb4263!8m2!3d57.7816174!4d14.1784039?hl=en"
+                }
+            ]
+        },
+        "cost": {
+            "amount": "2500.00",
+            "currency": "SEK"
+        },
+        "visibility": {
+            "show": true,
+            "mode": "visible",
+            "starts": "2016-07-01T00:00:00.000+0200",
+            "ends": "2016-08-15T00:00:00.000+0200"
+        },
+        "enrollment": {
+            "minimum": {
+                "show": false,
+                "amount": 1
+            },
+            "maximum": {
+                "show": true,
+                "amount": 10
+            },
+            "current": {
+                "show": true,
+                "amount": 0
+            },
+            "waitinglist": false,
+            "mode": "direct",
+            "starts": null,
+            "ends": "2016-07-28T00:00:00.000+0200"
+        },
+        "disenrollment": {
+            "mode": "direct",
+            "starts": null,
+            "ends": "2016-07-28T00:00:00.000+0200"
+        },
+        "participants": {
+            "individuals": {
+                "show": false,
+                "showPicture": true
+            }
+        },
+        "self": {
+            "enrollmentStatus": "enrolled"
+        }
+    }
+]
