@@ -33,8 +33,11 @@ ${cpweb_foot}
                     Info will appear here
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" data-bind="click: addAndClose, enable: anySelectedFiles()">
+                    <button class="btn btn-primary" id="courseModalSave">
                         <span class="glyphicon glyphicon-plus-sign"></span> Save
+                    </button>
+                    <button class="btn btn-primary" id="courseModalClose">
+                        Close
                     </button>
                 </div>
             </div><!-- /.modal-content -->

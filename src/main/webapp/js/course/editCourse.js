@@ -14,8 +14,16 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     });
 
     $(document).ready(function(){
-        console.log("editCourse: ", $(".modal"));
-        // $(".modal")
+        $(".modal button.close").click(function(){
+            imodalClient.close();
+        });
+        $(".modal button#courseModalClose").click(function(){
+            imodalClient.close();
+        });
+        $(".modal button#courseModalSave").click(function(){
+            console.log("And we are saving");
+            imodalClient.close();
+        });
         $(".modal").show();
 
     });
