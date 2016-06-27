@@ -62,6 +62,26 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 //        return jsonTarget(Collections.singletonMap("courses", Collections.emptyMap()));
     }
 
+    @WebAction
+    public RequestTarget onListSessions(RequestCycle cycle, String strOrgId, String strCourseId)
+            throws Exception {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+//        long courseId = Long.c(strCourseId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+
+        String file = "/coursecatalog/sessions-" + strCourseId + ".json";
+
+        final URL res = this.getClass().getResource(file);
+
+        byte[] data
+                = IOUtils.toByteArray(res);
+
+        return json(data);
+    }
+
     private RequestTarget json(byte[] data) { // Temporary test function
         JsonRequestTarget target = AbstractCocositeJsModule.jsonTarget(data);
         target.allowCrossDomain(true);

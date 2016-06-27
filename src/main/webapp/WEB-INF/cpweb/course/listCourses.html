@@ -8,6 +8,7 @@
         require(["${contextPath}/js/course/listCourses.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
             s.init({
                 listCoursesAjaxSource: "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}",
+                listSessionsAjaxSource: "${helper.urlFor('course.CourseJsonModule','listSessions',[org.id])}",
                 newProjectUrl:  "${helper.urlFor('project.NewProjectModule','setup',[org.id])}",
                 spinnerUrl: "[@common.spinnerUrl /]"
             });
