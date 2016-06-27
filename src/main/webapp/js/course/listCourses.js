@@ -7,6 +7,20 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
 
     var settings;
 
+    function openModal(imodalId, url){
+        // TODO: Not sure what to share between calls here
+        var imodal = new ccbImodal.Server({
+            serviceName: imodalId,
+            url: url,
+            callbacks: {
+                "close": function(data) {
+                    console.log("Close lol");
+                }
+            }
+        });
+        imodal.open();
+    }
+
     exports.init = function(options) {
 
         settings = $.extend({
@@ -28,26 +42,11 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     tbody
                         .append($('<tr />')
                             .append($('<td />')
-                                .append($('<a />', {href: "#"})
-                                    .on("click", function(e){
-                                        e.preventDefault();
-                                        var imodal = new ccbImodal.Server({
-                                            serviceName: "courseSession",
-                                            url: settings.sessionDetails + "/" + item.id,
-                                            callbacks: {
-                                                "close": function(data) {
-                                                }
-                                            }
-                                        });
-                                        imodal.open();
-                                        console.log("Click...", item);
-                                    })
+                                .append($('<a />', {href: settings.sessionDetails + "/" + "1212"})
                                     .text(item.name))));
                 });
-
                 deferred.resolve(table);
             });
-
             return deferred.promise();
         }
 
@@ -65,7 +64,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "orderable": false,
                             "width": "32px",
                             "data" : function(row, type, set) {
-                                row.imagelinkDisplay = '<a href="'+ "#" + '"><img width="32" src="'+row.thumbnail+'" /></a> ';
+                                row.imagelinkDisplay = '<a class="courseLink" href="'+ "#" + '"><img width="32" src="'+row.thumbnail+'" /></a>';
 
                                 if (type === 'display') {
                                     return row.imagelinkDisplay;
@@ -86,7 +85,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "data": function (row, type, set) {
                                 if (!row.nameDisplay | !row.nameFilter) {
                                     row.nameFilter = row.name + ' ' + row.id;
-                                    row.nameDisplay = '<a href="' + row.link + '">' + row.name + '</a> ';
+                                    row.nameDisplay = '<a data-courseid="' + row.id + '" class="courseLink" href="' + row.link + '">' + row.name + '</a> ';
+
                                 }
 
                                 if (type === 'display') {
@@ -126,6 +126,12 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 });
                 // Array to track the ids of the details displayed rows
                 var detailRows = [];
+
+                $(document).on('click', '.courseLink', function(e){
+                    var id = $(this).data("courseid");
+                    e.preventDefault();
+                    openModal("course", settings.courseDetails + "/" + id);
+                });
 
                 $('#listcourses').on( 'click', 'tr td.details-control', function () {
                     var tr = $(this).closest('tr');

@@ -1,1 +1,48 @@
-Edit/view course will appear here
+[#ftl strip_text="true" /]
+
+[#assign cpweb_head]
+${cpweb_head}
+[/#assign]
+
+[#assign cpweb_foot]
+${cpweb_foot}
+
+<script>
+    $('#menu-courses').addClass('active');
+
+    require(["${contextPath}/js/course/editCourse.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+        s.init({
+        });
+    });
+
+</script>
+
+[/#assign]
+
+[@dws.skin skin="bootstrap_barebone" head=cpweb_head foot=cpweb_foot]
+
+<div class="modal-open">
+    <div class="modal" style="padding-left: 0px;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button data-bind="click: closer" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">View/Edit Course</h4>
+                </div>
+                <div class="modal-body" style="padding: 15px 0;">
+                    Info will appear here
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bind="click: addAndClose, enable: anySelectedFiles()">
+                        <span class="glyphicon glyphicon-plus-sign"></span> Save
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+</div>
+
+<div class="modal-backdrop fade-in"></div>
+
+[/@dws.skin]
