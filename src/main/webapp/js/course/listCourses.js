@@ -1,7 +1,7 @@
 /* 
  * (c) Dabox AB 2013 All Rights Reserved
  */
-define([], function() {
+define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     "use strict";
     var exports = {};
 
@@ -10,13 +10,50 @@ define([], function() {
     exports.init = function(options) {
 
         settings = $.extend({
-            listCoursesAjaxSource: undefined,
-            newProjectUrl: undefined
+            listCoursesUrl: undefined,
+            listSessionsUrl: undefined,
+            newProjectUrl: undefined,
+            courseDetails: undefined,
+            sessionDetails: undefined
         }, options || {});
+
+        function formatSession ( d ) {
+            var deferred = $.Deferred();
+
+            $.ajax(settings.listSessionsUrl + "/" + d.id).done(function(data){
+                console.log("listSessions: ", data);
+                var table = $('<table/>', { "class": "lol"}),
+                    tbody = $('<tbody>').appendTo(table);
+                data.forEach(function(item){
+                    tbody
+                        .append($('<tr />')
+                            .append($('<td />')
+                                .append($('<a />', {href: "#"})
+                                    .on("click", function(e){
+                                        e.preventDefault();
+                                        var imodal = new ccbImodal.Server({
+                                            serviceName: "courseSession",
+                                            url: settings.sessionDetails + "/" + item.id,
+                                            callbacks: {
+                                                "close": function(data) {
+                                                }
+                                            }
+                                        });
+                                        imodal.open();
+                                        console.log("Click...", item);
+                                    })
+                                    .text(item.name))));
+                });
+
+                deferred.resolve(table);
+            });
+
+            return deferred.promise();
+        }
 
         $(document).ready(function () {
             require(['dataTables-bootstrap'], function () {
-                $('#listcourses').dataTable({
+                var dt = $('#listcourses').DataTable({
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                     "order": [[1, 'asc']],
                     "initComplete": function () {
@@ -67,9 +104,16 @@ define([], function() {
                         {
                             "targets": [2],
                             "data": "categories"
+                        },
+                        {
+                            "targets": [3],
+                            "class":          "details-control",
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ""
                         }
                     ],
-                    "ajax": settings.listCoursesAjaxSource,
+                    "ajax": settings.listCoursesUrl,
                     "pageLength": 25,
                     "pagingType": "full_numbers",
                     "deferRender": true,
@@ -80,7 +124,45 @@ define([], function() {
                         "loadingRecords": "<p>Loading courses...</p><img src='" + settings.spinnerUrl + "' />"
                     }
                 });
+                // Array to track the ids of the details displayed rows
+                var detailRows = [];
+
+                $('#listcourses').on( 'click', 'tr td.details-control', function () {
+                    var tr = $(this).closest('tr');
+                    var row = dt.row( tr );
+                    var idx = $.inArray( tr.attr('id'), detailRows );
+
+                    if ( row.child.isShown() ) {
+                        tr.removeClass( 'details' );
+                        row.child.hide();
+
+                        // Remove from the 'open' array
+                        detailRows.splice( idx, 1 );
+                    }
+                    else {
+                        tr.addClass( 'details' );
+
+                        // row.child( formatLoading( row.data() ) ).show();
+                        formatSession(row.data()).done(function(res){
+                            row.child(res).show();
+                        });
+
+                        // Add to the 'open' array
+                        if ( idx === -1 ) {
+                            detailRows.push( tr.attr('id') );
+                        }
+                    }
+                } );
+                // On each draw, loop over the detailRows array and show any child rows
+                dt.on( 'draw', function () {
+                    $.each( detailRows, function ( i, id ) {
+                        $('#'+id+' td.details-control').trigger( 'click' );
+                    } );
+                } );
             });
+
+
+
         });
     };
     return exports;
