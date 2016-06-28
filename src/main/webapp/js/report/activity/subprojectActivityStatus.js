@@ -27,7 +27,20 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
                 a.append(data);
                 $(td).html(a);
             }
+        },
+        {
+            "targets": [colCount++],
+            "data": "completedPercent",
+            "title": "Completed",
+            "render": function(data, type, row) {
+                if (type === "display") {
+                    return row.completed + " of " + row.activity.length;
+                }
+
+                return data;
+            }
         }
+
     ];
 
     var extraColsStart = colCount;
@@ -38,6 +51,7 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
     var initTable = function (data) {
         console.log("init would take place here");
 
+        createSummaryColumn(data);
         addActivityColumns(data.list);
         addFullActivityArray(data.list);
         initFooter();
@@ -162,6 +176,38 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
                 }
             }
         });
+    };
+
+    var createSummaryColumn = function(data) {
+        for (var i = 0; i < data.list.length; i++) {
+            var row = data.list[i];
+
+            var completed = countCompleted(row);
+
+            var percent = 0;
+
+            if (row.activity.length > 0) {
+                percent = completed / row.activity.length;
+            }
+
+            row.completed = completed;
+            row.completedPercent = percent;
+        }
+    };
+
+    var countCompleted = function(row) {
+        var comp = 0;
+        for (var i = 0; i < row.activity.length; i++) {
+            var act = row.activity[i];
+
+            var st = act.extendedStatus;
+
+            if (st === "completed" || st === "failed" || st === "passed") {
+                comp++;
+            }
+        }
+
+        return comp;
     };
 
     exports.init = function (opts) {
