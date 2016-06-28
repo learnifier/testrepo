@@ -109,7 +109,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "targets": [3],
                             "class":          "details-control",
                             "orderable":      false,
-                            "data":           null,
+                            "data":           function(){return '<span class="menu-icon one pe-7s-home pe-lg pe-va primaryColor"></span>'},
                             "defaultContent": ""
                         }
                     ],
@@ -137,16 +137,21 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     var tr = $(this).closest('tr');
                     var row = dt.row( tr );
                     var idx = $.inArray( tr.attr('id'), detailRows );
+                    var span = tr.find("span");
 
                     if ( row.child.isShown() ) {
-                        tr.removeClass( 'details' );
+                        // tr.removeClass( 'details' );
+                        span.addClass( 'pe-7s-home' );
+                        span.removeClass( 'pe-7s-graph1' );
                         row.child.hide();
 
                         // Remove from the 'open' array
                         detailRows.splice( idx, 1 );
                     }
                     else {
-                        tr.addClass( 'details' );
+                        // tr.addClass( 'details' );
+                        span.removeClass( 'pe-7s-home' );
+                        span.addClass( 'pe-7s-graph1' );
 
                         // row.child( formatLoading( row.data() ) ).show();
                         formatSession(row.data()).done(function(res){
