@@ -27,8 +27,9 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
             listCoursesUrl: undefined,
             listSessionsUrl: undefined,
             newProjectUrl: undefined,
-            courseDetails: undefined,
-            sessionDetails: undefined
+            newCourseUrl: undefined,
+            courseDetailsUrl: undefined,
+            sessionDetailsUrl: undefined
         }, options || {});
 
         function formatSession ( d ) {
@@ -42,7 +43,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     tbody
                         .append($('<tr />')
                             .append($('<td />')
-                                .append($('<a />', {href: settings.sessionDetails + "/" + "1212"})
+                                .append($('<a />', {href: settings.sessionDetailsUrl + "/" + "1212"})
                                     .text(item.name))));
                 });
                 deferred.resolve(table);
@@ -130,8 +131,14 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 $(document).on('click', '.courseLink', function(e){
                     var id = $(this).data("courseid");
                     e.preventDefault();
-                    openModal("course", settings.courseDetails + "/" + id);
+                    openModal("course", settings.courseDetailsUrl + "/" + id);
                 });
+
+                $("#addcourse-btn").click(function(e){
+                    e.preventDefault();
+                    openModal("course", settings.newCourseUrl);
+                });
+
 
                 $('#listcourses').on( 'click', 'tr td.details-control', function () {
                     var tr = $(this).closest('tr');
