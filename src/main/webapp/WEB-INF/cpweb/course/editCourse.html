@@ -12,6 +12,9 @@ ${cpweb_foot}
 
     require(["${contextPath}/js/course/editCourse.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         s.init({
+            saveCourseUrl: "${helper.urlFor('course.CourseJsonModule','saveCourse')}",
+            createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse')}",
+            courseId: "${courseId!''}"
         });
     });
 

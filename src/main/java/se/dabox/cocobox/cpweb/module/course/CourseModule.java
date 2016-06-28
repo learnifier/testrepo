@@ -68,4 +68,5 @@ public class CourseModule extends AbstractProjectWebModule {
         Map<String, Object> map = createMap();
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
+
 }

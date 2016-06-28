@@ -12,14 +12,18 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.ParamUtil;
 
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+
+import static se.dabox.service.common.ccbc.participation.filter.FilterParticipationSortField.id;
 
 /**
  *
@@ -97,6 +101,23 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 
 //        return jsonTarget(Collections.singletonMap("members", uas.size()));
         return jsonTarget(Collections.singletonMap("course", Collections.emptyMap()));
+    }
+
+    @WebAction
+    public RequestTarget onSaveCourse(RequestCycle cycle, String strCourseId) {
+        ParamUtil.required(strCourseId, "strCourseId");
+        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
+        final String description = cycle.getRequest().getParameter("description");
+
+        return jsonTarget(Collections.singletonMap("status", "ok"));
+    }
+
+    @WebAction
+    public RequestTarget onCreateCourse(RequestCycle cycle) {
+        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
+        final String description = cycle.getRequest().getParameter("description");
+
+        return jsonTarget(Collections.singletonMap("status", "ok"));
     }
 
 

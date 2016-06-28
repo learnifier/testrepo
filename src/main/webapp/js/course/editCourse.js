@@ -19,6 +19,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
     });
 
     function CourseModel() {
+        var self = this;
+
         this.name = ko.observable("lolname");
         this.description = ko.observable("loldesc");
 
@@ -27,7 +29,24 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         };
 
         this.save = function(){
+            var url;
+
             imodalClient.close();
+
+            if(settings.courseId) {
+                url = settings.saveCourseUrl + "/" + settings.courseId;
+            } else {
+                url = settings.createCourseUrl;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    name: self.name,
+                    description: self.description
+                }
+            })
         };
 
         this.validate = function(){
