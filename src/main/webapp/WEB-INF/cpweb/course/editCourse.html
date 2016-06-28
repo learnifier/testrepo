@@ -30,20 +30,22 @@ ${cpweb_foot}
                     <h4 class="modal-title">View/Edit Course</h4>
                 </div>
                 <div class="modal-body" style="padding: 15px 0;">
-                    Info will appear here
+                    <label for="courseName">Name</label>
+                    <input id="courseName" type="text" data-bind="textInput: name" class="form-control">
+                    <label for="courseDescription">Description</label>
+                    <input id="courseDescription" type="text" data-bind="textInput: description" class="form-control">
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="courseModalSave">
+                    <button data-bind="click: save, enable: validate()" class="btn btn-primary" id="courseModalSave">
                         <span class="glyphicon glyphicon-plus-sign"></span> Save
                     </button>
-                    <button class="btn btn-primary" id="courseModalClose">
+                    <button data-bind="click: closer" class="btn btn-primary" id="courseModalClose">
                         Close
                     </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div>
-
 </div>
 
 <div class="modal-backdrop fade-in"></div>

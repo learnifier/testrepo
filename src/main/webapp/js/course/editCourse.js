@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2016 All Rights Reserved
  */
-define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
+define(['knockout', 'cocobox/ccb-imodal', 'es6-shim'], function(ko, ccbImodal) {
     "use strict";
     var exports = {}, settings, imodalClient;
 
@@ -14,22 +14,31 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     });
 
     $(document).ready(function(){
-        $(".modal button.close").click(function(){
-            imodalClient.close();
-        });
-        $(".modal button#courseModalClose").click(function(){
-            imodalClient.close();
-        });
-        $(".modal button#courseModalSave").click(function(){
-            console.log("And we are saving");
-            imodalClient.close();
-        });
         $(".modal").show();
 
     });
+
+    function CourseModel() {
+        this.name = ko.observable("lolname");
+        this.description = ko.observable("loldesc");
+
+        this.closer = function(){
+            imodalClient.close();
+        };
+
+        this.save = function(){
+            imodalClient.close();
+        };
+
+        this.validate = function(){
+            return this.name();
+        };
+    }
+
+    var courseModel = new CourseModel();
+    ko.applyBindings(courseModel);
+
     return exports;
-
-
 
 });
 

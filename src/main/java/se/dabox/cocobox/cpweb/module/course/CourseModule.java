@@ -58,33 +58,14 @@ public class CourseModule extends AbstractProjectWebModule {
 
     @WebAction
     public RequestTarget onEditCourse(RequestCycle cycle, String strCourseId) {
-
-//        OrgProject project =
-//                getProject(cycle, courseId);
-//
-//        checkPermission(cycle, course);
-//        checkCoursePermission(cycle, course, CocoboxPermissions.CP_VIEW_PROJECT);
-
         Map<String, Object> map = createMap();
-
-//        addCommonMapValues(map, project, cycle);
-
+        map.put("courseId", strCourseId);
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
 
     @WebAction
-    public RequestTarget onEditSession(RequestCycle cycle, String strCourseId, String strSessionId) {
-
-//        OrgProject project =
-//                getProject(cycle, courseId);
-//
-//        checkPermission(cycle, course);
-//        checkCoursePermission(cycle, course, CocoboxPermissions.CP_VIEW_PROJECT);
-
+    public RequestTarget onCreateCourse(RequestCycle cycle) {
         Map<String, Object> map = createMap();
-
-//        addCommonMapValues(map, project, cycle);
-
-        return new FreemarkerRequestTarget("/course/editSession.html", map);
+        return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
 }
