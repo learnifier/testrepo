@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2016 All Rights Reserved
  */
-define(['knockout', 'cocobox/ccb-imodal', 'es6-shim'], function(ko, ccbImodal) {
+define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knockout-bindings'], function(ko, ccbImodal) {
     "use strict";
     var exports = {}, settings, imodalClient;
 

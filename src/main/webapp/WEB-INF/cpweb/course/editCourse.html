@@ -31,9 +31,9 @@ ${cpweb_foot}
                 </div>
                 <div class="modal-body" style="padding: 15px 0;">
                     <label for="courseName">Name</label>
-                    <input id="courseName" type="text" data-bind="textInput: name" class="form-control">
+                    <input id="courseName" type="text" data-bind="textInput: name" class="form-control" tabindex="2">
                     <label for="courseDescription">Description</label>
-                    <input id="courseDescription" type="text" data-bind="textInput: description" class="form-control">
+                    <div id="courseDescription" contenteditable data-bind="value: description, ccbCKEditable: description, ccbCKEditableMode: 'classic'" tabindex="2"></div>
                 </div>
                 <div class="modal-footer">
                     <button data-bind="click: save, enable: validate()" class="btn btn-primary" id="courseModalSave">
