@@ -95,7 +95,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 
 
     @WebAction
-    public RequestTarget onCourseInfo(RequestCycle cycle, String strCourseId)
+    public RequestTarget onCourse(RequestCycle cycle, String strCourseId)
             throws Exception {
 //        checkPermission(cycle, strCourseId);
 

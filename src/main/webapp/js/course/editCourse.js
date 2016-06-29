@@ -5,24 +5,32 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
     "use strict";
     var exports = {}, settings, imodalClient;
 
-    exports.init = function(options) {
-        settings = $.extend({
-        }, options || {});
-    };
     imodalClient = new ccbImodal.Client({
         serviceName: "course"
     });
 
     $(document).ready(function(){
-        $(".modal").show();
-
+        $(".modal").show(); 
     });
 
     function CourseModel() {
         var self = this;
 
-        this.name = ko.observable("lolname");
-        this.description = ko.observable("loldesc");
+        console.log("Init coursemodel: ", settings);
+        this.initializing = ko.observable(true);
+        this.name = ko.observable();
+        this.description = ko.observable();
+
+        if(settings.courseId) {
+            $.getJSON(settings.getCourseUrl + "/" + settings.courseId).done(function(data){
+                console.log("Read data: ", data);
+                self.name("fake name");
+                self.description("fake description");
+                self.initializing(true);
+            });
+        } else {
+            self.initializing(true);
+        }
 
         this.closer = function(){
             imodalClient.close();
@@ -54,8 +62,20 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         };
     }
 
-    var courseModel = new CourseModel();
-    ko.applyBindings(courseModel);
+    exports.init = function(options) {
+        settings = $.extend({
+            getCourseUrl: undefined,
+            saveCourseUrl: undefined,
+            createCourseUrl: undefined,
+            courseId: undefined
+        }, options || {});
+
+        console.log("");
+        var courseModel = new CourseModel();
+        ko.applyBindings(courseModel);
+
+    };
+
 
     return exports;
 

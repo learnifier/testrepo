@@ -11,7 +11,9 @@ ${cpweb_foot}
     $('#menu-courses').addClass('active');
 
     require(["${contextPath}/js/course/editCourse.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+        console.log("html: ", s);
         s.init({
+            getCourseUrl: "${helper.urlFor('course.CourseJsonModule','course')}",
             saveCourseUrl: "${helper.urlFor('course.CourseJsonModule','saveCourse')}",
             createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse')}",
             courseId: "${courseId!''}"
