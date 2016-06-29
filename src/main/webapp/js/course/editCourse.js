@@ -10,7 +10,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
     });
 
     $(document).ready(function(){
-        $(".modal").show(); 
+        $(".modal").show();
     });
 
     function CourseModel() {
@@ -24,8 +24,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         if(settings.courseId) {
             $.getJSON(settings.getCourseUrl + "/" + settings.courseId).done(function(data){
                 console.log("Read data: ", data);
-                self.name("fake name");
-                self.description("fake description");
+                self.name(data.name);
+                self.description(data.description);
                 self.initializing(true);
             });
         } else {

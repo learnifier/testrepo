@@ -100,7 +100,14 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 //        checkPermission(cycle, strCourseId);
 
 //        return jsonTarget(Collections.singletonMap("members", uas.size()));
-        return jsonTarget(Collections.singletonMap("course", Collections.emptyMap()));
+        String file = "/coursecatalog/course-" + strCourseId + ".json";
+
+        final URL res = this.getClass().getResource(file);
+
+        byte[] data
+                = IOUtils.toByteArray(res);
+
+        return json(data);
     }
 
     @WebAction
