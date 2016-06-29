@@ -236,7 +236,11 @@ ${cpweb_foot}
 
         <li id="language">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.settings.language.title" /]</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.name.title" /]</span>
+                <span class="short editable-content">${prj.locale.getDisplayName(userLocale)?xhtml}</span>
+            </span>
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.information.title" /]</span>
                 <span class="short editable-content">${prj.locale.getDisplayName(userLocale)?xhtml}</span>
             </span>
         </li>
