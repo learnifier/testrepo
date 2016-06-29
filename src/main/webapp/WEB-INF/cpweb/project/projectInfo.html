@@ -149,6 +149,10 @@
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <li class="[#if selected == 'settings']active[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             [/@]
+
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+            <li class="[#if selected == 'session']active[/#if]"><a href="${helper.urlFor('ProjectModule','session',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.session' /]</span></a></li>
+            [/@]
         </ul>
     </nav>
     </div>

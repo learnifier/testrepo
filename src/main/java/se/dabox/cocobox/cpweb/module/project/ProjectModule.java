@@ -581,6 +581,23 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     @WebAction
+    public RequestTarget onSession(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Map<String, Object> map = createMap();
+
+        map.put("formsess", getValidationSession(ChangePassword.class, cycle));
+        map.put("formLink", "");
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/projectSession.html", map);
+    }
+
+    @WebAction
     public RequestTarget onRoles(RequestCycle cycle, String projectId) {
         OrgProject project =
                 getProject(cycle, projectId);
