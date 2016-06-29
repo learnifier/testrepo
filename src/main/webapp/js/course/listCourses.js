@@ -15,6 +15,12 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
             callbacks: {
                 "close": function(data) {
                     console.log("Close lol");
+                },
+                "createDone": function(data){
+                    console.log("CreateDone: ", data);
+                },
+                "saveDone": function(data){
+                    console.log("SaveDone: ", data);
                 }
             }
         });

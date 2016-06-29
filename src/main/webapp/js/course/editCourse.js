@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2016 All Rights Reserved
  */
-define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knockout-bindings'], function(ko, ccbImodal) {
+define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knockout-bindings', 'messenger'], function(ko, ccbImodal) {
     "use strict";
     var exports = {}, settings, imodalClient;
 
@@ -39,7 +39,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         this.save = function(){
             var url;
 
-            imodalClient.close();
 
             if(settings.courseId) {
                 url = settings.saveCourseUrl + "/" + settings.courseId;
@@ -54,7 +53,15 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                     name: self.name,
                     description: self.description
                 }
-            })
+            }).done(function(data){
+                if(settings.courseId) {
+                    imodalClient.send("saveDone");
+                } else {
+                    imodalClient.send("createDone", {"forwardUrl": settings.newSessionUrl + "?courseId=" + 1011}); // TODO: Extract courseId from data once it is implemented
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                CCBMessengerError("Error when saving course: ", textStatus);
+            });
         };
 
         this.validate = function(){

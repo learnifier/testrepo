@@ -57,16 +57,19 @@ public class CourseModule extends AbstractProjectWebModule {
 
 
     @WebAction
-    public RequestTarget onEditCourse(RequestCycle cycle, String strCourseId) {
+    public RequestTarget onEditCourse(RequestCycle cycle, String strOrgId, String strCourseId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Map<String, Object> map = createMap();
+        map.put("org", org);
         map.put("courseId", strCourseId);
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
 
     @WebAction
-    public RequestTarget onCreateCourse(RequestCycle cycle) {
+    public RequestTarget onCreateCourse(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Map<String, Object> map = createMap();
+        map.put("org", org);
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
-
 }
