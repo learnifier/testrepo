@@ -43,10 +43,10 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     tbody
                         .append($('<tr />')
                             .append($('<td />')
-                                .append($('<a />', {href: settings.sessionDetailsUrl + "/" + "1212"})
+                                .append($('<a />', {href: settings.sessionDetailsUrl + "/" + "1212"}) // TODO: Add project ID here once it is available
                                     .text(item.name))));
                 });
-                tbody.append($("<a />", {"class": "btn btn-primary", "href": settings.newSessionUrl}).text("Add Session"));
+                tbody.append($("<a />", {"class": "btn btn-primary", "href": settings.newSessionUrl + "?courseId=" + d.id}).text("Add Session"));
 
                 deferred.resolve(table);
             });
