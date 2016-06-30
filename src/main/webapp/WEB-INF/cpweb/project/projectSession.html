@@ -8,9 +8,9 @@ ${cpweb_head}
 <!--[if lt IE 9]>
 <style>
 
-.toggle-button input {
-    position: static; !important
-}
+    .toggle-button input {
+        position: static; !important
+    }
 
 </style>
 
@@ -38,43 +38,43 @@ ${cpweb_foot}
 
     require(['${contextPath}/js/cpweb.js'], function() {
         cpweb.editable($('#language .editable-content'),
-        $('#language .edit '),
-        function(value){},
-        {'type': 'select',
-            'url': settingsUrl,
-            'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
-            'pk': 'locale',
-            'value': "${prj.locale.toLanguageTag()}"
-        });
+                $('#language .edit '),
+                function(value){},
+                {'type': 'select',
+                    'url': settingsUrl,
+                    'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
+                    'pk': 'locale',
+                    'value': "${prj.locale.toLanguageTag()}"
+                });
 
         cpweb.editable($('#country .editable-content'),
-        $('#country .edit '),
-        function(value){},
-        {type: 'select',
-            'url': settingsUrl,
-            'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
-            'pk': 'country',
-            'value': "${prj.country.toLanguageTag()}"
-        });
+                $('#country .edit '),
+                function(value){},
+                {type: 'select',
+                    'url': settingsUrl,
+                    'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
+                    'pk': 'country',
+                    'value': "${prj.country.toLanguageTag()}"
+                });
 
         cpweb.editable($('#timezone .editable-content'),
-        $('#timezone .edit '),
-        function(value){},
-        {type: 'select',
-            'url': settingsUrl,
-            'source': "${helper.urlFor('project.ProjectJsonModule','listTimeZones',[prj.projectId])}",
-            'pk': 'timezone',
-            'value': "${prj.timezone.ID?js_string}"
-        });
+                $('#timezone .edit '),
+                function(value){},
+                {type: 'select',
+                    'url': settingsUrl,
+                    'source': "${helper.urlFor('project.ProjectJsonModule','listTimeZones',[prj.projectId])}",
+                    'pk': 'timezone',
+                    'value': "${prj.timezone.ID?js_string}"
+                });
 
         cpweb.editable($('#expiration .editable-content'),
-        $('#expiration .edit '),
-        function(value){},
-        {type: 'text',
-            'url': settingsUrl,
-            'pk': 'participationexpiration',
-            'value': "${((prj.defaultParticipationExpiration/86400000)?c)!''}"
-        });
+                $('#expiration .edit '),
+                function(value){},
+                {type: 'text',
+                    'url': settingsUrl,
+                    'pk': 'participationexpiration',
+                    'value': "${((prj.defaultParticipationExpiration/86400000)?c)!''}"
+                });
     });
 
 
@@ -145,41 +145,41 @@ ${cpweb_foot}
 
                 if(clicked) {
                     cocobox.confirmationDialog(
-                    'Turning calendar invitations ON',
-                    'As you turn this feature on, all participants will automatically receive calendar invitations via email, both as events are added, updated and deleted.' ,
-                    function() {
-                        setIcal(true, false);
-                    }
+                            'Turning calendar invitations ON',
+                            'As you turn this feature on, all participants will automatically receive calendar invitations via email, both as events are added, updated and deleted.' ,
+                            function() {
+                                setIcal(true, false);
+                            }
                     );
                 } else {
                     cocobox.confirmationDialogYesNo(
-                        'Turning calendar invitations OFF',
-                                        'Do you want to send cancellations to previously sent calendar invitations?',
-                                    function () {
-                                        //log('Send cancels');
-                                        setIcal(false, true);
-                                    },
-                                    function () {
-                                        //log('No cancels');
-                                        setIcal(false, false);
-                                    }
-                            );
+                            'Turning calendar invitations OFF',
+                            'Do you want to send cancellations to previously sent calendar invitations?',
+                            function () {
+                                //log('Send cancels');
+                                setIcal(false, true);
+                            },
+                            function () {
+                                //log('No cancels');
+                                setIcal(false, false);
+                            }
+                    );
                 }
 
                 return false;
             });
 
-                $('#socialfeatures-h').next().on('click', function (ev) {
-                    $('#socialfeatures-cb').bootstrapToggle('disable');
-                    setSocial(!$("#socialfeatures-cb").prop("checked"));
-                    return false;
-                });
-                $('#progressVisible-h').next().on('click', function (ev) {
-                    $('#progressVisible-cb').bootstrapToggle('disable');
-                    setProgressVisibility(!$("#progressVisible-cb").prop("checked"));
-                    return false;
-                });
+            $('#socialfeatures-h').next().on('click', function (ev) {
+                $('#socialfeatures-cb').bootstrapToggle('disable');
+                setSocial(!$("#socialfeatures-cb").prop("checked"));
+                return false;
             });
+            $('#progressVisible-h').next().on('click', function (ev) {
+                $('#progressVisible-cb').bootstrapToggle('disable');
+                setProgressVisibility(!$("#progressVisible-cb").prop("checked"));
+                return false;
+            });
+        });
     });
 
     $('#expirationtoggle-false').click(function() {
@@ -231,23 +231,94 @@ ${cpweb_foot}
 [@pInfo.projectInfo selected="session"][/@pInfo.projectInfo]
 
 <section class="ccb-expandable-list">
-<div id="settingsList">
-    <ul>
-
-        <li id="language">
+    <h1>[@dws.txt key="cpweb.project.session.section.information.title" /]</h1>
+    <div id="settingsList">
+        <ul>
+            <li id="language">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.name.title" /]</span>
-                <span class="short editable-content">${prj.locale.getDisplayName(userLocale)?xhtml}</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.description.title" /]</span>
+                <span class="short editable-content"></span>
             </span>
+            </li>
+        </ul>
+    </div>
+</section>
+<section class="ccb-expandable-list">
+    <h1>[@dws.txt key="cpweb.project.session.section.visibility.title" /]</h1>
+    <div id="settingsList">
+        <ul>
+            <li id="visible">
+                <a class="setting">
+                    <span class="row-label">[@dws.txt key="cpweb.project.session.visibility.title" /]</span>
+                    [@bsform.inputBoolean 'visible' 'Visible in course catalog' 'ON' 'OFF' false?string session=formsess /]
+                </a>
+            </li>
+            <li id="showName">
+                <a class="setting">
+                    <span class="row-label">[@dws.txt key="cpweb.project.session.showNames.title" /]</span>
+                    [@bsform.inputBoolean 'showName' 'Show names in course catalog' 'ON' 'OFF' false?string session=formsess /] <!-- false -> something like prj.showVisible -->
+                </a>
+            </li>
+            <li id="showThumbnails">
+                <a class="setting">
+                    <span class="row-label">[@dws.txt key="cpweb.project.session.showThumbnails.title" /]</span>
+                    [@bsform.inputBoolean 'showThumbnails' 'Show thumbnails in course catalog' 'ON' 'OFF' false?string session=formsess /] <!-- false -> something like prj.showVisible -->
+                </a>
+            </li>
+        </ul>
+    </div>
+</section>
+<section class="ccb-expandable-list">
+    <h1>[@dws.txt key="cpweb.project.session.section.enrollment.title" /]</h1>
+    <div id="settingsList">
+        <ul>
+            <li id="enrollmentMode">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.information.title" /]</span>
-                <span class="short editable-content">${prj.locale.getDisplayName(userLocale)?xhtml}</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <select></select>
             </span>
-        </li>
+            </li>
+            <li id="enrollmentFromDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <span>Date here</span>
+            </span>
+            </li>
+            <li id="enrollmentToDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <span>Date here</span>
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
 
-    </ul>
-</div>
-    </section>
+<section class="ccb-expandable-list">
+    <h1>[@dws.txt key="cpweb.project.session.section.disenrollment.title" /]</h1>
+    <div id="settingsList">
+        <ul>
+            <li id="enrollmentMode">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <select></select>
+            </span>
+            </li>
+            <li id="enrollmentFromDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <span>Date here</span>
+            </span>
+            </li>
+            <li id="enrollmentToDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <span>Date here</span>
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
 
 [/@dws.skin]
 
