@@ -35,46 +35,82 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 
     var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
+    var sessionUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
-    require(['${contextPath}/js/cpweb.js'], function() {
-        cpweb.editable($('#language .editable-content'),
-                $('#language .edit '),
-                function(value){},
-                {'type': 'select',
-                    'url': settingsUrl,
-                    'source': "${helper.urlFor('project.ProjectJsonModule','listLanguages',[prj.projectId])}",
-                    'pk': 'locale',
-                    'value': "${prj.locale.toLanguageTag()}"
+    require(['${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable'], function() {
+
+        // Enroll section
+        $('#enrollmentMode select').select2({
+            data: [{id: 0, text: "Off"}, {id: 1, text: "Direct"}, {id: 2, text: "Moderated"}],
+            allowClear: false,
+            delay: 250,
+            minimumResultsForSearch: Infinity
+        }).val(2).trigger("change").ccbEditable({ // TODO: Dig out proper val
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: "{updateParentUrl}",
+                    data: {pk: "{cf.id}", value: $(element).val()}
                 });
+            }
+        });
 
-        cpweb.editable($('#country .editable-content'),
-                $('#country .edit '),
+        cpweb.editable($('#enrollmentFromDate .editable-content'),
+                $('#enrollmentFromDate .edit '),
                 function(value){},
-                {type: 'select',
-                    'url': settingsUrl,
-                    'source': "${helper.urlFor('project.ProjectJsonModule','listCountries',[prj.projectId])}",
-                    'pk': 'country',
-                    'value': "${prj.country.toLanguageTag()}"
-                });
-
-        cpweb.editable($('#timezone .editable-content'),
-                $('#timezone .edit '),
-                function(value){},
-                {type: 'select',
-                    'url': settingsUrl,
-                    'source': "${helper.urlFor('project.ProjectJsonModule','listTimeZones',[prj.projectId])}",
-                    'pk': 'timezone',
-                    'value': "${prj.timezone.ID?js_string}"
-                });
-
-        cpweb.editable($('#expiration .editable-content'),
-                $('#expiration .edit '),
-                function(value){},
-                {type: 'text',
-                    'url': settingsUrl,
+                {type: 'date',
+                    'url': sessionUrl,
                     'pk': 'participationexpiration',
-                    'value': "${((prj.defaultParticipationExpiration/86400000)?c)!''}"
+                    'value': "${((session.enrollment.fromDate)?c)!''}"
                 });
+
+        cpweb.editable($('#enrollmentToDate .editable-content'),
+                $('#enrollmentFromDate .edit '),
+                function(value){},
+                {type: 'date',
+                    'url': sessionUrl,
+                    'pk': 'enrollmentFromDate',
+                    'value': "${((session.enrollment.toDate)?c)!''}"
+                });
+
+
+        // Disenroll section
+        $('#disenrollmentMode select').select2({
+            data: [{id: 0, text: "Off"}, {id: 1, text: "Direct"}, {id: 2, text: "Moderated"}],
+            allowClear: false,
+            delay: 250,
+            minimumResultsForSearch: Infinity
+        }).val(2).trigger("change").ccbEditable({ // TODO: Dig out proper val
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: "{updateParentUrl}",
+                    data: {pk: "{cf.id}", value: $(element).val()}
+                });
+            }
+        });
+
+
+        cpweb.editable($('#disenrollmentFromDate .editable-content'),
+                $('#disenrollmentFromDate .edit '),
+                function(value){},
+                {type: 'date',
+                    'url': sessionUrl,
+                    'pk': 'participationexpiration',
+                    'value': "${((session.disenrollment.fromDate)?c)!''}"
+                });
+
+        cpweb.editable($('#disenrollmentToDate .editable-content'),
+                $('#disenrollmentFromDate .edit '),
+                function(value){},
+                {type: 'date',
+                    'url': sessionUrl,
+                    'pk': 'disenrollmentFromDate',
+                    'value': "${((session.disenrollment.toDate)?c)!''}"
+                });
+
     });
 
 
@@ -275,19 +311,19 @@ ${cpweb_foot}
             <li id="enrollmentMode">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <select></select>
+                <select style="width: 150px"></select>
             </span>
             </li>
             <li id="enrollmentFromDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <span>Date here</span>
+                <span class="short editable-content">${(session.enrollment.fromDate)!'Click to set enrollment start date'}</span>
             </span>
             </li>
             <li id="enrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <span>Date here</span>
+                <span class="short editable-content">${(session.enrollment.toDate)!'Click to set enrollment end date'}</span>
             </span>
             </li>
         </ul>
@@ -298,22 +334,22 @@ ${cpweb_foot}
     <h1>[@dws.txt key="cpweb.project.session.section.disenrollment.title" /]</h1>
     <div id="settingsList">
         <ul>
-            <li id="enrollmentMode">
+            <li id="disenrollmentMode">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <select></select>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.mode.title" /]</span>
+                <select style="width: 150px"></select>
             </span>
             </li>
-            <li id="enrollmentFromDate">
+            <li id="disenrollmentFromDate">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <span>Date here</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.mode.title" /]</span>
+                <span class="short editable-content">${(session.disenrollment.fromDate)!'Click to set disenrollment start date'}</span>
             </span>
             </li>
-            <li id="enrollmentToDate">
+            <li id="disenrollmentToDate">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <span>Date here</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.mode.title" /]</span>
+                <span class="short editable-content">${(session.disenrollment.toDate)!'Click to set disenrollment end date'}</span>
             </span>
             </li>
         </ul>
