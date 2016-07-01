@@ -88,7 +88,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
-        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withId(courseId).build());
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
         if(courses == null || courses.size() != 1) {
             return null;
         }
