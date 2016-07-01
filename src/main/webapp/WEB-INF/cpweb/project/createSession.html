@@ -1,0 +1,203 @@
+[#ftl strip_text="true" /]
+
+[#!-- Netbeans hint
+<script src="/js/cpweb.js"></script>
+<script src="/js/dev/jquery-1.7.2.js"></script>
+<script src="../../js/createProject.js"></script> -->
+--]
+
+[#assign foot]
+${cpweb_foot}
+
+[#include "courseDesignRenderer.html" />
+
+<script>
+    $('#menu-projects').addClass('active');
+
+    var listCourseDesigns = "${helper.urlFor('project.NewProjectJsonModule', 'newProjectTypes', [org.id])?js_string}";
+
+    [#if session.hasFlashAttribute("missingProducts") ]
+    $(function(){
+        require(['dabox-common'] , function(){
+            var msg = '${session.getFlashAttribute("missingProducts")?xhtml?js_string}';
+            cocobox.infoDialog('Missing material(s)',msg);
+        });
+    })
+    [/#if]
+
+
+    $(function(){
+        require(['handlebars', 'select2-4.min'] , function(Handlebars){
+                    $("#prjtype").val('DESIGNED_PROJECT');
+                    jQuery.post(listCourseDesigns, null, function(data) {
+                        [#if orgMatListSupport]
+                            var extra = {
+                                "id":"ml-0",
+                                "name":"Materials List",
+                                "description":"A simple format for designs that do not include activity due dates, live events, product groupings or a resource page",
+                                "thumbnail": "${cocoboxCdn}/cocobox/img/ml_default.png"
+                            };
+                            data.aaData.push(extra);
+                        [/#if]
+
+                        $.each(data.aaData, function(){
+                            if(this.type = 'design') {
+                                this.designType = true;
+                            }
+                            else {
+                                this.designType = false;
+                            }
+                        });
+
+
+                        var source = $('#courseDesignBox').html();
+
+                        var template = Handlebars.compile(source);
+
+                        var context = data.aaData;
+
+                        var output = template(context);
+
+                        $('#crprj_designslist ul').append(output);
+
+
+                    }, "json");
+
+                    $('#timezone').select2({
+                    formatResult: function(data) {
+                        return '<span>' + data.text + '</span>';
+                    },
+                    formatSelection: function(data) {
+                        return data.text;
+                    }
+
+                });
+
+
+                });
+
+                $('#crprj_designslist ul').on('click', 'a.preview', function(e) {
+                    //prevent the scrolling and such..
+                    e.stopPropagation();
+                });
+
+                $('#crprj_designslist ul').on('click', 'li', function() {
+                    log(this);
+                    $('#next_btn').removeAttr('disabled', 'disabled');
+                    $(this).parent('ul').find('li').removeClass('selection');
+                    $(this).addClass('selection');
+                    $('#design').val($(this).data('design'));
+                    $('html, body').delay(300).animate({
+                        scrollTop: $(".crprj_actions").offset().top-40
+                    }, 300);
+                    return true;
+                });
+            });
+
+</script>
+
+[/#assign]
+
+
+[#assign cpweb_head]
+${cpweb_head}
+
+[/#assign]
+
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=foot orgName=orgName]
+
+<article id="ccb-page-createProject">
+<h1>[@dws.txt key="cpweb.createprojectselectdesign.title" /]</h1>
+
+    <em>Course: ${course.name}, ${course.id.id}</em>
+
+[#global formPrefix="cpweb.createproject" /]
+<form action="${formLink}" name="createProjectSelectDesign" method="post">
+    [@bsform.alertsection]
+    [/@bsform.alertsection]
+    <section class="field clearfix">
+        <div class="column">
+
+            <fieldset>
+                <div id="projectname">
+                    <h2>1 Name your project - seen only by administrators</h2>
+                    [@bsform.inputText name="projectname" tabindex="1" maxlength="63"/]
+
+                </div>
+                <div id="typeselections" class="clearfix">
+                    <div id="crprj_designslist" style="">
+                        <input type="hidden" name="design" id="design" />
+                        <h2>2 Select your course design</h2>
+                        <ul id="designlist_options" class="crprj-option-list clearfix">
+                        </ul>
+                    </div>
+                </div>
+                <div id="projecttimezone">
+                    <h2>3 Set the time zone - can be edited later</h2>
+                        [#assign defaultValue = formsess.getDefaultValue('timezone')!(defaultTimezone.ID)!'' /]
+                        [@bsform.select name="timezone" tabindex="7" required="required"]
+                        <option></option>
+                        [#assign tzValueFound = false /]
+                        <optgroup label="Recently used">
+                            [#list timezones.recentList as tz]
+                                [@bsform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@bsform.option]
+                                [#if tz.ID == defaultValue]
+                                  [#assign tzValueFound = true /]
+                                [/#if]
+                            [/#list]
+                        </optgroup>
+                        <optgroup label="All timezones">
+                            [#list timezones.otherList?sort as tz]
+                                [#if tzValueFound]
+                                    [@bsform.option value=tz.ID defaultValue="xyz"]${tz.ID?xhtml}[/@bsform.option]
+                                [#else]
+                                    [@bsform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@bsform.option]
+                                [/#if]
+                            [/#list]
+                        </optgroup>
+                        [/@bsform.select]
+                </div>
+                <div id="projectsettings">
+                    <h2>4 Choose your default settings - can be edited later</h2>
+
+                    <div id="settings_summary">
+                        <ul class="list-inline">
+                            <li><label>Language:</label> ${(defaultLangLocale).getDisplayName(userLocale)?xhtml}</li>
+                            <li><label>Country:</label> ${(defaultCountryLocale).getDisplayCountry(userLocale)?xhtml}</li>
+                            <li><a onclick="$('#settings_expanded').toggle();">Edit default settings</a></li>
+                        </ul>
+                    </div>
+                    <div id="settings_expanded" style="display: none;">
+
+                        [#assign defaultValue = formsess.getDefaultValue('projectlang')!defaultLangLocale.toLanguageTag() /]
+                        [@bsform.select name="projectlang"  tabindex="5"]
+                        [#list langs as lang]
+                        [@bsform.option value=lang.toLanguageTag() defaultValue=defaultValue]${lang.getDisplayName(userLocale)?xhtml}[/@bsform.option]
+                        [/#list]
+                        [/@bsform.select]
+
+                        [#assign defaultValue = formsess.getDefaultValue('country')!defaultCountryLocale.toLanguageTag() /]
+                        [@bsform.select name="country" tabindex="6"]
+                        [#list countries as country]
+                        [@bsform.option value=country.toLanguageTag() defaultValue=defaultValue]${country.getDisplayCountry(userLocale)?xhtml}[/@bsform.option]
+                        [/#list]
+                        [/@bsform.select]
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </section>
+    [@bsform.infosection]
+    [/@bsform.infosection]
+    <section class="action crprj_actions">
+        <input type="hidden" name="orgId" value="${org.id?c}" />
+        <input type="hidden" id="prjtype" name="prjtype" />
+        <button tabindex="100" class="btn btn-primary btn-lg" disabled="disabled" id="next_btn">[@dws.txt key='form.action.next' /] <span class="glyphicon glyphicon-chevron-right"></span></button>
+        <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+    </section>
+
+</form>
+</article>
+
+[/@dws.skin]
+
