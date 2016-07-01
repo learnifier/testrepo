@@ -13,6 +13,8 @@
         page.init({
             'jsonUrl': "${jsonUrl?js_string}",
             'projectUrl': "${helper.urlFor('ProjectModule','overview')}/",
+            'contextPath': "${contextPath}",
+            'productId': "${material.id?js_string}",
             'statusNames': [@esMap.langKeyMap /]
         });
     });

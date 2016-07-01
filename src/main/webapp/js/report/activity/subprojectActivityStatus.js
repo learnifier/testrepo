@@ -5,6 +5,8 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
 
     var extStatusLabels;
     var projectUrl;
+    var contextPath;
+    var productId;
 
     var colCount = 0;
     var colDefs = [
@@ -23,7 +25,10 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
             "data": "masterProjectName",
             "title": "Project",
             "createdCell": function(td, data, rowData) {
-                var a = $("<a/>", {"href": projectUrl + rowData.masterProject, "target": "_blank"});
+                var href = contextPath + '/project.report/innerActivityReport/' +
+                        rowData.projectId + '/' + rowData.masterProject;
+
+                var a = $("<a/>", {"href": href, "target": "_blank"});
                 a.append(data);
                 $(td).html(a);
             }
@@ -64,7 +69,7 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
             "lengthMenu": [[10, 20, 50, 100, 1000, -1], [10, 20, 50, 100, 1000, "All"]],
             "pageLength": 10,
             buttons: [
-                    'copy', 'excel', 'csv', 'pdf', 'print', 'colvis'
+                    'copy', 'excel', 'csv', 'print', 'colvis'
             ],
             "deferRender": true,
             "data": data.list,
@@ -213,6 +218,8 @@ define(['dabox-ajax-longrun-bootstrap', 'dataTables-bootstrap', 'dabox-common', 
     exports.init = function (opts) {
         extStatusLabels = opts.statusNames;
         projectUrl = opts.projectUrl;
+        contextPath = opts.contextPath;
+        productId = opts.productId;
 
         longrun.guiLongRun(opts.jsonUrl, {
             progressTarget: "#pbar",
