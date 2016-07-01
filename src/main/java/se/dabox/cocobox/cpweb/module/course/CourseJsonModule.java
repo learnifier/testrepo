@@ -97,7 +97,15 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onSaveCourse(RequestCycle cycle, String strOrgId, String strCourseId) {
         ParamUtil.required(strCourseId, "strCourseId");
+        ParamUtil.required(strOrgId, "strOrgId");
+        long orgId = Long.valueOf(strOrgId);
+        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
+        final String description = cycle.getRequest().getParameter("description");
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        long caller = LoginUserAccountHelper.getUserId(cycle);
 
+        // TODO: Not sure what to do about locale
+        final CatalogCourse course = ccc.createCourse(new CreateCourseRequest(caller, name, orgId, Locale.ENGLISH).withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build()));
 
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
@@ -109,16 +117,19 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-        long caller = 0L;
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+
         // TODO: Not sure what to do about locale
-        final CatalogCourse course = ccc.createCourse(new CreateCourseRequest(caller, name, orgId, Locale.ENGLISH).withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build()));
+        final CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, Locale.ENGLISH);
+        if(description != null) {
+            ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
+        }
+        final CatalogCourse course = ccc.createCourse(ccr);
         return jsonTarget(
-                new HashMap<String, Object>(){
-                    {
-                        put("status", "ok");
-                        put("id", course.getId());
-                    }
-                }
+                new HashMap<String, Object>(){{
+                    put("status", "ok");
+                    put("id", course.getId());
+                }}
         );
     }
 
@@ -135,7 +146,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 //    }
 
     private byte[] toJson(final RequestCycle cycle,
-                                      final List<CatalogCourse> courses) {
+                          final List<CatalogCourse> courses) {
 
         return new JsonEncoding() {
             @Override

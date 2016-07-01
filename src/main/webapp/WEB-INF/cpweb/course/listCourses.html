@@ -6,7 +6,6 @@ ${cpweb_foot}
     $('#menu-courses').addClass('active');
 
     require(["${contextPath}/js/course/listCourses.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-        console.log("Sessions url: ${helper.urlFor('course.CourseJsonModule','listSessions',[org.id])}");
         s.init({
             listCoursesUrl: "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}",
             listSessionsUrl: "${helper.urlFor('course.CourseJsonModule','listSessions',[org.id])}",

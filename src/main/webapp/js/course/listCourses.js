@@ -40,8 +40,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
 
         function formatSession ( d ) {
             var deferred = $.Deferred();
-
-            $.ajax(settings.listSessionsUrl + "/" + d.id).done(function(data){
+            console.log("FormatSession: ", d);
+            $.ajax(settings.listSessionsUrl + "/" + d.id.id).done(function(data){
                 console.log("listSessions: ", data);
                 var table = $('<table/>', { "class": "lol"}),
                     tbody = $('<tbody>').appendTo(table);
