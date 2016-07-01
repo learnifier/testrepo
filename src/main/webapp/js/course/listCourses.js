@@ -122,7 +122,10 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "defaultContent": ""
                         }
                     ],
-                    "ajax": settings.listCoursesUrl,
+                    "ajax": {
+                        "url": settings.listCoursesUrl,
+                        "dataSrc": ""
+                    },
                     "pageLength": 25,
                     "pagingType": "full_numbers",
                     "deferRender": true,

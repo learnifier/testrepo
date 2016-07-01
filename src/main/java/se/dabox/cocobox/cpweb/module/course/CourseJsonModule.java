@@ -4,42 +4,31 @@
 package se.dabox.cocobox.cpweb.module.course;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.sun.org.apache.xml.internal.resolver.Catalog;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
-import se.dabox.cocobox.cpweb.module.user.UserModule;
-import se.dabox.cocobox.security.user.OrgRoleName;
-import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
-import se.dabox.cocosite.user.MiniUserAccountHelper;
-import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
-import se.dabox.service.coursecatalog.client.category.CatalogCategoryId;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-
-import static se.dabox.service.common.ccbc.participation.filter.FilterParticipationSortField.id;
 
 /**
  *
@@ -53,8 +42,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             LoggerFactory.getLogger(CourseJsonModule.class);
 
     @WebAction
-    public List<CatalogCourse> onListOrgCourses(RequestCycle cycle, String strOrgId)
-            throws Exception {
+    public List<CatalogCourse> onListOrgCourses(RequestCycle cycle, String strOrgId) {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
@@ -66,23 +54,15 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onListSessions(RequestCycle cycle, String strOrgId, String strCourseId)
-            throws Exception {
+    public List<CatalogCourseSession> onListSessions(RequestCycle cycle, String strOrgId, String strCourseId) {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
-//        long courseId = Long.c(strCourseId);
+        int intCourseId = Integer.valueOf(strCourseId);
+        CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
-        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-
-
-        String file = "/coursecatalog/sessions-" + strCourseId + ".json";
-
-        final URL res = this.getClass().getResource(file);
-
-        byte[] data
-                = IOUtils.toByteArray(res);
-
-        return json(data);
+        final List<CatalogCourseSession> sessions = ccc.listSessions(new ListCatalogSessionRequestBuilder().withCourseId(courseId).build());
+        return sessions;
     }
 
     private RequestTarget json(byte[] data) { // Temporary test function
@@ -91,7 +71,6 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 
         return target;
     }
-
 
     @WebAction
     public RequestTarget onCourse(RequestCycle cycle, String strCourseId)
