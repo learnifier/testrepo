@@ -18,7 +18,10 @@ import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.create.CreateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequest;
+import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.webutils.json.JsonEncoding;
@@ -28,7 +31,12 @@ import se.dabox.util.ParamUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.reflections.util.ConfigurationBuilder.build;
 
 /**
  *
@@ -49,14 +57,13 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
         final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withOrgId(orgId).build());
-        long caller = LoginUserAccountHelper.getUserId(cycle);
         return courses;
     }
 
     @WebAction
     public List<CatalogCourseSession> onListSessions(RequestCycle cycle, String strOrgId, String strCourseId) {
-        checkOrgPermission(cycle, strOrgId);
-        long orgId = Long.valueOf(strOrgId);
+        checkOrgPermission(cycle, strOrgId); // TODO: real permission check
+//        long orgId = Long.valueOf(strOrgId);
         int intCourseId = Integer.valueOf(strCourseId);
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
@@ -73,8 +80,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onCourse(RequestCycle cycle, String strCourseId)
-            throws Exception {
+    public RequestTarget onCourse(RequestCycle cycle, String strCourseId) throws Exception {
 //        checkPermission(cycle, strCourseId);
 
 //        return jsonTarget(Collections.singletonMap("members", uas.size()));
@@ -89,23 +95,32 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onSaveCourse(RequestCycle cycle, String strCourseId) {
+    public RequestTarget onSaveCourse(RequestCycle cycle, String strOrgId, String strCourseId) {
         ParamUtil.required(strCourseId, "strCourseId");
-        String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
-        final String description = cycle.getRequest().getParameter("description");
+
 
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
 
     @WebAction
-    public RequestTarget onCreateCourse(RequestCycle cycle) {
+    public RequestTarget onCreateCourse(RequestCycle cycle, String strOrgId) {
+        ParamUtil.required(strOrgId, "strOrgId");
+        long orgId = Long.valueOf(strOrgId);
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
-
-        return jsonTarget(Collections.singletonMap("status", "ok"));
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        long caller = 0L;
+        // TODO: Not sure what to do about locale
+        final CatalogCourse course = ccc.createCourse(new CreateCourseRequest(caller, name, orgId, Locale.ENGLISH).withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build()));
+        return jsonTarget(
+                new HashMap<String, Object>(){
+                    {
+                        put("status", "ok");
+                        put("id", course.getId());
+                    }
+                }
+        );
     }
-
-
 
 //    protected void checkPermission(RequestCycle cycle, Course course, String courseId) {
 //        if (course == null) {
