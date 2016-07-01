@@ -30,6 +30,7 @@ import se.dabox.service.common.cr.DwsContentRepoClient;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClientImpl;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.randdata.client.RandomDataClient;
 import se.dabox.service.webutils.druwa.DwsWebsiteConstants;
@@ -86,6 +87,11 @@ public abstract class AbstractModule {
     public static CocoboxCoordinatorClient getCocoboxCordinatorClient(
             ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
+    }
+
+    public static CourseCatalogClient getCourseCatalogClient(
+            ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, CourseCatalogClient.class);
     }
 
     public static OrgMaterialFolderClient getOrgMaterialFolderClient(

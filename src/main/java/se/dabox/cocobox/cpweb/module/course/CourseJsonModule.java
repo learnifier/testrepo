@@ -3,22 +3,38 @@
  */
 package se.dabox.cocobox.cpweb.module.course;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.sun.org.apache.xml.internal.resolver.Catalog;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.user.UserModule;
+import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
+import se.dabox.cocosite.user.MiniUserAccountHelper;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.category.CatalogCategoryId;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -37,33 +53,16 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             LoggerFactory.getLogger(CourseJsonModule.class);
 
     @WebAction
-    public RequestTarget onListOrgCourses(RequestCycle cycle, String strOrgId)
+    public List<CatalogCourse> onListOrgCourses(RequestCycle cycle, String strOrgId)
             throws Exception {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
-        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withOrgId(orgId).build());
         long caller = LoginUserAccountHelper.getUserId(cycle);
-
-        List<OrgProject> projects =
-                ccbc.listOrgProjects(orgId);
-
-//        ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects);
-
-        // Temp
-//        public RequestTarget onCourses(RequestCycle cycle) throws JsonProcessingException, IOException {
-
-            String file = "/coursecatalog/courses.json";
-
-            final URL res = this.getClass().getResource(file);
-
-            byte[] data
-                    = IOUtils.toByteArray(res);
-
-            return json(data);
-        // end temp
-//        return jsonTarget(Collections.singletonMap("courses", Collections.emptyMap()));
+        return courses;
     }
 
     @WebAction
@@ -141,20 +140,24 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 //        }
 //    }
 
-//    private byte[] toJson(final List<UserAccount> uas) {
-//        return new JsonEncoding() {
-//            @Override
-//            protected void encodeData(JsonGenerator generator) throws IOException {
-//                generator.writeStartObject();
-//                generator.writeArrayFieldStart("aaData");
-//                for(UserAccount ua: uas) {
-//                    generator.writeStartObject();
-//                    generator.writeNumberField("userId", ua.getUserId());
-//                    generator.writeEndObject();
-//                }
-//                generator.writeEndArray();
-//                generator.writeEndObject();
-//            }
-//        }.encode();
-//    }
+    private byte[] toJson(final RequestCycle cycle,
+                                      final List<CatalogCourse> courses) {
+
+        return new JsonEncoding() {
+            @Override
+            protected void encodeData(JsonGenerator generator) throws IOException {
+                generator.writeStartObject();
+                generator.writeArrayFieldStart("aaData");
+
+                for (CatalogCourse c : courses) {
+                    generator.writeStartObject();
+                    generator.writeStringField("name", c.getName());
+                    generator.writeStringField("thumbnail", c.getThumbnailUrl());
+                    generator.writeEndObject();
+                }
+                generator.writeEndArray();
+                generator.writeEndObject();
+            }
+        }.encode();
+    }
 }

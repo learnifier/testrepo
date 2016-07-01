@@ -209,6 +209,11 @@
             <version>1.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>se.dabox.service.coursecatalog</groupId>
+            <artifactId>coursecatalog-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
