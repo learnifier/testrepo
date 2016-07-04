@@ -4,13 +4,11 @@
 package se.dabox.cocobox.cpweb.module.course;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.sun.org.apache.xml.internal.resolver.Catalog;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
@@ -20,9 +18,7 @@ import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.create.CreateCourseRequest;
-import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequest;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
@@ -31,14 +27,10 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import static org.reflections.util.ConfigurationBuilder.build;
 
 /**
  *
