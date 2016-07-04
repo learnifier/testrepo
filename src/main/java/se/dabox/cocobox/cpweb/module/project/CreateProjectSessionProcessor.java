@@ -3,12 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
@@ -18,9 +12,9 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductsExtraConfigFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
@@ -46,17 +40,33 @@ import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.expiration.GetCourseDefaultExpiration;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CodecException;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
-import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.create.CreateSessionRequest;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductTypes;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCourseCatalogClient;
 
 /**
  *
@@ -207,6 +217,10 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
         updateRecentTimezone(cycle, npr);
 
+        if(nps.getCourseId() != null) {
+            addCourseSession(cycle, project, nps);
+        }
+
         if (failures != null) {
             cycle.getSession().setFlashAttribute(ProjectProductFailure.VIEWSESSION_NAME, failures);
         }
@@ -258,6 +272,35 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                 setUserDescription(userDesc).
                 setDefaultExpiration(getDefaultExpiration(cycle, newDesignId));
 
+        UpdateProjectRequest upr = updateBuilder.createUpdateProjectRequest();
+
+        getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
+    }
+
+    private void addCourseSession(RequestCycle cycle, OrgProject project, NewProjectSession nps) {
+        CourseDesignClient cdClient = Clients.getClient(cycle, CourseDesignClient.class);
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+
+        final CatalogCourseId courseId = CatalogCourseId.valueOf(nps.getCourseId());
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
+        if(courses == null || courses.size() != 1) {
+            return;
+        }
+        CatalogCourse course = courses.get(0);
+
+
+        UpdateProjectRequestBuilder updateBuilder
+                = new UpdateProjectRequestBuilder(caller, project.getProjectId());
+
+        final CreateSessionRequest csr = new CreateSessionRequest(caller, courseId).withName(course.getName()).withLocale(project.getLocale());
+//                .withUpdate();
+
+
+        final CatalogCourseSession ccs = ccc.createSession(csr);
+
+        updateBuilder.setCourseSessionId(ccs.getId().getId());
         UpdateProjectRequest upr = updateBuilder.createUpdateProjectRequest();
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);

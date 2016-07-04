@@ -112,8 +112,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         long caller = LoginUserAccountHelper.getUserId(cycle);
 
-        // TODO: Not sure what to do about locale
-        final CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, Locale.ENGLISH);
+        final CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, getUserLocale(cycle));
         if(description != null) {
             ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
         }

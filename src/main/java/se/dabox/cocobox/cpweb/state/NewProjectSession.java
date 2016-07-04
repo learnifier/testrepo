@@ -41,7 +41,7 @@ public class NewProjectSession implements Serializable {
     private CreateProjectGeneral createProjectGeneral;
     private final String productId;
     private List<ExtraProductConfig> extraConfig;
-
+    private Integer courseId;
 
 
     public NewProjectSession(String type,
@@ -140,18 +140,37 @@ public class NewProjectSession implements Serializable {
 
         return Collections.emptyMap();
     }
-    
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+
     @Override
     public String toString() {
-        return "NewProjectSession{" + "uuid=" + uuid + ", created=" + created + ", type=" + type +
-                ", orgmats=" + orgmats + ", prods=" + prods + ", processor=" + processor +
-                ", cancelTarget=" + cancelTarget + ", designId=" + designId + ", editMode=" +
-                editMode + ", createProjectGeneral=" + createProjectGeneral + ", productId=" +
-                productId + '}';
+        return "NewProjectSession{" +
+                "uuid=" + uuid +
+                ", created=" + created +
+                ", type='" + type + '\'' +
+                ", orgmats=" + orgmats +
+                ", prods=" + prods +
+                ", processor=" + processor +
+                ", cancelTarget='" + cancelTarget + '\'' +
+                ", designId=" + designId +
+                ", editMode=" + editMode +
+                ", createProjectGeneral=" + createProjectGeneral +
+                ", productId='" + productId + '\'' +
+                ", extraConfig=" + extraConfig +
+                ", courseId=" + courseId +
+                '}';
     }
-    
+
     public RequestTarget process(RequestCycle cycle,
-            MatListProjectDetailsForm matListDetails) {
+                                 MatListProjectDetailsForm matListDetails) {
         return processor.processSession(cycle, this, matListDetails);
     }
     

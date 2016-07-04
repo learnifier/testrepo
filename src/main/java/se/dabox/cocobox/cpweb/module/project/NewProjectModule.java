@@ -402,6 +402,13 @@ public class NewProjectModule extends AbstractWebAuthModule {
             return NavigationUtil.toCreateProject(cycle, strOrgId);
         }
 
+        final Integer courseId;
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
+        if(strCourseId != null) {
+            courseId = Integer.parseInt(strCourseId);
+        } else {
+            courseId = null;
+        }
         CreateProjectGeneral input = formsess.getObject();
 
         if (!getProjectLocales(cycle).contains(input.
@@ -470,6 +477,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 designId,
                 productId);
 
+        nps.setCourseId(courseId);
         nps.setCreateProjectGeneral(input);
         nps.storeInSession(cycle.getSession());
 
