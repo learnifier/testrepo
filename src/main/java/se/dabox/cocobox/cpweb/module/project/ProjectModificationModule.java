@@ -74,6 +74,13 @@ import se.dabox.service.common.tx.OperationFailureException;
 import se.dabox.service.common.tx.UTComplexTxOperation;
 import se.dabox.service.common.tx.ValidationFailureException;
 import se.dabox.service.common.tx.VerificationStatus;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.login.client.AlreadyExistsException;
 import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.CreateBasicUserAccountRequest;
@@ -265,6 +272,17 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                 ccbc.deleteOrgProject(
                         Long.valueOf(strProjectId),
                         LoginUserAccountHelper.getUserId(cycle));
+
+                // TODO: Implement delete session when it is implemented in CourseCatalogClient.
+//                CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+//                long caller = LoginUserAccountHelper.getUserId(cycle);
+//                final List<CatalogCourseSession> sessions = ccc.listSessions(new ListCatalogSessionRequestBuilder().withSourceType(CocoboxCourseSourceConstants.PROJECT).withSourceId(strProjectId).build());
+//                if(sessions.size() == 1) {
+//
+//                    ccc.updateSession();
+//                }
+
+
             } catch (NotFoundException nfe) {
                 LOGGER.debug("Project {} doesn't exist. Ignoring error.", strProjectId);
             }

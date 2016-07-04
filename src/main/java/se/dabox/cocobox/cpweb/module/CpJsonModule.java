@@ -311,6 +311,9 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                             writeBooleanField("favorite", favoriteSet.contains(project.
                             getProjectId()));
 
+                    if(project.getCourseSessionId() != null) {
+                        generator.writeNumberField("courseSessionId", project.getCourseSessionId());
+                    }
                     generator.writeEndObject();
                 }
                 generator.writeEndArray();

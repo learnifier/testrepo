@@ -3,9 +3,12 @@
  */
 define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     "use strict";
-    var exports = {};
+    var exports = {},
+        settings,
+        sessionHash = {},
+        orphanProjects = [];
 
-    var settings;
+
 
     function openModal(imodalId, url){
         // TODO: Not sure what to share between calls here
@@ -60,6 +63,22 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
         }
 
         $(document).ready(function () {
+
+            $.getJSON(settings.listProjectsUrl).done(function(data) {
+                data.aaData.forEach(function(project){
+                    if(project.courseSessionId != null) {
+                        if(!sessionHash[project.courseSessionId]) {
+                            sessionHash[project.courseSessionId] = [];
+                        }
+                        sessionHash[courseSessionId].push(project);
+                    } else {
+                        orphanProjects.push(project);
+                    }
+                });
+                console.log("*** sessionHash: ", sessionHash);
+                console.log("*** orphanProjects: ", orphanProjects);
+            });
+
             require(['dataTables-bootstrap'], function () {
                 var dt = $('#listcourses').DataTable({
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',

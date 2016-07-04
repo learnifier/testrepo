@@ -9,6 +9,7 @@ ${cpweb_foot}
         s.init({
             listCoursesUrl: "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}",
             listSessionsUrl: "${helper.urlFor('course.CourseJsonModule','listSessions',[org.id])}",
+            listProjectsUrl: "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}",
             newSessionUrl:  "${helper.urlFor('project.NewProjectModule','sessionSetup', [org.id])}",
             newCourseUrl:  "${helper.urlFor('course.CourseModule','createCourse',[org.id])}",
             spinnerUrl: "[@common.spinnerUrl /]",
