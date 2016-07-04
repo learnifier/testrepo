@@ -85,6 +85,12 @@ import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequest;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -119,6 +125,33 @@ public class ProjectModule extends AbstractProjectWebModule {
         addCommonMapValues(map, project, cycle);
 
         return new FreemarkerRequestTarget("/project/projectOverview.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onSessionOverview(RequestCycle cycle, String strCourseSessionId) {
+
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.parseInt(strCourseSessionId));
+        final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
+
+        if(session.getSource() != null && CocoboxCourseSourceConstants.PROJECT.equals(session.getSource().getType())) {
+            final String strProjectId = session.getSource().getId();
+            OrgProject project =
+                    getProject(cycle, strProjectId);
+
+            checkPermission(cycle, project);
+            checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+            Map<String, Object> map = createMap();
+
+            addCommonMapValues(map, project, cycle);
+
+            return new FreemarkerRequestTarget("/project/projectOverview.html", map);
+        } else {
+            // TODO: Handle other project types
+            throw new IllegalStateException("Unknown session source type: " + session.getSource());
+        }
+
     }
 
     @DefaultWebAction
