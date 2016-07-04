@@ -47,12 +47,17 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.create.CreateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.impl.StandardCatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.impl.StandardCourseSessionSource;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductTypes;
@@ -294,9 +299,13 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         UpdateProjectRequestBuilder updateBuilder
                 = new UpdateProjectRequestBuilder(caller, project.getProjectId());
 
-        final CreateSessionRequest csr = new CreateSessionRequest(caller, courseId).withName(course.getName()).withLocale(project.getLocale());
-//                .withUpdate();
 
+        final UpdateSessionRequest updateSource = UpdateSessionRequestBuilder.newCreateBuilder(caller).setSource(new StandardCourseSessionSource(CocoboxCourseSourceConstants.PROJECT, Long.toString(project.getProjectId()))).createUpdateSessionRequest();
+
+        final CreateSessionRequest csr = new CreateSessionRequest(caller, courseId)
+                .withName(course.getName())
+                .withLocale(project.getLocale())
+                .withUpdate(updateSource);
 
         final CatalogCourseSession ccs = ccc.createSession(csr);
 
