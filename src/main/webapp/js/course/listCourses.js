@@ -30,7 +30,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
         _sessionHash: {},
         _orphanSessions: [],
         addSession: function(id, val){
-           this._sessionHash[id] = val;
+            this._sessionHash[id] = val;
         },
         addOrphan: function(val) {
             this._orphanSessions.push(val);
@@ -63,37 +63,41 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
         }, options || {});
 
         function formatSession ( d ) {
-            var deferred = $.Deferred();
-            console.log("FormatSession: ", d);
-            $.ajax(settings.listSessionsUrl + "/" + d.id.id).done(function(data){
-                var table = $('<table/>', { "class": "lol"}),
+            function genHtml(items, addUrl) {
+                var table = $('<table/>', { "class": ""}),
                     tbody = $('<tbody>').appendTo(table);
-                data.forEach(function(item){
+
+                items.forEach(function(item){
                     tbody
                         .append($('<tr />')
                             .append($('<td />')
-                                .append($('<a />', {href: settings.sessionDetailsUrl + "/" + item.id.id}) // TODO: Add project ID here once it is available
-                                    .html(lookupName(item.id.id)))));
+                                .append($('<a />', {href: item.url}) // TODO: Add project ID here once it is available
+                                    .html(item.name))));
                 });
-                tbody.append($("<a />", {"class": "btn btn-primary", "href": settings.newSessionUrl + "/" + d.id.id}).text("Add Session"));
+                tbody.append($("<a />", {"class": "btn btn-primary", "href": addUrl}).text("Add Session"));
+                return table;
+            }
+            var deferred = $.Deferred();
+            if(d.id === "orphans") {
+                deferred.resolve("nop");
+            } else {
+                $.ajax(settings.listSessionsUrl + "/" + d.id.id).done(function (data) {
+                    var table = $('<table/>', {"class": "lol"}),
+                        tbody = $('<tbody>').appendTo(table);
+                    deferred.resolve(
+                        genHtml(data.map(function (item) {
+                            return {
+                                name: lookupName(item.id.id),
+                                url: settings.sessionDetailsUrl + "/" + item.id.id
+                            }
+                        }), settings.newSessionUrl + "/" + d.id.id));
 
-                deferred.resolve(table);
-            });
+                });
+            }
             return deferred.promise();
         }
 
         $(document).ready(function () {
-
-            $.getJSON(settings.listProjectsUrl).done(function(data) {
-                data.aaData.forEach(function(project){
-                    if(project.courseSessionId) {
-                        sessionHash.addSession(project.courseSessionId, project);
-                    } else {
-                        sessionHash.addOrphan(project);
-
-                    }
-                });
-            });
 
             require(['dataTables-bootstrap'], function () {
                 var dt = $('#listcourses').DataTable({
@@ -173,6 +177,17 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 });
                 // Array to track the ids of the details displayed rows
                 var detailRows = [];
+
+                $.getJSON(settings.listProjectsUrl).done(function(data) {
+                    data.aaData.forEach(function(project){
+                        if(project.courseSessionId) {
+                            sessionHash.addSession(project.courseSessionId, project);
+                        } else {
+                            sessionHash.addOrphan(project);
+                        }
+                    });
+                });
+                dt.row.add({id: "orphans", categories: [], name: "Orphan projects"});
 
                 $(document).on('click', '.courseLink', function(e){
                     var id = $(this).data("courseid");
