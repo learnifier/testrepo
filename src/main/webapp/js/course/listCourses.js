@@ -71,19 +71,25 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     tbody
                         .append($('<tr />')
                             .append($('<td />')
-                                .append($('<a />', {href: item.url}) // TODO: Add project ID here once it is available
+                                .append($('<a />', {href: item.url})
                                     .html(item.name))));
                 });
-                tbody.append($("<a />", {"class": "btn btn-primary", "href": addUrl}).text("Add Session"));
+                if(addUrl) {
+                    tbody.append($("<a />", {"class": "btn btn-primary", "href": addUrl}).text("Add Session"));
+                }
                 return table;
             }
             var deferred = $.Deferred();
             if(d.id === "orphans") {
-                deferred.resolve("nop");
+                console.log(sessionHash.getOrphans());
+                deferred.resolve(genHtml(sessionHash.getOrphans().map(function(item){
+                    return {
+                        name: item.name,
+                        url: settings.projectDetailsUrl + "/" + item.id
+                    }
+                })));
             } else {
                 $.ajax(settings.listSessionsUrl + "/" + d.id.id).done(function (data) {
-                    var table = $('<table/>', {"class": "lol"}),
-                        tbody = $('<tbody>').appendTo(table);
                     deferred.resolve(
                         genHtml(data.map(function (item) {
                             return {
