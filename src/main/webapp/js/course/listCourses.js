@@ -118,7 +118,11 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "orderable": false,
                             "width": "32px",
                             "data" : function(row, type, set) {
-                                row.imagelinkDisplay = '<a class="courseLink" href="'+ "#" + '"><img width="32" src="'+row.thumbnail+'" /></a>';
+                                if(row.id == "orphans") {
+                                    row.imagelinkDisplay = "";
+                                } else {
+                                    row.imagelinkDisplay = '<a class="courseLink" href="'+ "#" + '"><img width="32" src="'+row.thumbnail+'" /></a>';
+                                }
 
                                 if (type === 'display') {
                                     return row.imagelinkDisplay;
@@ -139,7 +143,12 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "data": function (row, type, set) {
                                 if (!row.nameDisplay | !row.nameFilter) {
                                     row.nameFilter = row.name + ' ' + row.id.id;
-                                    row.nameDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="' + row.link + '">' + row.name + '</a> ';
+                                    if(row.id == "orphans") {
+                                        row.nameDisplay = row.name;
+                                    } else {
+                                        row.nameDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="' + row.link + '">' + row.name + '</a> ';
+                                    }
+
 
                                 }
 
