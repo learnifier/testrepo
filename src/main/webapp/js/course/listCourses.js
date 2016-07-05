@@ -121,7 +121,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                                 if(row.id == "orphans") {
                                     row.imagelinkDisplay = "";
                                 } else {
-                                    row.imagelinkDisplay = '<a class="courseLink" href="'+ "#" + '"><img width="32" src="'+row.thumbnail+'" /></a>';
+                                    row.imagelinkDisplay = '<a class="courseLink" href="'+ "#" + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
                                 }
 
                                 if (type === 'display') {
