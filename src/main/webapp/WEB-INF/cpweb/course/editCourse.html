@@ -19,7 +19,7 @@ ${cpweb_foot}
             createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse', [org.id])}",
             [/#if]
             newSessionUrl:  "${helper.urlFor('project.NewProjectModule','setup')}",
-            courseId: "${courseId!''}"
+            courseId: "${courseId!''}",
             defaultImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/High-contrast-image-missing.svg/2000px-High-contrast-image-missing.svg.png'
         });
     });
