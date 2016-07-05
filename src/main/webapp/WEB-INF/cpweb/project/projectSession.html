@@ -141,9 +141,32 @@ ${cpweb_foot}
 [@pInfo.projectInfo selected="session"][/@pInfo.projectInfo]
 
 <section class="ccb-expandable-list">
+    <h1>[@dws.txt key="cpweb.project.session.section.course.title" /]</h1>
+    <div id="settingsList">
+        <ul>
+            <li id="courseSelector">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.course.title" /]</span>
+                <select>
+                    <option id="x">Select a course...</option>
+                </select>
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
+
+[#if extSession??]
+<section class="ccb-expandable-list">
     <h1>[@dws.txt key="cpweb.project.session.section.information.title" /]</h1>
     <div id="settingsList">
         <ul>
+            <li id="visible">
+                <a class="setting">
+                    <span class="row-label">[@dws.txt key="cpweb.project.session.visibility.title" /]</span>
+                    [@bsform.inputBoolean 'visible' 'Visible in course catalog' 'ON' 'OFF' false?string session=formsess /]
+                </a>
+            </li>
             <li id="language">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.description.title" /]</span>
@@ -158,9 +181,9 @@ ${cpweb_foot}
     <h1>[@dws.txt key="cpweb.project.session.section.visibility.title" /]</h1>
     <div id="settingsList">
         <ul>
-            <li id="visible">
+            <li id="participantsVisible">
                 <a class="setting">
-                    <span class="row-label">[@dws.txt key="cpweb.project.session.visibility.title" /]</span>
+                    <span class="row-label">[@dws.txt key="cpweb.project.session.paricipantsVisibile.title" /]</span>
                     [@bsform.inputBoolean 'visible' 'Visible in course catalog' 'ON' 'OFF' false?string session=formsess /]
                 </a>
             </li>
@@ -230,6 +253,7 @@ ${cpweb_foot}
         </ul>
     </div>
 </section>
+[/#if]
 
 [/@dws.skin]
 

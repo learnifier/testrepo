@@ -82,6 +82,7 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
+import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
@@ -89,6 +90,7 @@ import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
+import se.dabox.service.coursecatalog.client.session.extdetails.ExtendedSessionDetailsStatusList;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequest;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.cug.client.ClientUserGroup;
@@ -124,6 +126,8 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         addCommonMapValues(map, project, cycle);
 
+//        map.put("hasSession", project.getCourseSessionId() != null);
+
         return new FreemarkerRequestTarget("/project/projectOverview.html", map);
     }
 
@@ -145,6 +149,7 @@ public class ProjectModule extends AbstractProjectWebModule {
             Map<String, Object> map = createMap();
 
             addCommonMapValues(map, project, cycle);
+//            map.put("hasSession", true);
 
             return new FreemarkerRequestTarget("/project/projectOverview.html", map);
         } else {
@@ -622,6 +627,17 @@ public class ProjectModule extends AbstractProjectWebModule {
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
 
         Map<String, Object> map = createMap();
+
+        final Long sessionId = project.getCourseSessionId();
+        if(sessionId != null) {
+            final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+            final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(sessionId.intValue()); // TODO: sessionId should be Integer to start with.
+            final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
+            final ExtendedSessionDetailsStatusList extSession = ccc.getExtendedSessionDetails(new GetUserDefaultLocaleCommand().getLocale(cycle), Collections.singletonList(session.getSource()));
+            map.put("extSession", extSession);
+        } else {
+            map.put("extSession", null);
+        }
 
         map.put("formsess", getValidationSession(ChangePassword.class, cycle));
         map.put("formLink", "");
