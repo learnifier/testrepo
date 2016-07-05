@@ -13,7 +13,7 @@ ${cpweb_foot}
             newSessionUrl:  "${helper.urlFor('project.NewProjectModule','sessionSetup', [org.id])}",
             newCourseUrl:  "${helper.urlFor('course.CourseModule','createCourse',[org.id])}",
             spinnerUrl: "[@common.spinnerUrl /]",
-            courseDetailsUrl: "${helper.urlFor('course.CourseModule','editCourse',[org.id])}",
+            courseDetailsUrl: "${helper.urlFor('course.CourseModule','editCourse')}",
             sessionDetailsUrl: "${helper.urlFor('project.ProjectModule','sessionOverview')}",
             projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}"
         });

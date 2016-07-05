@@ -31,9 +31,7 @@ public class CourseModule extends AbstractProjectWebModule {
     @WebAction
     public RequestTarget onList(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
-
         Map<String, Object> map = createMap();
-
         map.put("org", org);
 
         return new FreemarkerRequestTarget("/course/listCourses.html", map);
@@ -41,26 +39,16 @@ public class CourseModule extends AbstractProjectWebModule {
 
     @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String courseId) {
-
-//        OrgProject project =
-//                getProject(cycle, courseId);
-//
-//        checkPermission(cycle, course);
-//        checkCoursePermission(cycle, course, CocoboxPermissions.CP_VIEW_PROJECT);
-
+        // Json call to get data will handle security check.
         Map<String, Object> map = createMap();
-
-//        addCommonMapValues(map, project, cycle);
-
         return new FreemarkerRequestTarget("/project/courseOverview.html", map);
     }
 
 
     @WebAction
-    public RequestTarget onEditCourse(RequestCycle cycle, String strOrgId, String strCourseId) {
-        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+    public RequestTarget onEditCourse(RequestCycle cycle, String strCourseId) {
+        // Json call to get/save data will handle security check.
         Map<String, Object> map = createMap();
-        map.put("org", org);
         map.put("courseId", strCourseId);
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }

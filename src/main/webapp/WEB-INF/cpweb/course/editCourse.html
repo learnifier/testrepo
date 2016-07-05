@@ -15,8 +15,10 @@ ${cpweb_foot}
         s.init({
             getCourseUrl: "${helper.urlFor('course.CourseJsonModule','course')}",
             saveCourseUrl: "${helper.urlFor('course.CourseJsonModule','saveCourse')}",
+            [#if org??]
             createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse', [org.id])}",
-            newSessionUrl:  "${helper.urlFor('project.NewProjectModule','setup', [org.id])}",
+            [/#if]
+            newSessionUrl:  "${helper.urlFor('project.NewProjectModule','setup')}",
             courseId: "${courseId!''}"
         });
     });
