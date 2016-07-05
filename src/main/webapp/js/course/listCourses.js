@@ -121,7 +121,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                                 if(row.id == "orphans") {
                                     row.imagelinkDisplay = "";
                                 } else {
-                                    row.imagelinkDisplay = '<a class="courseLink" href="'+ "#" + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
+                                    row.imagelinkDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="'+ row.link + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
                                 }
 
                                 if (type === 'display') {
@@ -146,7 +146,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                                     if(row.id == "orphans") {
                                         row.nameDisplay = row.name;
                                     } else {
-                                        row.nameDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="' + row.link + '">' + row.name + '</a> ';
+                                        row.nameDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="' + "#" + '">' + row.name + '</a> ';
                                     }
 
 
@@ -205,6 +205,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 dt.row.add({id: "orphans", categories: [], name: "Orphan projects"});
 
                 $(document).on('click', '.courseLink', function(e){
+                    console.log("Click .courseLink: ", $(this).data("courseid"));
                     var id = $(this).data("courseid");
                     e.preventDefault();
                     openModal("course", settings.courseDetailsUrl + "/" + id);
