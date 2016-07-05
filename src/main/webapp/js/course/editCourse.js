@@ -54,7 +54,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 url: url,
                 data: {
                     name: self.name,
-                    description: self.description
+                    description: self.description,
+                    viewLink: self.viewLink
                 }
             }).done(function(data){
                 if(settings.courseId) {

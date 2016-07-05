@@ -97,6 +97,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         long caller = LoginUserAccountHelper.getUserId(cycle);
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
+        final String viewLink = cycle.getRequest().getParameter("viewLink");
 
         int intCourseId = Integer.valueOf(strCourseId);
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
@@ -120,6 +121,11 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             updateReq.setDescription(description);
             change = true;
         }
+        if(!Objects.equals(course.getThumbnailUrl(), viewLink)) {
+            updateReq.setThumbnail(viewLink);
+            change = true;
+        }
+
         if(change) {
             ccc.updateCourse(updateReq.build());
         }
