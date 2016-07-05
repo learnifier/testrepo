@@ -138,9 +138,9 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         long caller = LoginUserAccountHelper.getUserId(cycle);
 
-        final CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, getUserLocale(cycle));
+        CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, getUserLocale(cycle));
         if(description != null) {
-            ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
+            ccr = ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
         }
 
         final CatalogCourse course = ccc.createCourse(ccr);
