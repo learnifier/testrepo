@@ -29,6 +29,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 console.log("Read data: ", data);
                 self.name(data.name);
                 self.description(data.description);
+                self.viewLink(data.thumbnailUrl);
                 self.initializing(true);
             });
         } else {
@@ -55,7 +56,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 data: {
                     name: self.name,
                     description: self.description,
-                    viewLink: self.viewLink
+                    thumbnailUrl: self.viewLink
                 }
             }).done(function(data){
                 if(settings.courseId) {

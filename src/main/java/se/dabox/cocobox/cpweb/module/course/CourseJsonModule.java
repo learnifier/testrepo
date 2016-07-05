@@ -97,7 +97,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         long caller = LoginUserAccountHelper.getUserId(cycle);
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
-        final String viewLink = cycle.getRequest().getParameter("viewLink");
+        final String thumbnailUrl = cycle.getRequest().getParameter("thumbnailUrl");
 
         int intCourseId = Integer.valueOf(strCourseId);
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
@@ -121,8 +121,8 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             updateReq.setDescription(description);
             change = true;
         }
-        if(!Objects.equals(course.getThumbnailUrl(), viewLink)) {
-            updateReq.setThumbnail(viewLink);
+        if(!Objects.equals(course.getThumbnailUrl(), thumbnailUrl)) {
+            updateReq.setThumbnail(thumbnailUrl);
             change = true;
         }
 
@@ -138,15 +138,26 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
+        final String thumbnailUrl = cycle.getRequest().getParameter("thumbnailUrl");
 
         checkOrgPermission(cycle, orgId);
 
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         long caller = LoginUserAccountHelper.getUserId(cycle);
 
+        UpdateCourseRequestBuilder updateReq = UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller);
+        boolean change = false;
         CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, getUserLocale(cycle));
         if(description != null) {
-            ccr = ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
+            updateReq = updateReq.setDescription(description);
+            change = true;
+        }
+        if(thumbnailUrl != null) {
+            updateReq = updateReq.setThumbnail(thumbnailUrl);
+            change = true;
+        }
+        if(change) {
+            ccr = ccr.withUpdate(updateReq.build());
         }
 
         final CatalogCourse course = ccc.createCourse(ccr);
