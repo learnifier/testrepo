@@ -116,6 +116,8 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         if(description != null) {
             ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
         }
+
+
         final CatalogCourse course = ccc.createCourse(ccr);
         return jsonTarget(
                 new HashMap<String, Object>(){{
