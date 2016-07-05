@@ -47,7 +47,7 @@ ${cpweb_foot}
                     <div class="">
                         <form id="fileUploadForm" action="${dwsrt.config['apiweb.baseurl']}imageupload?format=png" method="POST" enctype="multipart/form-data">
                             <label for="fileupload" class="btn btn-primary-outlined btn-progress">
-                                <img data-bind="attr: {'src': viewLink}" style="width: 256px; height: 256px"/>
+                                <img data-bind="attr: {'src': thumbnailUrl}" style="width: 256px; height: 256px"/>
                             </label>
                             <input id="fileupload" type="file" name="file" capture="capture" style="position: absolute; left: -10000px;" />
                             <div id="uploadPbar" class="progress" style="height: 4px; margin: 0px 0px 8px 0px;" data-bind="visible: progressPercent()">
