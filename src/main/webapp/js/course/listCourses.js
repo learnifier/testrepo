@@ -4,11 +4,7 @@
 define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     "use strict";
     var exports = {},
-        settings,
-        sessionHash = {},
-        orphanProjects = [];
-
-
+        settings;
 
     function openModal(imodalId, url){
         // TODO: Not sure what to share between calls here
@@ -30,9 +26,29 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
         imodal.open();
     }
 
+    var sessionHash = {
+        _sessionHash: {},
+        _orphanSessions: [],
+        addSession: function(id, val){
+           this._sessionHash[id] = val;
+        },
+        addOrphan: function(val) {
+            this._orphanSessions.push(val);
+        },
+        lookup: function(id) {
+            return this._sessionHash[id];
+        },
+        getOrphans: function(){
+            return this._orphanSessions;
+        }
+    };
+
     function lookupName(id) {
-        // return sessionHash[id].name || "<em>Empty name</em>";
-        return "<em>Empty name</em>";
+        var entry = sessionHash.lookup([id]);
+        if(entry && entry.name) {
+            return  entry.name
+        }
+        else return "<em>Empty course session name</em>";
     }
 
     exports.init = function(options) {
@@ -50,7 +66,6 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
             var deferred = $.Deferred();
             console.log("FormatSession: ", d);
             $.ajax(settings.listSessionsUrl + "/" + d.id.id).done(function(data){
-                console.log("listSessions: ", data);
                 var table = $('<table/>', { "class": "lol"}),
                     tbody = $('<tbody>').appendTo(table);
                 data.forEach(function(item){
@@ -71,10 +86,13 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
 
             $.getJSON(settings.listProjectsUrl).done(function(data) {
                 data.aaData.forEach(function(project){
-                    sessionHash[project.courseSessionId] = project;
+                    if(project.courseSessionId) {
+                        sessionHash.addSession(project.courseSessionId, project);
+                    } else {
+                        sessionHash.addOrphan(project);
+
+                    }
                 });
-                console.log("*** sessionHash: ", sessionHash);
-                console.log("*** orphanProjects: ", orphanProjects);
             });
 
             require(['dataTables-bootstrap'], function () {
