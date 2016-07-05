@@ -30,6 +30,11 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
         imodal.open();
     }
 
+    function lookupName(id) {
+        // return sessionHash[id].name || "<em>Empty name</em>";
+        return "<em>Empty name</em>";
+    }
+
     exports.init = function(options) {
 
         settings = $.extend({
@@ -53,7 +58,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                         .append($('<tr />')
                             .append($('<td />')
                                 .append($('<a />', {href: settings.sessionDetailsUrl + "/" + item.id.id}) // TODO: Add project ID here once it is available
-                                    .text(item.name))));
+                                    .html(lookupName(item.id.id)))));
                 });
                 tbody.append($("<a />", {"class": "btn btn-primary", "href": settings.newSessionUrl + "/" + d.id.id}).text("Add Session"));
 
@@ -66,14 +71,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
 
             $.getJSON(settings.listProjectsUrl).done(function(data) {
                 data.aaData.forEach(function(project){
-                    if(project.courseSessionId != null) {
-                        if(!sessionHash[project.courseSessionId]) {
-                            sessionHash[project.courseSessionId] = [];
-                        }
-                        sessionHash[courseSessionId].push(project);
-                    } else {
-                        orphanProjects.push(project);
-                    }
+                    sessionHash[project.courseSessionId] = project;
                 });
                 console.log("*** sessionHash: ", sessionHash);
                 console.log("*** orphanProjects: ", orphanProjects);
