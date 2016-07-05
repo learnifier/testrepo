@@ -60,9 +60,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public List<CatalogCourseSession> onListSessions(RequestCycle cycle, String strOrgId, String strCourseId) {
-        // TODO: strOrgId not used, remove here and in js.
-
+    public List<CatalogCourseSession> onListSessions(RequestCycle cycle, String strCourseId) {
         int intCourseId = Integer.valueOf(strCourseId);
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);

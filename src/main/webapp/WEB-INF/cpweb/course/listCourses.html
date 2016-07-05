@@ -8,7 +8,7 @@ ${cpweb_foot}
     require(["${contextPath}/js/course/listCourses.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         s.init({
             listCoursesUrl: "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}",
-            listSessionsUrl: "${helper.urlFor('course.CourseJsonModule','listSessions',[org.id])}",
+            listSessionsUrl: "${helper.urlFor('course.CourseJsonModule','listSessions')}",
             listProjectsUrl: "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}",
             newSessionUrl:  "${helper.urlFor('project.NewProjectModule','sessionSetup', [org.id])}",
             newCourseUrl:  "${helper.urlFor('course.CourseModule','createCourse',[org.id])}",
