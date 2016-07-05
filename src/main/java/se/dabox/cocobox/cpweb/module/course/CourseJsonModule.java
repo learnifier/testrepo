@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.course;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.google.common.base.Strings;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
@@ -19,6 +20,7 @@ import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.create.CreateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
@@ -31,6 +33,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+
+import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
 
 /**
  *
@@ -56,26 +61,8 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 
     @WebAction
     public List<CatalogCourseSession> onListSessions(RequestCycle cycle, String strOrgId, String strCourseId) {
-        checkOrgPermission(cycle, strOrgId); // TODO: real permission check
-//        long orgId = Long.valueOf(strOrgId);
-        int intCourseId = Integer.valueOf(strCourseId);
-        CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
-        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        // TODO: strOrgId not used, remove here and in js.
 
-        final List<CatalogCourseSession> sessions = ccc.listSessions(new ListCatalogSessionRequestBuilder().withCourseId(courseId).build());
-        return sessions;
-    }
-
-    private RequestTarget json(byte[] data) { // Temporary test function
-        JsonRequestTarget target = AbstractCocositeJsModule.jsonTarget(data);
-        target.allowCrossDomain(true);
-
-        return target;
-    }
-
-    @WebAction
-    public CatalogCourse onCourse(RequestCycle cycle, String strCourseId) throws Exception {
-//        checkCoursePermission(cycle, strCourseId); // TODO: real permission check
         int intCourseId = Integer.valueOf(strCourseId);
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
@@ -84,22 +71,60 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         if(courses == null || courses.size() != 1) {
             return null;
         }
-        return courses.get(0);
+        CatalogCourse course = courses.get(0);
+        checkOrgPermission(cycle, course.getOrgId());
+
+        final List<CatalogCourseSession> sessions = ccc.listSessions(new ListCatalogSessionRequestBuilder().withCourseId(courseId).build());
+        return sessions;
     }
 
     @WebAction
-    public RequestTarget onSaveCourse(RequestCycle cycle, String strOrgId, String strCourseId) {
+    public CatalogCourse onCourse(RequestCycle cycle, String strCourseId) throws Exception {
+        int intCourseId = Integer.valueOf(strCourseId);
+        CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
+        if(courses == null || courses.size() != 1) {
+            return null;
+        }
+        CatalogCourse course = courses.get(0);
+        checkOrgPermission(cycle, course.getOrgId());
+        return course;
+    }
+
+    @WebAction
+    public RequestTarget onSaveCourse(RequestCycle cycle, String strCourseId) {
         ParamUtil.required(strCourseId, "strCourseId");
-        ParamUtil.required(strOrgId, "strOrgId");
-        long orgId = Long.valueOf(strOrgId);
+        long caller = LoginUserAccountHelper.getUserId(cycle);
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
+
+        int intCourseId = Integer.valueOf(strCourseId);
+        CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-        long caller = LoginUserAccountHelper.getUserId(cycle);
 
-        // TODO: Not sure what to do about locale
-        final CatalogCourse course = ccc.createCourse(new CreateCourseRequest(caller, name, orgId, Locale.ENGLISH).withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build()));
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
+        if(courses == null || courses.size() != 1) {
+            return null;
+        }
+        CatalogCourse course = courses.get(0);
 
+        checkOrgPermission(cycle, course.getOrgId());
+
+        final UpdateCourseRequestBuilder updateReq = UpdateCourseRequestBuilder.newBuilder(caller, courseId);
+        boolean change = false;
+        if(!Objects.equals(course.getName(), name)) {
+            updateReq.setName(name);
+            change = true;
+        }
+        if(!Objects.equals(course.getDescription(), description)) {
+            updateReq.setDescription(description);
+            change = true;
+        }
+        if(change) {
+            ccc.updateCourse(updateReq.build());
+        }
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
 
@@ -109,6 +134,9 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         long orgId = Long.valueOf(strOrgId);
         String name = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "name");
         final String description = cycle.getRequest().getParameter("description");
+
+        checkOrgPermission(cycle, orgId);
+
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         long caller = LoginUserAccountHelper.getUserId(cycle);
 
@@ -117,7 +145,6 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             ccr.withUpdate(UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller).setDescription(description).build());
         }
 
-
         final CatalogCourse course = ccc.createCourse(ccr);
         return jsonTarget(
                 new HashMap<String, Object>(){{
@@ -125,38 +152,5 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
                     put("id", course.getId());
                 }}
         );
-    }
-
-//    protected void checkPermission(RequestCycle cycle, Course course, String courseId) {
-//        if (course == null) {
-//            LOGGER.warn("Project {} doesn't exist.", courseId);
-//
-//            ErrorCodeRequestTarget error
-//                    = new ErrorCodeRequestTarget(HttpServletResponse.SC_NOT_FOUND);
-//            throw new RetargetException(error);
-//        } else {
-//            super.checkPermission(cycle, course);
-//        }
-//    }
-
-    private byte[] toJson(final RequestCycle cycle,
-                          final List<CatalogCourse> courses) {
-
-        return new JsonEncoding() {
-            @Override
-            protected void encodeData(JsonGenerator generator) throws IOException {
-                generator.writeStartObject();
-                generator.writeArrayFieldStart("aaData");
-
-                for (CatalogCourse c : courses) {
-                    generator.writeStartObject();
-                    generator.writeStringField("name", c.getName());
-                    generator.writeStringField("thumbnail", c.getThumbnailUrl());
-                    generator.writeEndObject();
-                }
-                generator.writeEndArray();
-                generator.writeEndObject();
-            }
-        }.encode();
     }
 }
