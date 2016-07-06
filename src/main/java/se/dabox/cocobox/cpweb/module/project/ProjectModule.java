@@ -634,9 +634,11 @@ public class ProjectModule extends AbstractProjectWebModule {
             final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(sessionId.intValue()); // TODO: sessionId should be Integer to start with.
             final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
             final ExtendedSessionDetailsStatusList extSession = ccc.getExtendedSessionDetails(null, new GetUserDefaultLocaleCommand().getLocale(cycle), Collections.singletonList(session.getSource()));
-            map.put("extSession", extSession);
+            map.put("courseSession", session);
+            map.put("extCourseSession", extSession);
         } else {
-            map.put("extSession", null);
+            map.put("courseSession", null);
+            map.put("extCourseSession", null);
         }
 
         map.put("formsess", getValidationSession(ChangePassword.class, cycle));

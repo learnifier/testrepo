@@ -705,31 +705,6 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(Collections.singletonMap("status", status));
     }
 
-    @WebAction
-    public RequestTarget setCourseSessionVisible(RequestCycle cycle, String strCourseSessionId) {
-        // TODO: Permission check; not sure if we will use project or session id here.
-        long caller = LoginUserAccountHelper.getUserId(cycle);
-        CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
-        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-
-        String mode = DruwaParamHelper.getMandatoryParam(null, cycle.getRequest(), "mode");
-        VisibilityMode visibilityMode = VisibilityMode.valueOf(cycle.getRequest().getParameter("mode"));
-
-        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
-        final ExtendedCatalogCourseSession extSession = CollectionsUtil.singleItemOrNull(ccc.listExtendedSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
-        final SessionVisibility visibility = session.getVisibility();
-        StandardSessionVisibility newVisibility = new StandardSessionVisibility(visibility.getFrom(), visibility.getTo(), visibilityMode);
-        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setVisibilitySettings(newVisibility).createUpdateSessionRequest();
-        ccc.updateSession(usr);
-
-//        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        OrgProject project = ccbc.getProject(prjId);
-//        checkPermission(cycle, project, strProjectId);
-        Map<String, String> map = Collections.singletonMap("status", "OK");
-
-        return jsonTarget(map);
-    }
-
 
     private byte[] toTaskJson(
             final RequestCycle cycle,
