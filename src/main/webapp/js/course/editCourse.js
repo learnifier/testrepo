@@ -64,9 +64,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 type: "POST",
                 url: url,
                 data: {
-                    name: self.name,
-                    description: self.description,
-                    thumbnailUrl: self.thumbnailUrl
+                    name: self.name(),
+                    description: self.description(),
+                    thumbnailUrl: self.thumbnailUrl()
                 }
             }).done(function(data){
                 if(self.isCreateMode()) {
@@ -91,10 +91,10 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 return false;
             }
             if(self.isCreateMode()) {
-                return this.name();
+                return self.name();
             } else {
-                console.log("Name: ", this.name(), name);
-                return this.name() && (this.name() != name || this.description() != description || this.thumbnailUrl() != thumbnailUrl)
+                console.log("Name: ", self.name(), name);
+                return self.name() && (self.name() != name || self.description() != description || self.thumbnailUrl() != thumbnailUrl)
             }
         };
     }
