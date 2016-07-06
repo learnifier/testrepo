@@ -6,26 +6,6 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     var exports = {},
         settings;
 
-    function openModal(imodalId, url){
-        // TODO: Not sure what to share between calls here
-        var imodal = new ccbImodal.Server({
-            serviceName: imodalId,
-            url: url,
-            callbacks: {
-                "close": function(data) {
-                    console.log("Close lol");
-                },
-                "createDone": function(data){
-                    console.log("CreateDone: ", data);
-                },
-                "saveDone": function(data){
-                    console.log("SaveDone: ", data);
-                }
-            }
-        });
-        imodal.open();
-    }
-
     var sessionHash = {
         _sessionHash: {},
         _orphanSessions: [],
@@ -192,6 +172,26 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 });
                 // Array to track the ids of the details displayed rows
                 var detailRows = [];
+
+                function openModal(imodalId, url){
+                    var imodal = new ccbImodal.Server({
+                        serviceName: imodalId,
+                        url: url,
+                        callbacks: {
+                            "close": function(data) {
+                                console.log("Close lol");
+                            },
+                            "createAndForward": function(data){
+                                window.location = data.url;
+                            },
+                            "saveDone": function(data){
+                                dt.ajax.reload();
+                                console.log("SaveDone: ", data);
+                            }
+                        }
+                    });
+                    imodal.open();
+                }
 
                 $.getJSON(settings.listProjectsUrl).done(function(data) {
                     data.aaData.forEach(function(project){

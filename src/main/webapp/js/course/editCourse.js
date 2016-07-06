@@ -43,7 +43,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
             self.initializing(false);
         }
 
-        this.isCreate = function(){
+        this.isCreateMode = function(){
             return !settings.courseId;
         }
 
@@ -51,10 +51,10 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
             imodalClient.close();
         };
 
-        this.save = function(){
+        this.save = function(forward){
             var url;
 
-            if(self.isCreate()) {
+            if(self.isCreateMode()) {
                 url = settings.createCourseUrl;
             } else {
                 url = settings.saveCourseUrl + "/" + settings.courseId;
@@ -69,10 +69,17 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                     thumbnailUrl: self.thumbnailUrl
                 }
             }).done(function(data){
-                if(settings.courseId) {
-                    imodalClient.send("saveDone");
+                if(self.isCreateMode()) {
+                    if(forward) {
+                        imodalClient.send("createAndForward", {"url": settings.newSessionUrl + "/" + data.id.id});
+                        imodalClient.close();
+                    } else {
+                       imodalClient.send("saveDone");
+                        imodalClient.close();
+                    }
                 } else {
-                    imodalClient.send("createDone", {"forwardUrl": settings.newSessionUrl + "?courseId=" + 1011}); // TODO: Extract courseId from data once it is implemented
+                    imodalClient.send("saveDone");
+                    imodalClient.close();
                 }
             }).fail(function(jqXHR, textStatus, errorThrown){
                 CCBMessengerError("Error when saving course: ", textStatus);
@@ -83,7 +90,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
             if(self.initializing()) {
                 return false;
             }
-            if(self.isCreate()) {
+            if(self.isCreateMode()) {
                 return this.name();
             } else {
                 console.log("Name: ", this.name(), name);

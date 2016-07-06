@@ -17,8 +17,8 @@ ${cpweb_foot}
             saveCourseUrl: "${helper.urlFor('course.CourseJsonModule','saveCourse')}",
             [#if org??]
             createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse', [org.id])}",
+            newSessionUrl:  "${helper.urlFor('project.NewProjectModule','sessionSetup', [org.id])}",
             [/#if]
-            newSessionUrl:  "${helper.urlFor('project.NewProjectModule','setup')}",
             courseId: "${courseId!''}",
             defaultImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/High-contrast-image-missing.svg/2000px-High-contrast-image-missing.svg.png'
         });
@@ -59,10 +59,13 @@ ${cpweb_foot}
 
                 </div>
                 <div class="modal-footer">
-                    <button data-bind="click: save, enable: validate()" class="btn btn-primary" id="courseModalSave">
+                    <button data-bind="click: function(){save(false)}, enable: validate()" class="btn btn-primary">
                         <span class="glyphicon glyphicon-plus-sign"></span> Save
                     </button>
-                    <button data-bind="click: closer" class="btn btn-primary" id="courseModalClose">
+                    <button data-bind="visible: true, click: function(){save(true)}, enable: validate()" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus-sign"></span> Save and create first session
+                    </button>
+                    <button data-bind="click: closer" class="btn btn-primary">
                         Close
                     </button>
                 </div>
