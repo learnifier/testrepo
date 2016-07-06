@@ -12,6 +12,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
+import org.apache.ibatis.annotations.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
@@ -44,6 +45,15 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseField;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.*;
+import se.dabox.service.coursecatalog.client.session.impl.StandardSessionVisibility;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequest;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
@@ -62,6 +72,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
@@ -693,6 +704,32 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(Collections.singletonMap("status", status));
     }
+
+    @WebAction
+    public RequestTarget setCourseSessionVisible(RequestCycle cycle, String strCourseSessionId) {
+        // TODO: Permission check; not sure if we will use project or session id here.
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+        CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+
+        String mode = DruwaParamHelper.getMandatoryParam(null, cycle.getRequest(), "mode");
+        VisibilityMode visibilityMode = VisibilityMode.valueOf(cycle.getRequest().getParameter("mode"));
+
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+        final ExtendedCatalogCourseSession extSession = CollectionsUtil.singleItemOrNull(ccc.listExtendedSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+        final SessionVisibility visibility = session.getVisibility();
+        StandardSessionVisibility newVisibility = new StandardSessionVisibility(visibility.getFrom(), visibility.getTo(), visibilityMode);
+        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setVisibilitySettings(newVisibility).createUpdateSessionRequest();
+        ccc.updateSession(usr);
+
+//        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+//        OrgProject project = ccbc.getProject(prjId);
+//        checkPermission(cycle, project, strProjectId);
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+
 
     private byte[] toTaskJson(
             final RequestCycle cycle,
