@@ -32,13 +32,14 @@ ${cpweb_foot}
 
     require(['${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function() {
 
-        var descEditor = CKEDITOR.replace("sessionDescription");
+        var descEditor = CKEDITOR.replace("sessionDescription"),
+                updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[courseSession.id.id])}";
         descEditor.on('blur', function( evt ) {
             console.log( 'Saving... ' + evt.editor.getData() );
             $.ajax({
                 dataType: "json",
                 method: "POST",
-                url: "${helper.urlFor('project.ProjectSessionJsonModule', 'setCourseSessionDescription',[courseSession.id.id])}",
+                url: updateSessionFieldUrl,
                 data: {pk: "description", value: evt.editor.getData()}
             });
         });
@@ -70,8 +71,8 @@ ${cpweb_foot}
                 return $.ajax({
                     dataType: "json",
                     method: "POST",
-                    url: "${helper.urlFor('project.ProjectSessionJsonModule', 'setCourseSessionVisibility',[courseSession.id.id])}",
-                    data: {pk: "mode", value: $(element).val()}
+                    url: updateSessionFieldUrl,
+                    data: {pk: "visibility", value: $(element).val()}
                 });
             }
         });
