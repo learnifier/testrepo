@@ -35,7 +35,6 @@ ${cpweb_foot}
         var descEditor = CKEDITOR.replace("sessionDescription"),
                 updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[courseSession.id.id])}";
         descEditor.on('blur', function( evt ) {
-            console.log( 'Saving... ' + evt.editor.getData() );
             $.ajax({
                 dataType: "json",
                 method: "POST",
@@ -193,7 +192,9 @@ ${cpweb_foot}
             <li id="description">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.description.title" /]</span>
-                <textarea id="sessionDescription" class="short editable-content">???</textarea>
+                <textarea id="sessionDescription" class="short editable-content">
+                    ${courseSession.description!''}
+                </textarea>
 
             </span>
             </li>

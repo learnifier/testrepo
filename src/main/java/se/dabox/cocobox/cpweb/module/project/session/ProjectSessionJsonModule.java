@@ -30,32 +30,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ProjectSessionJsonModule.class);
-
-    @WebAction
-    public RequestTarget onSetCourseSessionVisibility(RequestCycle cycle, String strCourseSessionId) {
-        long caller = LoginUserAccountHelper.getUserId(cycle);
-        CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
-
-        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-        VisibilityMode visibilityMode = VisibilityMode.valueOf(cycle.getRequest().getParameter("value"));
-        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
-        checkSessionPermission(cycle, session);
-//        final ExtendedCatalogCourseSession extSession = CollectionsUtil.singleItemOrNull(ccc.listExtendedSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
-        final SessionVisibility visibility = session.getVisibility();
-        final StandardSessionVisibility newVisibility;
-        if(visibility == null) {
-            newVisibility = new StandardSessionVisibility(null, null, visibilityMode);
-        } else {
-            newVisibility = new StandardSessionVisibility(visibility.getFrom(), visibility.getTo(), visibilityMode);
-        }
-        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setVisibilitySettings(newVisibility).createUpdateSessionRequest();
-        ccc.updateSession(usr);
-
-        Map<String, String> map = Collections.singletonMap("status", "OK");
-
-        return jsonTarget(map);
-    }
-
+    
     @WebAction
     public RequestTarget onSetCourseSessionField(RequestCycle cycle, String strCourseSessionId) {
         long caller = LoginUserAccountHelper.getUserId(cycle);
