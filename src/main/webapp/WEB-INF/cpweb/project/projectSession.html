@@ -33,8 +33,14 @@ ${cpweb_foot}
     require(['${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function() {
 
         var descEditor = CKEDITOR.replace("sessionDescription");
-        descEditor.on( 'change', function( evt ) {
+        descEditor.on('blur', function( evt ) {
             console.log( 'Saving... ' + evt.editor.getData() );
+            $.ajax({
+                dataType: "json",
+                method: "POST",
+                url: "${helper.urlFor('project.ProjectSessionJsonModule', 'setCourseSessionDescription',[courseSession.id.id])}",
+                data: {pk: "description", value: evt.editor.getData()}
+            });
         });
 
         // Enroll section
@@ -43,7 +49,7 @@ ${cpweb_foot}
             allowClear: false,
             delay: 250,
             minimumResultsForSearch: Infinity
-        }).val(2).trigger("change").ccbEditable({ // TODO: Dig out proper val
+        }).val(2).trigger("change").ccbEditable({
             update: function (element) {
                 return $.ajax({
                     dataType: "json",
@@ -59,7 +65,7 @@ ${cpweb_foot}
             allowClear: false,
             delay: 250,
             minimumResultsForSearch: Infinity
-        }).val("[#if courseSession.visibility??]${courseSession.visibility.visibility}[#else]hidden[/#if]").trigger("change").ccbEditable({ // TODO: Dig out proper val
+        }).val("[#if courseSession.visibility??]${courseSession.visibility.visibility}[#else]hidden[/#if]").trigger("change").ccbEditable({
             update: function (element) {
                 return $.ajax({
                     dataType: "json",

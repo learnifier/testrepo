@@ -76,6 +76,8 @@ import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT.value;
+
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
@@ -92,8 +94,6 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
 
         final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-
-        final Map<String, String[]> parameterMap = cycle.getRequest().getParameterMap();
         VisibilityMode visibilityMode = VisibilityMode.valueOf(cycle.getRequest().getParameter("value"));
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
         checkSessionPermission(cycle, session);
@@ -108,15 +108,36 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setVisibilitySettings(newVisibility).createUpdateSessionRequest();
         ccc.updateSession(usr);
 
-//        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        OrgProject project = ccbc.getProject(prjId);
-//        checkPermission(cycle, project, strProjectId);
         Map<String, String> map = Collections.singletonMap("status", "OK");
 
         return jsonTarget(map);
     }
 
+    @WebAction
+    public RequestTarget onSetCourseSessionDescription(RequestCycle cycle, String strCourseSessionId) {
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+        CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
+
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        String description = cycle.getRequest().getParameter("value");
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+        checkSessionPermission(cycle, session);
+        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setDescription(description).createUpdateSessionRequest();
+        ccc.updateSession(usr);
+
+        Map<String, String> map = Collections.singletonMap("status", "OK");
+
+        return jsonTarget(map);
+    }
+
+
     protected void checkSessionPermission(RequestCycle cycle, CatalogCourseSession courseSession) { // TODO: implement
+
+//        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+//        OrgProject project = ccbc.getProject(prjId);
+//        checkPermission(cycle, project, strProjectId);
+
+
 //        if (project == null) {
 //            LOGGER.warn("Project {} doesn't exist.", strProjectId);
 //
