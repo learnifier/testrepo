@@ -43,27 +43,9 @@ ${cpweb_foot}
             });
         });
 
-        // Enroll section
-        $('#enrollmentMode select').select2({
-            data: [{id: 0, text: "Off"}, {id: 1, text: "Direct"}, {id: 2, text: "Moderated"}],
-            allowClear: false,
-            delay: 250,
-            minimumResultsForSearch: Infinity
-        }).val(2).trigger("change").ccbEditable({
-            update: function (element) {
-                return $.ajax({
-                    dataType: "json",
-                    method: "POST",
-                    url: "{updateParentUrl}",
-                    data: {pk: "{cf.id}", value: $(element).val()}
-                });
-            }
-        });
-
         $('#visibilityMode select').select2({
             data: [{id: "hidden", text: "Hidden"}, {id: "visible", text: "Visible"}, {id: "preview", text: "Preview"}],
             allowClear: false,
-            delay: 250,
             minimumResultsForSearch: Infinity
         }).val("[#if courseSession.visibility??]${courseSession.visibility.visibility}[#else]hidden[/#if]").trigger("change").ccbEditable({
             update: function (element) {
@@ -72,6 +54,22 @@ ${cpweb_foot}
                     method: "POST",
                     url: updateSessionFieldUrl,
                     data: {pk: "visibility", value: $(element).val()}
+                });
+            }
+        });
+
+        // Enroll section
+        $('#enrollmentMode select').select2({
+            data: [{id: "disabled", text: "Disabled"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Direct"}],
+            allowClear: false,
+            minimumResultsForSearch: Infinity
+        }).val("[#if courseSession.enrollmentSettings??]${courseSession.enrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: updateSessionFieldUrl,
+                    data: {pk: "enrollmentMode", value: $(element).val()}
                 });
             }
         });
@@ -97,17 +95,16 @@ ${cpweb_foot}
 
         // Disenroll section
         $('#disenrollmentMode select').select2({
-            data: [{id: 0, text: "Off"}, {id: 1, text: "Direct"}, {id: 2, text: "Moderated"}],
+            data: [{id: "disabled", text: "Disabled"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Direct"}],
             allowClear: false,
-            delay: 250,
             minimumResultsForSearch: Infinity
-        }).val(2).trigger("change").ccbEditable({ // TODO: Dig out proper val
+        }).val("[#if courseSession.disenrollmentSettings??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
             update: function (element) {
                 return $.ajax({
                     dataType: "json",
                     method: "POST",
-                    url: "{updateParentUrl}",
-                    data: {pk: "{cf.id}", value: $(element).val()}
+                    url: updateSessionFieldUrl,
+                    data: {pk: "disenrollmentMode", value: $(element).val()}
                 });
             }
         });
