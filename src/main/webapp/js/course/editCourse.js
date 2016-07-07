@@ -17,7 +17,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         var self = this;
         var name, description, crl;
 
-        console.log("Init coursemodel: ", settings);
         this.initializing = ko.observable(true);
         this.name = ko.observable();
         this.description = ko.observable();
@@ -27,7 +26,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
 
         if(settings.courseId) {
             $.getJSON(settings.getCourseUrl + "/" + settings.courseId).done(function(data){
-                console.log("Read data: ", data);
                 self.name(data.name);
                 name = data.name;
 
@@ -108,19 +106,16 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
             defaultImage: undefined
         }, options || {});
 
-        console.log("");
         var courseModel = new CourseModel();
         courseModel.viewLink(settings.defaultImage);
         ko.applyBindings(courseModel);
 
         $("#fileupload").fileupload({
             progress: function (e, data) {
-                console.log(data);
                 var progress = parseInt(data.loaded / data.total * 100, 10);
                 courseModel.progressPercent(progress);
             },
             fail: function (e, data) {
-                console.log("fail", data);
                 courseModel.progressPercent(0);
                 require(['dabox-common'], function() {
                         cocobox.errorDialog("Upload failed", "Upload failed. Make sure that the file you selected is a valid image");
@@ -128,7 +123,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 $("#uploadPbar").hide();
             },
             done: function (e, data) {
-                console.log("done", data);
                 $("#uploadPbar").hide();
                 if (data.result.status === 'ok') {
                     courseModel.crl(data.result.crl);

@@ -69,14 +69,14 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     }
                 })));
             } else {
-                $.ajax(settings.listSessionsUrl + "/" + d.id.id).done(function (data) {
+                $.ajax(settings.listSessionsUrl + "/" + d.course.id.id).done(function (data) {
                     deferred.resolve(
                         genHtml(data.map(function (item) {
                             return {
                                 name: lookupName(item.id.id),
                                 url: settings.sessionDetailsUrl + "/" + item.id.id
                             }
-                        }), settings.newSessionUrl + "/" + d.id.id));
+                        }), settings.newSessionUrl + "/" + d.course.id.id));
 
                 });
             }
@@ -98,11 +98,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "orderable": false,
                             "width": "32px",
                             "data" : function(row, type, set) {
-                                if(row.id == "orphans") {
-                                    row.imagelinkDisplay = "";
-                                } else {
-                                    row.imagelinkDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="'+ row.link + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
-                                }
+                                console.log("COURSE = ", row.course);
+                                row.imagelinkDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="'+ row.link + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
 
                                 if (type === 'display') {
                                     return row.imagelinkDisplay;
@@ -121,15 +118,10 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "width": "70%",
                             "className": "block-link",
                             "data": function (row, type, set) {
+                                console.log();
                                 if (!row.nameDisplay | !row.nameFilter) {
-                                    row.nameFilter = row.name + ' ' + row.id.id;
-                                    if(row.id == "orphans") {
-                                        row.nameDisplay = row.name;
-                                    } else {
-                                        row.nameDisplay = '<a data-courseid="' + row.id.id + '" class="courseLink" href="' + "#" + '">' + row.name + '</a> ';
-                                    }
-
-
+                                        row.nameFilter = row.course.name + ' ' + row.course.id.id;
+                                        row.nameDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="' + "#" + '">' + row.course.name + '</a> ';
                                 }
 
                                 if (type === 'display') {
@@ -137,19 +129,15 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                                 } else if (type === 'filter') {
                                     return row.nameFilter;
                                 } else if (type === 'sort') {
-                                    return row.name;
+                                    return row.course.name;
                                 } else {
                                     //Anything else and raw row
-                                    return row.name;
+                                    return row.course.name;
                                 }
                             }
                         },
                         {
                             "targets": [2],
-                            "data": "categories"
-                        },
-                        {
-                            "targets": [3],
                             "class":          "details-control",
                             "orderable":      false,
                             "data":           function(){return '<span class="menu-icon one pe-7s-home pe-lg pe-va primaryColor"></span>'},
@@ -202,7 +190,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                         }
                     });
                 });
-                dt.row.add({id: "orphans", categories: [], name: "Orphan projects"});
+                // dt.row.add({id: "orphans", categories: [], name: "Orphan projects"});
 
                 $(document).on('click', '.courseLink', function(e){
                     console.log("Click .courseLink: ", $(this).data("courseid"));
