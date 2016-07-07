@@ -258,13 +258,27 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         return(jsonTarget(map));
     }
 
+    @WebAction
+    public RequestTarget onUpdateCourse(RequestCycle cycle, String strCourseSessionId) {
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
+
+        final String courseId = cycle.getRequest().getParameter("courseId");
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+        checkSessionPermission(cycle, session);
+
+        // TODO: Add course change to updateSession.
+//        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourse(...).createUpdateSessionRequest();
+//        ccc.updateSession(usr);
+
+        return jsonTarget(Collections.singletonMap("status", "ok"));
+    }
+
 
     private ExtendedCatalogCourseSession getExtendedSession(CourseCatalogClient ccc, CatalogCourseSessionId courseSessionId) {
         return CollectionsUtil.singleItemOrNull(ccc.listExtendedSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
     }
-
-
-
 
 
     protected void checkSessionPermission(RequestCycle cycle, CatalogCourseSession courseSession) { // TODO: implement

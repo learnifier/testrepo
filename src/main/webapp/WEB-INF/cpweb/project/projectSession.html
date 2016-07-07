@@ -47,8 +47,8 @@ ${cpweb_foot}
             return $.ajax({
                 dataType: "json",
                 method: "POST",
-                url: updateSessionFieldUrl,
-                data: {pk: "visibility", value: $(element).val()}
+                url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[courseSession.id.id])}",
+                data: { courseId: $(element).val() }
             });
         }
     });
