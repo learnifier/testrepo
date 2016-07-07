@@ -55,7 +55,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                                     .html(item.name))));
                 });
                 if(addUrl) {
-                    tbody.append($("<a />", {"class": "btn btn-primary", "href": addUrl}).text("Add Session"));
+                    tbody.append($("<a />", {"class": "btn btn-primary-outlined", "href": addUrl}).html("<i class='glyphicon glyphicon-plus-sign'></i> Add Session"));
                 }
                 return table;
             }
@@ -139,7 +139,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "targets": [2],
                             "class":          "details-control",
                             "orderable":      false,
-                            "data":           function(){return '<span class="menu-icon one pe-7s-home pe-lg pe-va primaryColor"></span>'},
+                            "data":           function(){return '<a>Show sessions</a>'},
                             "defaultContent": ""
                         }
                     ],
@@ -208,12 +208,11 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     var tr = $(this).closest('tr');
                     var row = dt.row( tr );
                     var idx = $.inArray( tr.attr('id'), detailRows );
-                    var span = tr.find("span");
+                    var link = tr.find(".details-control a");
 
                     if ( row.child.isShown() ) {
                         // tr.removeClass( 'details' );
-                        span.addClass( 'pe-7s-home' );
-                        span.removeClass( 'pe-7s-graph1' );
+                        link.text( 'Show Sessions' );
                         row.child.hide();
 
                         // Remove from the 'open' array
@@ -221,8 +220,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     }
                     else {
                         // tr.addClass( 'details' );
-                        span.removeClass( 'pe-7s-home' );
-                        span.addClass( 'pe-7s-graph1' );
+                        link.text( 'Hide Sessions' );
 
                         // row.child( formatLoading( row.data() ) ).show();
                         formatSession(row.data()).done(function(res){
