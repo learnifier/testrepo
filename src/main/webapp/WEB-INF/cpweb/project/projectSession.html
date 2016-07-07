@@ -27,9 +27,10 @@ ${cpweb_foot}
     "use strict";
     $('#menu-projects').addClass('active');
 
-    var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
+//    var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
     var sessionUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
+    [#if courseSession??]
     require(['cocobox-datetime', '${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function(dt) {
 
         var descEditor = CKEDITOR.replace("sessionDescription"),
@@ -157,7 +158,7 @@ ${cpweb_foot}
             });
         });
     });
-
+    [/#if]
 </script>
 
 [/#assign]
