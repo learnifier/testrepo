@@ -10,6 +10,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.project.details.DateTimeFormatter;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.session.*;
 import se.dabox.service.coursecatalog.client.session.impl.StandardDisenrollmentSettings;
@@ -21,6 +22,8 @@ import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -77,7 +80,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
-                    newSettings = new StandardEnrollmentSettings(null, null, null, mode);
+                    newSettings = new StandardEnrollmentSettings(false, null, null, mode);
                 } else {
                     newSettings = new StandardEnrollmentSettings(settings.isEnabled(), settings.getFrom(), settings.getTo(), mode);
                 }
@@ -88,11 +91,33 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentFromDate() {
+//                Instant instant = Instant.parse(value);
+                Instant instant = Instant.now();
+                final EnrollmentSettings settings = session.getEnrollmentSettings();
+                final StandardEnrollmentSettings newSettings;
+                if(settings == null) {
+                    newSettings = new StandardEnrollmentSettings(false, instant, null, null);
+                } else {
+                    newSettings = new StandardEnrollmentSettings(settings.isEnabled(), instant, settings.getTo(), settings.getMode());
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrollmentSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
                 return null;
             }
 
             @Override
             public Void visitEnrollmentToDate() {
+//                Instant instant = Instant.parse(value);
+                Instant instant = Instant.now();
+                final EnrollmentSettings settings = session.getEnrollmentSettings();
+                final StandardEnrollmentSettings newSettings;
+                if(settings == null) {
+                    newSettings = new StandardEnrollmentSettings(false, null, instant, null);
+                } else {
+                    newSettings = new StandardEnrollmentSettings(settings.isEnabled(), settings.getFrom(), instant, settings.getMode());
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrollmentSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
                 return null;
             }
 
@@ -117,11 +142,33 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentFromDate() {
+//                Instant instant = Instant.parse(value);
+                Instant instant = Instant.now();
+                final DisenrollmentSettings settings = session.getDisenrollmentSettings();
+                final StandardDisenrollmentSettings newSettings;
+                if(settings == null) {
+                    newSettings = new StandardDisenrollmentSettings(null, instant, null);
+                } else {
+                    newSettings = new StandardDisenrollmentSettings(settings.getFrom(), instant, settings.getMode());
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
                 return null;
             }
 
             @Override
             public Void visitDisenrollmentToDate() {
+//                Instant instant = Instant.parse(value);
+                Instant instant = Instant.now();
+                final DisenrollmentSettings settings = session.getDisenrollmentSettings();
+                final StandardDisenrollmentSettings newSettings;
+                if(settings == null) {
+                    newSettings = new StandardDisenrollmentSettings(null, instant, null);
+                } else {
+                    newSettings = new StandardDisenrollmentSettings(settings.getFrom(), instant, settings.getMode());
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
                 return null;
             }
 
