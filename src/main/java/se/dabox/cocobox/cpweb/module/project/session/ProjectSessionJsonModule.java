@@ -15,6 +15,7 @@ import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.session.*;
 import se.dabox.service.coursecatalog.client.session.impl.StandardDisenrollmentSettings;
 import se.dabox.service.coursecatalog.client.session.impl.StandardEnrollmentSettings;
+import se.dabox.service.coursecatalog.client.session.impl.StandardParticipationSettings;
 import se.dabox.service.coursecatalog.client.session.impl.StandardSessionVisibility;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
@@ -51,7 +52,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
         checkSessionPermission(cycle, session);
 
-        Map<String, String> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         final SessionField sessionField = SessionField.valueOf(pk);
         sessionField.accept(new SessionField.SessionFieldVisitor<Void>(){
             @Override
@@ -176,17 +177,55 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitParticipationEnabled() {
-                resultMap.put("rofl", "hej");
+                final ParticipationSettings settings = session.getParticipationSettings();
+                final StandardParticipationSettings newSettings;
+                final boolean newVal;
+                if(settings == null) {
+                    newVal = true; // true = toggled default false
+                    newSettings = new StandardParticipationSettings(newVal, false, false);
+                } else {
+                    newVal = !settings.isEnabled();
+                    newSettings = new StandardParticipationSettings(newVal, settings.isShowName(), settings.isShowThumbnail());
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrolledSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
+                resultMap.put("enabled", newVal);
                 return null;
             }
 
             @Override
             public Void visitParticipationShowName() {
+                final ParticipationSettings settings = session.getParticipationSettings();
+                final StandardParticipationSettings newSettings;
+                final boolean newVal;
+                if(settings == null) {
+                    newVal = true; // true = toggled default false
+                    newSettings = new StandardParticipationSettings(false, newVal, false);
+                } else {
+                    newVal = !settings.isShowName();
+                    newSettings = new StandardParticipationSettings(settings.isEnabled(), newVal, settings.isShowThumbnail());
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrolledSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
+                resultMap.put("enabled", newVal);
                 return null;
-            }
+           }
 
             @Override
             public Void visitParticipationShowThumbnail() {
+                final ParticipationSettings settings = session.getParticipationSettings();
+                final StandardParticipationSettings newSettings;
+                final boolean newVal;
+                if(settings == null) {
+                    newVal = true; // true = toggled default false
+                    newSettings = new StandardParticipationSettings(false, false, newVal);
+                } else {
+                    newVal = !settings.isShowThumbnail();
+                    newSettings = new StandardParticipationSettings(settings.isEnabled(), settings.isShowName(), newVal);
+                }
+                final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrolledSettings(newSettings).createUpdateSessionRequest();
+                ccc.updateSession(usr);
+                resultMap.put("enabled", newVal);
                 return null;
             }
         });

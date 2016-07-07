@@ -84,7 +84,7 @@ ${cpweb_foot}
                 });
 
         $("#xxx").each(function(){
-           dt.dateTime(this);
+            dt.dateTime(this);
         });
 
         cpweb.editable($('#enrollmentToDate .editable-content'),
@@ -135,30 +135,29 @@ ${cpweb_foot}
 
         require(['cocobox-togglebutton'], function(cocoboxToggle) {
 
-            var cb = $("#participantsVisible");
-            //Initialize "cb" as a toggle
-            cocoboxToggle.initToggle(cb);
-
-            //Listen on changes
-            $(cb).on('CocoboxToggleChange', function(ev) {
-                var buttonControl = ev.buttonControl;
-                buttonControl.disable();
-                $.ajax({
-                    dataType: "json",
-                    method: "POST",
-                    url: updateSessionFieldUrl,
-                    data: {pk: "participationEnabled", value: ""}
-                })
-                        .always(function() {
-                            buttonControl.enable();
-                        })
-                        .done(function(data) {
-                            if (data.something) {
-                                buttonControl.on();
-                            } else {
-                                buttonControl.off();
-                            }
-                        });
+            $(".toggleButton").each(function(){
+                var fieldName = $(this).data("fieldname");
+                console.log("init is a go: ", fieldName);
+                cocoboxToggle.initToggle(this);
+                $(this).on('CocoboxToggleChange', function(ev) {
+                    var buttonControl = ev.buttonControl;
+                    buttonControl.disable();
+                    $.ajax({
+                        dataType: "json",
+                        method: "POST",
+                        url: updateSessionFieldUrl,
+                        data: {pk: fieldName, value: ""}
+                    }).always(function() {
+                        buttonControl.enable();
+                    }).done(function(data) {
+                        console.log("done: ", data);
+                        if (data.enabled) {
+                            buttonControl.on();
+                        } else {
+                            buttonControl.off();
+                        }
+                    });
+                });
             });
         });
     });
@@ -231,26 +230,17 @@ ${cpweb_foot}
     <h1>[@dws.txt key="cpweb.project.session.section.visibility.title" /]</h1>
     <div id="settingsList">
         <ul>
-            <li id="participantsVisible">
-                <div>
-                    <input type="checkbox" id="participantsVisible" />
-                </div>
-                <a class="setting">
-                    <span class="row-label">[@dws.txt key="cpweb.project.session.participantsVisible.title" /]</span>
-                    [@bsform.inputBoolean 'participantsVisible' 'Visible in course catalog' 'ON' 'OFF' false?string session=formsess /]
-                </a>
+            <li>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.participantsVisible.title" /]</span>
+                <input class="toggleButton" type="checkbox" data-fieldname="participationEnabled"[#if courseSession.participationSettings?? && courseSession.participationSettings.enabled] checked[/#if]>
             </li>
-            <li id="showName">
-                <a class="setting">
-                    <span class="row-label">[@dws.txt key="cpweb.project.session.showNames.title" /]</span>
-                    [@bsform.inputBoolean 'showName' 'Show names in course catalog' 'ON' 'OFF' false?string session=formsess /] <!-- false -> something like prj.showVisible -->
-                </a>
+            <li>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.showNames.title" /]</span>
+                <input class="toggleButton" type="checkbox" data-fieldname="participationShowName"[#if courseSession.participationSettings?? && courseSession.participationSettings.showName] checked[/#if] />
             </li>
-            <li id="showThumbnails">
-                <a class="setting">
-                    <span class="row-label">[@dws.txt key="cpweb.project.session.showThumbnails.title" /]</span>
-                    [@bsform.inputBoolean 'showThumbnails' 'Show thumbnails in course catalog' 'ON' 'OFF' false?string session=formsess /] <!-- false -> something like prj.showVisible -->
-                </a>
+            <li>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.showThumbnails.title" /]</span>
+                <input class="toggleButton" type="checkbox" data-fieldname="participationShowThumbnail"[#if courseSession.participationSettings?? && courseSession.participationSettings.showThumbnail] checked[/#if] />
             </li>
         </ul>
     </div>
