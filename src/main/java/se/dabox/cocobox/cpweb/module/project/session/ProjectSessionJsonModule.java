@@ -10,8 +10,11 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.course.CatalogCourseJson;
 import se.dabox.cocobox.cpweb.module.project.details.DateTimeFormatter;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.*;
 import se.dabox.service.coursecatalog.client.session.impl.StandardDisenrollmentSettings;
 import se.dabox.service.coursecatalog.client.session.impl.StandardEnrollmentSettings;
@@ -27,7 +30,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static javafx.scene.input.KeyCode.O;
 import static se.dabox.cocobox.cpweb.module.project.session.SessionField.visibility;
 
 /**
@@ -235,9 +240,32 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(resultMap);
     }
 
+    @WebAction
+    public RequestTarget onListCourses(RequestCycle cycle, String strOrgId) {
+        checkOrgPermission(cycle, strOrgId);
+        long orgId = Long.valueOf(strOrgId);
+
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withOrgId(orgId).build());
+
+        final List<HashMap<String, Object>> map = courses.stream().map(c ->
+                new HashMap<String, Object>() {{
+                    put("id", c.getId().getId());
+                    put("text", c.getName());
+                }}
+        ).collect(Collectors.toList());
+        return(jsonTarget(map));
+    }
+
+
     private ExtendedCatalogCourseSession getExtendedSession(CourseCatalogClient ccc, CatalogCourseSessionId courseSessionId) {
         return CollectionsUtil.singleItemOrNull(ccc.listExtendedSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
     }
+
+
+
+
 
     protected void checkSessionPermission(RequestCycle cycle, CatalogCourseSession courseSession) { // TODO: implement
 

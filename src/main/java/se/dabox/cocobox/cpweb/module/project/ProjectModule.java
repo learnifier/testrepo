@@ -88,6 +88,9 @@ import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient
 import se.dabox.service.common.material.Material;
 import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequest;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
 import se.dabox.service.coursecatalog.client.session.extdetails.ExtendedSessionDetailsStatusList;
@@ -96,6 +99,7 @@ import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequ
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.ValueUtils;
 
 /**
@@ -136,7 +140,7 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.parseInt(strCourseSessionId));
-        final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
 
         if(session.getSource() != null && CocoboxCourseSourceConstants.PROJECT.equals(session.getSource().getType())) {
             final String strProjectId = session.getSource().getId();
@@ -633,12 +637,21 @@ public class ProjectModule extends AbstractProjectWebModule {
             final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
             final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(sessionId.intValue()); // TODO: sessionId should be Integer to start with.
             final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
-            final ExtendedSessionDetailsStatusList extSession = ccc.getExtendedSessionDetails(null, new GetUserDefaultLocaleCommand().getLocale(cycle), Collections.singletonList(session.getSource()));
+//            final ExtendedSessionDetailsStatusList extSession = ccc.getExtendedSessionDetails(null, new GetUserDefaultLocaleCommand().getLocale(cycle), Collections.singletonList(session.getSource()));
             map.put("courseSession", session);
-            map.put("extCourseSession", extSession);
+
+            if(session.getCourseId() != null) {
+                final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(session.getCourseId()).build()));
+                if(course != null) {
+                    map.put("course", course);
+                }
+            }
+
+
+//            map.put("extCourseSession", extSession);
         } else {
             map.put("courseSession", null);
-            map.put("extCourseSession", null);
+//            map.put("extCourseSession", null);
         }
 
         map.put("formsess", getValidationSession(ChangePassword.class, cycle));

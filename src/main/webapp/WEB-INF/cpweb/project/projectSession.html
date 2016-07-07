@@ -27,11 +27,33 @@ ${cpweb_foot}
     "use strict";
     $('#menu-projects').addClass('active');
 
-//    var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
+    //    var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
     var sessionUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
-    [#if courseSession??]
     require(['cocobox-datetime', '${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function(dt) {
+        $('#courseSelector select').select2({
+            ajax: {
+                url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'listCourses',[org.id])}",
+                dataType: 'json',
+                processResults: function (data) {
+                    return { results: data };
+                }
+            },
+            placeholder: "Select a course...",
+            allowClear: true,
+            minimumResultsForSearch: Infinity
+        }).ccbEditable({
+        update: function (element) {
+            return $.ajax({
+                dataType: "json",
+                method: "POST",
+                url: updateSessionFieldUrl,
+                data: {pk: "visibility", value: $(element).val()}
+            });
+        }
+    });
+
+        [#if courseSession??]
 
         var descEditor = CKEDITOR.replace("sessionDescription"),
                 updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[courseSession.id.id])}";
@@ -157,8 +179,8 @@ ${cpweb_foot}
                 });
             });
         });
+        [/#if]
     });
-    [/#if]
 </script>
 
 [/#assign]
@@ -177,14 +199,17 @@ ${cpweb_foot}
             <li id="courseSelector">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.course.title" /]</span>
-                <select>
-                    <option id="x">Select a course...</option>
+                <select style="width: 400px">
+                    [#if course??]
+                        <option value="${course.id.id}" selected="selected">${course.name}</option>
+                    [/#if]
                 </select>
             </span>
             </li>
         </ul>
     </div>
 </section>
+
 
 [#if courseSession??]
 <section class="ccb-expandable-list">
