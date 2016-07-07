@@ -27,6 +27,7 @@ import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequ
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
+import se.dabox.util.collections.CollectionsUtil;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -65,11 +66,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
-        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
-        if(courses == null || courses.size() != 1) {
-            return null;
-        }
-        CatalogCourse course = courses.get(0);
+        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
         checkOrgPermission(cycle, course.getOrgId());
 
         final List<CatalogCourseSession> sessions = ccc.listSessions(new ListCatalogSessionRequestBuilder().withCourseId(courseId).build());
@@ -82,11 +79,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
-        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
-        if(courses == null || courses.size() != 1) {
-            return null;
-        }
-        CatalogCourse course = courses.get(0);
+        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
         checkOrgPermission(cycle, course.getOrgId());
         return course;
     }
@@ -103,11 +96,7 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
-        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
-        if(courses == null || courses.size() != 1) {
-            return null;
-        }
-        CatalogCourse course = courses.get(0);
+        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
 
         checkOrgPermission(cycle, course.getOrgId());
 
