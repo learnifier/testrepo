@@ -29,6 +29,13 @@ public final class CpwebConstants {
 
     public static final String SKIN_MODAL_MAIL = "bootstrap_barebone";
 
+    /**
+     * Thumbnail to use when session doen't have one set. The path is relative from
+     * the cdn
+     *
+     */
+    public static final String SESSION_DEFAULT_THUMBNAIL = "/cocobox/img/cd_default.png";
+
     private CpwebConstants() {
     }
 

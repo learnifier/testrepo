@@ -4,6 +4,12 @@
 package se.dabox.cocobox.cpweb.module.course;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -36,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
+import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -50,14 +56,15 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             LoggerFactory.getLogger(CourseJsonModule.class);
 
     @WebAction
-    public List<CatalogCourse> onListOrgCourses(RequestCycle cycle, String strOrgId) {
+    public List<CatalogCourseJson> onListOrgCourses(RequestCycle cycle, String strOrgId) {
         checkOrgPermission(cycle, strOrgId);
         long orgId = Long.valueOf(strOrgId);
 
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
         final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withOrgId(orgId).build());
-        return courses;
+
+        return CollectionsUtil.transformList(courses, CatalogCourseJson::new);
     }
 
     @WebAction
