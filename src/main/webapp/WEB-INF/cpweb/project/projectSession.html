@@ -132,12 +132,9 @@ ${cpweb_foot}
                     'value': "${((session.disenrollment.toDate)?c)!''}"
                 });
 
-
         require(['cocobox-togglebutton'], function(cocoboxToggle) {
-
             $(".toggleButton").each(function(){
                 var fieldName = $(this).data("fieldname");
-                console.log("init is a go: ", fieldName);
                 cocoboxToggle.initToggle(this);
                 $(this).on('CocoboxToggleChange', function(ev) {
                     var buttonControl = ev.buttonControl;
@@ -150,7 +147,6 @@ ${cpweb_foot}
                     }).always(function() {
                         buttonControl.enable();
                     }).done(function(data) {
-                        console.log("done: ", data);
                         if (data.enabled) {
                             buttonControl.on();
                         } else {
@@ -162,20 +158,6 @@ ${cpweb_foot}
         });
     });
 
-    var setProgressVisibility = function(visibility) {
-        $.ajax({
-            type: 'POST',
-            url: "${helper.urlFor('project.ProjectJsonModule','setProgressVisibility',[prj.projectId])}",
-            data: {enabled: visibility},
-            success: function(data) {
-                $('#progressVisible-cb').bootstrapToggle('enable');
-                $('#progressVisible-cb').bootstrapToggle(visibility ? 'on' : 'off');
-            },
-            complete: function() {
-                $('#progressVisible-cb').bootstrapToggle('enable');
-            }
-        });
-    };
 </script>
 
 [/#assign]
