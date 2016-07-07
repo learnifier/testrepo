@@ -98,7 +98,6 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "orderable": false,
                             "width": "32px",
                             "data" : function(row, type, set) {
-                                console.log("COURSE = ", row.course);
                                 row.imagelinkDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="'+ row.link + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
 
                                 if (type === 'display') {

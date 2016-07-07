@@ -81,14 +81,14 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public CatalogCourse onCourse(RequestCycle cycle, String strCourseId) throws Exception {
+    public CatalogCourseJson onCourse(RequestCycle cycle, String strCourseId) throws Exception {
         int intCourseId = Integer.valueOf(strCourseId);
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
         final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
         checkOrgPermission(cycle, course.getOrgId());
-        return course;
+        return new CatalogCourseJson(course);
     }
 
     @WebAction

@@ -26,15 +26,17 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
 
         if(settings.courseId) {
             $.getJSON(settings.getCourseUrl + "/" + settings.courseId).done(function(data){
-                self.name(data.name);
-                name = data.name;
+                console.log("read data: ", data);
+                self.name(data.course.name);
+                name = data.course.name;
 
-                self.description(data.description);
-                description = data.description;
+                self.description(data.course.description);
+                description = data.course.description;
 
-                self.crl(data.crl);
-                crl = data.crl;
+                self.crl(data.course.crl);
+                crl = data.course.crl;
 
+                self.viewLink(data.thumbnailUrl);
                 self.initializing(false);
             });
         } else {
@@ -107,7 +109,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         }, options || {});
 
         var courseModel = new CourseModel();
-        courseModel.viewLink(settings.defaultImage);
         ko.applyBindings(courseModel);
 
         $("#fileupload").fileupload({
