@@ -30,7 +30,7 @@ public class CatalogCourseJson {
 
         if (course.getThumbnailUrl() != null) {
             try {
-                url = repoClient.getDownloadUrl(url);
+                url = repoClient.getDownloadUrl(course.getThumbnailUrl());
             } catch(Exception ex) {
                 //Ignore
             }
