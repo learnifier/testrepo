@@ -15,7 +15,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
 
     function CourseModel() {
         var self = this;
-        var name, description, thumbnailUrl;
+        var name, description, crl;
 
         console.log("Init coursemodel: ", settings);
         this.initializing = ko.observable(true);
@@ -23,7 +23,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         this.description = ko.observable();
         this.crl = ko.observable();
         this.progressPercent = ko.observable(0);
-        this.thumbnailUrl = ko.observable();
+        this.viewLink = ko.observable();
 
         if(settings.courseId) {
             $.getJSON(settings.getCourseUrl + "/" + settings.courseId).done(function(data){
@@ -34,8 +34,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 self.description(data.description);
                 description = data.description;
 
-                self.thumbnailUrl(data.thumbnailUrl);
-                thumbnailUrl = data.thumbnailUrl;
+                self.crl(data.crl);
+                crl = data.crl;
 
                 self.initializing(false);
             });
@@ -66,7 +66,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 data: {
                     name: self.name(),
                     description: self.description(),
-                    thumbnailUrl: self.thumbnailUrl()
+                    thumbnailUrl: self.crl()
                 }
             }).done(function(data){
                 if(self.isCreateMode()) {
@@ -94,7 +94,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 return self.name();
             } else {
                 console.log("Name: ", self.name(), name);
-                return self.name() && (self.name() != name || self.description() != description || self.thumbnailUrl() != thumbnailUrl)
+                return self.name() && (self.name() != name || self.description() != description || self.crl() != crl)
             }
         };
     }
@@ -110,7 +110,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
 
         console.log("");
         var courseModel = new CourseModel();
-        courseModel.thumbnailUrl(settings.defaultImage);
+        courseModel.viewLink(settings.defaultImage);
         ko.applyBindings(courseModel);
 
         $("#fileupload").fileupload({
@@ -132,7 +132,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 $("#uploadPbar").hide();
                 if (data.result.status === 'ok') {
                     courseModel.crl(data.result.crl);
-                    courseModel.thumbnailUrl(data.result.viewLink);
+                    courseModel.viewLink(data.result.viewLink);
                 } else {
                     require(['dabox-common'], function() {
                         cocobox.errorDialog("Upload failed", "Upload failed. Make sure that the file you selected is a valid image");

@@ -30,7 +30,7 @@ ${cpweb_foot}
     var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
     var sessionUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
-    require(['${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function() {
+    require(['cocobox-datetime', '${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function(dt) {
 
         var descEditor = CKEDITOR.replace("sessionDescription"),
                 updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[courseSession.id.id])}";
@@ -83,6 +83,10 @@ ${cpweb_foot}
                     'value': "${((session.enrollment.fromDate)?c)!''}"
                 });
 
+        $("#xxx").each(function(){
+           dt.dateTime(this);
+        });
+
         cpweb.editable($('#enrollmentToDate .editable-content'),
                 $('#enrollmentToDate .edit '),
                 function(value){},
@@ -118,6 +122,7 @@ ${cpweb_foot}
                     'value': "${((session.disenrollment.fromDate)?c)!''}"
                 });
 
+
         cpweb.editable($('#disenrollmentToDate .editable-content'),
                 $('#disenrollmentFromDate .edit '),
                 function(value){},
@@ -127,8 +132,36 @@ ${cpweb_foot}
                     'value': "${((session.disenrollment.toDate)?c)!''}"
                 });
 
-    });
 
+        require(['cocobox-togglebutton'], function(cocoboxToggle) {
+
+            var cb = $("#participantsVisible");
+            //Initialize "cb" as a toggle
+            cocoboxToggle.initToggle(cb);
+
+            //Listen on changes
+            $(cb).on('CocoboxToggleChange', function(ev) {
+                var buttonControl = ev.buttonControl;
+                buttonControl.disable();
+                $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: updateSessionFieldUrl,
+                    data: {pk: "participationEnabled", value: ""}
+                })
+                        .always(function() {
+                            buttonControl.enable();
+                        })
+                        .done(function(data) {
+                            if (data.something) {
+                                buttonControl.on();
+                            } else {
+                                buttonControl.off();
+                            }
+                        });
+            });
+        });
+    });
 
     var setProgressVisibility = function(visibility) {
         $.ajax({
@@ -199,6 +232,9 @@ ${cpweb_foot}
     <div id="settingsList">
         <ul>
             <li id="participantsVisible">
+                <div>
+                    <input type="checkbox" id="participantsVisible" />
+                </div>
                 <a class="setting">
                     <span class="row-label">[@dws.txt key="cpweb.project.session.participantsVisible.title" /]</span>
                     [@bsform.inputBoolean 'participantsVisible' 'Visible in course catalog' 'ON' 'OFF' false?string session=formsess /]
@@ -228,6 +264,9 @@ ${cpweb_foot}
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
                 <select style="width: 150px"></select>
             </span>
+            </li>
+            <li>
+                <input id="xxx" type="hidden">
             </li>
             <li id="enrollmentFromDate">
             <span class="setting">

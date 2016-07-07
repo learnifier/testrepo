@@ -50,6 +50,8 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
 
         checkSessionPermission(cycle, session);
+
+        Map<String, String> resultMap = new HashMap<>();
         final SessionField sessionField = SessionField.valueOf(pk);
         sessionField.accept(new SessionField.SessionFieldVisitor<Void>(){
             @Override
@@ -174,6 +176,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitParticipationEnabled() {
+                resultMap.put("rofl", "hej");
                 return null;
             }
 
@@ -188,9 +191,9 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             }
         });
 
-        Map<String, String> map = Collections.singletonMap("status", "OK");
+        resultMap.put("status", "OK");
 
-        return jsonTarget(map);
+        return jsonTarget(resultMap);
     }
 
     private ExtendedCatalogCourseSession getExtendedSession(CourseCatalogClient ccc, CatalogCourseSessionId courseSessionId) {
