@@ -10,12 +10,18 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
-import se.dabox.cocobox.cpweb.module.course.CatalogCourseJson;
-import se.dabox.cocobox.cpweb.module.project.details.DateTimeFormatter;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.coursecatalog.client.session.*;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
+import se.dabox.service.coursecatalog.client.session.DisenrollmentSettings;
+import se.dabox.service.coursecatalog.client.session.EnrollmentMode;
+import se.dabox.service.coursecatalog.client.session.EnrollmentSettings;
+import se.dabox.service.coursecatalog.client.session.ExtendedCatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.ParticipationSettings;
+import se.dabox.service.coursecatalog.client.session.SessionVisibility;
+import se.dabox.service.coursecatalog.client.session.VisibilityMode;
 import se.dabox.service.coursecatalog.client.session.impl.StandardDisenrollmentSettings;
 import se.dabox.service.coursecatalog.client.session.impl.StandardEnrollmentSettings;
 import se.dabox.service.coursecatalog.client.session.impl.StandardParticipationSettings;
@@ -26,16 +32,19 @@ import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static javafx.scene.input.KeyCode.O;
-import static se.dabox.cocobox.cpweb.module.project.session.SessionField.visibility;
+import static java.awt.SystemColor.text;
+import static se.dabox.cocobox.crisp.response.config.ProjectConfigType.date;
 
 /**
  *
@@ -280,8 +289,10 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         if(value == null) {
             return null;
         } else {
-            // TODO x2: Timezone? We get "2011-01-01 01:00" instead of "2011-01-01T01:00"
-            return Instant.from(LocalDateTime.parse(value.replace(" ", "T")).toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezeon correctly here
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime parsedDate = LocalDateTime.parse(value, formatter);
+
+            return Instant.from(parsedDate.toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezeon correctly here
         }
     }
 
