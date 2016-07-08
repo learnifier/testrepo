@@ -120,6 +120,10 @@
             <li class="[#if selected == 'overview']active[/#if]"><a href="${helper.urlFor('ProjectModule','overview',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.overview' /]</span></a></li>
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
 
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+            <li class="[#if selected == 'session']active[/#if]"><a href="${helper.urlFor('ProjectModule','session',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.session' /]</span></a></li>
+            [/@]
+            
             [#--
             [#if project.type.ptype == 2 && !isIdproject(prj)]
                 <li class="[#if selected == 'info']active[/#if]"><a href="${helper.urlFor('ProjectModule','details',[project.projectId])}"><span>Info</span></a></li>
@@ -130,9 +134,6 @@
             [/@]
             [/#if]
             
-            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-            <li class="[#if selected == 'session']active[/#if]"><a href="${helper.urlFor('ProjectModule','session',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.session' /]</span></a></li>
-            [/@]
 
             [#if !dwsrt.hasFeature("altcbweb")]
                 [#if project.type.ptype == 1 || project.type.ptype == 2]
