@@ -50,9 +50,9 @@ ${cpweb_foot}
                         <div id="courseDescription" contenteditable data-bind="value: description, ccbCKEditable: description, ccbCKEditableMode: 'classic'" tabindex="2"></div>
                     </div>
                     <div class="">
-                        <form id="fileUploadForm" action="${dwsrt.config['apiweb.baseurl']}imageupload?format=png" method="POST" enctype="multipart/form-data">
+                        <form id="fileUploadForm" action="${dwsrt.config['apiweb.baseurl']}imageupload?format=png&amnp;width=800&amp;height=450" method="POST" enctype="multipart/form-data">
                             <label for="fileupload" class="">
-                                <img data-bind="attr: {'src': viewLink}" style="width: 256px; height: 256px"/>
+                                <img data-bind="attr: {'src': viewLink}" style="width: 256px; height: 144px"/>
                             </label>
                             <input id="fileupload" type="file" name="file" capture="capture" style="position: absolute; left: -10000px;" />
                             <div id="uploadPbar" class="progress" style="height: 4px; margin: 0px 0px 8px 0px;" data-bind="visible: progressPercent()">
