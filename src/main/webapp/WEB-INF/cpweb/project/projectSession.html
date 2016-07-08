@@ -73,7 +73,7 @@ ${cpweb_foot}
         });
 
         $('#visibilityMode select').select2({
-            data: [{id: "hidden", text: "Hidden"}, {id: "visible", text: "Visible"}, {id: "preview", text: "Preview"}],
+            data: [{id: "hidden", text: "Not shown in catalog"}, {id: "visible", text: "Shown in catalog"}, {id: "preview", text: "Preview in catalog"}],
             allowClear: false,
             minimumResultsForSearch: Infinity
         }).val("[#if courseSession.visibility??]${courseSession.visibility.visibility}[#else]hidden[/#if]").trigger("change").ccbEditable({
