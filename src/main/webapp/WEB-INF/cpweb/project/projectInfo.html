@@ -129,6 +129,10 @@
                 <li class="[#if selected == 'details']active[/#if]"><a href="${helper.urlFor('VerifyProjectDesignModule','verifyNewDesignSecondary',[project.projectId])}"><span>Course[#--[@dws.txt key='cpweb.projectmenu.details' /]--]</span></a></li>
             [/@]
             [/#if]
+            
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+            <li class="[#if selected == 'session']active[/#if]"><a href="${helper.urlFor('ProjectModule','session',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.session' /]</span></a></li>
+            [/@]
 
             [#if !dwsrt.hasFeature("altcbweb")]
                 [#if project.type.ptype == 1 || project.type.ptype == 2]
@@ -150,9 +154,6 @@
             <li class="[#if selected == 'settings']active[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             [/@]
 
-            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
-            <li class="[#if selected == 'session']active[/#if]"><a href="${helper.urlFor('ProjectModule','session',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.session' /]</span></a></li>
-            [/@]
         </ul>
     </nav>
     </div>
