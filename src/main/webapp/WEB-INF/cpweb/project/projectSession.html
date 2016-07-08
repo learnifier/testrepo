@@ -48,7 +48,7 @@ ${cpweb_foot}
                     dataType: "json",
                     method: "POST",
                     [#if courseSession??]
-                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[courseSession.id.id])}",
+                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[project.projectId])}",
                     [#else]
                     url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'createSession',[project.projectId])}",
                     [/#if]
@@ -60,7 +60,7 @@ ${cpweb_foot}
         [#if courseSession??]
 
         var descEditor = CKEDITOR.replace("sessionDescription"),
-                updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[courseSession.id.id])}";
+                updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[project.projectId])}";
         descEditor.on('blur', function( evt ) {
             $.ajax({
                 dataType: "json",
@@ -90,7 +90,7 @@ ${cpweb_foot}
             data: [{id: "disabled", text: "Disabled"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Direct"}],
             allowClear: false,
             minimumResultsForSearch: Infinity
-        }).val("[#if courseSession.enrollmentSettings??]${courseSession.enrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
+        }).val("[#if (courseSession.enrollmentSettings.mode)??]${courseSession.enrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
             update: function (element) {
                 return $.ajax({
                     dataType: "json",
@@ -134,7 +134,7 @@ ${cpweb_foot}
             data: [{id: "disabled", text: "Disabled"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Direct"}],
             allowClear: false,
             minimumResultsForSearch: Infinity
-        }).val("[#if courseSession.disenrollmentSettings??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
+        }).val("[#if (courseSession.disenrollmentSettings.mode)??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
             update: function (element) {
                 return $.ajax({
                     dataType: "json",
@@ -275,13 +275,15 @@ ${cpweb_foot}
             <li id="enrollmentFromDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.from.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" value="${((session.enrollment.fromDate)?c)!''}" class="datefield editable-content">${(session.enrollment.fromDate?date?string.full)!''}</span>
+                [#assign enrollFromVal = (courseSession.enrollmentSettings.from)!'']
+                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" data-value="${enrollFromVal}" class="datefield editable-content">${(instantToDate(enrollFromVal)?datetime?string.full)!''}</span>
             </span>
             </li>
             <li id="enrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.to.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="enrollmentToDate" value="${((session.enrollment.toDate)?c)!''}" class="datefield editable-content">${(session.enrollment.toDate?date?string.full)!''}</span>
+                [#assign enrollToVal = (courseSession.enrollmentSettings.from)!'']
+                <span data-type="ccbdatetime" data-pk="enrollmentToDate" data-value="${enrollToVal}" class="datefield editable-content">${(instantToDate(enrollToVal)?datetime?string.full)!''}</span>
             </span>
             </li>
         </ul>
@@ -301,13 +303,15 @@ ${cpweb_foot}
             <li id="disenrollmentFromDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.from.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" value="${((session.disenrollment.fromDate)?c)!''}" class="datefield editable-content">${(session.disenrollment.fromDate?date?string.full)!''}</span>
+                [#assign disenrollFromVal = (courseSession.disenrollmentSettings.from)!'']
+                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" data-value="${(courseSession.disenrollmentSettings.from)!''}" class="datefield editable-content">${(instantToDate(disendrollFromVal)?datetime?string.full)!''}</span>
             </span>
             </li>
             <li id="disenrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.to.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" value="${((session.disenrollment.toDate)?c)!''}" class="datefield editable-content">${(session.disenrollment.toDate?date?string.full)!''}</span>
+                [#assign disenrollToVal = (courseSession.disenrollmentSettings.to)!'']
+                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" data-value="${disenrollToVal}" class="datefield editable-content">${(instantToDate(disenrollToVal)?datetime?string.full)!''}</span>
             </span>
             </li>
         </ul>

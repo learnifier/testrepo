@@ -5,13 +5,18 @@ package se.dabox.cocobox.cpweb.module.project.session;
 
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
@@ -32,19 +37,19 @@ import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import static java.awt.SystemColor.text;
-import static se.dabox.cocobox.crisp.response.config.ProjectConfigType.date;
 
 /**
  *
@@ -57,16 +62,24 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             LoggerFactory.getLogger(ProjectSessionJsonModule.class);
 
     @WebAction
-    public RequestTarget onSetCourseSessionField(RequestCycle cycle, String strCourseSessionId) {
+    public RequestTarget onSetCourseSessionField(RequestCycle cycle, String strProjectId) {
         final long caller = LoginUserAccountHelper.getUserId(cycle);
-        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
+
+        final Integer projectId = Integer.valueOf(strProjectId);
+
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final OrgProject project = ccbc.getProject(projectId);
+
+        checkPermission(cycle, project, strProjectId);
+
+
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(project.getCourseSessionId());
 
         final String pk = cycle.getRequest().getParameter("pk");
         final String value = cycle.getRequest().getParameter("value");
         final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
 
-        checkSessionPermission(cycle, session);
 
         Map<String, Object> resultMap = new HashMap<>();
         final SessionField sessionField = SessionField.valueOf(pk);
@@ -110,7 +123,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentFromDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
@@ -125,7 +138,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentToDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
@@ -156,7 +169,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentFromDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
@@ -171,7 +184,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentToDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
@@ -263,26 +276,39 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction
-    public RequestTarget onUpdateCourse(RequestCycle cycle, String strCourseSessionId) {
+    public RequestTarget onUpdateCourse(RequestCycle cycle, String strProjectId) {
         final long caller = LoginUserAccountHelper.getUserId(cycle);
-        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.valueOf(strCourseSessionId));
+        final Integer projectId = Integer.valueOf(strProjectId);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final OrgProject project = ccbc.getProject(projectId);
 
-        final String courseId = cycle.getRequest().getParameter("courseId");
+        checkPermission(cycle, project, strProjectId);
+
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(project.getCourseSessionId());
+
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
+        final CatalogCourseId courseId = CatalogCourseId.valueOf(Integer.valueOf(strCourseId));
+
+
         final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
-        checkSessionPermission(cycle, session);
 
-        // TODO: Add course change to updateSession.
-//        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourse(...).createUpdateSessionRequest();
-//        ccc.updateSession(usr);
+        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourseId(courseId).createUpdateSessionRequest();
+        ccc.updateSession(usr);
 
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
 
     @WebAction
     public RequestTarget onCreateSession(RequestCycle cycle, String strProjectId) {
+
         // TODO: Create session coupled to project and course.
         final long caller = LoginUserAccountHelper.getUserId(cycle);
+        final Integer projectId = Integer.valueOf(strProjectId);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final OrgProject project = ccbc.getProject(projectId);
+        checkPermission(cycle, project, strProjectId);
+
         final String courseId = cycle.getRequest().getParameter("courseId");
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
@@ -293,33 +319,26 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
     }
 
 
-    private Instant instantFromString(String value) {
-        if(value == null) {
+    private Instant instantFromString(String value, TimeZone tz) {
+        if(value == null || "".equals(value)) {
             return null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime parsedDate = LocalDateTime.parse(value, formatter);
-
-            return Instant.from(parsedDate.toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezeon correctly here
+            return parsedDate.atZone(tz.toZoneId()).toInstant();
         }
     }
 
-    protected void checkSessionPermission(RequestCycle cycle, CatalogCourseSession courseSession) { // TODO: implement
+    protected void checkPermission(RequestCycle cycle, OrgProject project, String strProjectId) {
+        if (project == null) {
+            LOGGER.warn("Project {} doesn't exist.", strProjectId);
+
+            ErrorCodeRequestTarget error
+                    = new ErrorCodeRequestTarget(HttpServletResponse.SC_NOT_FOUND);
+
+            throw new RetargetException(error);
+        } else {
+            super.checkPermission(cycle, project);
+        }
     }
-
-//        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-//        OrgProject project = ccbc.getProject(prjId);
-//        checkPermission(cycle, project, strProjectId);
-
-
-//        if (project == null) {
-//            LOGGER.warn("Project {} doesn't exist.", strProjectId);
-//
-//            ErrorCodeRequestTarget error
-//                    = new ErrorCodeRequestTarget(HttpServletResponse.SC_NOT_FOUND);
-//
-//            throw new RetargetException(error);
-//        } else {
-//            super.checkPermission(cycle, project);
-//        }
 }

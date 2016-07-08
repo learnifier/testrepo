@@ -632,7 +632,7 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         Map<String, Object> map = createMap();
         map.put("project", project);
-        final Long sessionId = project.getCourseSessionId();
+        final Integer sessionId = project.getCourseSessionId();
         if(sessionId != null) {
             final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
             final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(sessionId.intValue()); // TODO: sessionId should be Integer to start with.

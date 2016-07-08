@@ -1,4 +1,4 @@
-/* 
+/*
  * (c) Dabox AB 2013 All Rights Reserved
  */
 define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
@@ -26,10 +26,39 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     function lookupName(id) {
         var entry = sessionHash.lookup([id]);
         if(entry && entry.name) {
-            return  entry.name
+            return  entry.name;
         }
         else return "<em>Empty course session name</em>";
     }
+
+    function deleteCourse(id) {
+        var performDelete = function() {
+            var dlg = cocobox.longOp();
+
+            $.post(settings.deleteSessionUrl, {"id": id}).
+                    always(function (data) {
+                        dlg.abort();
+
+                        return data;
+                    }).
+                    done(function (data) {
+                        if (data.status === "ok") {
+                            window.location.href = window.location.href;
+                        } else if (data.status === "notempty") {
+                            cocobox.infoDialog("Unable to delete", "Only empty courses can be deleted");
+                        } else {
+                            cocobox.errorDialog("Unknown error", "Unknown status code from server: "+data.status);
+                        }
+                    }).fail(function() {
+                        dlg.abort();
+                    }).fail(cocobox.internal.ajaxError);
+        };
+
+        require(['dabox-common'], function() {
+            cocobox.confirmationDialogYesNo("Delete course?", "Do you want to delete this course?", performDelete);
+        });
+
+    };
 
     exports.init = function(options) {
 
@@ -39,7 +68,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
             newProjectUrl: undefined,
             newCourseUrl: undefined,
             courseDetailsUrl: undefined,
-            sessionDetailsUrl: undefined
+            sessionDetailsUrl: undefined,
+            deleteSessionUrl: undefined
         }, options || {});
 
         function formatSession ( d ) {
@@ -92,63 +122,80 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
         $(document).ready(function () {
 
             require(['dataTables-bootstrap'], function () {
+                var columnDefs = [
+                    {
+                        "targets": [0],
+                        "orderable": false,
+                        "width": "32px",
+                        "data": function (row, type, set) {
+                            row.imagelinkDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="' + row.link + '"><img width="32" src="' + row.thumbnailUrl + '" /></a>';
+
+                            if (type === 'display') {
+                                return row.imagelinkDisplay;
+                            } else if (type === 'filter') {
+                                return row.imagelinkDisplay;
+                            } else if (type === 'sort') {
+                                return row.imagelinkDisplay;
+                            } else {
+                                //Anything else and raw row
+                                return row.imagelinkDisplay;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [1],
+                        "width": "70%",
+                        "className": "block-link",
+                        "data": function (row, type, set) {
+                            console.log();
+                            if (!row.nameDisplay | !row.nameFilter) {
+                                row.nameFilter = row.course.name + ' ' + row.course.id.id;
+                                row.nameDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="' + "#" + '">' + row.course.name + '</a> ';
+                            }
+
+                            if (type === 'display') {
+                                return row.nameDisplay;
+                            } else if (type === 'filter') {
+                                return row.nameFilter;
+                            } else if (type === 'sort') {
+                                return row.course.name;
+                            } else {
+                                //Anything else and raw row
+                                return row.course.name;
+                            }
+                        }
+                    },
+                    {
+                        "targets": [2],
+                        "class": "details-control",
+                        "orderable": false,
+                        "data": function () {
+                            return '<a data-btntype="showhide" href="#">Show sessions</a>'
+                        },
+                        "defaultContent": ""
+                    }
+                ];
+
+                if (settings.deleteSessionUrl) {
+                    columnDefs.push({
+                        "targets": [3],
+                        "class": "details-control",
+                        "orderable": false,
+                        "data": function () {
+                            return '<a data-btntype="delcourse" href="#">Delete</a>';
+                        },
+                        "defaultContent": ""
+                    });
+                }
+
+
                 var dt = $('#listcourses').DataTable({
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                     "order": [[1, 'asc']],
                     "initComplete": function () {
                         $('#listprojects_filter input').attr('placeholder', 'Search projects');
                     },
-                    "columnDefs": [
-                        {
-                            "targets": [ 0 ],
-                            "orderable": false,
-                            "width": "32px",
-                            "data" : function(row, type, set) {
-                                row.imagelinkDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="'+ row.link + '"><img width="32" src="'+row.thumbnailUrl+'" /></a>';
-
-                                if (type === 'display') {
-                                    return row.imagelinkDisplay;
-                                } else if (type === 'filter') {
-                                    return row.imagelinkDisplay;
-                                } else if (type === 'sort') {
-                                    return row.imagelinkDisplay;
-                                } else {
-                                    //Anything else and raw row
-                                    return row.imagelinkDisplay;
-                                }
-                            }
-                        },
-                        {
-                            "targets": [1],
-                            "width": "70%",
-                            "className": "block-link",
-                            "data": function (row, type, set) {
-                                console.log();
-                                if (!row.nameDisplay | !row.nameFilter) {
-                                        row.nameFilter = row.course.name + ' ' + row.course.id.id;
-                                        row.nameDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="' + "#" + '">' + row.course.name + '</a> ';
-                                }
-
-                                if (type === 'display') {
-                                    return row.nameDisplay;
-                                } else if (type === 'filter') {
-                                    return row.nameFilter;
-                                } else if (type === 'sort') {
-                                    return row.course.name;
-                                } else {
-                                    //Anything else and raw row
-                                    return row.course.name;
-                                }
-                            }
-                        },
-                        {
-                            "targets": [2],
-                            "class":          "details-control",
-                            "orderable":      false,
-                            "data":           function(){return '<a class="btn btn-link">Show sessions</a>'},
-                            "defaultContent": ""
-                        }
-                    ],
+                    "columnDefs": columnDefs,
                     "ajax": {
                         "url": settings.listCoursesUrl,
                         "dataSrc": ""
@@ -209,12 +256,22 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     openModal("course", settings.newCourseUrl);
                 });
 
+                $('#listcourses').on( 'click', 'a[data-btntype=delcourse]', function (e) {
+                    console.log("Course about to be deleted", this);
+
+                    var row = dt.row($(this).closest('tr'));
+                    deleteCourse(row.data().id);
+
+                    //Do not bubble this event, otherwise we get a toggle show/hide as well
+                    e.preventDefault();
+                    return false;
+                });
 
                 $('#listcourses').on( 'click', 'tr td.details-control', function () {
                     var tr = $(this).closest('tr');
                     var row = dt.row( tr );
                     var idx = $.inArray( tr.attr('id'), detailRows );
-                    var link = tr.find(".details-control a");
+                    var link = tr.find(".details-control a[data-btntype=showhide]");
 
                     if ( row.child.isShown() ) {
                         // tr.removeClass( 'details' );
@@ -238,6 +295,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             detailRows.push( tr.attr('id') );
                         }
                     }
+
+                    return false;
                 } );
                 // On each draw, loop over the detailRows array and show any child rows
                 dt.on( 'draw', function () {

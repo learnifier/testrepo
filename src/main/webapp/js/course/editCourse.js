@@ -91,7 +91,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 return false;
             }
             if(self.isCreateMode()) {
-                return self.name();
+                return self.name() && self.description() && self.crl();
             } else {
                 console.log("Name: ", self.name(), name);
                 return self.name() && (self.name() != name || self.description() != description || self.crl() != crl)
@@ -109,6 +109,10 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         }, options || {});
 
         var courseModel = new CourseModel();
+        if (!settings.courseId) {
+            courseModel.viewLink(settings.defaultImage);
+        }
+
         ko.applyBindings(courseModel);
 
         $("#fileupload").fileupload({

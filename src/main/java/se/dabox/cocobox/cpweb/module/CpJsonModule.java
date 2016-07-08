@@ -46,12 +46,14 @@ import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.alert.ProjectAlertInfo;
 import se.dabox.service.common.ccbc.alert.ProjectAlertRequest;
 import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.MailBounceInfo;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.OrgProjectPredicates;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeConstants;
 import se.dabox.service.common.io.RuntimeIOException;
+import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.webutils.json.DataTablesJson;
@@ -86,6 +88,13 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         List<OrgProject> projects =
                 ccbc.listOrgProjects(orgId);
+
+        if ("t".equals(cycle.getRequest().getParameter("filter")) &&
+                WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ALT_COURSE_CATALOG)) {
+
+            projects = CollectionsUtil.sublist(projects, p -> p.getCourseSessionId() == null);
+        }
+
         projects = CollectionsUtil.sublist(projects, OrgProjectPredicates.
                 getSubtypePredicate(ProjectSubtypeConstants.MAIN));
         projects = filterProjects(cycle.getRequest().getParameter("f"), projects);
@@ -205,7 +214,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
 
         return jsonTarget(toJsonUserAccounts(cycle, uas, org.getId()));
     }
-    
+
     @WebAction
     public RequestTarget onSearchUsers(RequestCycle cycle, String strOrgId, String query) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
@@ -265,7 +274,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         }.encode();
     }
 
-    
+
     private ByteArrayOutputStream toJsonObjectProjects(RequestCycle cycle, List<OrgProject> projects,
             List<Long> favoriteIds) {
         ByteArrayOutputStream baos =
