@@ -320,7 +320,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
 
     private Instant instantFromString(String value, TimeZone tz) {
-        if(value == null) {
+        if(value == null || "".equals(value)) {
             return null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
