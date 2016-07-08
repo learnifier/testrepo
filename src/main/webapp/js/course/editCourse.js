@@ -109,6 +109,10 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
         }, options || {});
 
         var courseModel = new CourseModel();
+        if (!settings.courseId) {
+            courseModel.viewLink(settings.defaultImage);
+        }
+
         ko.applyBindings(courseModel);
 
         $("#fileupload").fileupload({
