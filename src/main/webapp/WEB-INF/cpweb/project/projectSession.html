@@ -134,7 +134,7 @@ ${cpweb_foot}
             data: [{id: "disabled", text: "Disabled"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Direct"}],
             allowClear: false,
             minimumResultsForSearch: Infinity
-        }).val("[#if courseSession.disenrollmentSettings??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
+        }).val("[#if (courseSession.disenrollmentSettings.mode)??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
             update: function (element) {
                 return $.ajax({
                     dataType: "json",
@@ -275,13 +275,13 @@ ${cpweb_foot}
             <li id="enrollmentFromDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.from.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" value="${((session.enrollment.fromDate)?c)!''}" class="datefield editable-content">${(session.enrollment.fromDate?date?string.full)!''}</span>
+                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" data-value="${((courseSession.enrollmentSettings.from))!''}" class="datefield editable-content">{(courseSession.enrollmentSettings.from?date?string.full)!''}</span>
             </span>
             </li>
             <li id="enrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.to.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="enrollmentToDate" value="${((session.enrollment.toDate)?c)!''}" class="datefield editable-content">${(session.enrollment.toDate?date?string.full)!''}</span>
+                <span data-type="ccbdatetime" data-pk="enrollmentToDate" data-value="${((session.enrollment.toDate)?c)!''}" class="datefield editable-content">${(session.enrollment.toDate?date?string.full)!''}</span>
             </span>
             </li>
         </ul>
