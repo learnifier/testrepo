@@ -86,6 +86,9 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
                 };
                     
+                if( items.length === 0 ) {
+                    tbody.append($('<tr />').append($('<td />').append('<div />').text('No sessions have been added yet.')));
+                }
                 items.forEach(function(item){
                     tbody
                         .append($('<tr />', { "style": "border-bottom: 1px solid #f2f2f2;"})
