@@ -20,7 +20,7 @@ ${cpweb_foot}
             newSessionUrl:  "${helper.urlFor('project.NewProjectModule','sessionSetup', [org.id])}",
             [/#if]
             courseId: "${courseId!''}",
-            defaultImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/High-contrast-image-missing.svg/2000px-High-contrast-image-missing.svg.png'
+            defaultImage: '${defaultImage}'
         });
     });
 

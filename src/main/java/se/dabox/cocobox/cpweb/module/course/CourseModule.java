@@ -14,6 +14,8 @@ import se.dabox.cocobox.cpweb.module.project.AbstractProjectWebModule;
 import se.dabox.cocosite.org.MiniOrgInfo;
 
 import java.util.Map;
+import se.dabox.cocobox.cpweb.CpwebConstants;
+import se.dabox.cocosite.freemarker.util.CdnUtils;
 
 /**
  *
@@ -50,6 +52,7 @@ public class CourseModule extends AbstractProjectWebModule {
         // Json call to get/save data will handle security check.
         Map<String, Object> map = createMap();
         map.put("courseId", strCourseId);
+        map.put("defaultImage", CdnUtils.getResourceUrl(CpwebConstants.SESSION_DEFAULT_THUMBNAIL));
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
 
@@ -58,6 +61,7 @@ public class CourseModule extends AbstractProjectWebModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Map<String, Object> map = createMap();
         map.put("org", org);
+        map.put("defaultImage", CdnUtils.getResourceUrl(CpwebConstants.SESSION_DEFAULT_THUMBNAIL));
         return new FreemarkerRequestTarget("/course/editCourse.html", map);
     }
 }

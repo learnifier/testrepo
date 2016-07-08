@@ -34,7 +34,7 @@ public final class CpwebConstants {
      * the cdn
      *
      */
-    public static final String SESSION_DEFAULT_THUMBNAIL = "/cocobox/img/cd_default.png";
+    public static final String SESSION_DEFAULT_THUMBNAIL = "/cocobox/img/catalog/bag-and-hands-800.jpg";
 
     private CpwebConstants() {
     }
