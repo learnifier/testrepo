@@ -44,19 +44,25 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
 
         function formatSession ( d ) {
             function genHtml(items, addUrl) {
-                var table = $('<table/>', { "class": ""}),
-                    tbody = $('<tbody>').appendTo(table);
+                var table = $('<table/>', { "class": "", "style": "width: 100%;"}),
+                    tbody = $('<tbody>', { "style": "border: 0;"}).appendTo(table),
+                    addBtn = $("<a />", {"class": "btn btn-primary pull-right", "style": "margin-top: 10px;", "href": addUrl}).html("<i class='glyphicon glyphicon-plus-sign'></i> Add Session"),
+                    title = $("<h3 />", {"class": "", "style": "margin-top: 10px;", "href": addUrl}).html("Sessions"),
+                    header = '';
 
+                if(addUrl) {
+                    tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
+                } else {
+                    tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
+                };
+                    
                 items.forEach(function(item){
                     tbody
-                        .append($('<tr />')
+                        .append($('<tr />', { "style": "border-bottom: 1px solid #f2f2f2;"})
                             .append($('<td />')
                                 .append($('<a />', {href: item.url})
                                     .html(item.name))));
                 });
-                if(addUrl) {
-                    tbody.append($("<a />", {"class": "btn btn-primary-outlined", "href": addUrl}).html("<i class='glyphicon glyphicon-plus-sign'></i> Add Session"));
-                }
                 return table;
             }
             var deferred = $.Deferred();
@@ -139,7 +145,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             "targets": [2],
                             "class":          "details-control",
                             "orderable":      false,
-                            "data":           function(){return '<a>Show sessions</a>'},
+                            "data":           function(){return '<a class="btn btn-link">Show sessions</a>'},
                             "defaultContent": ""
                         }
                     ],
