@@ -7,6 +7,7 @@ import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocosite.freemarker.util.CdnUtils;
 import se.dabox.service.common.cr.DwsContentRepoClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 
 /**
  *
@@ -42,5 +43,11 @@ public class CatalogCourseJson {
 
         return url;
     }
+
+    public int getId() {
+        return course.getId().getId();
+    }
+
+
 
 }

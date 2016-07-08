@@ -3,44 +3,35 @@
  */
 package se.dabox.cocobox.cpweb.module.course;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.google.common.base.Strings;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
-import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
-import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.create.CreateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
-import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
-import se.dabox.util.collections.CollectionsUtil;
-
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
+import se.dabox.service.client.CacheClients;
+import se.dabox.service.coursecatalog.client.DeniedException;
+import se.dabox.service.coursecatalog.client.NotFoundException;
 
 import se.dabox.util.collections.CollectionsUtil;
 
@@ -163,5 +154,25 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
                     put("id", course.getId());
                 }}
         );
+    }
+
+    @WebAction
+    public Map<String, String> onDeleteCourse(RequestCycle cycle, String strOrgId) {
+        int courseId = DruwaParamHelper.getMandatoryIntParam(LOGGER, cycle.getRequest(), "id");
+
+        CourseCatalogClient client = CacheClients.getClient(cycle, CourseCatalogClient.class);
+
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+        try {
+            client.deleteCourse(caller, CatalogCourseId.valueOf(courseId));
+        } catch (NotFoundException notFoundException) {
+            //Ignore
+        } catch (DeniedException deniedException) {
+            return Collections.singletonMap("status", "notempty");
+        }
+
+        WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Course deleted", WebMessageType.success));
+
+        return Collections.singletonMap("status", "ok");
     }
 }

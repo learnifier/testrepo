@@ -15,7 +15,8 @@ ${cpweb_foot}
             spinnerUrl: "[@common.spinnerUrl /]",
             courseDetailsUrl: "${helper.urlFor('course.CourseModule','editCourse')}",
             sessionDetailsUrl: "${helper.urlFor('project.ProjectModule','sessionOverview')}",
-            projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}"
+            projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}",
+            deleteSessionUrl: "${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}"
         });
     });
 
@@ -41,6 +42,9 @@ ${cpweb_foot}
             <th></th>
             <th>Course Name</th>
             <th>Sessions</th>
+            [#if true]
+            <th></th>
+            [/#if]
         </tr>
         </thead>
         <tbody>
