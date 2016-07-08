@@ -25,11 +25,12 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
 <section class="ccb-page-header margin-bottom">
-    [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
     <div class="ccb-page-header__actions--right">
-        <a href="#" class="btn btn-primary" id="addcourse-btn"><span class="glyphicon glyphicon-plus-sign"></span> Add Course</a>
+        [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
+            <a href="#" class="btn btn-primary" id="addcourse-btn"><span class="glyphicon glyphicon-plus-sign"></span> Add Course</a>
+        [/@]
+        <a href="${helper.urlFor('CpMainModule', 'listProjects', [org.id])}" class="btn btn-primary">View Projects</a>
     </div>
-    [/@]
     <h1 class="page-title">Courses</h1>
 </section>
 

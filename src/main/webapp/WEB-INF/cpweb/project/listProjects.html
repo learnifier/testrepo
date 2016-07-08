@@ -21,11 +21,14 @@
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 
 <section class="ccb-page-header margin-bottom">
-    [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
         <div class="ccb-page-header__actions--right">
-            <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary" id="addproject-btn"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
+            [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
+                <a href="${helper.urlFor('project.NewProjectModule','setup',[org.id])}" class="btn btn-primary" id="addproject-btn"><span class="glyphicon glyphicon-plus-sign"></span> Add Project</a>
+            [/@]
+            [@dwsrt.feature feature="altcoursecatalog"]
+                <a href="${helper.urlFor('course.CourseModule', 'list', [org.id])}" class="btn btn-primary">View Courses</a>
+            [/@]
        </div>
-    [/@]
     <h1 class="page-title">Projects</h1>
 </section>
 <nav>
