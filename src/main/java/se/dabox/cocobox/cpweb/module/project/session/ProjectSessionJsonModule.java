@@ -29,6 +29,8 @@ import se.dabox.util.collections.CollectionsUtil;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -99,14 +101,13 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentFromDate() {
-//                Instant instant = Instant.parse(value);
-                Instant instant = Instant.now();
+                final Instant newVal = instantFromString(value);
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
-                    newSettings = new StandardEnrollmentSettings(false, instant, null, null);
+                    newSettings = new StandardEnrollmentSettings(false, newVal, null, null);
                 } else {
-                    newSettings = new StandardEnrollmentSettings(settings.isEnabled(), instant, settings.getTo(), settings.getMode());
+                    newSettings = new StandardEnrollmentSettings(settings.isEnabled(), newVal, settings.getTo(), settings.getMode());
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
@@ -115,14 +116,13 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentToDate() {
-//                Instant instant = Instant.parse(value);
-                Instant instant = Instant.now();
+                final Instant newVal = instantFromString(value);
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
-                    newSettings = new StandardEnrollmentSettings(false, null, instant, null);
+                    newSettings = new StandardEnrollmentSettings(false, null, newVal, null);
                 } else {
-                    newSettings = new StandardEnrollmentSettings(settings.isEnabled(), settings.getFrom(), instant, settings.getMode());
+                    newSettings = new StandardEnrollmentSettings(settings.isEnabled(), settings.getFrom(), newVal, settings.getMode());
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
@@ -135,13 +135,10 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
-//                    newSettings = new StandardDisenrollmentSettings(Instant.now(), Instant.now(), mode);
                     newSettings = new StandardDisenrollmentSettings(null, null, mode);
                 } else {
                     newSettings = new StandardDisenrollmentSettings(settings.getFrom(), settings.getTo(), mode);
                 }
-//                final ExtendedCatalogCourseSession extSession = getExtendedSession(ccc, courseSessionId);
-//                extSession.getExtendedDisenrollmentSettings(); ???
 
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
@@ -150,14 +147,13 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentFromDate() {
-//                Instant instant = Instant.parse(value);
-                Instant instant = Instant.now();
+                final Instant newVal = instantFromString(value);
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
-                    newSettings = new StandardDisenrollmentSettings(null, instant, null);
+                    newSettings = new StandardDisenrollmentSettings(newVal, null, null);
                 } else {
-                    newSettings = new StandardDisenrollmentSettings(settings.getFrom(), instant, settings.getMode());
+                    newSettings = new StandardDisenrollmentSettings(newVal, settings.getTo(), settings.getMode());
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
@@ -166,14 +162,13 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentToDate() {
-//                Instant instant = Instant.parse(value);
-                Instant instant = Instant.now();
+                final Instant newVal = instantFromString(value);
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
-                    newSettings = new StandardDisenrollmentSettings(null, instant, null);
+                    newSettings = new StandardDisenrollmentSettings(null, newVal, null);
                 } else {
-                    newSettings = new StandardDisenrollmentSettings(settings.getFrom(), instant, settings.getMode());
+                    newSettings = new StandardDisenrollmentSettings(settings.getFrom(), newVal, settings.getMode());
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
@@ -214,7 +209,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 ccc.updateSession(usr);
                 resultMap.put("enabled", newVal);
                 return null;
-           }
+            }
 
             @Override
             public Void visitParticipationShowThumbnail() {
@@ -281,7 +276,17 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
     }
 
 
+    private Instant instantFromString(String value) {
+        if(value == null) {
+            return null;
+        } else {
+            // TODO x2: Timezone? We get "2011-01-01 01:00" instead of "2011-01-01T01:00"
+            return Instant.from(LocalDateTime.parse(value.replace(" ", "T")).toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezeon correctly here
+        }
+    }
+
     protected void checkSessionPermission(RequestCycle cycle, CatalogCourseSession courseSession) { // TODO: implement
+    }
 
 //        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 //        OrgProject project = ccbc.getProject(prjId);
@@ -298,6 +303,4 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 //        } else {
 //            super.checkPermission(cycle, project);
 //        }
-    }
-
 }

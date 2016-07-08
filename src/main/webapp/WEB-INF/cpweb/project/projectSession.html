@@ -30,7 +30,7 @@ ${cpweb_foot}
     //    var settingsUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
     var sessionUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
 
-    require(['cocobox-datetime', '${contextPath}/js/cpweb.js', 'select2-4.min', 'cocobox-editable', 'ckeditor4'], function(dt) {
+    require(['${contextPath}/js/cpweb.js', 'cocobox-editable', 'cocobox-datetime', 'select2-4.min', 'ckeditor4'], function() {
         $('#courseSelector select').select2({
             ajax: {
                 url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'listCourses',[org.id])}",
@@ -43,15 +43,15 @@ ${cpweb_foot}
             allowClear: true,
             minimumResultsForSearch: Infinity
         }).ccbEditable({
-        update: function (element) {
-            return $.ajax({
-                dataType: "json",
-                method: "POST",
-                url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[courseSession.id.id])}",
-                data: { courseId: $(element).val() }
-            });
-        }
-    });
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[courseSession.id.id])}",
+                    data: { courseId: $(element).val() }
+                });
+            }
+        });
 
         [#if courseSession??]
 
@@ -97,28 +97,33 @@ ${cpweb_foot}
             }
         });
 
-        cpweb.editable($('#enrollmentFromDate .editable-content'),
-                $('#enrollmentFromDate .edit '),
-                function(value){},
-                {type: 'date',
-                    'url': updateSessionFieldUrl,
-                    'pk': 'enrollmentFromDate',
-                    'value': "${((session.enrollment.fromDate)?c)!''}"
-                });
+//        cpweb.editable($('#enrollmentFromDate .editable-content'),
+//                $('#enrollmentFromDate .edit '),
+//                function(value){},
+//                {type: 'date',
+//                    'url': updateSessionFieldUrl,
+//                    'pk': 'enrollmentFromDate',
+//                    'value': "${((session.enrollment.fromDate)?c)!''}"
+//                });
 
-        $("#xxx").each(function(){
-            dt.dateTime(this);
-        });
 
-        cpweb.editable($('#enrollmentToDate .editable-content'),
-                $('#enrollmentToDate .edit '),
-                function(value){},
-                {type: 'date',
-                    'url': updateSessionFieldUrl,
-                    'pk': 'enrollmentFromDate',
-                    'value': "${((session.enrollment.toDate)?c)!''}"
-                });
+        window.setTimeout(function(){
+            $(".datefield").editable({
+                'url': updateSessionFieldUrl
+            });
 
+        }, 1000);
+
+
+//        cpweb.editable($('#enrollmentToDate .editable-content'),
+//                $('#enrollmentToDate .edit '),
+//                function(value){},
+//                {type: 'date',
+//                    'url': updateSessionFieldUrl,
+//                    'pk': 'enrollmentFromDate',
+//                    'value': "${((session.enrollment.toDate)?c)!''}"
+//                });
+//
 
         // Disenroll section
         $('#disenrollmentMode select').select2({
@@ -136,24 +141,24 @@ ${cpweb_foot}
             }
         });
 
-        cpweb.editable($('#disenrollmentFromDate .editable-content'),
-                $('#disenrollmentFromDate .edit '),
-                function(value){},
-                {type: 'date',
-                    'url': updateSessionFieldUrl,
-                    'pk': 'participationexpiration',
-                    'value': "${((session.disenrollment.fromDate)?c)!''}"
-                });
-
-
-        cpweb.editable($('#disenrollmentToDate .editable-content'),
-                $('#disenrollmentFromDate .edit '),
-                function(value){},
-                {type: 'date',
-                    'url': updateSessionFieldUrl,
-                    'pk': 'disenrollmentFromDate',
-                    'value': "${((session.disenrollment.toDate)?c)!''}"
-                });
+//        cpweb.editable($('#disenrollmentFromDate .editable-content'),
+//                $('#disenrollmentFromDate .edit '),
+//                function(value){},
+//                {type: 'date',
+//                    'url': updateSessionFieldUrl,
+//                    'pk': 'participationexpiration',
+//                    'value': "${((session.disenrollment.fromDate)?c)!''}"
+//                });
+//
+//
+//        cpweb.editable($('#disenrollmentToDate .editable-content'),
+//                $('#disenrollmentFromDate .edit '),
+//                function(value){},
+//                {type: 'date',
+//                    'url': updateSessionFieldUrl,
+//                    'pk': 'disenrollmentFromDate',
+//                    'value': "${((session.disenrollment.toDate)?c)!''}"
+//                });
 
         require(['cocobox-togglebutton'], function(cocoboxToggle) {
             $(".toggleButton").each(function(){
@@ -263,19 +268,16 @@ ${cpweb_foot}
                 <select style="width: 150px"></select>
             </span>
             </li>
-            <li>
-                <input id="xxx" type="hidden">
-            </li>
             <li id="enrollmentFromDate">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <span class="short editable-content">${(session.enrollment.fromDate)!'Click to set enrollment start date'}</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.from.title" /]</span>
+                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" value="${((session.enrollment.fromDate)?c)!''}" class="datefield editable-content">${(session.enrollment.fromDate?date?string.full)!''}</span>
             </span>
             </li>
             <li id="enrollmentToDate">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
-                <span class="short editable-content">${(session.enrollment.toDate)!'Click to set enrollment end date'}</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.to.title" /]</span>
+                <span data-type="ccbdatetime" data-pk="enrollmentToDate" value="${((session.enrollment.toDate)?c)!''}" class="datefield editable-content">${(session.enrollment.toDate?date?string.full)!''}</span>
             </span>
             </li>
         </ul>
@@ -294,14 +296,14 @@ ${cpweb_foot}
             </li>
             <li id="disenrollmentFromDate">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.mode.title" /]</span>
-                <span class="short editable-content">${(session.disenrollment.fromDate)!'Click to set disenrollment start date'}</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.from.title" /]</span>
+                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" value="${((session.disenrollment.fromDate)?c)!''}" class="datefield editable-content">${(session.disenrollment.fromDate?date?string.full)!''}</span>
             </span>
             </li>
             <li id="disenrollmentToDate">
             <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.mode.title" /]</span>
-                <span class="short editable-content">${(session.disenrollment.toDate)!'Click to set disenrollment end date'}</span>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.to.title" /]</span>
+                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" value="${((session.disenrollment.toDate)?c)!''}" class="datefield editable-content">${(session.disenrollment.toDate?date?string.full)!''}</span>
             </span>
             </li>
         </ul>
