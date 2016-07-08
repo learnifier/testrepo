@@ -9,7 +9,7 @@
         var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
         var spinnerUrl = "[@common.spinnerUrl /]";
         var newProjectUrl = "${helper.urlFor('project.NewProjectModule','setup',[org.id])}";
-        var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?f=${projectFilter}";
+        var listProjectsAjaxSource = "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}?filter=t&f=${projectFilter}";
 
         require(["${contextPath}/js/project/listProjects.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
            //No initialization needed
