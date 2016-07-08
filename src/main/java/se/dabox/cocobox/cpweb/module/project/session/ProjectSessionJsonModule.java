@@ -16,6 +16,7 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
@@ -283,17 +284,17 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
         checkPermission(cycle, project, strProjectId);
 
-
         final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(project.getCourseSessionId());
 
-        final String courseId = cycle.getRequest().getParameter("courseId");
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
+        final CatalogCourseId courseId = CatalogCourseId.valueOf(Integer.valueOf(strCourseId));
+
+
         final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
-//        checkPermission(cycle, project, strProjectId);
 
-        // TODO: Add course change to updateSession.
-//        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourse(...).createUpdateSessionRequest();
-//        ccc.updateSession(usr);
+        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourseId(courseId).createUpdateSessionRequest();
+        ccc.updateSession(usr);
 
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
