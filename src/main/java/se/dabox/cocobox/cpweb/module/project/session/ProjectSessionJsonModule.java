@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
@@ -282,20 +284,24 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final OrgProject project = ccbc.getProject(projectId);
 
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+
         checkPermission(cycle, project, strProjectId);
 
         final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(project.getCourseSessionId());
-
-        final String strCourseId = cycle.getRequest().getParameter("courseId");
-        final CatalogCourseId courseId = CatalogCourseId.valueOf(Integer.valueOf(strCourseId));
-
-
-        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
 
-        final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourseId(courseId).createUpdateSessionRequest();
-        ccc.updateSession(usr);
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
 
+
+        if("".equals(strCourseId)) {
+            ccbc.updateOrgProject(new UpdateProjectRequestBuilder(caller, projectId).setCourseSessionId(null).createUpdateProjectRequest());
+            ccc.deleteSession(caller, session.getId());
+        } else {
+            final CatalogCourseId courseId = CatalogCourseId.valueOf(Integer.valueOf(strCourseId));
+            final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setCourseId(courseId).createUpdateSessionRequest();
+            ccc.updateSession(usr);
+        }
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
 

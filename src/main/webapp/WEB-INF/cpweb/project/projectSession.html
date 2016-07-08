@@ -53,6 +53,8 @@ ${cpweb_foot}
                     url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'createSession',[project.projectId])}",
                     [/#if]
                     data: { courseId: $(element).val() }
+                }).done(function(){
+                    window.location.href = window.location.href;
                 });
             }
         });
