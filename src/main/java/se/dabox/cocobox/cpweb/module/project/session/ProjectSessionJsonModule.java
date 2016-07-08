@@ -300,7 +300,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime parsedDate = LocalDateTime.parse(value, formatter);
 
-            return Instant.from(parsedDate.toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezeon correctly here
+            return Instant.from(parsedDate.toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezone correctly here
         }
     }
 
