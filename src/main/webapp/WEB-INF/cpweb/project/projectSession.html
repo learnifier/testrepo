@@ -301,13 +301,13 @@ ${cpweb_foot}
             <li id="disenrollmentFromDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.from.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" value="${((session.disenrollment.fromDate)?c)!''}" class="datefield editable-content">${(instantToDate(courseSession.disenrollmentSettings.from)?datetime)?string.full!''}</span>
+                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" data-value="${(courseSession.disenrollmentSettings.from)!''}" class="datefield editable-content">${(instantToDate(courseSession.disenrollmentSettings.from)?datetime)?string.full!''}</span>
             </span>
             </li>
             <li id="disenrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.to.title" /]</span>
-                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" value="${((session.disenrollment.toDate)?c)!''}" class="datefield editable-content">${(instantToDate(courseSession.enrollmentSettings.to)?datetime)?string.full!''}</span>
+                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" data-value="${(courseSession.disenrollmentSettings.to)!''}" class="datefield editable-content">${(instantToDate(courseSession.enrollmentSettings.to)?datetime)?string.full!''}</span>
             </span>
             </li>
         </ul>
