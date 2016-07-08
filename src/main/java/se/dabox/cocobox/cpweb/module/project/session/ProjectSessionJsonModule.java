@@ -12,9 +12,9 @@ import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.project.CreateCatalogCourseSessionCmd;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
@@ -42,11 +42,8 @@ import se.dabox.util.collections.CollectionsUtil;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -315,9 +312,19 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         final OrgProject project = ccbc.getProject(projectId);
         checkPermission(cycle, project, strProjectId);
 
-        final String courseId = cycle.getRequest().getParameter("courseId");
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
+        CatalogCourseId courseId = CatalogCourseId.valueOf(Integer.valueOf(strCourseId));
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
+
+        new CreateCatalogCourseSessionCmd(cycle, caller).run(project, course);
+
         return jsonTarget(Collections.singletonMap("status", "ok"));
+
+
+
     }
+
 
 
     private ExtendedCatalogCourseSession getExtendedSession(CourseCatalogClient ccc, CatalogCourseSessionId courseSessionId) {

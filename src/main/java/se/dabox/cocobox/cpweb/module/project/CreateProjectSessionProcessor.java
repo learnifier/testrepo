@@ -54,7 +54,6 @@ import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.create.CreateSessionRequest;
-import se.dabox.service.coursecatalog.client.session.impl.StandardCatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.impl.StandardCourseSessionSource;
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
@@ -63,11 +62,11 @@ import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductTypes;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
+import se.dabox.util.collections.CollectionsUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -96,7 +95,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
     @Override
     public RequestTarget processSession(final RequestCycle cycle, final NewProjectSession nps,
-            final MatListProjectDetailsForm matListDetails) {
+                                        final MatListProjectDetailsForm matListDetails) {
 
         String strNpsId = nps.getUuid().toString();
 
@@ -133,16 +132,16 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                     public NewProjectRequest callMaterialListProject() {
                         ParamUtil.required(matListDetails, "matListDetails");
                         return NewProjectRequest.
-                        newMaterialListProject(
-                                input.getProjectname(),
-                                orgId,
-                                input.getProjectlang(),
-                                LoginUserAccountHelper.getUserId(cycle),
-                                input.getCountry(),
-                                input.getTimezone(),
-                                null,
-                                matListDetails.getUserTitle(),
-                                matListDetails.getUserDescription());
+                                newMaterialListProject(
+                                        input.getProjectname(),
+                                        orgId,
+                                        input.getProjectlang(),
+                                        LoginUserAccountHelper.getUserId(cycle),
+                                        input.getCountry(),
+                                        input.getTimezone(),
+                                        null,
+                                        matListDetails.getUserTitle(),
+                                        matListDetails.getUserDescription());
 
                     }
 
@@ -160,12 +159,12 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                     public NewProjectRequest callSingleProductProject() {
                         nps.setProds(Collections.singletonList(nps.getProductId()));
                         return NewProjectRequest.
-                        newSingleProductProject(
-                                input.getProjectname(), orgId, input.getProjectlang(),
-                                LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
-                                input.getTimezone(), null, matListDetails.getUserTitle(),
-                                matListDetails.getUserDescription(), nps.getProductId()
-                        );
+                                newSingleProductProject(
+                                        input.getProjectname(), orgId, input.getProjectlang(),
+                                        LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
+                                        input.getTimezone(), null, matListDetails.getUserTitle(),
+                                        matListDetails.getUserDescription(), nps.getProductId()
+                                );
                     }
 
                 });
@@ -289,35 +288,17 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         long caller = LoginUserAccountHelper.getUserId(cycle);
 
         final CatalogCourseId courseId = CatalogCourseId.valueOf(nps.getCourseId());
-        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build());
-        if(courses == null || courses.size() != 1) {
+        final CatalogCourse course =  CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
+        if(course == null) {
             return;
         }
-        CatalogCourse course = courses.get(0);
 
-
-        UpdateProjectRequestBuilder updateBuilder
-                = new UpdateProjectRequestBuilder(caller, project.getProjectId());
-
-
-        final UpdateSessionRequest updateSource = UpdateSessionRequestBuilder.newCreateBuilder(caller).setSource(new StandardCourseSessionSource(CocoboxCourseSourceConstants.PROJECT, Long.toString(project.getProjectId()))).createUpdateSessionRequest();
-
-        final CreateSessionRequest csr = new CreateSessionRequest(caller, courseId)
-                .withName(course.getName())
-                .withLocale(project.getLocale())
-                .withUpdate(updateSource);
-
-        final CatalogCourseSession ccs = ccc.createSession(csr);
-
-        updateBuilder.setCourseSessionId(ccs.getId().getId());
-        UpdateProjectRequest upr = updateBuilder.createUpdateProjectRequest();
-
-        getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
+        new CreateCatalogCourseSessionCmd(cycle, caller).run(project, course);
     }
 
     private void addProjectProduct(RequestCycle cycle, ProjectMaterialCoordinatorClient pmcClient,
-            OrgProject project, String prodId, boolean retryAttempt,
-            Map<String, String> productExtraSettings)
+                                   OrgProject project, String prodId, boolean retryAttempt,
+                                   Map<String, String> productExtraSettings)
             throws DeniedException, ProjectProductException {
 
         try {
@@ -342,7 +323,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void addProjectProductError(String prodId, OrgProject project, Exception ex,
-            RequestCycle cycle) {
+                                        RequestCycle cycle) {
         LOGGER.warn("Unable to add product {} to project {}",
                 prodId, project.getProjectId(), ex);
         if (failures == null) {
@@ -354,7 +335,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void addProjectOrgMat(ProjectMaterialCoordinatorClient pmcClient, OrgProject project,
-            Long orgMatId) {
+                                  Long orgMatId) {
         try {
             pmcClient.addProjectOrgMaterial(project.getProjectId(), orgMatId);
         } catch (Exception ex) {
