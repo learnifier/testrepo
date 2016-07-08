@@ -48,7 +48,7 @@ ${cpweb_foot}
                     dataType: "json",
                     method: "POST",
                     [#if courseSession??]
-                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[courseSession.id.id])}",
+                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[project.projectId])}",
                     [#else]
                     url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'createSession',[project.projectId])}",
                     [/#if]
@@ -60,7 +60,7 @@ ${cpweb_foot}
         [#if courseSession??]
 
         var descEditor = CKEDITOR.replace("sessionDescription"),
-                updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[courseSession.id.id])}";
+                updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[project.projectId])}";
         descEditor.on('blur', function( evt ) {
             $.ajax({
                 dataType: "json",
