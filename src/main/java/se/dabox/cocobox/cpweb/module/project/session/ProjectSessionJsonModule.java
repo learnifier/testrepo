@@ -39,12 +39,15 @@ import se.dabox.util.collections.CollectionsUtil;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**
@@ -119,7 +122,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentFromDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
@@ -134,7 +137,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitEnrollmentToDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
                 if(settings == null) {
@@ -165,7 +168,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentFromDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
@@ -180,7 +183,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
             @Override
             public Void visitDisenrollmentToDate() {
-                final Instant newVal = instantFromString(value);
+                final Instant newVal = instantFromString(value, project.getTimezone());
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
                 if(settings == null) {
@@ -315,14 +318,13 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
     }
 
 
-    private Instant instantFromString(String value) {
+    private Instant instantFromString(String value, TimeZone tz) {
         if(value == null) {
             return null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime parsedDate = LocalDateTime.parse(value, formatter);
-
-            return Instant.from(parsedDate.toInstant(ZoneOffset.UTC)); // TODO: Not sure how to convert /w timezone correctly here
+            return parsedDate.atZone(tz.toZoneId()).toInstant();
         }
     }
 
