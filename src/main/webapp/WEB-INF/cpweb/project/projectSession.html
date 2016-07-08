@@ -47,7 +47,11 @@ ${cpweb_foot}
                 return $.ajax({
                     dataType: "json",
                     method: "POST",
+                    [#if courseSession??]
                     url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[courseSession.id.id])}",
+                    [#else]
+                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'createSession',[project.projectId])}",
+                    [/#if]
                     data: { courseId: $(element).val() }
                 });
             }

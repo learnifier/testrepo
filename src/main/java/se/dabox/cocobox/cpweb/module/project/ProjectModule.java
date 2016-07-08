@@ -631,7 +631,7 @@ public class ProjectModule extends AbstractProjectWebModule {
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
 
         Map<String, Object> map = createMap();
-
+        map.put("project", project);
         final Long sessionId = project.getCourseSessionId();
         if(sessionId != null) {
             final CourseCatalogClient ccc = getCourseCatalogClient(cycle);

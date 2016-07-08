@@ -279,6 +279,14 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(Collections.singletonMap("status", "ok"));
     }
 
+    @WebAction
+    public RequestTarget onCreateSession(RequestCycle cycle, String strProjectId) {
+        // TODO: Create session coupled to project and course.
+        final long caller = LoginUserAccountHelper.getUserId(cycle);
+        final String courseId = cycle.getRequest().getParameter("courseId");
+        return jsonTarget(Collections.singletonMap("status", "ok"));
+    }
+
 
     private ExtendedCatalogCourseSession getExtendedSession(CourseCatalogClient ccc, CatalogCourseSessionId courseSessionId) {
         return CollectionsUtil.singleItemOrNull(ccc.listExtendedSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
