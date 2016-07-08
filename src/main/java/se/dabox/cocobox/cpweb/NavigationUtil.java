@@ -13,6 +13,7 @@ import se.dabox.cocobox.cpweb.module.CpMainModule;
 import se.dabox.cocobox.cpweb.module.OrgSelectorModule;
 import se.dabox.cocobox.cpweb.module.account.AccountSettingsModule;
 import se.dabox.cocobox.cpweb.module.branding.BrandingModule;
+import se.dabox.cocobox.cpweb.module.course.CourseModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.DesignModule;
 import se.dabox.cocobox.cpweb.module.cug.ClientUserGroupModule;
 import se.dabox.cocobox.cpweb.module.integration.IntegrationErrorModule;
@@ -22,7 +23,9 @@ import se.dabox.cocobox.cpweb.module.project.ProjectModule;
 import se.dabox.cocobox.cpweb.module.project.VerifyProjectDesignModule;
 import se.dabox.cocobox.cpweb.module.user.UserModule;
 import se.dabox.cocobox.cpweb.state.ErrorState;
+import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.webfeature.WebFeatures;
 
 /**
  *
@@ -35,11 +38,11 @@ public final class NavigationUtil {
                 ProjectModule.OVERVIEW_ACTION, Long.toString(projectId));
     }
 
-    
+
     public static String toProjectPageUrlPrefix(RequestCycle cycle) {
         return cycle.urlFor(ProjectModule.class, ProjectModule.OVERVIEW_ACTION);
     }
-    
+
     public static String toProjectPageUrl(RequestCycle cycle, long projectId) {
         return cycle.urlFor(ProjectModule.class,
                 ProjectModule.OVERVIEW_ACTION, Long.toString(projectId));
@@ -149,9 +152,11 @@ public final class NavigationUtil {
     }
 
     public static String toOrgProjectsUrl(RequestCycle cycle, String strOrgId) {
-        return cycle.urlFor(CpMainModule.class,
-                CpMainModule.LIST_PROJECTS,
-                strOrgId);
+        if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ALT_COURSE_CATALOG)) {
+            return cycle.urlFor(CourseModule.class, CourseModule.LIST_ACTION, strOrgId);
+        }
+
+        return cycle.urlFor(CpMainModule.class, CpMainModule.LIST_PROJECTS, strOrgId);
     }
 
     public static String toAccountSettingsUrl(RequestCycle cycle, String strOrgId) {
