@@ -108,7 +108,9 @@ ${cpweb_foot}
 
         // Disenroll section
         $('#disenrollmentMode select').select2({
-            data: [{id: "disabled", text: "Not Allowed"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Allowed"}],
+// Moderated mode is not implemeted, therefor removing option until it is // MB            
+//            data: [{id: "disabled", text: "Not Allowed"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Allowed"}],
+            data: [{id: "disabled", text: "Not Allowed"}, {id: "direct", text: "Allowed"}],
             allowClear: false,
             minimumResultsForSearch: Infinity
         }).val("[#if (courseSession.disenrollmentSettings.mode)??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
