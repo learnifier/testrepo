@@ -3,12 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
@@ -18,9 +12,9 @@ import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailure;
 import se.dabox.cocobox.cpweb.module.project.error.ProjectProductFailureFactory;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductsExtraConfigFactory;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionProcessor;
@@ -46,17 +40,37 @@ import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.expiration.GetCourseDefaultExpiration;
+import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CodecException;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
-import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.create.CreateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.impl.StandardCourseSessionSource;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.proddir.data.ProductTypes;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
+import se.dabox.util.collections.CollectionsUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static se.dabox.cocobox.cpweb.module.core.AbstractModule.getCourseCatalogClient;
 
 /**
  *
@@ -81,7 +95,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
 
     @Override
     public RequestTarget processSession(final RequestCycle cycle, final NewProjectSession nps,
-            final MatListProjectDetailsForm matListDetails) {
+                                        final MatListProjectDetailsForm matListDetails) {
 
         String strNpsId = nps.getUuid().toString();
 
@@ -118,16 +132,16 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                     public NewProjectRequest callMaterialListProject() {
                         ParamUtil.required(matListDetails, "matListDetails");
                         return NewProjectRequest.
-                        newMaterialListProject(
-                                input.getProjectname(),
-                                orgId,
-                                input.getProjectlang(),
-                                LoginUserAccountHelper.getUserId(cycle),
-                                input.getCountry(),
-                                input.getTimezone(),
-                                null,
-                                matListDetails.getUserTitle(),
-                                matListDetails.getUserDescription());
+                                newMaterialListProject(
+                                        input.getProjectname(),
+                                        orgId,
+                                        input.getProjectlang(),
+                                        LoginUserAccountHelper.getUserId(cycle),
+                                        input.getCountry(),
+                                        input.getTimezone(),
+                                        null,
+                                        matListDetails.getUserTitle(),
+                                        matListDetails.getUserDescription());
 
                     }
 
@@ -145,12 +159,12 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                     public NewProjectRequest callSingleProductProject() {
                         nps.setProds(Collections.singletonList(nps.getProductId()));
                         return NewProjectRequest.
-                        newSingleProductProject(
-                                input.getProjectname(), orgId, input.getProjectlang(),
-                                LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
-                                input.getTimezone(), null, matListDetails.getUserTitle(),
-                                matListDetails.getUserDescription(), nps.getProductId()
-                        );
+                                newSingleProductProject(
+                                        input.getProjectname(), orgId, input.getProjectlang(),
+                                        LoginUserAccountHelper.getUserId(cycle), input.getCountry(),
+                                        input.getTimezone(), null, matListDetails.getUserTitle(),
+                                        matListDetails.getUserDescription(), nps.getProductId()
+                                );
                     }
 
                 });
@@ -206,6 +220,10 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
                 strNpsId));
 
         updateRecentTimezone(cycle, npr);
+
+        if(nps.getCourseId() != null) {
+            addCourseSession(cycle, project, nps);
+        }
 
         if (failures != null) {
             cycle.getSession().setFlashAttribute(ProjectProductFailure.VIEWSESSION_NAME, failures);
@@ -263,9 +281,24 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
         getCocoboxCordinatorClient(cycle).updateOrgProject(upr);
     }
 
+    private void addCourseSession(RequestCycle cycle, OrgProject project, NewProjectSession nps) {
+        CourseDesignClient cdClient = Clients.getClient(cycle, CourseDesignClient.class);
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+
+        final CatalogCourseId courseId = CatalogCourseId.valueOf(nps.getCourseId());
+        final CatalogCourse course =  CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
+        if(course == null) {
+            return;
+        }
+
+        new CreateCatalogCourseSessionCmd(cycle, caller).run(project, course);
+    }
+
     private void addProjectProduct(RequestCycle cycle, ProjectMaterialCoordinatorClient pmcClient,
-            OrgProject project, String prodId, boolean retryAttempt,
-            Map<String, String> productExtraSettings)
+                                   OrgProject project, String prodId, boolean retryAttempt,
+                                   Map<String, String> productExtraSettings)
             throws DeniedException, ProjectProductException {
 
         try {
@@ -290,7 +323,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void addProjectProductError(String prodId, OrgProject project, Exception ex,
-            RequestCycle cycle) {
+                                        RequestCycle cycle) {
         LOGGER.warn("Unable to add product {} to project {}",
                 prodId, project.getProjectId(), ex);
         if (failures == null) {
@@ -302,7 +335,7 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
     }
 
     private void addProjectOrgMat(ProjectMaterialCoordinatorClient pmcClient, OrgProject project,
-            Long orgMatId) {
+                                  Long orgMatId) {
         try {
             pmcClient.addProjectOrgMaterial(project.getProjectId(), orgMatId);
         } catch (Exception ex) {

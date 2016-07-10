@@ -1,0 +1,46 @@
+{
+    "id": "chicken2",
+    "name": "Me and my chicken - 北京 July",
+    "language": "zh",
+    "info": {
+        "description": "Kung Pao Chicken"
+    },
+    "cost": {
+    },
+    "visibility": {
+        "show": true,
+        "mode": "visible"
+    },
+    "enrollment": {
+        "minimum": {
+            "show": true,
+            "amount": null
+        },
+        "maximum": {
+            "show": false,
+            "amount": null
+        },
+        "current": {
+            "show": false,
+            "amount": 0
+        },
+        "waitinglist": true,
+        "mode": "direct",
+        "starts": null,
+        "ends": null
+    },
+    "disenrollment": {
+        "mode": "direct",
+        "starts": null,
+        "ends": null
+    },
+    "participants": {
+        "individuals": {
+            "show": false,
+            "showPicture": true
+        }
+    },
+    "self": {
+        "enrollmentStatus": "unenrolled"
+    }
+}

@@ -30,6 +30,7 @@ import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
+import se.dabox.cocobox.cpweb.freemarker.InstantToLocalDateTimeTemplateMethod;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
@@ -82,12 +83,24 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
+import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequest;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
+import se.dabox.service.coursecatalog.client.session.extdetails.ExtendedSessionDetailsStatusList;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequest;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.ValueUtils;
 
 /**
@@ -118,7 +131,37 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         addCommonMapValues(map, project, cycle);
 
+//        map.put("hasSession", project.getCourseSessionId() != null);
+
         return new FreemarkerRequestTarget("/project/projectOverview.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onSessionOverview(RequestCycle cycle, String strCourseSessionId) {
+
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.parseInt(strCourseSessionId));
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+
+        if(session.getSource() != null && CocoboxCourseSourceConstants.PROJECT.equals(session.getSource().getType())) {
+            final String strProjectId = session.getSource().getId();
+            OrgProject project =
+                    getProject(cycle, strProjectId);
+
+            checkPermission(cycle, project);
+            checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+            Map<String, Object> map = createMap();
+
+            addCommonMapValues(map, project, cycle);
+//            map.put("hasSession", true);
+
+            return new FreemarkerRequestTarget("/project/projectOverview.html", map);
+        } else {
+            // TODO: Handle other project types
+            throw new IllegalStateException("Unknown session source type: " + session.getSource());
+        }
+
     }
 
     @DefaultWebAction
@@ -578,6 +621,47 @@ public class ProjectModule extends AbstractProjectWebModule {
         addCommonMapValues(map, project, cycle);
 
         return new FreemarkerRequestTarget("/project/projectSettings.html", map);
+    }
+
+    @WebAction
+    public RequestTarget onSession(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Map<String, Object> map = createMap();
+        map.put("project", project);
+        final Integer sessionId = project.getCourseSessionId();
+        if(sessionId != null) {
+            final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+            final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(sessionId.intValue()); // TODO: sessionId should be Integer to start with.
+            final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
+//            final ExtendedSessionDetailsStatusList extSession = ccc.getExtendedSessionDetails(null, new GetUserDefaultLocaleCommand().getLocale(cycle), Collections.singletonList(session.getSource()));
+            map.put("courseSession", session);
+
+            if(session.getCourseId() != null) {
+                final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(session.getCourseId()).build()));
+                if(course != null) {
+                    map.put("course", course);
+                }
+            }
+
+
+//            map.put("extCourseSession", extSession);
+        } else {
+            map.put("courseSession", null);
+//            map.put("extCourseSession", null);
+        }
+
+        map.put("formsess", getValidationSession(ChangePassword.class, cycle));
+        map.put("formLink", "");
+        map.put("instantToLocalDateTime",
+                new InstantToLocalDateTimeTemplateMethod(project.getTimezone().toZoneId()));
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/projectSession.html", map);
     }
 
     @WebAction

@@ -1,0 +1,286 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+${cpweb_head}
+
+<!--[if lt IE 9]>
+<style>
+
+    .toggle-button input {
+        position: static; !important
+    }
+
+</style>
+
+
+<![endif]-->
+[/#assign]
+
+[#assign cpweb_foot ]
+
+${cpweb_foot}
+
+<script>
+
+    "use strict";
+    $('#menu-projects').addClass('active');
+
+    var sessionUrl = "${helper.urlFor('project.ProjectSettingsJsonModule', 'changeSetting',[prj.projectId])}";
+
+    require(['cocobox-editable', 'bootstrap/cocobox-editable-datetime', 'select2-4.min', 'ckeditor4'], function() {
+        $('#courseSelector select').select2({
+            ajax: {
+                url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'listCourses',[org.id])}",
+                dataType: 'json',
+                processResults: function (data) {
+                    return { results: data };
+                }
+            },
+            placeholder: "Select a course...",
+            allowClear: true,
+            minimumResultsForSearch: Infinity
+        }).ccbEditable({
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    [#if courseSession??]
+                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'updateCourse',[project.projectId])}",
+                    [#else]
+                    url: "${helper.urlFor('project.session.ProjectSessionJsonModule', 'createSession',[project.projectId])}",
+                    [/#if]
+                    data: { courseId: $(element).val() }
+                }).done(function(){
+                    window.location.href = window.location.href;
+                });
+            }
+        });
+
+        [#if courseSession??]
+
+        var descEditor = CKEDITOR.replace("sessionDescription"),
+                updateSessionFieldUrl = "${helper.urlFor('project.session.ProjectSessionJsonModule', 'setCourseSessionField',[project.projectId])}";
+        descEditor.on('blur', function( evt ) {
+            $.ajax({
+                dataType: "json",
+                method: "POST",
+                url: updateSessionFieldUrl,
+                data: {pk: "description", value: evt.editor.getData()}
+            });
+        });
+
+        $('#visibilityMode select').select2({
+            data: [{id: "hidden", text: "Not shown in catalog"}, {id: "visible", text: "Shown in catalog"}, {id: "preview", text: "Preview in catalog"}],
+            allowClear: false,
+            minimumResultsForSearch: Infinity
+        }).val("[#if courseSession.visibility??]${courseSession.visibility.visibility}[#else]hidden[/#if]").trigger("change").ccbEditable({
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: updateSessionFieldUrl,
+                    data: {pk: "visibility", value: $(element).val()}
+                });
+            }
+        });
+
+        // Enroll section
+        $('#enrollmentMode select').select2({
+            data: [{id: "disabled", text: "Closed"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Open"}],
+            allowClear: false,
+            minimumResultsForSearch: Infinity
+        }).val("[#if (courseSession.enrollmentSettings.mode)??]${courseSession.enrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: updateSessionFieldUrl,
+                    data: {pk: "enrollmentMode", value: $(element).val()}
+                });
+            }
+        });
+
+            $(".datefield").editable({
+                'url': updateSessionFieldUrl
+            });
+
+        // Disenroll section
+        $('#disenrollmentMode select').select2({
+// Moderated mode is not implemeted, therefor removing option until it is // MB
+//            data: [{id: "disabled", text: "Not Allowed"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Allowed"}],
+            data: [{id: "disabled", text: "Not Allowed"}, {id: "direct", text: "Allowed"}],
+            allowClear: false,
+            minimumResultsForSearch: Infinity
+        }).val("[#if (courseSession.disenrollmentSettings.mode)??]${courseSession.disenrollmentSettings.mode}[#else]disabled[/#if]").trigger("change").ccbEditable({
+            update: function (element) {
+                return $.ajax({
+                    dataType: "json",
+                    method: "POST",
+                    url: updateSessionFieldUrl,
+                    data: {pk: "disenrollmentMode", value: $(element).val()}
+                });
+            }
+        });
+
+        require(['cocobox-togglebutton'], function(cocoboxToggle) {
+            $(".toggleButton").each(function(){
+                var fieldName = $(this).data("fieldname");
+                cocoboxToggle.initToggle(this);
+                $(this).on('CocoboxToggleChange', function(ev) {
+                    var buttonControl = ev.buttonControl;
+                    buttonControl.disable();
+                    $.ajax({
+                        dataType: "json",
+                        method: "POST",
+                        url: updateSessionFieldUrl,
+                        data: {pk: fieldName, value: ""}
+                    }).always(function() {
+                        buttonControl.enable();
+                    }).done(function(data) {
+                        if (data.enabled) {
+                            buttonControl.on();
+                        } else {
+                            buttonControl.off();
+                        }
+                    });
+                });
+            });
+        });
+        [/#if]
+    });
+</script>
+
+[/#assign]
+
+
+
+[#assign title = (prj.name!'') + " session ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
+
+[@pInfo.projectInfo selected="session"][/@pInfo.projectInfo]
+
+
+
+[#if courseSession??]
+<section class="ccb-expandable-list">
+    <h3>[@dws.txt key="cpweb.project.session.section.information.title" /]</h3>
+    <div id="settingsList">
+        <ul>
+            <li id="visibilityMode">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.visibility.title" /]</span>
+                <select style="width: 150px"></select>
+            </span>
+            </li>
+            <li id="description">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.description.title" /]</span>
+                <span style="display: inline-block; padding: 0 0 15px 180px; margin-right: 15px;">
+                    <textarea id="sessionDescription" class="short editable-content">
+                        ${courseSession.description!''}
+                    </textarea>
+                </span>
+
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
+<section class="ccb-expandable-list">
+    <h3>[@dws.txt key="cpweb.project.session.section.enrollment.title" /]</h3>
+    <div id="settingsList">
+        <ul>
+            <li id="enrollmentMode">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.mode.title" /]</span>
+                <select style="width: 150px"></select>
+            </span>
+            </li>
+            <li id="enrollmentFromDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.from.title" /]</span>
+                [#assign enrollFromVal = (courseSession.enrollmentSettings.from)!'']
+                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" data-value="${instantToLocalDateTime(enrollFromVal)!''}" class="datefield editable-content">${(instantToDate(enrollFromVal)?datetime?string.long)!''}</span>
+            </span>
+            </li>
+            <li id="enrollmentToDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.to.title" /]</span>
+                [#assign enrollToVal = (courseSession.enrollmentSettings.to)!'']
+                <span data-type="ccbdatetime" data-pk="enrollmentToDate" data-value="${instantToLocalDateTime(enrollToVal)!''}" class="datefield editable-content">${(instantToDate(enrollToVal)?datetime?string.long)!''}</span>
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<section class="ccb-expandable-list">
+    <h3>[@dws.txt key="cpweb.project.session.section.disenrollment.title" /]</h3>
+    <div id="settingsList">
+        <ul>
+            <li id="disenrollmentMode">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.mode.title" /]</span>
+                <select style="width: 150px"></select>
+            </span>
+            </li>
+            <li id="disenrollmentFromDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.from.title" /]</span>
+                [#assign disenrollFromVal = (courseSession.disenrollmentSettings.from)!'']
+                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" data-value="${(instantToLocalDateTime(courseSession.disenrollmentSettings.from))!''}" class="datefield editable-content">${(instantToDate(disenrollFromVal)?datetime?string.full)!''}</span>
+            </span>
+            </li>
+            <li id="disenrollmentToDate">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.to.title" /]</span>
+                [#assign disenrollToVal = (courseSession.disenrollmentSettings.to)!'']
+                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" data-value="${instantToLocalDateTime(disenrollToVal)!''}" class="datefield editable-content">${(instantToDate(disenrollToVal)?datetime?string.full)!''}</span>
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
+<section class="ccb-expandable-list">
+    <h3>[@dws.txt key="cpweb.project.session.section.visibility.title" /]</h3>
+    <div id="settingsList">
+        <ul>
+            <li>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.participantsVisible.title" /]</span>
+                <input class="toggleButton" type="checkbox" data-fieldname="participationEnabled"[#if courseSession.participationSettings?? && courseSession.participationSettings.enabled] checked[/#if]>
+            </li>
+            <li>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.showNames.title" /]</span>
+                <input class="toggleButton" type="checkbox" data-fieldname="participationShowName"[#if courseSession.participationSettings?? && courseSession.participationSettings.showName] checked[/#if] />
+            </li>
+            <li>
+                <span class="row-label">[@dws.txt key="cpweb.project.session.showThumbnails.title" /]</span>
+                <input class="toggleButton" type="checkbox" data-fieldname="participationShowThumbnail"[#if courseSession.participationSettings?? && courseSession.participationSettings.showThumbnail] checked[/#if] />
+            </li>
+        </ul>
+    </div>
+</section>[/#if]
+
+<section class="ccb-expandable-list">
+    <h3>[@dws.txt key="cpweb.project.session.section.course.title" /]</h3>
+    <div id="settingsList">
+        <ul>
+            <li id="courseSelector">
+            <span class="setting">
+                <span class="row-label">[@dws.txt key="cpweb.project.session.course.title" /]</span>
+                <select style="width: 400px">
+                    [#if course??]
+                        <option value="${course.id.id}" selected="selected">${course.name}</option>
+                    [/#if]
+                </select>
+            </span>
+            </li>
+        </ul>
+    </div>
+</section>
+
+
+[/@dws.skin]
+

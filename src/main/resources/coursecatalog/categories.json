@@ -1,0 +1,29 @@
+[
+    {
+        "id": "c01",
+        "shortname": "cs",
+        "name": "Computer Science",
+        "description": "Learn science about computers and stuff"
+    },
+    {
+        "id": "c02",
+        "name": "Life Sciences",
+        "description": null
+    },
+    {
+        "id": "c03",
+        "name": "Math and Logic",
+        "description": "1+2=3 and 2+1=3"
+    },
+    {
+        "id": "c04",
+        "name": "Personal Development",
+        "description": null
+    },
+    {
+        "id": "c05",
+        "shortname": "learnlang",
+        "name": "Language Learning",
+        "description": "Habla språk? <iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/ybcvlxivscw\" frameborder=\"0\" allowfullscreen></iframe>"
+    }
+]

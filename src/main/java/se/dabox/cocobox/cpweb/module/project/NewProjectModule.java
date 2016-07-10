@@ -65,6 +65,11 @@ import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.fatsession.client.GetSessionRequest;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
@@ -131,6 +136,56 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 NewProjectModule.PROCESS_SETUP, strOrgId));
 
         return new FreemarkerRequestTarget("/project/createProjectSelectDesign.html", map);
+    }
+
+    /**
+     * Setup basic details. Select a design (or a fake matlist design). Processing in
+     * {@link #onProcessSetup(net.unixdeveloper.druwa.RequestCycle, java.lang.String)}. Redirects to
+     * {@link #onMatListDetails(net.unixdeveloper.druwa.RequestCycle, java.lang.String, java.lang.String)}.
+     *
+     * @param cycle
+     * @param strOrgId
+     *
+     * @return
+     */
+    @WebAction
+    public RequestTarget onSessionSetup(RequestCycle cycle, String strOrgId, String strCourseId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        checkOrgPermission(cycle, org.getId(), CocoboxPermissions.CP_CREATE_PROJECT);
+
+        int courseId = Integer.valueOf(strCourseId);
+
+        CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final List<CatalogCourse> courses = ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(CatalogCourseId.valueOf(courseId)).build());
+        if(courses == null || courses.size() != 1) {
+            throw new IllegalStateException("Can not find course"); // TODO: Not sure how to signal error here.
+        }
+        final CatalogCourse course = courses.get(0);
+
+        Map<String, Object> map = createMap();
+
+        map.put("formsess", getValidationSession(CreateProjectGeneral.class, cycle));
+        map.put("org", org);
+
+        map.put("langs", getProjectLocales(cycle));
+        map.put("defaultLangLocale", getDefaultLangLocale(cycle));
+
+        map.put("countries", getProjectCountries(cycle));
+        map.put("defaultCountryLocale", getDefaultCountryLocale(cycle));
+
+        map.put("timezones", OrgProjectTimezoneFactory.newRecentList(cycle, org.getId()));
+        map.put("defaultTimezone", getDefaultTimezone(cycle));
+
+        map.put("orgMatListSupport", getMatListSupportSetting(cycle, org));
+
+        map.put("orgmats", getCocoboxCordinatorClient(cycle).listOrgMaterial(
+                org.getId()));
+        map.put("formLink", cycle.urlFor(NewProjectModule.class,
+                NewProjectModule.PROCESS_SETUP, strOrgId));
+
+        map.put("course", course);
+
+        return new FreemarkerRequestTarget("/project/createSession.html", map);
     }
 
     /**
@@ -347,6 +402,13 @@ public class NewProjectModule extends AbstractWebAuthModule {
             return NavigationUtil.toCreateProject(cycle, strOrgId);
         }
 
+        final Integer courseId;
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
+        if(strCourseId != null) {
+            courseId = Integer.parseInt(strCourseId);
+        } else {
+            courseId = null;
+        }
         CreateProjectGeneral input = formsess.getObject();
 
         if (!getProjectLocales(cycle).contains(input.
@@ -415,6 +477,7 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 designId,
                 productId);
 
+        nps.setCourseId(courseId);
         nps.setCreateProjectGeneral(input);
         nps.storeInSession(cycle.getSession());
 

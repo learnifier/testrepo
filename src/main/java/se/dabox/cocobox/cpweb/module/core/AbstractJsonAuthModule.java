@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.core;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
@@ -33,6 +34,7 @@ import se.dabox.service.webutils.login.nlogin.JavascriptNewLoginChecker;
  */
 public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     private final WebLoginCheck loginChecker;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public AbstractJsonAuthModule() {
         DwsExecutionContext context =
@@ -47,6 +49,21 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     @AroundInvoke(order=500)
     public Object loginCheck(InvocationContext ctx) {
         return loginChecker.loginCheck(ctx);
+    }
+
+    @AroundInvoke(order = 600)
+    public Object aroundJsonHandler(InvocationContext ctx) throws JsonProcessingException {
+        Object resp = ctx.proceed();
+
+        if (resp == null) {
+            return null;
+        } else if (resp instanceof RequestTarget) {
+            return resp;
+        }
+
+        byte[] data = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsBytes(resp);
+        final JsonRequestTarget jsonTarget = jsonTarget(data);
+        return jsonTarget;
     }
 
     protected RequestTarget jsonTarget(Map<String, ?> map) {
@@ -80,7 +97,10 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
                 JsonRequestTarget.DEFAULT_ENCODING);
     }
 
-    protected static RequestTarget jsonTarget(byte[] data) {
+//    public static JsonRequestTarget jsonTarget(byte[] data) {
+//        return new JsonRequestTarget(data);
+//    }
+    protected static JsonRequestTarget jsonTarget(byte[] data) {
         return new JsonRequestTarget(new ByteArrayBinarySource(data, false),
                 JsonRequestTarget.DEFAULT_ENCODING);
     }
