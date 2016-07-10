@@ -30,6 +30,7 @@ import se.dabox.cocobox.cpweb.formdata.project.AddTaskForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.formdata.project.UploadRosterForm;
+import se.dabox.cocobox.cpweb.freemarker.InstantToLocalDateTimeTemplateMethod;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.coursedesign.GotoDesignBuilder;
 import se.dabox.cocobox.cpweb.module.mail.TemplateLists;
@@ -656,6 +657,8 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         map.put("formsess", getValidationSession(ChangePassword.class, cycle));
         map.put("formLink", "");
+        map.put("instantToLocalDateTime",
+                new InstantToLocalDateTimeTemplateMethod(project.getTimezone().toZoneId()));
         addCommonMapValues(map, project, cycle);
 
         return new FreemarkerRequestTarget("/project/projectSession.html", map);
