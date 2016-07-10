@@ -108,7 +108,7 @@ ${cpweb_foot}
 
         // Disenroll section
         $('#disenrollmentMode select').select2({
-// Moderated mode is not implemeted, therefor removing option until it is // MB            
+// Moderated mode is not implemeted, therefor removing option until it is // MB
 //            data: [{id: "disabled", text: "Not Allowed"}, {id: "moderated", text: "Moderated"}, {id: "direct", text: "Allowed"}],
             data: [{id: "disabled", text: "Not Allowed"}, {id: "direct", text: "Allowed"}],
             allowClear: false,
@@ -180,7 +180,7 @@ ${cpweb_foot}
                 <span style="display: inline-block; padding: 0 0 15px 180px; margin-right: 15px;">
                     <textarea id="sessionDescription" class="short editable-content">
                         ${courseSession.description!''}
-                    </textarea>                            
+                    </textarea>
                 </span>
 
             </span>
@@ -202,14 +202,14 @@ ${cpweb_foot}
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.from.title" /]</span>
                 [#assign enrollFromVal = (courseSession.enrollmentSettings.from)!'']
-                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" data-value="${enrollFromVal}" class="datefield editable-content">${(instantToDate(enrollFromVal)?datetime?string.full)!''}</span>
+                <span data-type="ccbdatetime" data-pk="enrollmentFromDate" data-value="${instantToLocalDateTime(enrollFromVal)!''}" class="datefield editable-content">${(instantToDate(enrollFromVal)?datetime?string.long)!''}</span>
             </span>
             </li>
             <li id="enrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.enrollment.to.title" /]</span>
                 [#assign enrollToVal = (courseSession.enrollmentSettings.to)!'']
-                <span data-type="ccbdatetime" data-pk="enrollmentToDate" data-value="${enrollToVal}" class="datefield editable-content">${(instantToDate(enrollToVal)?datetime?string.full)!''}</span>
+                <span data-type="ccbdatetime" data-pk="enrollmentToDate" data-value="${instantToLocalDateTime(enrollToVal)!''}" class="datefield editable-content">${(instantToDate(enrollToVal)?datetime?string.long)!''}</span>
             </span>
             </li>
         </ul>
@@ -230,14 +230,14 @@ ${cpweb_foot}
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.from.title" /]</span>
                 [#assign disenrollFromVal = (courseSession.disenrollmentSettings.from)!'']
-                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" data-value="${(courseSession.disenrollmentSettings.from)!''}" class="datefield editable-content">${(instantToDate(disenrollFromVal)?datetime?string.full)!''}</span>
+                <span data-type="ccbdatetime" data-pk="disenrollmentFromDate" data-value="${(instantToLocalDateTime(courseSession.disenrollmentSettings.from))!''}" class="datefield editable-content">${(instantToDate(disenrollFromVal)?datetime?string.full)!''}</span>
             </span>
             </li>
             <li id="disenrollmentToDate">
             <span class="setting">
                 <span class="row-label">[@dws.txt key="cpweb.project.session.disenrollment.to.title" /]</span>
                 [#assign disenrollToVal = (courseSession.disenrollmentSettings.to)!'']
-                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" data-value="${disenrollToVal}" class="datefield editable-content">${(instantToDate(disenrollToVal)?datetime?string.full)!''}</span>
+                <span data-type="ccbdatetime" data-pk="disenrollmentToDate" data-value="${instantToLocalDateTime(disenrollToVal)!''}" class="datefield editable-content">${(instantToDate(disenrollToVal)?datetime?string.full)!''}</span>
             </span>
             </li>
         </ul>

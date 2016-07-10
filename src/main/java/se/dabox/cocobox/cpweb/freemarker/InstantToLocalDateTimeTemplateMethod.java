@@ -31,7 +31,13 @@ public class InstantToLocalDateTimeTemplateMethod implements TemplateMethodModel
             return null;
         }
 
-        Instant instant = (Instant) DeepUnwrap.permissiveUnwrap((TemplateModel) arg);
+        Object obj = DeepUnwrap.permissiveUnwrap((TemplateModel) arg);
+
+        if (!(obj instanceof Instant)) {
+            return null;
+        }
+
+        Instant instant = Instant.class.cast(obj);
 
         return LocalDateTime.ofInstant(instant, zoneId);
     }
