@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project.session;
 
+import java.text.DateFormat;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.RetargetException;
@@ -43,12 +44,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import net.unixdeveloper.druwa.DruwaApplication;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
+import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.service.login.client.CocoboxUserAccount;
 
 /**
  *
@@ -70,6 +77,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
         final OrgProject project = ccbc.getProject(projectId);
 
         checkPermission(cycle, project, strProjectId);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
 
 
         final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(project.getCourseSessionId());
@@ -82,16 +90,16 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
 
         Map<String, Object> resultMap = new HashMap<>();
         final SessionField sessionField = SessionField.valueOf(pk);
-        sessionField.accept(new SessionField.SessionFieldVisitor<Void>(){
+        String responseValue = sessionField.accept(new SessionField.SessionFieldVisitor<String>(){
             @Override
-            public Void visitDescription() {
+            public String visitDescription() {
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setDescription(value).createUpdateSessionRequest();
                 ccc.updateSession(usr);
                 return null;
             }
 
             @Override
-            public Void visitVisibility() {
+            public String visitVisibility() {
                 VisibilityMode mode = VisibilityMode.valueOf(value);
                 final SessionVisibility visibility = session.getVisibility();
                 final StandardSessionVisibility newVisibility;
@@ -106,7 +114,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             }
 
             @Override
-            public Void visitEnrollmentMode() {
+            public String visitEnrollmentMode() {
                 EnrollmentMode mode = EnrollmentMode.valueOf(value);
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
@@ -121,7 +129,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             }
 
             @Override
-            public Void visitEnrollmentFromDate() {
+            public String visitEnrollmentFromDate() {
                 final Instant newVal = instantFromString(value, project.getTimezone());
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
@@ -132,11 +140,12 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
-                return null;
+
+                return toDateString(newVal);
             }
 
             @Override
-            public Void visitEnrollmentToDate() {
+            public String visitEnrollmentToDate() {
                 final Instant newVal = instantFromString(value, project.getTimezone());
                 final EnrollmentSettings settings = session.getEnrollmentSettings();
                 final StandardEnrollmentSettings newSettings;
@@ -147,11 +156,12 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setEnrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
-                return null;
+
+                return toDateString(newVal);
             }
 
             @Override
-            public Void visitDisenrollmentMode() {
+            public String visitDisenrollmentMode() {
                 EnrollmentMode mode = EnrollmentMode.valueOf(value);
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
@@ -167,7 +177,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             }
 
             @Override
-            public Void visitDisenrollmentFromDate() {
+            public String visitDisenrollmentFromDate() {
                 final Instant newVal = instantFromString(value, project.getTimezone());
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
@@ -178,11 +188,12 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
-                return null;
+
+                return toDateString(newVal);
             }
 
             @Override
-            public Void visitDisenrollmentToDate() {
+            public String visitDisenrollmentToDate() {
                 final Instant newVal = instantFromString(value, project.getTimezone());
                 final DisenrollmentSettings settings = session.getDisenrollmentSettings();
                 final StandardDisenrollmentSettings newSettings;
@@ -193,11 +204,12 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 }
                 final UpdateSessionRequest usr = UpdateSessionRequestBuilder.newBuilder(caller, courseSessionId).setUnenrollmentSettings(newSettings).createUpdateSessionRequest();
                 ccc.updateSession(usr);
-                return null;
+
+                return toDateString(newVal);
             }
 
             @Override
-            public Void visitParticipationEnabled() {
+            public String visitParticipationEnabled() {
                 final ParticipationSettings settings = session.getParticipationSettings();
                 final StandardParticipationSettings newSettings;
                 final boolean newVal;
@@ -215,7 +227,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             }
 
             @Override
-            public Void visitParticipationShowName() {
+            public String visitParticipationShowName() {
                 final ParticipationSettings settings = session.getParticipationSettings();
                 final StandardParticipationSettings newSettings;
                 final boolean newVal;
@@ -233,7 +245,7 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
             }
 
             @Override
-            public Void visitParticipationShowThumbnail() {
+            public String visitParticipationShowThumbnail() {
                 final ParticipationSettings settings = session.getParticipationSettings();
                 final StandardParticipationSettings newSettings;
                 final boolean newVal;
@@ -249,9 +261,24 @@ public class ProjectSessionJsonModule extends AbstractJsonAuthModule {
                 resultMap.put("enabled", newVal);
                 return null;
             }
+
+            private String toDateString(Instant value) {
+                if (value == null) {
+                    return null;
+                }
+
+                Locale locale = CocositeUserHelper.getUserLocale(cycle);
+                DateTimeFormatter formatter
+                        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.LONG).
+                                withLocale(locale).
+                                withZone(project.getTimezone().toZoneId());
+
+                return formatter.format(value);
+            }
         });
 
         resultMap.put("status", "OK");
+        resultMap.put("value", responseValue);
 
         return jsonTarget(resultMap);
     }

@@ -103,7 +103,16 @@ ${cpweb_foot}
         });
 
             $(".datefield").editable({
-                'url': updateSessionFieldUrl
+                'url': updateSessionFieldUrl,
+                "display": function(value, response) {
+                    if (response && response.value) {
+                        console.log("resp", response.value);
+                        $(this).html(response.value);
+                        return response.value;
+                    }
+
+                    return null;
+                }
             });
 
         // Disenroll section
