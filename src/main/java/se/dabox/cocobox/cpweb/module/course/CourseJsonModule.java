@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.unixdeveloper.druwa.RetargetException;
+import se.dabox.cocosite.messagepage.GenericMessagePageFactory;
 import se.dabox.cocosite.webmessage.WebMessage;
 import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
@@ -77,7 +79,17 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         CatalogCourseId courseId = CatalogCourseId.valueOf(intCourseId);
         CourseCatalogClient ccc = getCourseCatalogClient(cycle);
 
-        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
+        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(
+                new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
+
+        if (course == null) {
+            LOGGER.warn("Course not found: {}", strCourseId);
+            throw new RetargetException(GenericMessagePageFactory.
+                    newNotFoundPage().
+                    withMessageText("Course not found").
+                    build());
+        }
+
         checkOrgPermission(cycle, course.getOrgId());
         return new CatalogCourseJson(course);
     }
