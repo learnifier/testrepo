@@ -144,7 +144,7 @@ pgraphs.renderProjectGraphs = function(dataUrl, prjType, animationState) {
                     onTrackParticipants.push(' ' + item.displayName);
                 }
 
-                if (item.inError === true) {
+                if (item.inError === true && !item.activationPending) {
                     inError = inError + 1;
                     inErrorParticipants.push(' ' + item.displayName);
                 }

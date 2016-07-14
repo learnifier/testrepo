@@ -159,8 +159,10 @@ public class ParticipationDetailsCommand {
                 this.generator = generator;
                 generator.writeStartObject();
 
-                generator.writeNumberField("activityCount", participation.getActivityCount());
-                generator.writeNumberField("activitiesTotal", participation.getActivitiesCompleted());
+                generator.writeNumberField("activityCount", participation.getActivityCount() == null ?
+                        0 : participation.getActivityCount());
+                generator.writeNumberField("activitiesTotal", participation.getActivitiesCompleted() == null ?
+                        0 : participation.getActivitiesCompleted());
 
                 generator.writeArrayFieldStart("reports");
                 for (ParticipationCrispProductReport report : reports) {
