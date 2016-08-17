@@ -481,7 +481,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     data: function (params) {
                         return {
                             q: params.term,
-                            pageLimit: 8,
+                            pageLimit: 50,
                             page: params.page || 1
                         };
                     },
@@ -490,7 +490,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                         return {
                             results: data.items,
                             pagination: {
-                                more: (params.page * 8) < data.total_count
+                                more: (params.page * 50) < data.total_count
                             }
                         };
                     },
@@ -498,7 +498,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                 },
                 placeholder: "Search for existing user",
                 allowClear: true,
-                minimumInputLength: 1,
+                minimumInputLength: 3,
                 templateResult: function (item) {
                     return templateUser(item);
                 },
