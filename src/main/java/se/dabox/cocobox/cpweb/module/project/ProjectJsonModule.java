@@ -19,12 +19,15 @@ import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
+import se.dabox.cocobox.security.CocoboxSecurityConstants;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.project.ProjectPermissionCheck;
+import se.dabox.cocobox.security.user.OrgRoleName;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.cocosite.webmessage.WebMessage;
 import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
@@ -56,6 +59,7 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
+import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
@@ -85,6 +89,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
+import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
+import static se.dabox.service.common.ccbc.participation.filter.FilterParticipationField.activated;
 
 /**
  *
@@ -713,8 +720,19 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     @WebAction
     public RequestTarget onSearchUser(RequestCycle cycle, String strProjectId) {
 
-        long prjId = Long.valueOf(strProjectId);
+        boolean realmSearch;
+        if(WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ROSTER_SEARCH_REALM)) {
+            realmSearch = true;
+        } else if(WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ROSTER_SEARCH_ORG)) {
+            realmSearch = false;
+        } else {
+            throw new IllegalStateException("Web Feature " +  CocositeWebFeatureConstants.ROSTER_SEARCH_REALM + " or " +
+                    CocositeWebFeatureConstants.ROSTER_SEARCH_ORG + " must be activated to allow searching of users for roster add.");
+        }
 
+
+        long prjId = Long.valueOf(strProjectId);
+        final OrgProject project = getCocoboxCordinatorClient(cycle).getProject(prjId);
 
         String query = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "q");
         int pageLimit = DruwaParamHelper.getMandatoryIntParam(LOGGER, cycle.getRequest(), "pageLimit");;
@@ -724,7 +742,15 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         final long caller = getCurrentUser(cycle);
         final UserAccountService uas = getUserAccountService(cycle);
-        final List<UserAccount> accounts = uas.searchUserAccounts(caller, query);
+        List<UserAccount> accounts;
+        if(realmSearch) {
+            accounts = uas.searchUserAccounts(caller, query);
+        } else {
+            final String orgRole = OrgRoleName.forOrg(project.getOrgId()).toString();
+            // TODO: This probably do not list all the users we need; see CpJSonModule:getOutsideOrgParticipationUsers.
+            accounts = uas.searchUserAccounts(caller, query, CocoSiteConstants.UA_PROFILE, orgRole, CocoboxSecurityConstants.USER_ROLE);
+        }
+
         return jsonTarget(toSearchUserJson(accounts, pageLimit, page));
     }
 

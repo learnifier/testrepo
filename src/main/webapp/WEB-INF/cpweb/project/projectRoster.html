@@ -72,6 +72,11 @@ ${cpweb_foot}
     var addMembersByGroupUrl = "${helper.urlFor('project.ProjectJsonModule','addMembersByGroup', [prj.projectId?c])}/";
     var listGroupMembersUrl = "${helper.urlFor('project.ProjectJsonModule','listGroupMembers', [prj.projectId?c])}/";
     var searchUserUrl = "${helper.urlFor('project.ProjectJsonModule','searchUser', [prj.projectId?c])}/";
+    [#if dwsrt.hasFeature("rostersearchrealm")]
+        var searchUserPlaceholder = "Search for existing user";
+    [#else]
+        var searchUserPlaceholder = "Search for existing user in organization";
+    [/#if]
     var permissionEditProjectRoster = ${projectSecurity.hasPermission("CP_EDIT_PROJECT_ROSTER")?c};
     var spinnerUrl = "[@common.spinnerUrl /]";
     var participationActivationSpinnerUrl = "${contextPath}/img/participationActivation.gif";
@@ -392,11 +397,13 @@ ${cpweb_head}
         <div class="row">
             [#global formPrefix="cpweb" /]
             <form action="${helper.urlFor('ProjectModificationModule','addMember',[prj.projectId?c])}" name="addMemberForm" id="addMemberForm" method="post" onsubmit="return addMemberListener()">
+                [#if dwsrt.hasFeature("rostersearchrealm") || dwsrt.hasFeature("rostersearchorg")]
                 <div class="col-md-12">
                     <select id="lookupUser" style="width: 400px;visibility:hidden">
                         <option value=""></option>
                     </select>
                 </div>
+                [/#if]
                 <div class="col-md-6">
                     [@bsform.inputText name="memberfirstname" tabindex="2" maxlength="64" /]
                 </div>

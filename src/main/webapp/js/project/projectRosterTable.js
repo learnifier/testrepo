@@ -496,7 +496,7 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
                     },
                     cache: true,
                 },
-                placeholder: "Search for existing user",
+                placeholder: searchUserPlaceholder,
                 allowClear: true,
                 minimumInputLength: 3,
                 templateResult: function (item) {
