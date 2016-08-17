@@ -458,6 +458,66 @@ define(['cocobox-handlebars', 'dataTables-bootstrap', 'jquery.timeago', 'cocobox
         $("#projectrosterform").submit(cpweb.projectRosterListForm);
 
         require(['select2-4.min'], function () {
+            function templateUser(item) {
+                var res = "";
+                if (item.firstname) {
+                    res += item.firstname;
+                }
+                if (item.lastname) {
+                    res += " " + item.lastname;
+                }
+                if(item.primaryEmail) {
+                    res += " (" + item.primaryEmail + ")";
+                }
+                return res;
+            }
+
+            // Add user "Individual" tab
+            $("#lookupUser").select2({
+                ajax: {
+                    url: searchUserUrl,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term,
+                            pageLimit: 8,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 8) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true,
+                },
+                placeholder: "Search for existing user",
+                allowClear: true,
+                minimumInputLength: 1,
+                templateResult: function (item) {
+                    return templateUser(item);
+                },
+                templateSelection: function (item) {
+                    if(item.id) {
+                        return templateUser(item);
+                    }
+                    return item.text;
+                },
+
+            }).change(function(e){
+                var data = $(this).data("select2").data();
+                if(data && data.length) {
+                    $("#memberemail").val(data[0].primaryEmail?data[0].primaryEmail:"");
+                    $("#memberfirstname").val(data[0].primaryEmail?data[0].firstname:"");
+                    $("#memberlastname").val(data[0].primaryEmail?data[0].lastname:"");
+                }
+            });
+
             // Group tab
             $("#addByGroup").select2({
                 placeholder: "Select a group",

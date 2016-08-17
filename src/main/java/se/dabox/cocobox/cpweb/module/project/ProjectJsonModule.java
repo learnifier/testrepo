@@ -12,27 +12,38 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
-import org.apache.ibatis.annotations.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocobox.security.project.ProjectPermissionCheck;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.mail.GetOrgMailBucketCommand;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessageType;
+import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.dws.client.langservice.LangBundle;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ListProjectParticipationsRequest;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.material.OrgMaterial;
-import se.dabox.service.common.ccbc.project.*;
+import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
+import se.dabox.service.common.ccbc.project.MailBounce;
+import se.dabox.service.common.ccbc.project.MailBounceUtil;
+import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.ProjectParticipation;
+import se.dabox.service.common.ccbc.project.ProjectProduct;
+import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
+import se.dabox.service.common.ccbc.project.ProjectTask;
 import se.dabox.service.common.ccbc.project.catalog.CatalogMode;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
@@ -45,15 +56,6 @@ import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductTypeUtil;
-import se.dabox.service.coursecatalog.client.CourseCatalogClient;
-import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseField;
-import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.coursecatalog.client.session.*;
-import se.dabox.service.coursecatalog.client.session.impl.StandardSessionVisibility;
-import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequest;
-import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
-import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
-import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.cug.client.ClientUserGroupClient;
 import se.dabox.service.login.client.UserAccount;
@@ -61,6 +63,7 @@ import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductTransformers;
 import se.dabox.service.webutils.druwa.FormbeanJsRequestTargetFactory;
+import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 import se.dabox.service.webutils.freemarker.text.LangServiceClientFactory;
 import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -72,14 +75,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
-import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
-import se.dabox.cocosite.webmessage.WebMessage;
-import se.dabox.cocosite.webmessage.WebMessageType;
-import se.dabox.cocosite.webmessage.WebMessages;
-import se.dabox.service.webutils.freemarker.text.JavaCocoText;
 
 /**
  *
@@ -705,6 +710,29 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(Collections.singletonMap("status", status));
     }
 
+    @WebAction
+    public RequestTarget onSearchUser(RequestCycle cycle, String strProjectId) {
+
+        long prjId = Long.valueOf(strProjectId);
+
+
+        String query = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "q");
+        int pageLimit = DruwaParamHelper.getMandatoryIntParam(LOGGER, cycle.getRequest(), "pageLimit");;
+        int page = DruwaParamHelper.getMandatoryIntParam(LOGGER, cycle.getRequest(), "page");
+
+        final Map<String, String[]> parameterMap = cycle.getRequest().getParameterMap();
+
+        final long caller = getCurrentUser(cycle);
+        final UserAccountService uas = getUserAccountService(cycle);
+        final List<UserAccount> accounts = uas.searchUserAccounts(caller, query);
+        return jsonTarget(toSearchUserJson(accounts, pageLimit, page));
+    }
+
+    private UserAccountService getUserAccountService(RequestCycle cycle) {
+        UserAccountService uaClient = CacheClients.getClient(cycle, UserAccountService.class);
+
+        return uaClient;
+    }
 
     private byte[] toTaskJson(
             final RequestCycle cycle,
@@ -903,6 +931,32 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         }
     }
 
+    private byte[] toSearchUserJson(final List<UserAccount> uas, int pageSize, Integer page) {
+        return new JsonEncoding() {
+            @Override
+            protected void encodeData(JsonGenerator generator) throws IOException {
+                int offset = (page-1)*pageSize;
+                generator.writeStartObject();
+                generator.writeNumberField("total_count", uas.size());
+                generator.writeArrayFieldStart("items");
+                for(int i=offset; i<offset + pageSize; i++) {
+                    if(i >= uas.size()) {
+                        break;
+                    }
+                    UserAccount ua = uas.get(i);
+                    generator.writeStartObject();
+                    generator.writeNumberField("id", ua.getUserId());
+                    generator.writeStringField("lastname", ua.getSurname());
+                    generator.writeStringField("firstname", ua.getGivenName());
+                    generator.writeStringField("primaryEmail", ua.getPrimaryEmail());
+                    generator.writeEndObject();
+                }
+                generator.writeEndArray();
+                generator.writeEndObject();
+            }
+        }.encode();
+    }
+
     private byte[] toJson(final List<UserAccount> uas) {
         return new JsonEncoding() {
             @Override
@@ -919,4 +973,5 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
             }
         }.encode();
     }
+
 }
