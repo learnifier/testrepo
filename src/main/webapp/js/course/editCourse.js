@@ -91,7 +91,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 return false;
             }
             if(self.isCreateMode()) {
-                return self.name() && self.description() && self.crl();
+                return self.name() && self.description();
             } else {
                 console.log("Name: ", self.name(), name);
                 return self.name() && (self.name() != name || self.description() != description || self.crl() != crl)
