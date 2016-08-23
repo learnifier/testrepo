@@ -6,6 +6,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
     "use strict";
     var exports = {};
     var settings;
+    var realmProducts;
 
 
     function ListMaterialModel() {
@@ -187,6 +188,26 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
         self.canWriteFolder = function() {
             return self.cocoboxListApi() && self.cocoboxListApi().canWriteFolder();
         };
+
+        self.addMenu = function(){
+            var rows = [];
+
+            settings.addMenu.forEach(function(c){
+                var first = true;
+                c.category = true;
+                c.types.forEach(function(t) {
+                    t.category = false;
+                    if (realmProducts[t.pType]) {
+                        if (first) {
+                            rows.push(c);
+                            first = false;
+                        }
+                        rows.push(t);
+                    }
+                });
+            });
+            return rows;
+        };
     }
 
     exports.init = function(options) {
@@ -196,10 +217,19 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
             addProductUrl: undefined,
             resolveIdToVfs: undefined,
             postDeleteErrorUrl: undefined,
+            realmProductsUrl: undefined,
+            addMenu: [],
             editMode: true
         }, options);
-        ko.applyBindings(new ListMaterialModel(), $("#pagewrapper").get(0));
-    };
 
+        $.getJSON(settings.realmProductsUrl).done(function(data){
+            realmProducts = data;
+        }).fail(function(){
+            CCBMessengerError("There was a problem loading product types, it may not be possible to create new materials.");
+            realmProducts = [];
+        }).always(function(){
+            ko.applyBindings(new ListMaterialModel(), $("#pagewrapper").get(0));
+        });
+    };
     return exports;
 });

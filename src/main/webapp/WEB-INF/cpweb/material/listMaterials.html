@@ -17,7 +17,27 @@ ${cpweb_foot}
 
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
-    })
+    });
+
+    var addMenu = [
+        { categoryName: "UPLOAD", liClasses: '', types: [
+            {id: 'audioplayer', pType: 'audioplayer', name: 'Audio', iconClasses: 'pe-7s-volume pe-va pe-2x pe-fw', liClasses: ''},
+            {id: 'file', pType: 'genericfile', name: 'Document', iconClasses: 'pe-7s-news-paper pe-va pe-2x pe-fw', liClasses: ''},
+            {id: 'image', pType: 'image', name: 'Image', iconClasses: 'pe-7s-photo pe-va pe-2x pe-fw', liClasses: ''},
+            {id: 'scorm', pType: 'scorm', name: 'Scorm (AICC/Tin Can)', iconClasses: 'pe-7s-monitor pe-va pe-2x pe-fw', liClasses: ''},
+            {id: 'vimeo2video', pType: 'vimeo2video', name: 'Video', iconClasses: 'pe-7s-video pe-va pe-2x pe-fw', liClasses: ''},
+            {id: 'generic', pType: 'generic', name: 'Quick upload...', iconClasses: 'pe-7s-rocket pe-va pe-lg pe-fw primaryColor', alwaysShown: true, title: 'Upload different file types together at once', liClasses: 'text-center'}
+        ]},
+        { categoryName: "CREATE", liClasses: '', types: [
+            {id: 'htmlsnippet', pType: 'htmlsnippet', name: 'Text/HTML', iconClasses: 'pe-7s-note pe-va pe-2x pe-fw', liClasses: ''},
+            {id: 'scorequiz', pType: 'scorequiz', name: 'Quiz', iconClasses: 'pe-7s-target pe-va pe-2x pe-fw', liClasses: ''}
+        ]},
+        { categoryName: "INTERNET/LINK", liClasses: '', types: [
+            {id: 'youtubevideo', pType: 'youtubevideo', name: 'YouTube', iconClasses: '', liClasses: 'text-center'},
+        ]}
+    ];
+
+
 
 
     window.cocoboxCdn = "${cocoboxCdn}";
@@ -30,7 +50,9 @@ ${cpweb_foot}
             addProductUrl: "${dwsrt.config['pdweb.baseurl']}aprodnew/createProduct?scope=O${org.id?c}",
             resolveIdToVfs: "${helper.urlFor('material.LibraryVfsModule','resolveProduct',[org.id])}",
             postDeleteErrorUrl: "${helper.urlFor('OrgMaterialJsonModule', 'listProductProjects')}",
-            editMode: true // TODO: Check permissions here.
+            realmProductsUrl: "${helper.urlFor('material.MaterialJsonModule', 'listRealmProductTypes')}",
+            addMenu: addMenu,
+            editMode: true
         });
     });
 
@@ -46,52 +68,22 @@ ${cpweb_foot}
         [#if portalSecurity.hasPermission("CP_CREATE_ORGMAT")]
         <button class="btn btn-primary" data-bind="click: addFolder, enable: canWriteFolder()"><span class="glyphicon glyphicon-plus-sign"></span> Add Folder</button>
         <div class="btn-group">
-          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bind="enable: canWriteFolder()">
-              <i class="glyphicon glyphicon-plus-sign"></i> Add Materials <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
-            <li><h4 class="text-center primaryColor">UPLOAD</h4></li>
-            [#if productTypes['audioplayer']??]
-              <li data-bind="click: function(){addMaterial(['audioplayer']);}"><a href="#"><i class="pe-7s-volume pe-va pe-2x pe-fw"></i> Audio</a></li>
-            [/#if]
-            [#if productTypes['genericfile']??]
-              <li data-bind="click: function(){addMaterial(['file']);}"><a href="#"><i class="pe-7s-news-paper pe-va pe-2x pe-fw"></i> Document</a></li>
-            [/#if]
-            [#if productTypes['image']??]
-              <li data-bind="click: function(){addMaterial(['image']);}"><a href="#"><i class="pe-7s-photo pe-va pe-2x pe-fw"></i> Image</a></li>
-            [/#if]
-            [#if productTypes['scorm']??]
-              <li data-bind="click: function(){addMaterial(['scorm']);}"><a href="#"><i class="pe-7s-monitor pe-va pe-2x pe-fw"></i> Scorm (AICC/Tin Can)</a></li>
-            [/#if]
-            [#if productTypes['vimeo2video']??]
-            <li data-bind="click: function(){addMaterial(['vimeo2video']);}"><a href="#"><i class="pe-7s-video pe-va pe-2x pe-fw"></i> Video</a></li>
-            [/#if]
-            <li data-bind="click: function(){addMaterial(['generic']);}" class="text-center" data-toggle="tooltip" data-placement="bottom" title="Upload different file types together at once"><a href="#"><small><em><i class="pe-7s-rocket pe-va pe-lg pe-fw primaryColor"></i> Quick upload...</small></em></a></li>
-            <li role="separator" class="divider"></li>
-            <li><h4 class="text-center primaryColor">CREATE</h4></li>
-            <li data-bind="click: function(){addMaterial(['htmlsnippet']);}"><a href="#"><i class="pe-7s-note pe-va pe-2x pe-fw"></i> Text/HTML</a></li>
-            [#if productTypes['scorequiz']??]
-              <li data-bind="click: function(){addMaterial(['scorequiz']);}"><a href="#"><i class="pe-7s-target pe-va pe-2x pe-fw"></i> Quiz</a></li>
-            [/#if]
-            [#if productTypes['quiz']??]
-              <li data-bind="click: function(){addMaterial(['quiz']);}"><a href="#"><i class="pe-7s-help1 pe-va pe-2x pe-fw"></i> Survey</a></li>
-            [/#if]
-            <li role="separator" class="divider"></li>
-            <li><h4 class="text-center primaryColor">INTERNET/LINK</h4></li>
-            <li class="text-center">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bind="enable: canWriteFolder()">
+                <i class="glyphicon glyphicon-plus-sign"></i> Add Materials <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" style="min-width: 300px;" data-bind="foreach: addMenu()">
+                <li data-bind="if: category, css: liClasses">
+                    <h4 data-bind="text: categoryName" class="text-center primaryColor" >
+                    </h4>
+                </li>
+                <li data-bind="if: !category, click: function(){$parent.addMaterial([id]);}, css: liClasses">
+                    <a href="#">
+                        <i data-bind="css: iconClasses"></i>
+                        <span data-bind="text: name"></span>
+                    </a>
+                </li>
+            </ul>
 
-                [#if productTypes['youtubevideo']??]
-                  <a href data-bind="click: function(){addMaterial(['youtubevideo']);}">YouTube</a>
-                [/#if]
-                [#--if productTypes['tedtalk']??--]
-                  <!--<span data-bind="click: function(){addMaterial(['tedtalk']);}" href="#">TED Talks</span>,-->
-                [#--/#if--]
-            </li>
-            <!--
-            <li role="separator" class="divider"></li>
-            <li><h4 class="text-center primaryColor">APPS/INTEGRATIONS</h4></li>
-            <li class="text-center"><span>Rebox</span>, <span>Booth</span>, <span>Challenge</span>, <span>Team Invite</span></li>-->
-          </ul>
         </div>
         [/#if]
     </div>

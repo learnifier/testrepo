@@ -147,6 +147,7 @@ public class CpMainModule extends AbstractWebAuthModule {
                 urlFor(ProductMaterialJsonModule.class, "addCredits", strOrgId));
 
 
+        // TODO: Remove productTypes when we switch to dynamic menu.
         ProductTypes types = getProductDirectoryClient(cycle).listTypes();
         final Map<String, String> productTypes = types.getProductTypes().stream().collect(Collectors.toMap(
                 p -> p.getId().getId(),
