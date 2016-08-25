@@ -192,7 +192,7 @@ ${cpweb_head}
         <input type="hidden" id="prjtype" name="prjtype" />
         <input type="hidden" id="courseId" name="courseId" value="${course.id.id?c}" />
         <button tabindex="100" class="btn btn-primary btn-lg" disabled="disabled" id="next_btn">[@dws.txt key='form.action.next' /] <span class="glyphicon glyphicon-chevron-right"></span></button>
-        <a href="${helper.urlFor("CpMainModule", "listProjects", [org.id] )}" tabindex="101" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
+        <a href="${helper.urlFor("course.CourseModule", "list", [org.id] )}" tabindex="101" class="btn btn-default">[@dws.txt key="form.action.cancel" /]</a>
     </section>
 
 </form>
