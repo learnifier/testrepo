@@ -41,6 +41,10 @@
     <div class="ccb-page-header__info--thumbnail">
         <img class="page-thumbnail img-thumbnail" src="${projectThumbnail}" />
         <p class="page-title-label">Project</p>
+        [#if course??]
+        <p>Course: <a href="${helper.urlFor('course.CourseModule', 'list',[org.id])}?course=${course.id}">${course.name}</a></p>
+        [/#if]
+
         [#if isIdproject() ]
                 <h1 class="page-title" id="project-name">${projectName?xml}</h1>
                 <p class="invited-info">invited by ${infoHelper.getUserIdentifier(project.createdBy)!''?xhtml} in ${masterProject.name}</p>

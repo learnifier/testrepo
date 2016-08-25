@@ -131,8 +131,6 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         addCommonMapValues(map, project, cycle);
 
-//        map.put("hasSession", project.getCourseSessionId() != null);
-
         return new FreemarkerRequestTarget("/project/projectOverview.html", map);
     }
 
@@ -151,14 +149,10 @@ public class ProjectModule extends AbstractProjectWebModule {
             checkPermission(cycle, project);
             checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
 
-            Map<String, Object> map = createMap();
+            return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, project.getProjectId()));
 
-            addCommonMapValues(map, project, cycle);
-//            map.put("hasSession", true);
-
-            return new FreemarkerRequestTarget("/project/projectOverview.html", map);
         } else {
-            // TODO: Handle other project types
+            // Add support for other project types here when needed
             throw new IllegalStateException("Unknown session source type: " + session.getSource());
         }
 
@@ -633,27 +627,6 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         Map<String, Object> map = createMap();
         map.put("project", project);
-        final Integer sessionId = project.getCourseSessionId();
-        if(sessionId != null) {
-            final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-            final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(sessionId.intValue()); // TODO: sessionId should be Integer to start with.
-            final CatalogCourseSession session = ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()).get(0);
-//            final ExtendedSessionDetailsStatusList extSession = ccc.getExtendedSessionDetails(null, new GetUserDefaultLocaleCommand().getLocale(cycle), Collections.singletonList(session.getSource()));
-            map.put("courseSession", session);
-
-            if(session.getCourseId() != null) {
-                final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(session.getCourseId()).build()));
-                if(course != null) {
-                    map.put("course", course);
-                }
-            }
-
-
-//            map.put("extCourseSession", extSession);
-        } else {
-            map.put("courseSession", null);
-//            map.put("extCourseSession", null);
-        }
 
         map.put("formsess", getValidationSession(ChangePassword.class, cycle));
         map.put("formLink", "");

@@ -41,8 +41,14 @@ import se.dabox.service.common.scheduler.SchedulerServiceClient;
 import se.dabox.service.common.scheduler.TaskInfo;
 import se.dabox.service.common.scheduler.filter.TaskFilterBuilder;
 import se.dabox.service.common.webfeature.WebFeatures;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
+import se.dabox.util.collections.CollectionsUtil;
 
 /**
  *
@@ -91,6 +97,18 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
 
             Material material = mlf.getList().get(0);
             map.put("material", material);
+        }
+
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseSession courseSession = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withSourceId(Long.toString(project.getProjectId())).build()));
+        if(courseSession != null) {
+            map.put("courseSession", courseSession);
+            if (courseSession.getCourseId() != null) {
+                final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseSession.getCourseId()).build()));
+                if (course != null) {
+                    map.put("course", course);
+                }
+            }
         }
 
         map.put("projectThumbnail", new LazyProjectThumbnail(cycle, project));
