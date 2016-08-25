@@ -34,6 +34,8 @@ public class CourseModule extends AbstractProjectWebModule {
     public RequestTarget onList(RequestCycle cycle, String strOrgId) {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
         Map<String, Object> map = createMap();
+
+        map.put("course", cycle.getRequest().getParameter("course"));
         map.put("org", org);
 
         return new FreemarkerRequestTarget("/course/listCourses.html", map);

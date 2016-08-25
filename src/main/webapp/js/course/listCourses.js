@@ -77,9 +77,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 var table = $('<table/>', { "class": "", "style": "width: 100%;"}),
                     tbody = $('<tbody>', { "style": "border: 0;"}).appendTo(table),
                     addBtn = $("<a />", {"class": "btn btn-primary pull-right", "style": "margin-top: 10px;", "href": addUrl}).html("<i class='glyphicon glyphicon-plus-sign'></i> Add Session"),
-                    title = $("<h3 />", {"class": "", "style": "margin-top: 10px;", "href": addUrl}).html("Sessions"),
-                    header = '';
-
+                    title = $("<h3 />", {"class": "", "style": "margin-top: 10px;", "href": addUrl}).html("Sessions");
                 if(addUrl) {
                     tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
                 } else {
@@ -173,6 +171,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                         "class": "details-control",
                         "orderable": false,
                         "data": function () {
+
                             return '<a data-btntype="showhide" href="#">Show sessions</a>'
                         },
                         "defaultContent": ""
@@ -263,8 +262,6 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 $(document).on("click", "#addcourse-link", addCourse);
 
                 $('#listcourses').on( 'click', 'a[data-btntype=delcourse]', function (e) {
-                    console.log("Course about to be deleted", this);
-
                     var row = dt.row($(this).closest('tr'));
                     deleteCourse(row.data().id);
 
@@ -273,14 +270,12 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     return false;
                 });
 
-                $('#listcourses').on( 'click', 'tr td.details-control', function () {
-                    var tr = $(this).closest('tr');
+                function drawSessionSection(tr) {
                     var row = dt.row( tr );
                     var idx = $.inArray( tr.attr('id'), detailRows );
                     var link = tr.find(".details-control a[data-btntype=showhide]");
 
                     if ( row.child.isShown() ) {
-                        // tr.removeClass( 'details' );
                         link.text( 'Show Sessions' );
                         row.child.hide();
 
@@ -288,10 +283,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                         detailRows.splice( idx, 1 );
                     }
                     else {
-                        // tr.addClass( 'details' );
                         link.text( 'Hide Sessions' );
 
-                        // row.child( formatLoading( row.data() ) ).show();
                         formatSession(row.data()).done(function(res){
                             row.child(res).show();
                         });
@@ -301,7 +294,11 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                             detailRows.push( tr.attr('id') );
                         }
                     }
+                }
 
+                $('#listcourses').on( 'click', 'tr td.details-control', function () {
+                    var tr = $(this).closest('tr');
+                    drawSessionSection(tr);
                     return false;
                 } );
                 // On each draw, loop over the detailRows array and show any child rows
