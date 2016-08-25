@@ -6,20 +6,13 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
     var exports = {},
         settings;
 
-    var sessionHash = {
+    var sessionHash = { // TODO: Can probably simplify this now that "orphan projects" concept is gone.
         _sessionHash: {},
-        _orphanSessions: [],
         addSession: function(id, val){
             this._sessionHash[id] = val;
         },
-        addOrphan: function(val) {
-            this._orphanSessions.push(val);
-        },
         lookup: function(id) {
             return this._sessionHash[id];
-        },
-        getOrphans: function(){
-            return this._orphanSessions;
         }
     };
 
@@ -83,7 +76,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 } else {
                     tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
                 };
-                    
+
                 if( items.length === 0 ) {
                     tbody.append($('<tr />').append($('<td />').append('<div />').text('No sessions have been added yet.')));
                 }
@@ -97,26 +90,16 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 return table;
             }
             var deferred = $.Deferred();
-            if(d.id === "orphans") {
-                console.log(sessionHash.getOrphans());
-                deferred.resolve(genHtml(sessionHash.getOrphans().map(function(item){
-                    return {
-                        name: item.name,
-                        url: settings.projectDetailsUrl + "/" + item.id
-                    }
-                })));
-            } else {
-                $.ajax(settings.listSessionsUrl + "/" + d.course.id.id).done(function (data) {
-                    deferred.resolve(
-                        genHtml(data.map(function (item) {
-                            return {
-                                name: lookupName(item.id.id),
-                                url: settings.sessionDetailsUrl + "/" + item.id.id
-                            }
-                        }), settings.newSessionUrl + "/" + d.course.id.id));
+            $.ajax(settings.listSessionsUrl + "/" + d.course.id.id).done(function (data) {
+                deferred.resolve(
+                    genHtml(data.map(function (item) {
+                        return {
+                            name: lookupName(item.id.id),
+                            url: settings.sessionDetailsUrl + "/" + item.id.id
+                        }
+                    }), settings.newSessionUrl + "/" + d.course.id.id));
 
-                });
-            }
+            });
             return deferred.promise();
         }
 
@@ -237,14 +220,9 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
 
                 $.getJSON(settings.listProjectsUrl).done(function(data) {
                     data.aaData.forEach(function(project){
-                        if(project.courseSessionId) {
-                            sessionHash.addSession(project.courseSessionId, project);
-                        } else {
-                            sessionHash.addOrphan(project);
-                        }
+                        sessionHash.addSession(project.courseSessionId, project);
                     });
                 });
-                // dt.row.add({id: "orphans", categories: [], name: "Orphan projects"});
 
                 $(document).on('click', '.courseLink', function(e){
                     console.log("Click .courseLink: ", $(this).data("courseid"));
