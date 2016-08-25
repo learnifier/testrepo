@@ -209,7 +209,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     "language": {
                         "search": "",
                         "zeroRecords": "No projects matches your query",
-                        "emptyTable": "<span class='emptytable'>Start now by creating your <a href='" + settings.newCourseUrl + "'>first course</a></span>",
+                        "emptyTable": "<span class='emptytable'>Start now by creating your <a id='addcourse-link' href='#'>first course</a></span>",
                         "loadingRecords": "<p>Loading courses...</p><img src='" + settings.spinnerUrl + "' />"
                     }
                 });
@@ -254,10 +254,13 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     openModal("course", settings.courseDetailsUrl + "/" + id);
                 });
 
-                $("#addcourse-btn").click(function(e){
+                function addCourse(e){
                     e.preventDefault();
                     openModal("course", settings.newCourseUrl);
-                });
+                }
+
+                $("#addcourse-btn").click(addCourse);
+                $(document).on("click", "#addcourse-link", addCourse);
 
                 $('#listcourses').on( 'click', 'a[data-btntype=delcourse]', function (e) {
                     console.log("Course about to be deleted", this);
