@@ -40,9 +40,10 @@
 
     <div class="ccb-page-header__info--thumbnail">
         <img class="page-thumbnail img-thumbnail" src="${projectThumbnail}" />
-        <p class="page-title-label">Project</p>
         [#if course??]
-        <p>Course: <a href="${helper.urlFor('course.CourseModule', 'list',[org.id])}?course=${course.id}">${course.name}</a></p>
+        <p><a href="${helper.urlFor('course.CourseModule', 'list',[org.id])}?course=${course.id}">${course.name}</a></p>
+        [#else]
+        <p class="page-title-label">Project</p>
         [/#if]
 
         [#if isIdproject() ]
