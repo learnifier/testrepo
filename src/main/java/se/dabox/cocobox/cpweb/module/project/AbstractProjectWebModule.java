@@ -99,14 +99,16 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
             map.put("material", material);
         }
 
-        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
-        final CatalogCourseSession courseSession = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withSourceId(Long.toString(project.getProjectId())).build()));
-        if(courseSession != null) {
-            map.put("courseSession", courseSession);
-            if (courseSession.getCourseId() != null) {
-                final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseSession.getCourseId()).build()));
-                if (course != null) {
-                    map.put("course", course);
+        if(WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ALT_COURSE_CATALOG)) {
+            final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+            final CatalogCourseSession courseSession = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withSourceId(Long.toString(project.getProjectId())).build()));
+            if(courseSession != null) {
+                map.put("courseSession", courseSession);
+                if (courseSession.getCourseId() != null) {
+                    final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseSession.getCourseId()).build()));
+                    if (course != null) {
+                        map.put("course", course);
+                    }
                 }
             }
         }
