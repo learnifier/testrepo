@@ -62,20 +62,17 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
             newCourseUrl: undefined,
             courseDetailsUrl: undefined,
             sessionDetailsUrl: undefined,
-            deleteSessionUrl: undefined
+            deleteSessionUrl: undefined,
+            selectedCourses : []
         }, options || {});
 
         function formatSession ( d ) {
             function genHtml(items, addUrl) {
                 var table = $('<table/>', { "class": "", "style": "width: 100%;"}),
                     tbody = $('<tbody>', { "style": "border: 0;"}).appendTo(table),
-                    addBtn = $("<a />", {"class": "btn btn-primary pull-right", "style": "margin-top: 10px;", "href": addUrl}).html("<i class='glyphicon glyphicon-plus-sign'></i> Add Session"),
-                    title = $("<h3 />", {"class": "", "style": "margin-top: 10px;", "href": addUrl}).html("Sessions");
-                if(addUrl) {
-                    tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
-                } else {
-                    tbody.append($('<tr />').append($('<td />').append(addBtn).append(title)));
-                };
+                    addBtn = $("<a />", {"class": "btn btn-primary pull-right", "style": "margin-top: 10px;", "href": addUrl}).html("<i class='glyphicon glyphicon-plus-sign'></i> Add Session");
+                    // title = $("<h3 />", {"class": "", "style": "margin-top: 10px;", "href": addUrl}).html("Sessions");
+                    tbody.append($('<tr />').append($('<td />').append(addBtn))); //.append(title)));
 
                 if( items.length === 0 ) {
                     tbody.append($('<tr />').append($('<td />').append('<div />').text('No sessions have been added yet.')));
@@ -153,8 +150,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                         "targets": [2],
                         "class": "details-control",
                         "orderable": false,
-                        "data": function () {
-
+                        "render": function (row, type, val, meta) {
                             return '<a data-btntype="showhide" href="#">Show sessions</a>'
                         },
                         "defaultContent": ""
@@ -177,9 +173,6 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 var dt = $('#listcourses').DataTable({
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                     "order": [[1, 'asc']],
-                    "initComplete": function () {
-                        $('#listprojects_filter input').attr('placeholder', 'Search projects');
-                    },
                     "columnDefs": columnDefs,
                     "ajax": {
                         "url": settings.listCoursesUrl,
@@ -193,10 +186,14 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                         "zeroRecords": "No projects matches your query",
                         "emptyTable": "<span class='emptytable'>Start now by creating your <a id='addcourse-link' href='#'>first course</a></span>",
                         "loadingRecords": "<p>Loading courses...</p><img src='" + settings.spinnerUrl + "' />"
+                    },
+                    "createdRow": function ( row, data, index ) {
+                        var link = $(row).find(".details-control a[data-btntype=showhide]");
+                        if(settings.selectedCourses.indexOf(data.id) != -1) {
+                            drawSessionSection(dt.row(row), link);
+                        }
                     }
                 });
-                // Array to track the ids of the details displayed rows
-                var detailRows = [];
 
                 function openModal(imodalId, url){
                     var imodal = new ccbImodal.Server({
@@ -248,35 +245,30 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                     return false;
                 });
 
-                function drawSessionSection(tr) {
-                    var row = dt.row( tr );
-                    var idx = $.inArray( tr.attr('id'), detailRows );
-                    var link = tr.find(".details-control a[data-btntype=showhide]");
-
+                function drawSessionSection(row, link) {
+                    console.log("drawSession: ", row.child(), link);
                     if ( row.child.isShown() ) {
-                        link.text( 'Show Sessions' );
                         row.child.hide();
-
-                        // Remove from the 'open' array
-                        detailRows.splice( idx, 1 );
+                        if(link) {
+                            link.text('Show Sessions');
+                        }
                     }
                     else {
-                        link.text( 'Hide Sessions' );
-
-                        formatSession(row.data()).done(function(res){
-                            row.child(res).show();
-                        });
-
-                        // Add to the 'open' array
-                        if ( idx === -1 ) {
-                            detailRows.push( tr.attr('id') );
+                        row.child("Loading...").show();
+                        if(link) {
+                            link.text('Hide Sessions');
                         }
+                        formatSession(row.data()).done(function(res){
+                            row.child(res);
+                        });
                     }
                 }
 
                 $('#listcourses').on( 'click', 'tr td.details-control', function () {
                     var tr = $(this).closest('tr');
-                    drawSessionSection(tr);
+                    var link = tr.find(".details-control a[data-btntype=showhide]");
+                    var row = dt.row( tr );
+                    drawSessionSection(row, link);
                     return false;
                 } );
             });
