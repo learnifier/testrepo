@@ -60,8 +60,6 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
-        final Map<String, String[]> parameterMap = cycle.getRequest().getParameterMap();
-
         String fieldName = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "pk");
         String fieldValue = cycle.getRequest().getParameter("value");
         if(fieldValue == null) {
