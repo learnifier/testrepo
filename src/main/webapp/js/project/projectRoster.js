@@ -38,7 +38,9 @@ define([], function () {
 
                                 var correctDate = myHidden.val();
                                 $('#expirationdate').val(correctDate);
-                                cpweb.runListCommand(button, listform, 'setExpiration');
+                                if(correctDate) {
+                                    cpweb.runListCommand(button, listform, 'setExpiration');
+                                }
                             } else {
                                 var selectedNum = $("#adjustedDateSetter").val();
                                 if (selectedNum) {
