@@ -60,8 +60,14 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj);
 
+        final Map<String, String[]> parameterMap = cycle.getRequest().getParameterMap();
+
         String fieldName = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "pk");
-        String fieldValue = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "value");
+        String fieldValue = cycle.getRequest().getParameter("value");
+        if(fieldValue == null) {
+            throw new IllegalArgumentException("No value supplied.");
+        }
+
         String stringValue = null;
 
         long projectId = prj.getProjectId();
@@ -94,6 +100,9 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
         boolean match = true;
         switch (fieldName) {
             case "name":
+                if("".equals(fieldValue)) {
+                    return returnSettingError(cycle, "Empty name is not allowed.");
+                }
                 name = fieldValue;
                 break;
             case "note":
