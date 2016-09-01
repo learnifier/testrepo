@@ -197,7 +197,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 c.category = true;
                 c.types.forEach(function(t) {
                     t.category = false;
-                    if (realmProducts[t.pType]) {
+                    if (c.alwaysShown || realmProducts[t.pType]) {
                         if (first) {
                             rows.push(c);
                             first = false;
