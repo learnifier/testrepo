@@ -221,7 +221,6 @@
     </build>
 
     <properties>
-        <druwa.version>1.0-SNAPSHOT</druwa.version>
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
         <poi.version>3.10.1</poi.version>
     </properties>
