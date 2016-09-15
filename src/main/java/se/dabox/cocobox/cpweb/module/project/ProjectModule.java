@@ -825,8 +825,13 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         CourseDesign design = cdClient.getDesign(designId);
 
-        CourseDesignDefinition cdd =
-                CddCodec.decode(cycle, design.getDesign());
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+
+        if (cdd == null) {
+            LOGGER.warn("Design {} in relation to project {} did not exist", designId, project.
+                    getProjectId());
+            return;
+        }
 
         CourseDesignInfo info = cdd.getInfo();
         CourseDesignInfo newInfo = info;
