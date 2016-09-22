@@ -5,18 +5,18 @@ ${cpweb_foot}
 <script>
     $('#menu-library').addClass('subMenuExpanded');
     $('#menu-library-coursetemplates').addClass('active');
-    
+
     var oldExpiration = 0;
     $('#expirationtoggle-false').click(function() {
         oldExpiration = $('#expiration').val();
         $('#expiration').attr({'value': 0, 'disabled': 'disabled'});
     });
-   
+
     $('#expirationtoggle-true').click(function() {
-       $('#expiration').attr({'value': oldExpiration}).removeAttr('disabled').focus(); 
+       $('#expiration').attr({'value': oldExpiration}).removeAttr('disabled').focus();
     });
-    
-    
+
+
 </script>
 [/#assign]
 
@@ -24,7 +24,7 @@ ${cpweb_foot}
 
 <h1>[@dws.txt key="cpweb.editdesignsettings.title" /></h1>
     [#global formPrefix="cpweb.editdesignsettings" /]
-    <form action="${formLink}" id="newMaterial" name="newMaterial"method="post" enctype="multipart/form-data">
+    <form action="${formLink}" id="newMaterial" name="newMaterial" method="post" enctype="multipart/form-data">
         [@bsform.alertsection]
         [/@bsform.alertsection]
 
@@ -35,16 +35,20 @@ ${cpweb_foot}
         [#assign expirationtoggle = "false" /]
         [#if formsess.getDefaultValue("expiration")??]
             [#if formsess.getDefaultValue("expiration")?number > 0]
-                [#assign expirationtoggle = "true" /]        
+                [#assign expirationtoggle = "true" /]
             [/#if]
         [/#if]
 
-        Activate Expiration Timer
-        [@bsform.inputBoolean name="expirationtoggle" label="Expiration toggle" truetext="Yes" falsetext="No" defaultstate=expirationtoggle /]
+        [@security.permissionBlock permission='PRJ_CHANGE_EXPIRATION']
 
-        Expiration (Number of days)
-        [@bsform.inputNumber name="expiration"  tabindex="5" value=formsess.getDefaultValue("expiration")!"" /]
-                    
+            Activate Expiration Timer
+            [@bsform.inputBoolean name="expirationtoggle" label="Expiration toggle" truetext="Yes" falsetext="No" defaultstate=expirationtoggle /]
+
+            Expiration (Number of days)
+            [@bsform.inputNumber name="expiration"  tabindex="5" value=formsess.getDefaultValue("expiration")!"" /]
+
+        [/@]
+
         [@bsform.infosection]
         [/@bsform.infosection]
         <input type="hidden" name="orgId" value="${org.id}" />
