@@ -16,7 +16,7 @@ ${cpweb_foot}
             courseDetailsUrl: "${helper.urlFor('course.CourseModule','editCourse')}",
             sessionDetailsUrl: "${helper.urlFor('project.ProjectModule','sessionOverview')}",
             projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}",
-            deleteSessionUrl: "[@security.permissionBlock permission='CP_DELETE_PROJECT']${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}[/@]",
+            deleteSessionUrl: "[@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}[/@]",
             selectedCourses : [${course!""}]
         });
     });
@@ -43,7 +43,7 @@ ${cpweb_foot}
             <th></th>
             <th>Course Name</th>
             <th>Sessions</th>
-            [@security.permissionBlock permission='CP_DELETE_PROJECT']
+            [@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']
             <th></th>
             [/@]
         </tr>
