@@ -90,7 +90,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                 ccbc.listOrgProjects(orgId);
 
         if ("t".equals(cycle.getRequest().getParameter("filter")) &&
-                WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ALT_COURSE_CATALOG)) {
+                WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.COURSE_CATALOG)) {
 
             projects = CollectionsUtil.sublist(projects, p -> p.getCourseSessionId() == null);
         }
