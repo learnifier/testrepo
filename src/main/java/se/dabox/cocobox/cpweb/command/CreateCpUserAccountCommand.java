@@ -101,13 +101,13 @@ public class CreateCpUserAccountCommand {
                     userAccount = uas.createBasicUserAccount(req);
 
                     // Track to segment
-                    WebTracking.builder(cycle).track(WebTrackingMessage.builder("inviteAdmin")
-                            .userId(WebTracking.createUserId(LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle).toHex()))
-                            .properties(ImmutableMap.of(
+                    WebTracking.simpleEvent(cycle, LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle),
+                            "inviteAdmin",
+                            ImmutableMap.of(
                                     "email", email,
                                     "firstName", firstName,
                                     "lastName", lastName
-                            ))).send();
+                            ));
                 }
 
                 uas.addUserRole(userAccount.getUserId(), CocoboxSecurityConstants.USER_ROLE);

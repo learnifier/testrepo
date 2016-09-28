@@ -690,13 +690,13 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                 ccbcClient.newProjectParticipant(caller, prj.getProjectId(), ua.getUserId());
 
                 // Track to segment
-                WebTracking.builder(cycle).track(WebTrackingMessage.builder("inviteParticipant")
-                                .userId(WebTracking.createUserId(LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle).toHex()))
-                                .properties(ImmutableMap.of(
-                                        "email", email,
-                                        "firstName", ua.getGivenName(),
-                                        "lastName", ua.getSurname()
-                                ))).send();
+                WebTracking.simpleEvent(cycle, LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle),
+                        "inviteParticipant",
+                        ImmutableMap.of(
+                                "email", email,
+                                "firstName", ua.getGivenName(),
+                                "lastName", ua.getSurname()
+                        ));
 
                 return null;
             }
