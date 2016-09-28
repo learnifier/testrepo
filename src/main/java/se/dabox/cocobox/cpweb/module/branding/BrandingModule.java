@@ -3,8 +3,11 @@
  */
 package se.dabox.cocobox.cpweb.module.branding;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -28,7 +31,10 @@ import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.service.branding.client.Branding;
 import se.dabox.service.common.context.Configuration;
 import se.dabox.service.common.context.DwsRealmHelper;
+import se.dabox.service.webtracking.WebTracking;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+
+import static com.segment.analytics.messages.Message.Type.track;
 
 /**
  *
@@ -87,6 +93,7 @@ public class BrandingModule extends AbstractWebAuthModule {
         BrandingChangedListenerUtil.triggerEvent(cycle, branding.getBrandingId());
 
         OrgUnitChangedListenerUtil.triggerEvent(cycle, org.getId());
+        trackBrandingChange(cycle);
 
         return new WebModuleRedirectRequestTarget(BrandingModule.class, "logo", strOrgId);
     }
@@ -111,7 +118,14 @@ public class BrandingModule extends AbstractWebAuthModule {
 
         OrgUnitChangedListenerUtil.triggerEvent(cycle, org.getId());
 
+        trackBrandingChange(cycle);
         return new WebModuleRedirectRequestTarget(BrandingModule.class, "logo", strOrgId);
+    }
+
+    private void trackBrandingChange(RequestCycle cycle) {
+        // Track to segment
+        WebTracking.simpleEvent(cycle, LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle),
+                "brandingSet", Collections.emptyMap());
     }
 
     private BrandingColorForm getCurrentBrandingColors(RequestCycle cycle, long orgId) {
