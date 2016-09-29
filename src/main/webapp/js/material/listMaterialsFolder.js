@@ -63,7 +63,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                     label: "Name",
                     name: "name",
                     value: function(item){return item.file.displayName},
-                    format: function(val, item){return decorateLink(item.file.type==="DIRECTORY", val)},
+                    format: function(val, item){ return '<span class="material-name">' + decorateLink(item.file.type==="DIRECTORY", val)  + '</span>'; },
                     sortable: true,
                     cssClass: "",
                     clickFn: chdir
