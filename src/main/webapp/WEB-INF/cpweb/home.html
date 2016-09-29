@@ -208,6 +208,19 @@ ${cpweb_foot}
             </div>
             [/#if]
             [#if portalSecurity.hasPermission("CP_CREATE_PROJECT") || portalSecurity.hasPermission("CP_LIST_PROJECTS")]
+            [#if dwsrt.hasFeature("coursecatalog")]
+            <div class="ccb-flat-card ccb-flat-card--colored">
+                [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
+                <div class="ccb-flat-card__header"><h2>New Course</h2></div>
+                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
+                    <p>Get started with a new course by following the simple step-by-step instructions.</p>
+                    <p class="text-center">
+                        <a href="${helper.urlFor('course.CourseModule','listAndCreate',[org.id])}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Course</a>
+                    </p>
+                </div>
+                [/@]
+            </div>
+            [#else]
             <div class="ccb-flat-card ccb-flat-card--colored">
                 [@portalSecurity.permissionBlock permission="CP_CREATE_PROJECT"]
                 <div class="ccb-flat-card__header"><h2>New Project</h2></div>
@@ -232,19 +245,7 @@ ${cpweb_foot}
                 </div>
             </div>
             [/#if]
-            [@portalSecurity.permissionBlock permission="CP_CREATE_ORGMAT"]
-            <div class="ccb-flat-card ccb-flat-card--colored">
-                <div class="ccb-flat-card__header"><h3>Upload your materials</h3></div>
-                <div class="ccb-flat-card__content ccb-flat-card__content--padding">
-                    <p>Add your own training materials to tailor the learning to your needs.</p>
-                    <div class="text-center">
-                        <div class="ui-helper-hidden" data-anoncreateprodelement="show">
-                            <div class="btn btn-primary-outlined" id="addmatbtn"><span class="glyphicon glyphicon-plus-sign"></span> Upload Material</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            [/@]
+            [/#if]
             [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
             <div class="ccb-flat-card ccb-flat-card--colored">
                 <div class="ccb-flat-card__header"><h3>Invite an administrator</h3></div>

@@ -42,6 +42,18 @@ public class CourseModule extends AbstractProjectWebModule {
     }
 
     @WebAction
+    public RequestTarget onListAndCreate(RequestCycle cycle, String strOrgId) {
+        MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
+        Map<String, Object> map = createMap();
+
+        map.put("initiateCreate", true);
+        map.put("course", cycle.getRequest().getParameter("course"));
+        map.put("org", org);
+
+        return new FreemarkerRequestTarget("/course/listCourses.html", map);
+    }
+
+    @WebAction
     public RequestTarget onOverview(RequestCycle cycle, String courseId) {
         // Json call to get data will handle security check.
         Map<String, Object> map = createMap();

@@ -207,7 +207,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                                 window.location = data.url;
                             },
                             "saveDone": function(data){
-                                dt.ajax.reload();
+                                window.location = settings.listCoursesPage;
+                                // dt.ajax.reload();
                                 console.log("SaveDone: ", data);
                             }
                         }
@@ -229,12 +230,18 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function(ccbImodal) {
                 });
 
                 function addCourse(e){
-                    e.preventDefault();
+                    if(e) {
+                        e.preventDefault();
+                    }
                     openModal("course", settings.newCourseUrl);
                 }
 
                 $("#addcourse-btn").click(addCourse);
                 $(document).on("click", "#addcourse-link", addCourse);
+                if(settings.initiateCreate) {
+                    console.log("Gogo Initiate: ", addCourse);
+                    addCourse();
+                }
 
                 $('#listcourses').on( 'click', 'a[data-btntype=delcourse]', function (e) {
                     var row = dt.row($(this).closest('tr'));
