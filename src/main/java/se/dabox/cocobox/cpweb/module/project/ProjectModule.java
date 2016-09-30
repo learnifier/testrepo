@@ -3,10 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -83,25 +79,24 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
-import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
 import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
-import se.dabox.service.coursecatalog.client.course.CatalogCourse;
-import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequest;
-import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
-import se.dabox.service.coursecatalog.client.session.extdetails.ExtendedSessionDetailsStatusList;
-import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequest;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.cug.client.ClientUserGroup;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.ValueUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  *
