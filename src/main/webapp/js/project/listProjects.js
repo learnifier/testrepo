@@ -1,4 +1,4 @@
-/* 
+/*
  * (c) Dabox AB 2013 All Rights Reserved
  */
 define([], function() {
@@ -6,7 +6,8 @@ define([], function() {
     var exports = {};
 
     $(document).ready(function() {
-        require(['dataTables-bootstrap'], function() {
+        require(['dataTables-bootstrap', 'dabox-common'], function() {
+            var escapeHtml = cocobox.internal.escapeHTML;
             $('#listprojects').dataTable({
                 "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
                 "order": [[1, 'asc']],
@@ -42,7 +43,7 @@ define([], function() {
                         "data" : function(row, type, set) {
                             if (!row.nameDisplay | !row.nameFilter) {
                                 row.nameFilter = row.name + ' ' + row.id;
-                                row.nameDisplay = '<a href="'+ row.link + '">' + row.name +'</a> ';
+                                row.nameDisplay = '<a href="'+ row.link + '">' + escapeHtml(row.name) +'</a> ';
                             }
 
                             if (type === 'display') {
@@ -87,7 +88,7 @@ define([], function() {
             var rowData = $('#listprojects').dataTable().fnGetData(tr);
 
             var prjId = rowData.id;
-            
+
             var ajax = {};
             var ajaxData = {projectId: prjId};
             ajax.data = ajaxData;

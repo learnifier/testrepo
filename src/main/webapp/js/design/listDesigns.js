@@ -6,7 +6,9 @@ define([textSource], function(t) {
     var exports = {};
 
     $(document).ready(function() {
-       require(['dataTables-bootstrap'], function() {
+        require(['dataTables-bootstrap', 'dabox-common'], function () {
+         var escapeHtml = cocobox.internal.escapeHTML;
+
          var oTable = $('#listdesigns').dataTable({
             "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "paging": false,
@@ -21,7 +23,7 @@ define([textSource], function(t) {
                     "className": "block-link",
                     "data" : function(row, type, set) {
                         if (!row.nameDisplay) {
-                            row.nameDisplay =  '<a href="'+ row.editlink + '" title="' + row.description  + '">' + row.name +'</a> ';
+                            row.nameDisplay =  '<a href="'+ row.editlink + '" title="' + escapeHtml(row.description)  + '">' + escapeHtml(row.name) +'</a> ';
                         }
 
                         if (type === 'display') {
