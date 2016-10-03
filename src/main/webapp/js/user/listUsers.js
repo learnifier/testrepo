@@ -62,7 +62,8 @@ define([], function() {
                 },
                 {
                     "targets": [ 2 ],
-                    "data": "email"
+                    "data": "email",
+                    "render": $.fn.dataTable.render.text()
                 }
             ],
             "ajax": listUsersAjaxSource,
