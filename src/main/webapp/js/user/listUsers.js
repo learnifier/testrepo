@@ -1,4 +1,4 @@
-/* 
+/*
  * (c) Dabox AB 2013 All Rights Reserved
  */
 define([], function() {
@@ -6,14 +6,14 @@ define([], function() {
     var exports = {};
 
    $(document).ready(function() {
-        require(['dataTables-bootstrap'], function() {
+        require(['dataTables-bootstrap', 'dabox-common'], function() {
         var oTable = $('#listusers').dataTable({
             "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
             "order": [[1,'asc']],
             "initComplete": function() {
                 $('#listusers_filter input').attr('placeholder', 'Search users');
             },
-            "columnDefs": [ 
+            "columnDefs": [
                 {
                     "targets": [ 0 ],
                     "orderable": false,
@@ -45,7 +45,7 @@ define([], function() {
                     "data" : function(row, type, set) {
                         if (!row.nameDisplay) {
                             var name = (row.name && row.name.length > 0) ? row.name : "Name not set yet...";
-                            row.nameDisplay = '<a href="'+ row.link + '">' +  name +'</a> ';
+                            row.nameDisplay = '<a href="'+ row.link + '">' +  cocobox.internal.escapeHTML(name) +'</a> ';
                         }
 
                         if (type === 'display') {
@@ -77,7 +77,7 @@ define([], function() {
             }
         });
         });
-                
+
     } );
 
     return exports;
