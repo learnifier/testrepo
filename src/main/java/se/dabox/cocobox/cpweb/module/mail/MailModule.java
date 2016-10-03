@@ -290,7 +290,7 @@ public class MailModule extends AbstractWebAuthModule {
             DruwaFormValidationSession<EmailSettingForm> formsess, String strOrgId) {
 
         if (template.getSticky() != null && template.getSticky()) {
-            toListPage(cycle, strOrgId);
+            return toListPage(cycle, strOrgId);
         }
 
         EmailSettingForm form = formsess.getObject();
