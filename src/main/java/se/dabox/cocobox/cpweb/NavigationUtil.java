@@ -152,7 +152,7 @@ public final class NavigationUtil {
     }
 
     public static String toOrgProjectsUrl(RequestCycle cycle, String strOrgId) {
-        if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.ALT_COURSE_CATALOG)) {
+        if (WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.COURSE_CATALOG)) {
             return cycle.urlFor(CourseModule.class, CourseModule.LIST_ACTION, strOrgId);
         }
 

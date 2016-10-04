@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -68,6 +70,7 @@ import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectTask;
 import se.dabox.service.common.ccbc.project.role.ProjectUserRoleModification;
+import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplate;
 import se.dabox.service.common.mailsender.pmt.PortableMailTemplateCodec;
 import se.dabox.service.common.tx.OperationFailureException;
@@ -88,6 +91,8 @@ import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
+import se.dabox.service.webtracking.WebTracking;
+import se.dabox.service.webtracking.WebTrackingMessage;
 import se.dabox.service.webutils.druwa.FormbeanJsRequestTargetFactory;
 import se.dabox.service.webutils.druwa.JsonRequestUtil;
 import se.dabox.service.webutils.freemarker.text.LangServiceClientFactory;
@@ -683,6 +688,15 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
 
                 long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
                 ccbcClient.newProjectParticipant(caller, prj.getProjectId(), ua.getUserId());
+
+                // Track to segment
+                WebTracking.simpleEvent(cycle, LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle),
+                        "inviteParticipant",
+                        ImmutableMap.of(
+                                "email", email,
+                                "firstName", ua.getGivenName(),
+                                "lastName", ua.getSurname()
+                        ));
 
                 return null;
             }

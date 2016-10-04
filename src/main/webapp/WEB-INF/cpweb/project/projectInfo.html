@@ -126,7 +126,7 @@
             <li class="[#if selected == 'participants']active[/#if]"><a href="${helper.urlFor('ProjectModule','roster',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.participants' /]</span></a></li>
 
 
-            [#if dwsrt.hasFeature("altcoursecatalog")]
+            [#if dwsrt.hasFeature("coursecatalog")]
                 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
                     <li class="[#if selected == 'session']active[/#if]"><a href="${helper.urlFor('ProjectModule','session',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.session' /]</span></a></li>
                 [/@]

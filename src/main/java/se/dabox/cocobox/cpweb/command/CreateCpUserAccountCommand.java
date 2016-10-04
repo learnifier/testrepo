@@ -5,6 +5,8 @@ package se.dabox.cocobox.cpweb.command;
 
 import java.util.List;
 import java.util.Locale;
+
+import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.security.CocoboxSecurityConstants;
 import se.dabox.cocobox.security.user.UserAccountRoleCheck;
@@ -12,11 +14,17 @@ import se.dabox.cocobox.cpweb.CpAdminRoles;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.cocobox.security.user.OrgRoleName;
+import se.dabox.service.common.RealmId;
+import se.dabox.service.common.ccbc.material.ImmutableOrgMaterial;
+import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.tx.UTComplexTxOperation;
 import se.dabox.service.common.tx.VerificationStatus;
 import se.dabox.service.login.client.CreateBasicUserAccountRequest;
 import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.login.client.UserAccountService;
+import se.dabox.service.webtracking.WebTracking;
+import se.dabox.service.webtracking.WebTrackingMessage;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 /**
  *
@@ -91,6 +99,15 @@ public class CreateCpUserAccountCommand {
                                     email);
 
                     userAccount = uas.createBasicUserAccount(req);
+
+                    // Track to segment
+                    WebTracking.simpleEvent(cycle, LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle),
+                            "inviteAdmin",
+                            ImmutableMap.of(
+                                    "email", email,
+                                    "firstName", firstName,
+                                    "lastName", lastName
+                            ));
                 }
 
                 uas.addUserRole(userAccount.getUserId(), CocoboxSecurityConstants.USER_ROLE);

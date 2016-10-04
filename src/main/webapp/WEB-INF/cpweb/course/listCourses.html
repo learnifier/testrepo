@@ -7,6 +7,7 @@ ${cpweb_foot}
 
     require(["${contextPath}/js/course/listCourses.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         s.init({
+            listCoursesPage: "${helper.urlFor('course.CourseModule','list',[org.id])}",
             listCoursesUrl: "${helper.urlFor('course.CourseJsonModule','listOrgCourses',[org.id])}",
             listSessionsUrl: "${helper.urlFor('course.CourseJsonModule','listSessions')}",
             listProjectsUrl: "${helper.urlFor('CpJsonModule','listOrgProjects',[org.id])}",
@@ -16,8 +17,11 @@ ${cpweb_foot}
             courseDetailsUrl: "${helper.urlFor('course.CourseModule','editCourse')}",
             sessionDetailsUrl: "${helper.urlFor('project.ProjectModule','sessionOverview')}",
             projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}",
-            deleteSessionUrl: "[@security.permissionBlock permission='CP_DELETE_PROJECT']${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}[/@]",
-            selectedCourses : [${course!""}]
+            deleteSessionUrl: "[@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}[/@]",
+            selectedCourses : [${course!""}],
+            [#if initiateCreate??]
+            initiateCreate: "true"
+            [/#if]
         });
     });
 
@@ -43,7 +47,7 @@ ${cpweb_foot}
             <th></th>
             <th>Course Name</th>
             <th>Sessions</th>
-            [@security.permissionBlock permission='CP_DELETE_PROJECT']
+            [@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']
             <th></th>
             [/@]
         </tr>

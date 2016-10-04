@@ -4,10 +4,6 @@
  */
 package se.dabox.cocobox.cpweb.module.coursedesign;
 
-import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
-import java.util.List;
-import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -345,7 +341,7 @@ public class DesignModule extends AbstractWebAuthModule {
 
         EditDesignSettingsForm form = formsess.getObject();
 
-        String newDesign = updateDesign(cycle, bcd, form);
+        String newDesign = updateDesign(cycle, bcd, form, Long.parseLong(strOrgId));
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         UpdateDesignRequest updateReq = new UpdateDesignRequest(info.getDesignId(), userId,
@@ -364,9 +360,6 @@ public class DesignModule extends AbstractWebAuthModule {
         EditDesignSettingsForm form = formsess.getObject();
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
-        UpdateDesignRequest updateReq = new UpdateDesignRequest(info.getDesignId(), caller);
-        updateReq.setName(form.getName());
-        updateReq.setDescription(StringUtils.trimToEmpty(form.getDescription()));
 
         String techInfo = CpDesignTechInfo.createOrgTechInfo(orgId);
 
@@ -385,7 +378,7 @@ public class DesignModule extends AbstractWebAuthModule {
         cdClient.addBucketDesign(caller, bucketId, newDesignId);
 
         BucketCourseDesign newBcd = getOrgCourseDesign(cycle, orgId, newDesignId);
-        String newXml = updateDesign(cycle, newBcd, form);
+        String newXml = updateDesign(cycle, newBcd, form, orgId);
         getCourseDesignClient(cycle).updateDesign(new UpdateDesignRequest(newDesignId, caller,
                 newXml));
 
@@ -403,13 +396,18 @@ public class DesignModule extends AbstractWebAuthModule {
     }
 
     private String updateDesign(RequestCycle cycle, BucketCourseDesign bcd,
-            EditDesignSettingsForm form) {
+            EditDesignSettingsForm form, long orgId) {
         CourseDesignDefinition cdd = CddCodec.decode(cycle, bcd.getDesign().getDesign());
         CourseDesignXmlMutator mutator = new CourseDesignXmlMutator(bcd.getDesign().getDesign());
 
-        DurationString newExpiration = formToDurationString(form);
-
         CourseDesignInfo oldInfo = cdd.getInfo();
+
+        DurationString newExpiration = formToDurationString(form);
+        if (newExpiration == null ||
+                !hasOrgPermission(cycle, orgId, CocoboxPermissions.PRJ_CHANGE_EXPIRATION)) {
+            newExpiration = oldInfo.getDefaultParticipationExpiration();
+        }
+
         MutableCourseDesignInfo newInfo = new MutableCourseDesignInfo(oldInfo.getUserTitle(), oldInfo.
                 getUserDescription(), oldInfo.getThumbnailCrl(), newExpiration, oldInfo.getCustomFields());
         mutator.setInfo(newInfo.toCourseDesignInfo());
