@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.DefaultWebAction;
@@ -13,6 +14,7 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
+import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.coursebuilder.initdata.CourseBuilderActivationLink;
@@ -736,6 +738,30 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         return new RedirectUrlRequestTarget(url);
     }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onCopyProject(RequestCycle cycle, String strProjectId) {
+        OrgProject project =
+                getProject(cycle, strProjectId);
+
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Long newProject = new CopyProjectCommand(cycle).execute(project);
+        if(newProject == null) {
+            // error
+        }
+        // goto new project/session
+        return toSomewhere(strProjectId);
+    }
+
+
+
+    private WebModuleRedirectRequestTarget toSomewhere(String projectId) {
+        return new WebModuleRedirectRequestTarget(ProjectModule.class, "roster",
+                projectId);
+    }
+
+
 
     private TemplateLists getLists(RequestCycle cycle, long mailBucket) {
         MailTemplateServiceClient mtClient = getMailTemplateClient(cycle);
