@@ -101,6 +101,13 @@
                     <button class="btn btn-primary-outlined btn-sm" type="button" id="deletePrjBtn"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
             [/#if]
+            [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
+            <div id="cp-project-copyproject">
+                <form action="${helper.urlFor('ProjectModule','copyProject',[prj.projectId])}" method="post">
+                    <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-grain"></span> <span>Copy</span></button>
+                </form>
+            </div>
+            [/@]
         </div>
     </div>
 </section>
