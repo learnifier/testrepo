@@ -2,11 +2,21 @@ package se.dabox.cocobox.cpweb.module.project;
 
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
+import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
+import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
+import se.dabox.util.collections.CollectionsUtil;
 
 import java.util.List;
 
@@ -47,18 +57,36 @@ public class CopyProjectCommand {
                 designId,
                 null);
 
-        Integer courseId = null;
-        nps.setCourseId(courseId);
-        final CreateProjectGeneral input = new CreateProjectGeneral(); // TODO: Remove form object
-        input.setProjectname(newName);
+        Integer courseIdRaw = null;
+
+        final Integer sessionId = orgProj.getCourseSessionId();
+        if(sessionId != null) {
+            final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(getCourseCatalogClient(cycle)
+                    .listSessions(new ListCatalogSessionRequestBuilder()
+                            .withId(CatalogCourseSessionId.valueOf(sessionId)).build()));
+            CatalogCourseId courseId = session.getCourseId();
+            if(courseId != null) {
+                courseIdRaw = courseId.getId();
+            }
+        }
+
+        nps.setCourseId(courseIdRaw);
+
+        final CreateProjectGeneral input = new CreateProjectGeneral(); // TODO: Remove form object from NewProjectSession
+        input.setProjectname(newName==null?"zzz":newName);
         input.setCountry(orgProj.getCountry());
         input.setDesign(String.valueOf(orgProj.getDesignId()));
         input.setProjectlang(orgProj.getLocale());
         input.setTimezone(orgProj.getTimezone());
+        nps.setCreateProjectGeneral(input);
 
         nps.storeInSession(cycle.getSession());
 
         return nps.process(cycle, null);
+    }
+
+    public static CourseCatalogClient getCourseCatalogClient(ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, CourseCatalogClient.class);
     }
 
 
