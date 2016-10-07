@@ -3,24 +3,9 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.regex.Pattern;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
@@ -31,37 +16,30 @@ import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.dabox.cocobox.cpweb.CpwebConstants;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.core.AbstractWebAuthModule;
+import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ProductNameMapFactory;
 import se.dabox.cocobox.cpweb.module.project.productconfig.SettingsFormInputProcessor;
 import se.dabox.cocobox.cpweb.state.NewProjectSession;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.org.MiniOrgInfo;
-import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.material.OrgMaterialConstants;
-import se.dabox.service.common.ccbc.org.OrgProduct;
-import se.dabox.service.common.ccbc.org.OrgProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.ProjectTypeCallable;
 import se.dabox.service.common.ccbc.project.ProjectTypeRunnable;
 import se.dabox.service.common.ccbc.project.ProjectTypeUtil;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.context.command.LazyCacheConfigurationValueCmd;
-import se.dabox.service.common.coursedesign.CourseDesign;
-import se.dabox.service.common.coursedesign.CourseDesignClient;
-import se.dabox.service.common.coursedesign.v1.CddCodec;
-import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.locale.GetUserDefaultLocaleCommand;
 import se.dabox.service.common.locale.GetUserLocalesCommand;
 import se.dabox.service.common.material.MaterialUtils;
-import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.ProductFetchUtil;
 import se.dabox.service.common.proddir.material.ProductMaterialConstants;
 import se.dabox.service.common.webfeature.WebFeatures;
@@ -69,14 +47,21 @@ import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.fatsession.client.GetSessionRequest;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.proddir.data.Product;
-import se.dabox.service.proddir.data.ProductTransformers;
 import se.dabox.service.proddir.data.ProductUtils;
 import se.dabox.util.HybridLocaleUtils;
 import se.dabox.util.collections.CollectionsUtil;
+
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -463,8 +448,8 @@ public class NewProjectModule extends AbstractWebAuthModule {
         List<Long> orgmats = null;
 
         if (projType == ProjectType.DESIGNED_PROJECT) {
-            products = getDesignProducts(cycle, designId, org);
-            orgmats = getDesignOrgmats(cycle, designId);
+            products = ProductsHelper.getDesignProducts(cycle, designId, org.getId());
+            orgmats = ProductsHelper.getDesignOrgmats(cycle, designId);
         }
 
         CreateProjectSessionProcessor processor = new CreateProjectSessionProcessor(Long.valueOf(
@@ -645,93 +630,6 @@ public class NewProjectModule extends AbstractWebAuthModule {
         List<String> ids = Arrays.asList(TimeZone.getAvailableIDs());
 
         return CollectionsUtil.transformList(ids, TimeZone::getTimeZone);
-    }
-
-    private List<String> getDesignProducts(RequestCycle cycle, Long designId, MiniOrgInfo org) {
-        //TODO: Verify that the design is a project design
-        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
-        CourseDesign design = cdClient.getDesign(designId);
-
-        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-
-        Set<String> productIds = cdd.getAllProductIdStringSet();
-
-        verifyProjectProductsExists(cycle, org, productIds);
-
-        return new ArrayList<>(productIds);
-    }
-
-    private List<Long> getDesignOrgmats(RequestCycle cycle, Long designId) {
-        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
-        CourseDesign design = cdClient.getDesign(designId);
-
-        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-
-        Set<Long> orgmatIds = cdd.getAllOrgMatIdSet();
-
-        return new ArrayList<>(orgmatIds);
-    }
-
-    private void verifyProjectProductsExists(RequestCycle cycle, MiniOrgInfo org,
-            Collection<String> productIds) {
-
-        List<OrgProduct> orgProds = getCocoboxCordinatorClient(cycle).listOrgProducts(org.getId());
-        List<String> orgProdIds = CollectionsUtil.transformList(orgProds, OrgProductTransformers.
-                getProductIdTransformer());
-
-        HashSet<String> missing = new HashSet<>(productIds);
-        missing.removeAll(orgProdIds);
-
-        if (missing.isEmpty()) {
-            return;
-        }
-
-        final ProductDirectoryClient pdClient
-                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
-
-        //We have missing products
-        List<Product> missingProducts = pdClient.getProducts(missing);
-        //Create a writable copy
-        missingProducts = new ArrayList<>(missingProducts);
-
-        removeMissingRealmAnonProd(missingProducts);
-
-        if (missingProducts.isEmpty()) {
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder(512);
-        sb.append(
-                "The selected design includes the following materials that you do not have access to. Reach out to your contact person for any questions.\n\n");
-
-        for (Product product : missingProducts) {
-            sb.append(product.getTitle()).append(" (").append(product.getId().getId()).append(")\n");
-            missing.remove(product.getId().getId());
-        }
-
-        for (String prodId : missing) {
-            sb.append(prodId).append('\n');
-        }
-
-        cycle.getSession().setFlashAttribute(CpwebConstants.MISSING_PRODUCTS_FLASH, sb.toString());
-
-        throw new RetargetException(NavigationUtil.
-                toCreateProject(cycle, Long.toString(org.getId())));
-
-    }
-
-    private void removeMissingRealmAnonProd(List<Product> missingProducts) {
-        Map<String, Product> productMap = CollectionsUtil.createMap(missingProducts,
-                ProductTransformers.getIdStringTransformer());
-
-        for (Iterator<Product> iterator = missingProducts.iterator(); iterator.hasNext();) {
-            Product prod = iterator.next();
-
-            if (prod.isAnonymous() && prod.isRealmProduct()) {
-                iterator.remove();
-            }
-        }
-
     }
 
     /**
