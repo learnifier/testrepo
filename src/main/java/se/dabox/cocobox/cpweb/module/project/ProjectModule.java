@@ -740,18 +740,13 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     @WebAction(methods = HttpMethod.POST)
-    public RequestTarget onCopyProject(RequestCycle cycle, String strProjectId) {
+    public RequestTarget onCopyProject(RequestCycle cycle, String strProjectId, String name) {
         OrgProject project =
                 getProject(cycle, strProjectId);
 
-        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
 
-        Long newProject = new CopyProjectCommand(cycle).execute(project);
-        if(newProject == null) {
-            // error
-        }
-        // goto new project/session
-        return toSomewhere(strProjectId);
+        return new CopyProjectCommand(cycle).execute(project, name);
     }
 
 
