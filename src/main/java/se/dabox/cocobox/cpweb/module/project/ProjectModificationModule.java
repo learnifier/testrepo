@@ -103,6 +103,8 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.email.SimpleEmailValidator;
 
+import static javafx.scene.input.KeyCode.M;
+
 /**
  *
  * @author Jerker Klang (jerker.klang@dabox.se)
@@ -689,15 +691,17 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                 long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
                 ccbcClient.newProjectParticipant(caller, prj.getProjectId(), ua.getUserId());
 
-                // Track to segment
+                final ImmutableMap.Builder<String, Object> props = ImmutableMap.<String, Object>builder()
+                        .put("email", email);
+                if(ua.getGivenName() != null) {
+                    props.put("firstName", ua.getGivenName());
+                }
+                if(ua.getSurname() != null) {
+                    props.put("lastName", ua.getSurname());
+                }
                 WebTracking.simpleEvent(cycle, LoginUserAccountHelper.getUserId(cycle), DwsRealmHelper.determineRequestRealmId(cycle),
                         "inviteParticipant",
-                        ImmutableMap.of(
-                                "email", email,
-                                "firstName", ua.getGivenName(),
-                                "lastName", ua.getSurname()
-                        ));
-
+                        props.build());
                 return null;
             }
         };
