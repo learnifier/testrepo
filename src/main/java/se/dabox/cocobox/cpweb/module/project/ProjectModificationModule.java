@@ -3,16 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -59,7 +49,6 @@ import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.cocosite.modal.ModalParamsHelper;
 import se.dabox.cocosite.module.core.AbstractCocositeJsModule;
-import se.dabox.dws.client.DwsServiceErrorCodeException;
 import se.dabox.dws.client.langservice.LangBundle;
 import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.client.Clients;
@@ -77,13 +66,6 @@ import se.dabox.service.common.tx.OperationFailureException;
 import se.dabox.service.common.tx.UTComplexTxOperation;
 import se.dabox.service.common.tx.ValidationFailureException;
 import se.dabox.service.common.tx.VerificationStatus;
-import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
-import se.dabox.service.coursecatalog.client.CourseCatalogClient;
-import se.dabox.service.coursecatalog.client.course.CatalogCourse;
-import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
-import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
-import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
-import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.login.client.AlreadyExistsException;
 import se.dabox.service.login.client.CocoboxUserAccount;
 import se.dabox.service.login.client.CreateBasicUserAccountRequest;
@@ -92,7 +74,6 @@ import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.orgdir.client.OrgUnitInfo;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.service.webtracking.WebTracking;
-import se.dabox.service.webtracking.WebTrackingMessage;
 import se.dabox.service.webutils.druwa.FormbeanJsRequestTargetFactory;
 import se.dabox.service.webutils.druwa.JsonRequestUtil;
 import se.dabox.service.webutils.freemarker.text.LangServiceClientFactory;
@@ -103,7 +84,15 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.email.SimpleEmailValidator;
 
-import static javafx.scene.input.KeyCode.M;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  *
