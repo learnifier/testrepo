@@ -4,7 +4,6 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
-import se.dabox.cocobox.cpweb.state.NewProjectSession;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionNg;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -30,10 +29,11 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static se.dabox.cocobox.cpweb.module.project.ProductsHelper.getDesignOrgmats;
@@ -91,6 +91,17 @@ public class CopyProjectCommand {
         input.setProjectname(newName==null?"zzz":newName); // TODO: Remove conditional when properly called.
         input.setCountry(orgProj.getCountry());
 
+//
+//        input.setDesign(String.valueOf(newDesignId));
+        input.setDesign(null);
+
+
+        input.setProjectlang(orgProj.getLocale());
+        input.setTimezone(orgProj.getTimezone());
+        nps.setCreateProjectGeneral(input);
+
+        nps.storeInSession(cycle.getSession());
+        Project newProject = nps.process(cycle, null);
 
         CourseDesignClient cdc = getCourseDesignClient(cycle);
         final CourseDesign design = cdc.getDesign(orgProj.getDesignId());
@@ -104,11 +115,12 @@ public class CopyProjectCommand {
         Set<Product> localComponents = getLocalComponents(mutableCdd);
 
         // 2. Copy them
+        HashMap<String, String> replaceHash = copyProjectProducts(localComponents, newProject);
 
         // 3. Replace them in cdd with generic operation
+        replaceProducts(mutableCdd, replaceHash);
 
         // 4. Set cdd in project
-
 
         final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
 
@@ -120,37 +132,56 @@ public class CopyProjectCommand {
         CreateDesignResponse des = cdc.createDesign(cdr);
 
         final long newDesignId = des.getDesignId();
-//
-//        input.setDesign(String.valueOf(newDesignId));
-        input.setDesign(null);
 
 
-        input.setProjectlang(orgProj.getLocale());
-        input.setTimezone(orgProj.getTimezone());
-        nps.setCreateProjectGeneral(input);
-
-        nps.storeInSession(cycle.getSession());
-        Project newProject = nps.process(cycle, null);
         return null;
+    }
+
+    private void replaceComponent(MutableComponent component, HashMap<String, String> replaceHash) {
+        final String productId = getProductIdFromType(component.getType());
+        if(productId != null && replaceHash.containsKey(productId)) {
+            component.setType(getTypeFromProductId("fake_" + replaceHash.get(productId)));
+        }
+        final List<MutableComponent> children = component.getChildren();
+        if(children != null) {
+            children.forEach(c -> replaceComponent(c, replaceHash));
+        }
+    }
+
+    private void replaceProducts(MutableCourseDesignDefinition mutableCdd, HashMap<String, String> replaceHash) {
+        final List<MutableComponent> components = mutableCdd.getComponents();
+        components.forEach(c -> replaceComponent(c, replaceHash));
+
     }
 
 
     // ----- start this will probably be moved to own class
 
     private void processComponent(MutableComponent component, Set<String> candidates) {
-        final UUID cid = component.getCid();
-        final List<MutableComponent> children = component.getChildren();
         final String type = component.getType();
         if(type != null) {
-            if(type.contains("material|proddir|")) {
-                String id = type.substring("material|proddir|".length());
+            String id = getProductIdFromType(type);
+            if(id != null) {
                 candidates.add(id);
             }
         }
 
+        final List<MutableComponent> children = component.getChildren();
         if(children != null) {
             children.forEach(c -> processComponent(c, candidates));
         }
+    }
+
+    private String getProductIdFromType(String type) {
+        if(type.contains("material|proddir|")) {
+            return type.substring("material|proddir|".length());
+        } else {
+            return null;
+        }
+    }
+
+    private String getTypeFromProductId(String id) {
+        return "material|proddir|" + id;
     }
 
     private Set<Product> getLocalComponents(MutableCourseDesignDefinition mutableCdd) {
@@ -163,8 +194,6 @@ public class CopyProjectCommand {
 
         final Set<Product> projectPs = ps.stream().filter(Product::isProjectProduct).collect(Collectors.toSet());
 
-        Project toProject = null;
-        copyProjectProducts(ps, toProject);
 //        final List<MutableResource> resources = mutableCdd.getResources();
 //        resources.forEach(r -> {
 //            final String materialId = r.getMaterialId();
@@ -177,12 +206,21 @@ public class CopyProjectCommand {
         return projectPs;
     }
 
-    private void copyProjectProducts(List<Product> ps, Project toProject) {
-        ps.stream().map(p -> {
-            final Product newP = p.copy();
-            return null;
-        });
+    private HashMap<String, String> copyProjectProducts(Set<Product> ps, Project toProject) {
+        Map<String, String> res = new HashMap<>();
+        return ps.stream().collect(HashMap<String, String>::new,
+                (m, p) -> {
+//                    final Product newP = p.copy();
+                    // TODO: Do the actual copying...
+                    // Should probably work on ProductId instead of String.
+                    String newId =  "newid_" + p.getId().getId();
+                    m.put(p.getId().getId(), newId);
+                },
+                (m, u) -> {});
     }
+
+
+
     // ----- end this will probably be moved to own class
 
     public static CourseCatalogClient getCourseCatalogClient(ServiceRequestCycle cycle) {
