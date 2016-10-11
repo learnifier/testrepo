@@ -6,9 +6,12 @@ import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionNg;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.CreateDesignRequest;
@@ -120,8 +123,7 @@ public class CopyProjectCommand {
         // 3. Replace them in cdd with generic operation
         replaceProducts(mutableCdd, replaceHash);
 
-        // 4. Set cdd in project
-
+        // 4. Create design
         final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
 
         String cddXml = CddCodec.encode(cdd);
@@ -133,6 +135,15 @@ public class CopyProjectCommand {
 
         final long newDesignId = des.getDesignId();
 
+        // 5. Set design in project
+
+        OrgProject newOrgProject = (OrgProject)newProject;
+        newOrgProject.setDesignId(newDesignId);
+        UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(caller, newOrgProject.getProjectId());
+        uprb.setDesignId(newDesignId);
+        uprb.setStageDesignId(newDesignId);
+        final UpdateProjectRequest upr = uprb.createUpdateProjectRequest();
+        getCocoboxCoordinatorClient(cycle).updateOrgProject(upr);
 
         return null;
     }
@@ -227,9 +238,11 @@ public class CopyProjectCommand {
         return CacheClients.getClient(cycle, CourseCatalogClient.class);
     }
 
-
     public static CourseDesignClient getCourseDesignClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CourseDesignClient.class);
     }
 
+    public static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
+    }
 }
