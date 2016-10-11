@@ -2,7 +2,7 @@
  * (c) Dabox AB 2016 All Rights Reserved
  */
 
-define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components/list/cocobox-list-copymat', 'es6-shim'], function (ko, ccbImodal) {
+define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components/list/cocobox-list', 'es6-shim'], function (ko, ccbImodal) {
     "use strict";
     var exports = {};
     var settings;
