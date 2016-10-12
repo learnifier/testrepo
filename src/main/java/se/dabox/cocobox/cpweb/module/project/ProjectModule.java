@@ -749,8 +749,12 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         Project newProject = new CopyProjectCommand(cycle).execute(project, name);
         if(newProject != null) {
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Copied project",
+                    WebMessageType.success));
             return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, newProject.getProjectId()));
         } else {
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Failed to copy project/course session",
+                    WebMessageType.error));
             return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, project.getProjectId())); // TODO: Show error
         }
     }
