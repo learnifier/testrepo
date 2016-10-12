@@ -78,6 +78,8 @@ public class CopyProjectCommand {
             projName = orgProj.getUserTitle() + " (copy)"; // TODO: Add counter if not available...
         }
 
+        // 1. Create project w/o cdd, databank and course session.
+
         Locale locale = orgProj.getLocale();
         Locale country = orgProj.getCountry();
 
@@ -104,20 +106,20 @@ public class CopyProjectCommand {
 
         OrgProject newProject = ccbc.newProject(caller, npr);
 
+        // 2. Extract cdd from old project
         CourseDesignClient cdc = getCourseDesignClient(cycle);
         final CourseDesign design = cdc.getDesign(orgProj.getDesignId());
         final CourseDesignDefinition decodedDesign = CddCodec.decode(cycle, design.getDesign());
         final MutableCourseDesignDefinition mutableCdd = decodedDesign.toMutable();
 
-        // 0. We have created a project with empty cdd; have not set up CourseSession/Course yet
 
-        // 1. Get list of local products we should copy from old cdd.
+        // 3. Get list of local products we should copy from old cdd.
         Set<Product> localComponents = getLocalComponents(mutableCdd);
 
-        // 2. Copy them
+        // 4. Copy them
         HashMap<String, String> replaceHash = copyProjectProducts(caller, localComponents, newProject);
 
-        // 3. Replace them in cdd with generic operation
+        // 5. Replace old products with the new copies in cdd
         replaceProducts(mutableCdd, replaceHash);
 
         // 4. Create the new design
