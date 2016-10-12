@@ -7,6 +7,7 @@ import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionNg;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectType;
@@ -29,11 +30,21 @@ import se.dabox.service.common.coursedesign.v1.mutable.MutableResource;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.UpdateProductRequest;
 import se.dabox.service.common.proddir.id.AnonymousProductIdFactory;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
+import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
+import se.dabox.service.coursecatalog.client.course.create.CreateCourseRequest;
+import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequest;
+import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
+import se.dabox.service.coursecatalog.client.session.create.CreateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.impl.StandardCourseSessionSource;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
+import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
+import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -44,7 +55,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 
@@ -59,7 +72,7 @@ public class CopyProjectCommand {
         this.cycle = cycle;
     }
 
-    RequestTarget execute(Project project, String newName) {
+    RequestTarget execute(Project project, String projName) {
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
@@ -69,47 +82,44 @@ public class CopyProjectCommand {
         }
         OrgProject orgProj = (OrgProject)project; // How do i check project type?
 
-        final Long designId = orgProj.getDesignId();
+        CourseCatalogClient ccClient = CacheClients.getClient(cycle, CourseCatalogClient.class);
 
-        CreateProjectSessionProcessorNg processor = new CreateProjectSessionProcessorNg(orgProj.getOrgId());
+        if(projName == null) {
+            projName = orgProj.getUserTitle() + " (copy)"; // TODO: Add counter if not available...
+        }
 
-        final NewProjectSessionNg nps = new NewProjectSessionNg(type.toString(), Collections.emptyList(), Collections.emptyList(), processor,
-                null,
-                designId,
-                null);
+        Locale locale = orgProj.getLocale();
+        Locale country = orgProj.getCountry();
+
+        TimeZone timezone = orgProj.getTimezone();
 
         Integer courseIdRaw = null;
 
         final Integer sessionId = orgProj.getCourseSessionId();
+        final CatalogCourseSession oldCourseSession;
         if(sessionId != null) {
-            final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(getCourseCatalogClient(cycle)
+            oldCourseSession = CollectionsUtil.singleItemOrNull(getCourseCatalogClient(cycle)
                     .listSessions(new ListCatalogSessionRequestBuilder()
                             .withId(CatalogCourseSessionId.valueOf(sessionId)).build()));
-            CatalogCourseId courseId = session.getCourseId();
-            courseIdRaw = courseId.getId();
+        } else {
+            oldCourseSession = null;
         }
-        nps.setCourseId(courseIdRaw);
 
-        final CreateProjectGeneral input = new CreateProjectGeneral(); // TODO: Remove form object from NewProjectSession
-        input.setProjectname(newName==null?"zzz":newName); // TODO: Remove conditional when properly called.
-        input.setCountry(orgProj.getCountry());
+        NewProjectRequest npr = NewProjectRequest.newDesignedProject(projName,
+                orgProj.getOrgId(),
+                locale, caller, country, timezone, null, projName, null, false);
 
-        input.setDesign(null);
+        CocoboxCoordinatorClient ccbc
+                = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
 
-
-        input.setProjectlang(orgProj.getLocale());
-        input.setTimezone(orgProj.getTimezone());
-        nps.setCreateProjectGeneral(input);
-
-        nps.storeInSession(cycle.getSession());
-        OrgProject newProject = nps.process(cycle, null);
+        OrgProject newProject = ccbc.newProject(caller, npr);
 
         CourseDesignClient cdc = getCourseDesignClient(cycle);
         final CourseDesign design = cdc.getDesign(orgProj.getDesignId());
         final CourseDesignDefinition decodedDesign = CddCodec.decode(cycle, design.getDesign());
         final MutableCourseDesignDefinition mutableCdd = decodedDesign.toMutable();
 
-        // 0. We have created a project with empty cdd
+        // 0. We have created a project with empty cdd; have not set up CourseSession/Course yet
 
         // 1. Get list of local products we should copy from old cdd.
         Set<Product> localComponents = getLocalComponents(mutableCdd);
@@ -120,7 +130,7 @@ public class CopyProjectCommand {
         // 3. Replace them in cdd with generic operation
         replaceProducts(mutableCdd, replaceHash);
 
-        // 4. Create design
+        // 4. Create the new design
         final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
 
         String cddXml = CddCodec.encode(cdd);
@@ -131,13 +141,32 @@ public class CopyProjectCommand {
 
         final long newDesignId = des.getDesignId();
 
-        // 5. Set design in project
-        newProject.setDesignId(newDesignId);
-        UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(caller, newProject.getProjectId());
-        uprb.setDesignId(newDesignId);
-        uprb.setStageDesignId(newDesignId);
-        final UpdateProjectRequest upr = uprb.createUpdateProjectRequest();
-        getCocoboxCoordinatorClient(cycle).updateOrgProject(upr);
+        // 5. Create session
+        UpdateProjectRequestBuilder upr
+                = new UpdateProjectRequestBuilder(caller, newProject.getProjectId());
+
+        if(oldCourseSession != null) {
+            CreateSessionRequest csr = new CreateSessionRequest(caller, oldCourseSession.getCourseId());
+            csr = csr.withName(projName);
+            UpdateSessionRequest update
+                    = UpdateSessionRequestBuilder.newCreateBuilder(caller).setSource(
+                    new StandardCourseSessionSource(CocoboxCourseSourceConstants.PROJECT, Long.toString(
+                            newProject.getProjectId()))).
+                    createUpdateSessionRequest();
+
+            csr = csr.withUpdate(update);
+
+            CatalogCourseSession session = ccClient.createSession(csr);
+            upr.setCourseSessionId(session.getId().getId());
+        }
+
+        long databankId = ccbc.createDatabank(0, newProject.getProjectId());
+
+        // 6. Set data bank + design ids.
+        upr.setStageDatabank(databankId);
+        upr.setDesignId(newDesignId);
+        upr.setStageDesignId(newDesignId);
+        ccbc.updateOrgProject(upr.createUpdateProjectRequest());
 
         return null;
     }
