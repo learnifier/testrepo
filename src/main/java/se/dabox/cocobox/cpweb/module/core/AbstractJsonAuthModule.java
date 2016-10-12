@@ -24,6 +24,7 @@ import se.dabox.cocobox.security.CocoboxSecurityConstants;
 import se.dabox.cocosite.security.UserRoleCheckAfterLoginListener;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
+import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
 import se.dabox.service.webutils.json.JsonExceptionHandler;
 import se.dabox.service.webutils.login.WebLoginCheck;
 import se.dabox.service.webutils.login.nlogin.JavascriptNewLoginChecker;
@@ -34,7 +35,7 @@ import se.dabox.service.webutils.login.nlogin.JavascriptNewLoginChecker;
  */
 public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     private final WebLoginCheck loginChecker;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new DwsJacksonObjectMapperFactory().newInstance();
 
     public AbstractJsonAuthModule() {
         DwsExecutionContext context =
@@ -67,12 +68,10 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     }
 
     protected RequestTarget jsonTarget(Map<String, ?> map) {
-        ObjectMapper mapper = new ObjectMapper();
-
         String jsonString;
         try {
             jsonString =
-                    mapper.writer((PrettyPrinter) null).writeValueAsString(map);
+                    MAPPER.writer((PrettyPrinter) null).writeValueAsString(map);
             return new JsonRequestTarget(jsonString);
         } catch (Exception ex) {
             throw new JsonEncodingException("Failed to encode map: "+map, ex);
@@ -80,12 +79,10 @@ public abstract class AbstractJsonAuthModule extends AbstractAuthModule {
     }
 
     protected RequestTarget jsonTarget(List<?> list) {
-        ObjectMapper mapper = new ObjectMapper();
-
         String jsonString;
         try {
             jsonString =
-                    mapper.writer((PrettyPrinter) null).writeValueAsString(list);
+                    MAPPER.writer((PrettyPrinter) null).writeValueAsString(list);
             return new JsonRequestTarget(jsonString);
         } catch (Exception ex) {
             throw new JsonEncodingException("Failed to encode list: "+list, ex);
