@@ -1,6 +1,5 @@
 package se.dabox.cocobox.cpweb.module.project;
 
-import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
@@ -8,7 +7,6 @@ import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionNg;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectType;
@@ -26,6 +24,8 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignDefinition;
+import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseScene;
+import se.dabox.service.common.coursedesign.v1.mutable.MutableResource;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.common.proddir.UpdateProductRequest;
 import se.dabox.service.common.proddir.id.AnonymousProductIdFactory;
@@ -34,7 +34,6 @@ import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
-import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
@@ -45,11 +44,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static se.dabox.cocobox.cpweb.module.project.ProductsHelper.getDesignOrgmats;
 
 
 /**
@@ -157,10 +153,40 @@ public class CopyProjectCommand {
         }
     }
 
+    private void replaceResource(MutableResource resource, HashMap<String, String> replaceHash) {
+        final String materialId = resource.getMaterialId();
+        final String id = getProductIdFromResource(materialId);
+        if(id != null && replaceHash.containsKey(id)) {
+            resource.setMaterialId(getResourceFromProductId(replaceHash.get(id)));
+        }
+
+        final String constraint = resource.getConstraint();
+        final String constraintId = getProductIdFromResource(constraint);
+        if(constraintId != null && replaceHash.containsKey(constraintId)) {
+            resource.setConstraint(getResourceFromProductId(replaceHash.get(constraintId)));
+        }
+    }
+
     private void replaceProducts(MutableCourseDesignDefinition mutableCdd, HashMap<String, String> replaceHash) {
         final List<MutableComponent> components = mutableCdd.getComponents();
-        components.forEach(c -> replaceComponent(c, replaceHash));
+        if(components != null) {
+            components.forEach(c -> replaceComponent(c, replaceHash));
+        }
 
+        final List<MutableResource> resources = mutableCdd.getResources();
+        if(resources != null) {
+            resources.forEach(r -> replaceResource(r, replaceHash));
+        }
+
+        final List<MutableCourseScene> scenes = mutableCdd.getScenes();
+        if(scenes != null) {
+            scenes.forEach(s -> {
+                final List<MutableComponent> sceneComponents = s.getComponents();
+                if(sceneComponents != null) {
+                    sceneComponents.forEach(c -> replaceComponent(c, replaceHash));
+                }
+            });
+        }
     }
 
 
@@ -181,6 +207,14 @@ public class CopyProjectCommand {
         }
     }
 
+    private void processResource(MutableResource resource, Set<String> candidates) {
+        final String materialId = resource.getMaterialId();
+        final String id = getProductIdFromResource(materialId);
+        if(id != null) {
+            candidates.add(materialId);
+        }
+    }
+
     private String getProductIdFromType(String type) {
         if(type.contains("material|proddir|")) {
             return type.substring("material|proddir|".length());
@@ -193,26 +227,36 @@ public class CopyProjectCommand {
         return "material|proddir|" + id;
     }
 
+    private String getProductIdFromResource(String resource) {
+        if(resource.contains("proddir|")) {
+            return resource.substring("proddir|".length());
+        } else {
+            return null;
+        }
+    }
+
+    private String getResourceFromProductId(String id) {
+        return "proddir|" + id;
+    }
+
     private Set<Product> getLocalComponents(MutableCourseDesignDefinition mutableCdd) {
         Set<String> candidates = new HashSet<>();
         final List<MutableComponent> components = mutableCdd.getComponents();
         components.forEach(c -> processComponent(c, candidates));
-
+        final List<MutableCourseScene> scenes = mutableCdd.getScenes();
+        if (scenes != null) { // Can it be null?
+            scenes.forEach(s ->
+                    s.getComponents().forEach(c -> processComponent(c, candidates))
+            );
+        }
+        final List<MutableResource> resources = mutableCdd.getResources();
+        if (resources != null) {
+            resources.forEach(r -> processResource(r, candidates));
+        }
         final ProductDirectoryClient pdClient = CacheClients.getClient(cycle, ProductDirectoryClient.class);
         List<Product> ps = pdClient.getProducts(new ArrayList<>(candidates));
 
-        final Set<Product> projectPs = ps.stream().filter(Product::isProjectProduct).collect(Collectors.toSet());
-
-//        final List<MutableResource> resources = mutableCdd.getResources();
-//        resources.forEach(r -> {
-//            final String materialId = r.getMaterialId();
-//            // TODO: Handle resources
-//        });
-//
-//        final List<MutableCourseScene> scenes = mutableCdd.getScenes();
-//        scenes.forEach(s -> s.getComponents()); // Can probably re-use components handling above.
-
-        return projectPs;
+        return ps.stream().filter(Product::isProjectProduct).collect(Collectors.toSet());
     }
 
     private HashMap<String, String> copyProjectProducts(long caller, Set<Product> ps, OrgProject toProject) {
