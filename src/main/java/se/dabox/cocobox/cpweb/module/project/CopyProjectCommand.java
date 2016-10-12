@@ -1,7 +1,6 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import net.unixdeveloper.druwa.RequestCycle;
-import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -62,7 +61,7 @@ public class CopyProjectCommand {
         this.cycle = cycle;
     }
 
-    RequestTarget execute(Project project, String projName) {
+    Project execute(Project project, String projName) {
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
@@ -84,8 +83,6 @@ public class CopyProjectCommand {
         Locale country = orgProj.getCountry();
 
         TimeZone timezone = orgProj.getTimezone();
-
-        Integer courseIdRaw = null;
 
         final Integer sessionId = orgProj.getCourseSessionId();
         final CatalogCourseSession oldCourseSession;
@@ -160,7 +157,7 @@ public class CopyProjectCommand {
         upr.setStageDesignId(newDesignId);
         ccbc.updateOrgProject(upr.createUpdateProjectRequest());
 
-        return null;
+        return newProject;
     }
 
     private void replaceComponent(MutableComponent component, HashMap<String, String> replaceHash) {

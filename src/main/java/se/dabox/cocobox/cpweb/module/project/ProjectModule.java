@@ -62,6 +62,7 @@ import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
 import se.dabox.service.common.ccbc.project.GetProjectAdministrativeName;
 import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectSubtypeCallable;
@@ -746,7 +747,12 @@ public class ProjectModule extends AbstractProjectWebModule {
 
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
 
-        return new CopyProjectCommand(cycle).execute(project, name);
+        Project newProject = new CopyProjectCommand(cycle).execute(project, name);
+        if(newProject != null) {
+            return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, newProject.getProjectId()));
+        } else {
+            return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, project.getProjectId())); // TODO: Show error
+        }
     }
 
 
