@@ -1,5 +1,6 @@
 package se.dabox.cocobox.cpweb.module.project;
 
+import net.unixdeveloper.druwa.DruwaService;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
@@ -7,9 +8,13 @@ import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.state.NewProjectSessionNg;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.org.OrgProduct;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectType;
+import se.dabox.service.common.ccbc.project.material.AddProjectProductRequest;
+import se.dabox.service.common.ccbc.project.material.AddProjectProductRequestBuilder;
+import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.coursedesign.CourseDesign;
@@ -22,12 +27,16 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignDefinition;
 import se.dabox.service.common.proddir.ProductDirectoryClient;
+import se.dabox.service.common.proddir.UpdateProductRequest;
+import se.dabox.service.common.proddir.id.AnonymousProductIdFactory;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
+import se.dabox.service.login.client.UserAccount;
 import se.dabox.service.proddir.data.Product;
+import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
@@ -54,6 +63,8 @@ public class CopyProjectCommand {
     }
 
     RequestTarget execute(Project project, String newName) {
+
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
         final ProjectType type = project.getType();
         if(type != ProjectType.DESIGNED_PROJECT) {
@@ -94,8 +105,6 @@ public class CopyProjectCommand {
         input.setProjectname(newName==null?"zzz":newName); // TODO: Remove conditional when properly called.
         input.setCountry(orgProj.getCountry());
 
-//
-//        input.setDesign(String.valueOf(newDesignId));
         input.setDesign(null);
 
 
@@ -104,7 +113,7 @@ public class CopyProjectCommand {
         nps.setCreateProjectGeneral(input);
 
         nps.storeInSession(cycle.getSession());
-        Project newProject = nps.process(cycle, null);
+        OrgProject newProject = nps.process(cycle, null);
 
         CourseDesignClient cdc = getCourseDesignClient(cycle);
         final CourseDesign design = cdc.getDesign(orgProj.getDesignId());
@@ -118,7 +127,7 @@ public class CopyProjectCommand {
         Set<Product> localComponents = getLocalComponents(mutableCdd);
 
         // 2. Copy them
-        HashMap<String, String> replaceHash = copyProjectProducts(localComponents, newProject);
+        HashMap<String, String> replaceHash = copyProjectProducts(caller, localComponents, newProject);
 
         // 3. Replace them in cdd with generic operation
         replaceProducts(mutableCdd, replaceHash);
@@ -127,7 +136,6 @@ public class CopyProjectCommand {
         final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
 
         String cddXml = CddCodec.encode(cdd);
-        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
         CreateDesignRequest cdr = new CreateDesignRequest(caller, null, "", cddXml, "");
         String techInfo = CpDesignTechInfo.createStageTechInfo(project.getProjectId());
         cdr.setTechInfo(techInfo);
@@ -137,9 +145,8 @@ public class CopyProjectCommand {
 
         // 5. Set design in project
 
-        OrgProject newOrgProject = (OrgProject)newProject;
-        newOrgProject.setDesignId(newDesignId);
-        UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(caller, newOrgProject.getProjectId());
+        newProject.setDesignId(newDesignId);
+        UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(caller, newProject.getProjectId());
         uprb.setDesignId(newDesignId);
         uprb.setStageDesignId(newDesignId);
         final UpdateProjectRequest upr = uprb.createUpdateProjectRequest();
@@ -151,7 +158,7 @@ public class CopyProjectCommand {
     private void replaceComponent(MutableComponent component, HashMap<String, String> replaceHash) {
         final String productId = getProductIdFromType(component.getType());
         if(productId != null && replaceHash.containsKey(productId)) {
-            component.setType(getTypeFromProductId("fake_" + replaceHash.get(productId)));
+            component.setType(getTypeFromProductId(replaceHash.get(productId)));
         }
         final List<MutableComponent> children = component.getChildren();
         if(children != null) {
@@ -217,18 +224,53 @@ public class CopyProjectCommand {
         return projectPs;
     }
 
-    private HashMap<String, String> copyProjectProducts(Set<Product> ps, Project toProject) {
+    private HashMap<String, String> copyProjectProducts(long caller, Set<Product> ps, OrgProject toProject) {
         Map<String, String> res = new HashMap<>();
+        ProjectMaterialCoordinatorClient pmcClient
+                = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
+
         return ps.stream().collect(HashMap<String, String>::new,
                 (m, p) -> {
-//                    final Product newP = p.copy();
-                    // TODO: Do the actual copying...
-                    // Should probably work on ProductId instead of String.
-                    String newId =  "newid_" + p.getId().getId();
-                    m.put(p.getId().getId(), newId);
+                    Product copied = p.copy();
+                    final ProductId productId = createId();
+                    copied.setId(productId);
+
+                    getProductDirectoryClient(cycle).addProduct(caller, copied);
+                    getCocoboxCoordinatorClient(cycle).addOrgProduct(caller, toProject.getOrgId(), productId.getId());
+
+                    AddProjectProductRequest addreq
+                            = new AddProjectProductRequestBuilder().
+                            setProductId(productId.getId()).
+                            setProjectId(toProject.getProjectId()).
+                            setSkipActivation(true).
+                            build();
+
+                    pmcClient.addProjectProduct(addreq);
+
+//                    updateProductOwner(toProject.getProjectId(), copied); // Hmm, do we really need to explicitly set owner when we already created a ProjectProduct?
+
+                    String newId =  productId.getId();
+                    String oldId = p.getId().getId();
+                    m.put(oldId, newId);
                 },
                 (m, u) -> {});
     }
+
+//    private void updateProductOwner(long projectId) {
+//        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
+//        ProductDirectoryClient pdClient
+//                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
+//
+//        for (Product product : products) {
+//            Product p = product.copy();
+//            p.setOwnerProjectId(projectId);
+//
+//            //We want to make as little noise as possible
+//            UpdateProductRequest upr = new UpdateProductRequest(UserAccount.USERID_UNKNOWN, p,
+//                    false, false, false);
+//            pdClient.updateProduct(upr);
+//        }
+//    }
 
 
 
@@ -245,4 +287,13 @@ public class CopyProjectCommand {
     public static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
+
+    public static ProductDirectoryClient getProductDirectoryClient(ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, ProductDirectoryClient.class);
+    }
+
+    private ProductId createId() {
+        return new AnonymousProductIdFactory().newId();
+    }
+
 }

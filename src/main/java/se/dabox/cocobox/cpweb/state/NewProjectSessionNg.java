@@ -9,6 +9,7 @@ import net.unixdeveloper.druwa.WebSession;
 import se.dabox.cocobox.cpweb.formdata.project.CreateProjectGeneral;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
 import se.dabox.cocobox.cpweb.module.project.productconfig.ExtraProductConfig;
+import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.util.ParamUtil;
 
@@ -171,8 +172,8 @@ public class NewProjectSessionNg implements Serializable {
                 '}';
     }
 
-    public Project process(RequestCycle cycle,
-                           MatListProjectDetailsForm matListDetails) {
+    public OrgProject process(RequestCycle cycle,
+                              MatListProjectDetailsForm matListDetails) {
 
         return processor.processSession(cycle, this, matListDetails);
     }

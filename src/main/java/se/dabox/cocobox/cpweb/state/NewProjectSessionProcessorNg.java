@@ -6,6 +6,7 @@ package se.dabox.cocobox.cpweb.state;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import se.dabox.cocobox.cpweb.formdata.project.MatListProjectDetailsForm;
+import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ import java.io.Serializable;
  */
 public interface NewProjectSessionProcessorNg extends Serializable {
 
-    Project processSession(RequestCycle cycle, NewProjectSessionNg nps,
-                                  MatListProjectDetailsForm matListDetails);
+    OrgProject processSession(RequestCycle cycle, NewProjectSessionNg nps,
+                              MatListProjectDetailsForm matListDetails);
 
 }

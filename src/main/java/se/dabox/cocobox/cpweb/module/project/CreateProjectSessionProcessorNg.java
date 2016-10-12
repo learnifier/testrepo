@@ -94,7 +94,7 @@ public class CreateProjectSessionProcessorNg implements NewProjectSessionProcess
     }
 
     @Override
-    public Project processSession(final RequestCycle cycle, final NewProjectSessionNg nps,
+    public OrgProject processSession(final RequestCycle cycle, final NewProjectSessionNg nps,
                                   final MatListProjectDetailsForm matListDetails) {
 
         String strNpsId = nps.getUuid().toString();
