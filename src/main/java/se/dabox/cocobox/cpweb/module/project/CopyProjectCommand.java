@@ -41,6 +41,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,19 +71,15 @@ public class CopyProjectCommand {
         if(type != ProjectType.DESIGNED_PROJECT) {
             throw new UnsupportedOperationException("Can only copy projects of type designed");
         }
-        final String subtype = project.getSubtype();
         OrgProject orgProj = (OrgProject)project; // How do i check project type?
 
         final Long designId = orgProj.getDesignId();
-        List<String> products = products = ProductsHelper.getDesignProducts(cycle, designId, orgProj.getOrgId());
-        List<Long> orgmats = getDesignOrgmats(cycle, designId);
-
 
         CreateProjectSessionProcessorNg processor = new CreateProjectSessionProcessorNg(orgProj.getOrgId());
 
         String cancelUrl = null;
 
-        final NewProjectSessionNg nps = new NewProjectSessionNg(type.toString(), orgmats, products, processor,
+        final NewProjectSessionNg nps = new NewProjectSessionNg(type.toString(), Collections.emptyList(), Collections.emptyList(), processor,
                 cancelUrl,
                 designId,
                 null);
@@ -95,9 +92,7 @@ public class CopyProjectCommand {
                     .listSessions(new ListCatalogSessionRequestBuilder()
                             .withId(CatalogCourseSessionId.valueOf(sessionId)).build()));
             CatalogCourseId courseId = session.getCourseId();
-            if(courseId != null) {
-                courseIdRaw = courseId.getId();
-            }
+            courseIdRaw = courseId.getId();
         }
         nps.setCourseId(courseIdRaw);
 
@@ -117,7 +112,6 @@ public class CopyProjectCommand {
 
         CourseDesignClient cdc = getCourseDesignClient(cycle);
         final CourseDesign design = cdc.getDesign(orgProj.getDesignId());
-        final String strDesign = design.getDesign();
         final CourseDesignDefinition decodedDesign = CddCodec.decode(cycle, design.getDesign());
         final MutableCourseDesignDefinition mutableCdd = decodedDesign.toMutable();
 
@@ -144,7 +138,6 @@ public class CopyProjectCommand {
         final long newDesignId = des.getDesignId();
 
         // 5. Set design in project
-
         newProject.setDesignId(newDesignId);
         UpdateProjectRequestBuilder uprb = new UpdateProjectRequestBuilder(caller, newProject.getProjectId());
         uprb.setDesignId(newDesignId);
@@ -247,30 +240,20 @@ public class CopyProjectCommand {
 
                     pmcClient.addProjectProduct(addreq);
 
-//                    updateProductOwner(toProject.getProjectId(), copied); // Hmm, do we really need to explicitly set owner when we already created a ProjectProduct?
+                    updateProductOwner(caller, copied, toProject.getProjectId()); // Hmm, do we really need to explicitly set owner when we already created a ProjectProduct?
 
-                    String newId =  productId.getId();
-                    String oldId = p.getId().getId();
-                    m.put(oldId, newId);
+                    m.put(p.getId().getId(), productId.getId());
                 },
                 (m, u) -> {});
     }
 
-//    private void updateProductOwner(long projectId) {
-//        final ServiceRequestCycle cycle = DruwaService.getCurrentCycle();
-//        ProductDirectoryClient pdClient
-//                = CacheClients.getClient(cycle, ProductDirectoryClient.class);
-//
-//        for (Product product : products) {
-//            Product p = product.copy();
-//            p.setOwnerProjectId(projectId);
-//
-//            //We want to make as little noise as possible
-//            UpdateProductRequest upr = new UpdateProductRequest(UserAccount.USERID_UNKNOWN, p,
-//                    false, false, false);
-//            pdClient.updateProduct(upr);
-//        }
-//    }
+    private void updateProductOwner(long caller, Product product, long projectId) {
+        Product p = product.copy();
+        p.setOwnerProjectId(projectId);
+
+        UpdateProductRequest upr = new UpdateProductRequest(caller, p, false, false, false);
+        getProductDirectoryClient(cycle).updateProduct(upr);
+    }
 
 
 
