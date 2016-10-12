@@ -77,10 +77,8 @@ public class CopyProjectCommand {
 
         CreateProjectSessionProcessorNg processor = new CreateProjectSessionProcessorNg(orgProj.getOrgId());
 
-        String cancelUrl = null;
-
         final NewProjectSessionNg nps = new NewProjectSessionNg(type.toString(), Collections.emptyList(), Collections.emptyList(), processor,
-                cancelUrl,
+                null,
                 designId,
                 null);
 
@@ -218,10 +216,6 @@ public class CopyProjectCommand {
     }
 
     private HashMap<String, String> copyProjectProducts(long caller, Set<Product> ps, OrgProject toProject) {
-        Map<String, String> res = new HashMap<>();
-        ProjectMaterialCoordinatorClient pmcClient
-                = CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
-
         return ps.stream().collect(HashMap<String, String>::new,
                 (m, p) -> {
                     Product copied = p.copy();
@@ -238,7 +232,7 @@ public class CopyProjectCommand {
                             setSkipActivation(true).
                             build();
 
-                    pmcClient.addProjectProduct(addreq);
+                    getProjectMaterialCoordinatorClient(cycle).addProjectProduct(addreq);
 
                     updateProductOwner(caller, copied, toProject.getProjectId()); // Hmm, do we really need to explicitly set owner when we already created a ProjectProduct?
 
@@ -259,20 +253,24 @@ public class CopyProjectCommand {
 
     // ----- end this will probably be moved to own class
 
-    public static CourseCatalogClient getCourseCatalogClient(ServiceRequestCycle cycle) {
+    private static CourseCatalogClient getCourseCatalogClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CourseCatalogClient.class);
     }
 
-    public static CourseDesignClient getCourseDesignClient(ServiceRequestCycle cycle) {
+    private static CourseDesignClient getCourseDesignClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CourseDesignClient.class);
     }
 
-    public static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
+    private static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
-    public static ProductDirectoryClient getProductDirectoryClient(ServiceRequestCycle cycle) {
+    private static ProductDirectoryClient getProductDirectoryClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, ProductDirectoryClient.class);
+    }
+
+    private static ProjectMaterialCoordinatorClient getProjectMaterialCoordinatorClient(ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
     }
 
     private ProductId createId() {
