@@ -202,7 +202,8 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
     }
 
     @WebAction(methods = HttpMethod.POST)
-    public Map<String, Object> onCopyProject(RequestCycle cycle, String strCourseSessionId) {
+    public Map<String, Object> onCopySession(RequestCycle cycle) {
+        final String strCourseSessionId = cycle.getRequest().getParameter("sessionId");
         final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
         final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.parseInt(strCourseSessionId));
         final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));

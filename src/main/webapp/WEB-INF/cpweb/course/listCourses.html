@@ -18,6 +18,7 @@ ${cpweb_foot}
             sessionDetailsUrl: "${helper.urlFor('project.ProjectModule','sessionOverview')}",
             projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}",
             deleteSessionUrl: "[@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}[/@]",
+            copySessionUrl: "${helper.urlFor('course.CourseJsonModule','copySession')}",
             selectedCourses : [${course!""}],
             [#if initiateCreate??]
             initiateCreate: "true"

@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2013 All Rights Reserved
  */
-define(['cocobox/ccb-imodal', 'es6-shim'], function( ccbImodal ) {
+define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
     "use strict";
     var exports = {},
         settings;
@@ -78,8 +78,21 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function( ccbImodal ) {
         require(['dabox-common'], function() {
             cocobox.confirmationDialogYesNo("Delete course?", "Do you want to delete this course?", performDelete);
         });
+    }
 
-    };
+    function copySession(sessionId) {
+
+        $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
+            console.log("Result: ", data);
+            CCBMessengerError("Session copied");
+        }).fail(function(jqXHR, textStatus, errorThrown){
+            CCBMessengerError("Could not copy session.");
+            console.log("Could not copy session:", textStatus);
+        });
+        console.log("copySession: ", sessionId);
+
+    }
+
 
     exports.init = function(options) {
 
@@ -127,7 +140,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function( ccbImodal ) {
                   $item
                     .append( $( '<a/>', { href: item.url, title: item.name, style: 'overflow: hidden; text-overflow: ellipsis;' } )
                       .text( item.name )
-                    );
+                    ).append($("<span/>").text(" Copy").click(function(){copySession(item.id); console.log("Click");return false;}));
                   $sessionList.append( $item );
                 } );
 
