@@ -2,55 +2,34 @@ package se.dabox.cocobox.cpweb.module.project;
 
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
+import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
-import se.dabox.service.common.ccbc.project.Project;
-import se.dabox.service.common.ccbc.project.ProjectType;
-import se.dabox.service.common.ccbc.project.material.AddProjectProductRequest;
-import se.dabox.service.common.ccbc.project.material.AddProjectProductRequestBuilder;
-import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
-import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.CreateDesignRequest;
 import se.dabox.service.common.coursedesign.CreateDesignResponse;
-import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
+import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
-import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
-import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignDefinition;
-import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseScene;
-import se.dabox.service.common.coursedesign.v1.mutable.MutableResource;
-import se.dabox.service.common.proddir.ProductDirectoryClient;
-import se.dabox.service.common.proddir.UpdateProductRequest;
-import se.dabox.service.common.proddir.id.AnonymousProductIdFactory;
+import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
 import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
-import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
 import se.dabox.service.coursecatalog.client.session.create.CreateSessionRequest;
 import se.dabox.service.coursecatalog.client.session.impl.StandardCourseSessionSource;
-import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
-import se.dabox.service.proddir.data.Product;
-import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
-import se.dabox.util.collections.CollectionsUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -75,11 +54,11 @@ public class CreateProjectCommand {
 
         // 1. Create project w/o cdd, databank and course session.
 
-        Locale locale = course.getLanguage(); // Slightly questionable
+//        Locale language = course.getLanguage(); // Slightly questionable
 
         TimeZone timezone = TimeZone.getDefault(); // Bad idea, just temporary
 
-        Locale country = locale; // Slightly questionable
+        Locale locale = CocositeUserHelper.getUserLocale(cycle);
 
         final CocoboxCoordinatorClient ccbc = getCocoboxCoordinatorClient(cycle);
 
@@ -93,7 +72,7 @@ public class CreateProjectCommand {
                     try {
                         final NewProjectRequest npr = NewProjectRequest.newDesignedProject(name,
                                 course.getOrgId(),
-                                locale, caller, country, timezone, null, name, null, false);
+                                locale, caller, locale, timezone, null, name, null, false);
                         return ccbc.newProject(caller, npr);
                     } catch (AlreadyExistsException ex) {
                         return null;
@@ -134,14 +113,43 @@ public class CreateProjectCommand {
 
         // 6. Set data bank + design ids.
         upr.setStageDatabank(databankId);
-//        upr.setDesignId(newDesignId);
-//        upr.setStageDesignId(newDesignId);
+        long designId = createDesign(course.getOrgId(), course.getName(), locale);
+        upr.setDesignId(designId);
+        upr.setStageDesignId(designId);
         ccbc.updateOrgProject(upr.createUpdateProjectRequest());
 
         return newProject.getProjectId();
     }
 
+    private long createDesign(long orgId, String designName, Locale language) {
+
+        long userId = LoginUserAccountHelper.getUserId(cycle);
+        long bucketId = new GetCourseDesignBucketCommand(cycle).forOrg(orgId);
+
+        MutableCourseDesignDefinition cdd = CddCodec.getBlank().toMutable();
+        cdd.setInfo(new MutableCourseDesignInfo(null, null, null, null, Collections.emptyList()));
+
+        String design =
+                CddCodec.encode(cdd);
+
+        CreateDesignRequest createReq = new CreateDesignRequest(userId, bucketId, designName,
+                design, "");
+        //Enabled = auto-add in this context
+        createReq.setEnabled(false);
+        createReq.setLang(language);
+
+        CreateDesignResponse response = getCourseDesignClient(cycle).createDesign(createReq);
+
+        return response.getDesignId();
+    }
+
+
+
     private static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
+    }
+
+    private static CourseDesignClient getCourseDesignClient(ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, CourseDesignClient.class);
     }
 }
