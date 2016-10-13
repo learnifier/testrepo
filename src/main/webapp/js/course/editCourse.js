@@ -51,7 +51,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
             imodalClient.close();
         };
 
-        this.save = function(forward){
+        this.save = function(){
             var url;
 
             if(self.isCreateMode()) {
@@ -70,12 +70,21 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                 }
             }).done(function(data){
                 if(self.isCreateMode()) {
-                    if(forward) {
-                        imodalClient.send("createAndForward", {"url": settings.newSessionUrl + "/" + data.id.id});
-                        imodalClient.close();
-                    } else {
-                       imodalClient.send("saveDone");
-                        imodalClient.close();
+                    if(data.status == "ok") {
+                        console.log("Calling ", settings.createSessionUrl, data);
+                        $.post(settings.createSessionUrl, {"courseId": data.id.id}).done(function(data){
+                            console.log("Created done: ", data);
+                            if(data.status == "ok") {
+                                imodalClient.send("createAndForward", {"url": settings.sessionDetailsUrl + "/" + data.sessionId});
+                                imodalClient.close();
+                            } else {
+                                imodalClient.close();
+                                CCBMessengerError("Could not create session: ", data.message);
+                            }
+                        }).fail(function(jqXHR, textStatus, errorThrown){
+                            CCBMessengerError("Could not copy session.");
+                            console.log("Could not copy session:", errorThrown);
+                        });
                     }
                 } else {
                     imodalClient.send("saveDone");

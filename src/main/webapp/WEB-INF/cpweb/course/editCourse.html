@@ -17,7 +17,7 @@ ${cpweb_foot}
             saveCourseUrl: "${helper.urlFor('course.CourseJsonModule','saveCourse')}",
             [#if org??]
             createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse', [org.id])}",
-            newSessionUrl:  "${helper.urlFor('project.NewProjectModule','sessionSetup', [org.id])}",
+            createSessionUrl: "${helper.urlFor('course.CourseJsonModule','createSession')}",
             [/#if]
             courseId: "${courseId!''}",
             defaultImage: '${defaultImage}'
@@ -67,11 +67,8 @@ ${cpweb_foot}
                     <button data-bind="click: closer" class="btn btn-link">
                         Close
                     </button>
-                    <button data-bind="click: function(){save(false)}, enable: validate()" class="btn btn-primary">
+                    <button data-bind="click: function(){save()}, enable: validate()" class="btn btn-primary">
                         <span class="glyphicon glyphicon-plus-sign"></span> Save
-                    </button>
-                    <button data-bind="visible: isCreateMode(), click: function(){save(true)}, enable: validate()" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-plus-sign"></span> Save and create first session
                     </button>
                 </div>
             </div><!-- /.modal-content -->

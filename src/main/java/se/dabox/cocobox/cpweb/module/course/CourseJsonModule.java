@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.CopyProjectCommand;
+import se.dabox.cocobox.cpweb.module.project.CreateProjectCommand;
 import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
@@ -238,6 +239,31 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             }
         } else {
             throw new IllegalStateException("Can not copy an external project.");
+        }
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public Map<String, Object> onCreateSession(RequestCycle cycle) {
+        final String strCourseId = cycle.getRequest().getParameter("courseId");
+
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseId courseId = CatalogCourseId.valueOf(Integer.parseInt(strCourseId));
+        final CatalogCourse course = CollectionsUtil.singleItemOrNull(ccc.listCourses(new ListCatalogCourseRequestBuilder().withCourseId(courseId).build()));
+        if(course == null) {
+            throw new NotFoundException("Course not found.");
+        }
+        checkOrgPermission(cycle, course.getOrgId());
+        try {
+            Long newProjectId = new CreateProjectCommand(cycle).execute(course);
+            if (newProjectId != null) {
+                return ImmutableMap.of(
+                        "status", "ok",
+                        "projectId", newProjectId);
+            } else {
+                return ImmutableMap.of("status", "error", "message", "Failed to create course session.");
+            }
+        } catch (AlreadyExistsException e) {
+            return ImmutableMap.of("status", "error", "message", "Could not find a free name. Copy aborted.");
         }
     }
 }
