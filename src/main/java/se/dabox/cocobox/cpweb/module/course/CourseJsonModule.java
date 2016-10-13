@@ -226,10 +226,9 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
                 Project newProject = new CopyProjectCommand(cycle).execute(project);
 
                 if (newProject != null) {
-                    return ImmutableMap.<String, Object>builder()
-                            .put("status", "ok")
-                            .put("sessionId", project.getCourseSessionId())
-                            .build();
+                    return ImmutableMap.of(
+                            "status", "ok",
+                            "sessionId", project.getCourseSessionId());
                 } else {
                     return ImmutableMap.of("status", "error", "message", "Failed to copy project/course session.");
                 }
