@@ -141,7 +141,7 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                   $item
                     .append( $( '<a/>', { href: "#", title: item.name, style: 'overflow: hidden; text-overflow: ellipsis;' } )
                       .text( item.name ).click(function(){window.location = item.url; return false;})
-                    ).append($("<span/>").text(" Copy").click(function(){copySession(item.id); return false;}));
+                    ).append($("<a/>", { href: "#" }).text(" [Copy]").click(function(){copySession(item.id); return false;}));
                   $sessionList.append( $item );
                 } );
 
