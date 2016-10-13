@@ -139,8 +139,8 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                       } )
                   );*/
                   $item
-                    .append( $( '<a/>', { href: item.url, title: item.name, style: 'overflow: hidden; text-overflow: ellipsis;' } )
-                      .text( item.name )
+                    .append( $( '<a/>', { href: "#", title: item.name, style: 'overflow: hidden; text-overflow: ellipsis;' } )
+                      .text( item.name ).click(function(){window.location = item.url; return false;})
                     ).append($("<span/>").text(" Copy").click(function(){copySession(item.id); return false;}));
                   $sessionList.append( $item );
                 } );
@@ -299,7 +299,6 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                 $("#addcourse-btn").click(addCourse);
                 $(document).on("click", "#addcourse-link", addCourse);
                 if(settings.initiateCreate) {
-                    console.log("Gogo Initiate: ", addCourse);
                     addCourse();
                 }
 
