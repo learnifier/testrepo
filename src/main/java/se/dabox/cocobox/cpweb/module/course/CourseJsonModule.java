@@ -3,14 +3,26 @@
  */
 package se.dabox.cocobox.cpweb.module.course;
 
+import com.google.common.collect.ImmutableMap;
+import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.NavigationUtil;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
+import se.dabox.cocobox.cpweb.module.project.CopyProjectCommand;
+import se.dabox.cocobox.cpweb.module.util.CpwebParameterUtil;
+import se.dabox.cocobox.security.permission.CocoboxPermissions;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
+import se.dabox.service.common.ccbc.AlreadyExistsException;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.project.OrgProject;
+import se.dabox.service.common.ccbc.project.Project;
+import se.dabox.service.coursecatalog.client.CocoboxCourseSourceConstants;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.coursecatalog.client.course.CatalogCourse;
 import se.dabox.service.coursecatalog.client.course.CatalogCourseId;
@@ -18,6 +30,7 @@ import se.dabox.service.coursecatalog.client.course.create.CreateCourseRequest;
 import se.dabox.service.coursecatalog.client.course.list.ListCatalogCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.course.update.UpdateCourseRequestBuilder;
 import se.dabox.service.coursecatalog.client.session.CatalogCourseSession;
+import se.dabox.service.coursecatalog.client.session.CatalogCourseSessionId;
 import se.dabox.service.coursecatalog.client.session.list.ListCatalogSessionRequestBuilder;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.ParamUtil;
@@ -112,20 +125,20 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
 
         final UpdateCourseRequestBuilder updateReq = UpdateCourseRequestBuilder.newBuilder(caller, courseId);
         boolean change = false;
-        if(!Objects.equals(course.getName(), name)) {
+        if (!Objects.equals(course.getName(), name)) {
             updateReq.setName(name);
             change = true;
         }
-        if(!Objects.equals(course.getDescription(), description)) {
+        if (!Objects.equals(course.getDescription(), description)) {
             updateReq.setDescription(description);
             change = true;
         }
-        if(!Objects.equals(course.getThumbnailUrl(), thumbnailUrl)) {
+        if (!Objects.equals(course.getThumbnailUrl(), thumbnailUrl)) {
             updateReq.setThumbnail(thumbnailUrl);
             change = true;
         }
 
-        if(change) {
+        if (change) {
             ccc.updateCourse(updateReq.build());
         }
         return jsonTarget(Collections.singletonMap("status", "ok"));
@@ -147,21 +160,21 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         UpdateCourseRequestBuilder updateReq = UpdateCourseRequestBuilder.newCreateUpdateBuilder(caller);
         boolean change = false;
         CreateCourseRequest ccr = new CreateCourseRequest(caller, name, orgId, getUserLocale(cycle));
-        if(description != null) {
+        if (description != null) {
             updateReq = updateReq.setDescription(description);
             change = true;
         }
-        if(thumbnailUrl != null) {
+        if (thumbnailUrl != null) {
             updateReq = updateReq.setThumbnail(thumbnailUrl);
             change = true;
         }
-        if(change) {
+        if (change) {
             ccr = ccr.withUpdate(updateReq.build());
         }
 
         final CatalogCourse course = ccc.createCourse(ccr);
         return jsonTarget(
-                new HashMap<String, Object>(){{
+                new HashMap<String, Object>() {{
                     put("status", "ok");
                     put("id", course.getId());
                 }}
@@ -186,5 +199,45 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
         WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Course deleted", WebMessageType.success));
 
         return Collections.singletonMap("status", "ok");
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public Map<String, Object> onCopyProject(RequestCycle cycle, String strCourseSessionId) {
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.parseInt(strCourseSessionId));
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+
+        if (session.getSource() != null && CocoboxCourseSourceConstants.PROJECT.equals(session.getSource().getType())) {
+            final String strProjectId = session.getSource().getId();
+            final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
+            Long projectId = CpwebParameterUtil.stringToLong(strProjectId);
+            OrgProject project = null;
+            if (projectId != null) {
+                project = cocoboxCordinatorClient.getProject(projectId);
+            }
+            if (project == null) {
+                return ImmutableMap.of("status", "error", "message", "Project missing.");
+            }
+
+            checkPermission(cycle, project);
+            checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
+
+            try {
+                Project newProject = new CopyProjectCommand(cycle).execute(project);
+
+                if (newProject != null) {
+                    return ImmutableMap.<String, Object>builder()
+                            .put("status", "ok")
+                            .put("sessionId", project.getCourseSessionId())
+                            .build();
+                } else {
+                    return ImmutableMap.of("status", "error", "message", "Failed to copy project/course session.");
+                }
+            } catch (AlreadyExistsException e) {
+                return ImmutableMap.of("status", "error", "message", "Could not find a free name. Copy aborted.");
+            }
+        } else {
+            throw new IllegalStateException("Can not copy an external project.");
+        }
     }
 }

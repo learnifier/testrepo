@@ -61,11 +61,11 @@ import java.util.stream.Stream;
 public class CopyProjectCommand {
 
     private final RequestCycle cycle;
-    CopyProjectCommand(RequestCycle cycle) {
+    public CopyProjectCommand(RequestCycle cycle) {
         this.cycle = cycle;
     }
 
-    Project execute(Project project) {
+    public Project execute(Project project) {
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
