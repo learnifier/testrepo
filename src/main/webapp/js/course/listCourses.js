@@ -49,7 +49,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function( ccbImodal ) {
         if(entry && entry.name) {
             return  entry.name;
         }
-        else return "<em>Empty course session name</em>";
+        else return "Empty course session name";
     }
 
     function deleteCourse(id) {
