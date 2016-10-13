@@ -57,6 +57,7 @@ import se.dabox.cocosite.webmessage.WebMessageType;
 import se.dabox.cocosite.webmessage.WebMessages;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.client.Clients;
+import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.ParticipationProgress;
@@ -741,21 +742,27 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
     @WebAction(methods = HttpMethod.POST)
-    public RequestTarget onCopyProject(RequestCycle cycle, String strProjectId, String name) {
+    public RequestTarget onCopyProject(RequestCycle cycle, String strProjectId) {
         OrgProject project =
                 getProject(cycle, strProjectId);
 
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
 
-        Project newProject = new CopyProjectCommand(cycle).execute(project, name);
-        if(newProject != null) {
-            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Copied project",
-                    WebMessageType.success));
-            return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, newProject.getProjectId()));
-        } else {
-            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Failed to copy project/course session",
+        try {
+            Project newProject = new CopyProjectCommand(cycle).execute(project);
+            if(newProject != null) {
+                WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Copied project",
+                        WebMessageType.success));
+                return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, newProject.getProjectId()));
+            } else {
+                WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Failed to copy project/course session",
+                        WebMessageType.error));
+                return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, project.getProjectId()));
+            }
+        } catch(AlreadyExistsException e) {
+            WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Could not find a free name. Copy aborted.",
                     WebMessageType.error));
-            return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, project.getProjectId())); // TODO: Show error
+            return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, project.getProjectId()));
         }
     }
 

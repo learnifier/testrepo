@@ -3,6 +3,7 @@ package se.dabox.cocobox.cpweb.module.project;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -47,7 +48,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 /**
@@ -61,7 +65,7 @@ public class CopyProjectCommand {
         this.cycle = cycle;
     }
 
-    Project execute(Project project, String projName) {
+    Project execute(Project project) {
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
@@ -73,9 +77,7 @@ public class CopyProjectCommand {
 
         CourseCatalogClient ccClient = CacheClients.getClient(cycle, CourseCatalogClient.class);
 
-        if(projName == null) {
-            projName = orgProj.getUserTitle() + " (copy)"; // TODO: Add counter if not available...
-        }
+        String oldProjName = orgProj.getUserTitle();
 
         // 1. Create project w/o cdd, databank and course session.
 
@@ -94,14 +96,24 @@ public class CopyProjectCommand {
             oldCourseSession = null;
         }
 
-        NewProjectRequest npr = NewProjectRequest.newDesignedProject(projName,
-                orgProj.getOrgId(),
-                locale, caller, country, timezone, null, projName, null, false);
+        final CocoboxCoordinatorClient ccbc = getCocoboxCoordinatorClient(cycle);
 
-        CocoboxCoordinatorClient ccbc
-                = CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
+        // Try creating "oldname (copy 1)" ... "oldname (copy N)", "oldname randomUUID"
+        final Stream<String> names = Stream.concat(IntStream.range(1, 6).mapToObj(i -> oldProjName + " (copy " + i + ")"), Stream.of(oldProjName + " " + UUID.randomUUID().toString()));
 
-        OrgProject newProject = ccbc.newProject(caller, npr);
+        final OrgProject newProject = names
+                .map (name -> {
+                    try {
+                        final NewProjectRequest npr = NewProjectRequest.newDesignedProject(name,
+                                orgProj.getOrgId(),
+                                locale, caller, country, timezone, null, name, null, false);
+                        return ccbc.newProject(caller, npr);
+                    } catch (AlreadyExistsException ex) {
+                        return null;
+                    }
+                }).filter(p -> p != null)
+                .findFirst()
+                .orElseThrow(() -> new AlreadyExistsException("Could not find a free project name to use.")); // Should not happen with random uuid
 
         // 2. Extract cdd from old project
         CourseDesignClient cdc = getCourseDesignClient(cycle);
@@ -136,7 +148,7 @@ public class CopyProjectCommand {
 
         if(oldCourseSession != null) {
             CreateSessionRequest csr = new CreateSessionRequest(caller, oldCourseSession.getCourseId());
-            csr = csr.withName(projName);
+            csr = csr.withName(newProject.getName());
             UpdateSessionRequest update
                     = UpdateSessionRequestBuilder.newCreateBuilder(caller).setSource(
                     new StandardCourseSessionSource(CocoboxCourseSourceConstants.PROJECT, Long.toString(
