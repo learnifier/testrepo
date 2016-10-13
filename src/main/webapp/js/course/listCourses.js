@@ -83,16 +83,17 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
     function copySession(sessionId) {
 
         $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
-            console.log("Result: ", data);
-            CCBMessengerError("Session copied");
+            console.log("copied: ", data);
+            if(data.status == "ok") {
+                window.location = settings.projectDetailsUrl + "/" + data.projectId;
+            } else {
+                CCBMessengerError("Could not copy session: ", data.message);
+            }
         }).fail(function(jqXHR, textStatus, errorThrown){
             CCBMessengerError("Could not copy session.");
-            console.log("Could not copy session:", textStatus);
+            console.log("Could not copy session:", errorThrown);
         });
-        console.log("copySession: ", sessionId);
-
     }
-
 
     exports.init = function(options) {
 
@@ -140,7 +141,7 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                   $item
                     .append( $( '<a/>', { href: item.url, title: item.name, style: 'overflow: hidden; text-overflow: ellipsis;' } )
                       .text( item.name )
-                    ).append($("<span/>").text(" Copy").click(function(){copySession(item.id); console.log("Click");return false;}));
+                    ).append($("<span/>").text(" Copy").click(function(){copySession(item.id); return false;}));
                   $sessionList.append( $item );
                 } );
 
