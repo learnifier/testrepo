@@ -65,7 +65,7 @@ public class CopyProjectCommand {
         this.cycle = cycle;
     }
 
-    public Project execute(Project project) {
+    public Long execute(Project project) {
 
         long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
@@ -169,7 +169,7 @@ public class CopyProjectCommand {
         upr.setStageDesignId(newDesignId);
         ccbc.updateOrgProject(upr.createUpdateProjectRequest());
 
-        return newProject;
+        return newProject.getProjectId();
     }
 
     private void replaceComponent(MutableComponent component, HashMap<String, String> replaceHash) {

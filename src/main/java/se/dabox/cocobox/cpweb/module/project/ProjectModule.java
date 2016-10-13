@@ -749,11 +749,11 @@ public class ProjectModule extends AbstractProjectWebModule {
         checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
 
         try {
-            Project newProject = new CopyProjectCommand(cycle).execute(project);
-            if(newProject != null) {
+            Long newProjectId = new CopyProjectCommand(cycle).execute(project);
+            if(newProjectId != null) {
                 WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Copied project",
                         WebMessageType.success));
-                return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, newProject.getProjectId()));
+                return new RedirectUrlRequestTarget(NavigationUtil.toProjectPageUrl(cycle, newProjectId));
             } else {
                 WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Failed to copy project/course session",
                         WebMessageType.error));

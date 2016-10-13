@@ -224,12 +224,12 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
 
             try {
-                Project newProject = new CopyProjectCommand(cycle).execute(project);
+                Long newProjId = new CopyProjectCommand(cycle).execute(project);
 
-                if (newProject != null) {
+                if (newProjId != null) {
                     return ImmutableMap.of(
                             "status", "ok",
-                            "sessionId", project.getCourseSessionId());
+                            "projectId", newProjId);
                 } else {
                     return ImmutableMap.of("status", "error", "message", "Failed to copy project/course session.");
                 }
