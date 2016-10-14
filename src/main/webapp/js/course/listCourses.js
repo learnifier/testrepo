@@ -197,8 +197,8 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function( ccbImodal ) {
                         "targets": [2],
                         "class": "details-control",
                         "orderable": false,
-                        "render": function (row, type, val, meta) {
-                            return '<a data-btntype="showhide" href="#">Edit</a>'
+                        "data": function (row, type, val, meta) {
+                            return '<a data-courseid="' + row.course.id.id + '" data-btntype="showhide" href="#">Edit</a>';
                         },
                         "defaultContent": ""
                     }
@@ -270,7 +270,7 @@ define(['cocobox/ccb-imodal', 'es6-shim'], function( ccbImodal ) {
                 });
 
                 $('#listcourses').on('click', '.details-control', function(e) {
-                    var id = $(this).data("courseid");
+                    var id = $(e.target).data("courseid");
                     e.preventDefault();
                     openModal("course", settings.courseDetailsUrl + "/" + id);
                 });
