@@ -1,7 +1,6 @@
-package se.dabox.cocobox.cpweb.module.project;
+package se.dabox.cocobox.cpweb.module.project.command;
 
 import net.unixdeveloper.druwa.RequestCycle;
-import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
@@ -9,7 +8,6 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
-import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.CreateDesignRequest;
 import se.dabox.service.common.coursedesign.CreateDesignResponse;
 import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
@@ -38,11 +36,10 @@ import java.util.stream.Stream;
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
-public class CreateProjectCommand {
+public class CreateProjectCommand extends AbstractCopyCommand {
 
-    private final RequestCycle cycle;
     public CreateProjectCommand(RequestCycle cycle) {
-        this.cycle = cycle;
+        super(cycle);
     }
 
     public Long execute(CatalogCourse course) {
@@ -96,7 +93,7 @@ public class CreateProjectCommand {
         long databankId = ccbc.createDatabank(0, newProject.getProjectId());
 
         upr.setStageDatabank(databankId);
-        long designId = createDesign(course.getOrgId(), course.getName(), locale);
+        long designId = createBlankDesign(course.getOrgId(), course.getName(), locale);
         upr.setDesignId(designId);
         upr.setStageDesignId(designId);
         ccbc.updateOrgProject(upr.createUpdateProjectRequest());
@@ -104,7 +101,7 @@ public class CreateProjectCommand {
         return newProject.getProjectId();
     }
 
-    private long createDesign(long orgId, String designName, Locale language) {
+    private long createBlankDesign(long orgId, String designName, Locale language) {
 
         long userId = LoginUserAccountHelper.getUserId(cycle);
         long bucketId = new GetCourseDesignBucketCommand(cycle).forOrg(orgId);
@@ -126,12 +123,4 @@ public class CreateProjectCommand {
     }
 
 
-
-    private static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
-    }
-
-    private static CourseDesignClient getCourseDesignClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, CourseDesignClient.class);
-    }
 }

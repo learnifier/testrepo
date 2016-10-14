@@ -1,7 +1,6 @@
-package se.dabox.cocobox.cpweb.module.project;
+package se.dabox.cocobox.cpweb.module.project.command;
 
 import net.unixdeveloper.druwa.RequestCycle;
-import net.unixdeveloper.druwa.ServiceRequestCycle;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
@@ -11,7 +10,6 @@ import se.dabox.service.common.ccbc.project.Project;
 import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.material.AddProjectProductRequest;
 import se.dabox.service.common.ccbc.project.material.AddProjectProductRequestBuilder;
-import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
@@ -53,16 +51,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getProductIdFromResource;
+import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getProductIdFromType;
+
 
 /**
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
-public class CopyProjectCommand {
+public class CopyProjectCommand extends AbstractCopyCommand {
 
-    private final RequestCycle cycle;
     public CopyProjectCommand(RequestCycle cycle) {
-        this.cycle = cycle;
+        super(cycle);
     }
 
     public Long execute(Project project) {
@@ -129,7 +129,7 @@ public class CopyProjectCommand {
         HashMap<String, String> replaceHash = copyProjectProducts(caller, localComponents, newProject);
 
         // 5. Replace old products with the new copies in cdd
-        replaceProducts(mutableCdd, replaceHash);
+        new ReplaceCddMaterials(mutableCdd).replaceProducts(replaceHash);
 
         // 4. Create the new design
         final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
@@ -163,7 +163,6 @@ public class CopyProjectCommand {
 
         long databankId = ccbc.createDatabank(0, newProject.getProjectId());
 
-        // 6. Set data bank + design ids.
         upr.setStageDatabank(databankId);
         upr.setDesignId(newDesignId);
         upr.setStageDesignId(newDesignId);
@@ -171,56 +170,6 @@ public class CopyProjectCommand {
 
         return newProject.getProjectId();
     }
-
-    private void replaceComponent(MutableComponent component, HashMap<String, String> replaceHash) {
-        final String productId = getProductIdFromType(component.getType());
-        if(productId != null && replaceHash.containsKey(productId)) {
-            component.setType(getTypeFromProductId(replaceHash.get(productId)));
-        }
-        final List<MutableComponent> children = component.getChildren();
-        if(children != null) {
-            children.forEach(c -> replaceComponent(c, replaceHash));
-        }
-    }
-
-    private void replaceResource(MutableResource resource, HashMap<String, String> replaceHash) {
-        final String materialId = resource.getMaterialId();
-        final String id = getProductIdFromResource(materialId);
-        if(id != null && replaceHash.containsKey(id)) {
-            resource.setMaterialId(getResourceFromProductId(replaceHash.get(id)));
-        }
-
-        final String constraint = resource.getConstraint();
-        final String constraintId = getProductIdFromResource(constraint);
-        if(constraintId != null && replaceHash.containsKey(constraintId)) {
-            resource.setConstraint(getResourceFromProductId(replaceHash.get(constraintId)));
-        }
-    }
-
-    private void replaceProducts(MutableCourseDesignDefinition mutableCdd, HashMap<String, String> replaceHash) {
-        final List<MutableComponent> components = mutableCdd.getComponents();
-        if(components != null) {
-            components.forEach(c -> replaceComponent(c, replaceHash));
-        }
-
-        final List<MutableResource> resources = mutableCdd.getResources();
-        if(resources != null) {
-            resources.forEach(r -> replaceResource(r, replaceHash));
-        }
-
-        final List<MutableCourseScene> scenes = mutableCdd.getScenes();
-        if(scenes != null) {
-            scenes.forEach(s -> {
-                final List<MutableComponent> sceneComponents = s.getComponents();
-                if(sceneComponents != null) {
-                    sceneComponents.forEach(c -> replaceComponent(c, replaceHash));
-                }
-            });
-        }
-    }
-
-
-    // ----- start this will probably be moved to own class
 
     private void processComponent(MutableComponent component, Set<String> candidates) {
         final String type = component.getType();
@@ -243,30 +192,6 @@ public class CopyProjectCommand {
         if(id != null) {
             candidates.add(materialId);
         }
-    }
-
-    private String getProductIdFromType(String type) {
-        if(type.contains("material|proddir|")) {
-            return type.substring("material|proddir|".length());
-        } else {
-            return null;
-        }
-    }
-
-    private String getTypeFromProductId(String id) {
-        return "material|proddir|" + id;
-    }
-
-    private String getProductIdFromResource(String resource) {
-        if(resource.contains("proddir|")) {
-            return resource.substring("proddir|".length());
-        } else {
-            return null;
-        }
-    }
-
-    private String getResourceFromProductId(String id) {
-        return "proddir|" + id;
     }
 
     private Set<Product> getLocalComponents(MutableCourseDesignDefinition mutableCdd) {
@@ -321,30 +246,6 @@ public class CopyProjectCommand {
 
         UpdateProductRequest upr = new UpdateProductRequest(caller, p, false, false, false);
         getProductDirectoryClient(cycle).updateProduct(upr);
-    }
-
-
-
-    // ----- end this will probably be moved to own class
-
-    private static CourseCatalogClient getCourseCatalogClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, CourseCatalogClient.class);
-    }
-
-    private static CourseDesignClient getCourseDesignClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, CourseDesignClient.class);
-    }
-
-    private static CocoboxCoordinatorClient getCocoboxCoordinatorClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
-    }
-
-    private static ProductDirectoryClient getProductDirectoryClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, ProductDirectoryClient.class);
-    }
-
-    private static ProjectMaterialCoordinatorClient getProjectMaterialCoordinatorClient(ServiceRequestCycle cycle) {
-        return CacheClients.getClient(cycle, ProjectMaterialCoordinatorClient.class);
     }
 
     private ProductId createId() {
