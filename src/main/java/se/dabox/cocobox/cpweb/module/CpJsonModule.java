@@ -292,14 +292,13 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         final GetProjectAdministrativeName projectNameHelper = new GetProjectAdministrativeName(
                 cycle);
 
+        DateFormat df = getUserListDateFormat(cycle);
+
         try {
-            try (JsonGenerator generator = FACTORY.createGenerator(baos, com.fasterxml.jackson.core.JsonEncoding.UTF8)) {
-                generator.writeStartObject();
 
-                generator.writeArrayFieldStart("aaData");
-
-                for (OrgProject project : projects) {
-                    generator.writeStartObject();
+            new DataTablesJson<OrgProject>(df, userLocale) {
+                @Override
+                protected void encodeItem(OrgProject project) throws IOException {
                     generator.writeNumberField("id", project.getProjectId());
                     generator.writeStringField("name", projectNameHelper.getName(project));
                     generator.writeStringField("added", nf.format(project.getUserCount()));
@@ -320,15 +319,14 @@ public class CpJsonModule extends AbstractJsonAuthModule {
                             writeBooleanField("favorite", favoriteSet.contains(project.
                             getProjectId()));
 
+                    writeDateField("created", project.getCreated());
+                    writeDateField("updated", project.getUpdated());
+
                     if(project.getCourseSessionId() != null) {
                         generator.writeNumberField("courseSessionId", project.getCourseSessionId());
                     }
-                    generator.writeEndObject();
                 }
-                generator.writeEndArray();
-
-                generator.writeEndObject();
-            }
+            }.writeTo(projects, baos);
 
             return baos;
         } catch (IOException ex) {

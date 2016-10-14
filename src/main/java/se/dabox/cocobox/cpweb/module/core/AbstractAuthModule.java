@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.core;
 
+import java.text.DateFormat;
 import java.util.Locale;
 import java.util.Set;
 import net.unixdeveloper.druwa.RequestCycle;
@@ -283,4 +284,15 @@ public abstract class AbstractAuthModule extends AbstractModule {
             return true;
         }
     }
+
+    /**
+     * Returns a formatter for the current user suitable for table listings.
+     *
+     * @param cycle
+     * @return
+     */
+    public static DateFormat getUserListDateFormat(RequestCycle cycle) {
+        return DateFormat.getDateInstance(DateFormat.SHORT, CocositeUserHelper.getUserLocale(cycle));
+    }
+
 }
