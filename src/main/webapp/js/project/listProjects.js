@@ -57,13 +57,31 @@ define([], function() {
                                 return row.name;
                             }
                         }
-                    },
-                    {
+                    },{
                         "targets": [2],
-                        "data": "added"
+                        "data" : function(row, type, set) {
+                            if (!row.createdDisplay) {
+                                row.createdDisplay = row.createdStr ? row.createdStr : "";
+                            }
+
+                            if (type === 'display') {
+                                return row.createdDisplay;
+                            } else if (type === 'filter') {
+                                return row.createdDisplay;
+                            } else if (type === 'sort') {
+                                return row.created;
+                            } else {
+                                //Anything else and raw row
+                                return row.created;
+                            }
+                        }
                     },
                     {
                         "targets": [3],
+                        "data": "added"
+                    },
+                    {
+                        "targets": [4],
                         "data": "invited"
                     }
                 ],

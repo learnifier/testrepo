@@ -89,8 +89,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
 import static se.dabox.service.common.ccbc.participation.filter.FilterParticipationField.activated;
 
 /**

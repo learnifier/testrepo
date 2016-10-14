@@ -53,6 +53,9 @@
                 <h1 class="page-title" id="project-name">${projectName?xml}</h1>
         [#else]
             <h1 class="page-title" id="project-name"><span class="editable-content" data-url="${projectSettingUrl}" data-pk="name">${project.name?xhtml}</span>[#include "projectEditLabel.html" /]</h1>
+            [#if project.demo]
+            <div><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> This is a demo ${course???string('course','project')}</div>
+            [/#if]
             <ul class="page-created-updated__wrapper list-inline">
                 <li>
                     <p class="page-updated-label">Created</p><p class="page-updated">[@userNameAndEmail prj.createdBy!-1 /]<span data-toggle="tooltip" data-placement="top" title="${(prj.created?datetime?string.full)!''}">${(prj.created?date?string.full)!''}</span></p>
@@ -86,7 +89,7 @@
                 [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT_COURSEDESIGN"]
                 <div id="cp-project-editdesign">
                     <form action="${helper.urlFor('ProjectModule','gotoDesignBuilder',[prj.projectId])}" method="post">
-                        <button class="delete btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil"></span> <span>Edit Design</span></button>
+                        <button class="delete btn btn-primary btn-sm" type="submit"><span class="glyphicon glyphicon-pencil"></span> <span>Edit Design</span></button>
                     </form>
                 </div>
                 [/@]
@@ -99,6 +102,11 @@
             [#if projectSecurity.hasPermission("CP_DELETE_PROJECT") && canDeleteProject ]
                 <form id="deleteprojectform" action="${helper.urlFor('project.ProjectModificationModule','deleteProject',[org.id,project.projectId])}" method="post">
                     <button class="btn btn-primary-outlined btn-sm" type="button" id="deletePrjBtn"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                </form>
+            [/#if]
+            [#if security.userAccount.superUser]
+                <form id="toggledemo" action="${helper.urlFor('project.ProjectModificationModule','toggleDemo',[org.id,project.projectId])}" method="post">
+                    <button class="btn btn-primary-outlined btn-sm" type="submit"><span class="glyphicon glyphicon-ice-lolly-tasted"></span> Toggle demo flag</button>
                 </form>
             [/#if]
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]

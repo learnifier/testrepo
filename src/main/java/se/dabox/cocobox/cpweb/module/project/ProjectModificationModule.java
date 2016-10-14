@@ -93,6 +93,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
+import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
 
 /**
  *
@@ -532,6 +534,32 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
             return toProjectRolePage(cycle, strProjectId);
         }
     }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onToggleDemo(RequestCycle cycle, String strOrgId, String strProjectId) {
+        final UserAccount userAccount = LoginUserAccountHelper.getUserAccount(cycle);
+        if(!userAccount.isSuperUser()) {
+            throw new IllegalStateException("Must be superuser");
+        }
+
+        long prjId = Long.parseLong(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+
+        if (prj == null) {
+            return NavigationUtil.toMain(cycle);
+        }
+
+        UpdateProjectRequest req
+                = new UpdateProjectRequestBuilder(userAccount.getUserId(), prjId).
+                        setDemo(!prj.isDemo()).createUpdateProjectRequest();
+
+        getCocoboxCordinatorClient(cycle).updateOrgProject(req);
+
+        return NavigationUtil.toProjectPage(prjId);
+    }
+
 
     private WebModuleRedirectRequestTarget toRoster(String projectId) {
         return new WebModuleRedirectRequestTarget(ProjectModule.class, "roster",
