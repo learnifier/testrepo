@@ -1,6 +1,8 @@
 package se.dabox.cocobox.cpweb.module.project.command;
 
 import net.unixdeveloper.druwa.RequestCycle;
+import org.apache.commons.lang3.StringUtils;
+import se.dabox.cocosite.druwa.CocoSiteConstants;
 import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
@@ -8,6 +10,7 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
+import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.coursedesign.CreateDesignRequest;
 import se.dabox.service.common.coursedesign.CreateDesignResponse;
 import se.dabox.service.common.coursedesign.GetCourseDesignBucketCommand;
@@ -23,6 +26,7 @@ import se.dabox.service.coursecatalog.client.session.impl.StandardCourseSessionS
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequest;
 import se.dabox.service.coursecatalog.client.session.update.UpdateSessionRequestBuilder;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
+import se.dabox.util.HybridLocaleUtils;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -49,10 +53,6 @@ public class CreateProjectCommand extends AbstractCopyCommand {
 
         CourseCatalogClient ccClient = CacheClients.getClient(cycle, CourseCatalogClient.class);
 
-        TimeZone timezone = TimeZone.getDefault(); // Bad idea, just temporary
-
-        Locale locale = CocositeUserHelper.getUserLocale(cycle);
-
         final CocoboxCoordinatorClient ccbc = getCocoboxCoordinatorClient(cycle);
 
         String wantedName = course.getName();
@@ -65,7 +65,7 @@ public class CreateProjectCommand extends AbstractCopyCommand {
                     try {
                         final NewProjectRequest npr = NewProjectRequest.newDesignedProject(name,
                                 course.getOrgId(),
-                                locale, caller, locale, timezone, null, name, null, false);
+                                getLocale(), caller, getCountry(), getTz(), null, name, null, false);
                         return ccbc.newProject(caller, npr);
                     } catch (AlreadyExistsException ex) {
                         return null;
@@ -93,7 +93,7 @@ public class CreateProjectCommand extends AbstractCopyCommand {
         long databankId = ccbc.createDatabank(0, newProject.getProjectId());
 
         upr.setStageDatabank(databankId);
-        long designId = createBlankDesign(course.getOrgId(), course.getName(), locale);
+        long designId = createBlankDesign(course.getOrgId(), course.getName(), getLocale());
         upr.setDesignId(designId);
         upr.setStageDesignId(designId);
         ccbc.updateOrgProject(upr.createUpdateProjectRequest());
@@ -122,5 +122,24 @@ public class CreateProjectCommand extends AbstractCopyCommand {
         return response.getDesignId();
     }
 
+    private TimeZone getTz() {
+        String tzStr = DwsRealmHelper.getRealmConfiguration(cycle).getValue("cocobox.project.timezone.default");
+        if (tzStr == null) {
+            return null;
+        }
+        return TimeZone.getTimeZone(tzStr);
+    }
 
+    private Locale getLocale() {
+        return CocositeUserHelper.getUserLocale(cycle);
+    }
+
+    private Locale getCountry() {
+        String cStr = DwsRealmHelper.getRealmConfiguration(cycle).getValue(
+                "cocobox.project.countrylocale.default");
+        if (cStr == null) {
+            return null;
+        }
+        return HybridLocaleUtils.toLocale(cStr);
+    }
 }
