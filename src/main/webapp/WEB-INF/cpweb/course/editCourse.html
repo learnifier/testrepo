@@ -19,6 +19,8 @@ ${cpweb_foot}
             createCourseUrl: "${helper.urlFor('course.CourseJsonModule','createCourse', [org.id])}",
             createSessionUrl: "${helper.urlFor('course.CourseJsonModule','createSession')}",
             [/#if]
+            sessionDetailsUrl: "${helper.urlFor('project.ProjectModule','sessionOverview')}",
+            projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}",
             courseId: "${courseId!''}",
             defaultImage: '${defaultImage}'
         });

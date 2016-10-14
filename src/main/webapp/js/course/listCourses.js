@@ -112,10 +112,10 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
             function genHtml(items, addUrl) {
                 var $container = $( '<div/>', { style: "width: 100%; overflow: hidden;" } );
 
-                var $button = $( '<a/>', { 'class': 'btn btn-primary pull-right', href: addUrl, style: 'margin-top: 6px;' } );
-                $button.append( $( '<i/>', { 'class': 'glyphicon glyphicon-plus-sign' } ) );
-                $button.append( $( '<span> Add Session</span>' ) );
-                $container.append( $button );
+                // var $button = $( '<a/>', { 'class': 'btn btn-primary pull-right', href: addUrl, style: 'margin-top: 6px;' } );
+                // $button.append( $( '<i/>', { 'class': 'glyphicon glyphicon-plus-sign' } ) );
+                // $button.append( $( '<span> Add Session</span>' ) );
+                // $container.append( $button );
 
                 var $sessionList = $( '<ul />', { style: 'max-width: 65vw; margin-top: 12px;' } );
                 $container.append( $sessionList );
@@ -270,7 +270,6 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                             "saveDone": function(data){
                                 window.location = settings.listCoursesPage;
                                 // dt.ajax.reload();
-                                console.log("SaveDone: ", data);
                             }
                         }
                     });

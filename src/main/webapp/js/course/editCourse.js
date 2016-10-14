@@ -75,7 +75,9 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
                         $.post(settings.createSessionUrl, {"courseId": data.id.id}).done(function(data){
                             console.log("Created done: ", data);
                             if(data.status == "ok") {
-                                imodalClient.send("createAndForward", {"url": settings.sessionDetailsUrl + "/" + data.sessionId});
+                                console.log("Forwarding to: ", settings.courseDetailsUrl + "/" + data.projectId);
+                                console.log("Forwarding to: ", settings, data);
+                                imodalClient.send("createAndForward", {"url": settings.projectDetailsUrl + "/" + data.projectId});
                                 imodalClient.close();
                             } else {
                                 imodalClient.close();
@@ -102,7 +104,6 @@ define(['knockout', 'cocobox/ccb-imodal', 'es6-shim', 'ckeditor4', 'cocobox-knoc
             if(self.isCreateMode()) {
                 return self.name() && self.description();
             } else {
-                console.log("Name: ", self.name(), name);
                 return self.name() && (self.name() != name || self.description() != description || self.crl() != crl)
             }
         };
