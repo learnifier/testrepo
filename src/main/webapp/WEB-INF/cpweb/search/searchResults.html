@@ -9,22 +9,22 @@ ${cpweb_foot}
     var addFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','add')}";
     var deleteFavorite = "${helper.urlFor('favorites.FavoritesJsonModule','delete')}";
     var spinnerUrl = "[@common.spinnerUrl /]";
-    
+
     var listUsersAjaxSource =  "${helper.urlFor('CpJsonModule','searchUsers',[org.id, query])}";
     var listProjectsAjaxSource =  "${helper.urlFor('CpJsonModule','searchOrgProjects',[org.id, query])}";
     var listMaterialsAjaxSource =  "${helper.urlFor('OrgMaterialJsonModule','searchPurchasedMats',[org.id, query])}";
-    
+
     require(["${contextPath}/js/search/searchResults.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
        //No initialization needed
     });
-    
+
     $(function($) {
-        $(".scroll").click(function(event){		
+        $(".scroll").click(function(event){
             event.preventDefault();
             $('html,body').animate({scrollTop:$(this.hash).offset().top}, 500);
         });
     });
-                         
+
 </script>
 
 [/#assign]
@@ -32,7 +32,7 @@ ${cpweb_foot}
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
 <article id="ccb-page-searchResults">
     <h1 id="top">Search Results</h1>
-    <p>Your search for <span class="query">${query}</span> resulted in the following results.</p>
+    <p>Your search for <span class="query">${query?xml}</span> resulted in the following results.</p>
     <ul class="categories list-inline">
         <li id="lprojects"><a href="#listprojects_info" class="scroll">Projects</a></li>
         <li id="lusers" ><a href="#listusers_info" class="scroll">Users</a></li>

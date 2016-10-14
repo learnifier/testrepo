@@ -38,6 +38,7 @@ import se.dabox.service.common.ccbc.folder.FolderId;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.org.OrgProduct;
+import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
 import se.dabox.util.collections.CollectionsUtil;
 
 /**
@@ -49,7 +50,7 @@ public class LibraryVfsModule extends AbstractJsonAuthModule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryVfsModule.class);
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new DwsJacksonObjectMapperFactory().newInstance();
 
     @WebActionMountpoint("/libvfs.js")
     @WebAction

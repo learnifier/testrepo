@@ -44,11 +44,8 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
 
         self.cocoboxListParams = function() {
             return {
-                editMode: settings.editMode, // TODO: This is not used
+                editMode: settings.editMode,
                 vfs: settings.vfs,
-                idField: "id", // TODO: Not used
-                nameField: "name",
-                typeField: "type",  // TODO: Not used
                 filterTypes: undefined,
                 groupOps: true,
                 folderSelectable: true,
@@ -86,6 +83,7 @@ define(['knockout', 'cocobox/ccb-imodal', 'dabox-common', 'cocobox/ko-components
                 vfsActions: {
                     preview: { html: '<span class="glyphicon glyphicon-eye-open"></span> Preview' },
                     rename: { html: '<span class="glyphicon glyphicon-pencil"></span> Rename' },
+                    copy: { html: '<span class="glyphicon glyphicon-grain"></span> Copy' },
                     edit: { html: '<span class="glyphicon glyphicon-edit"></span> Edit' },
                     move: { html: '<span class="glyphicon glyphicon-share"></span> Move' },
                     remove: { html: '<span class="glyphicon glyphicon-trash"></span> Delete' }

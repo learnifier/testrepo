@@ -23,6 +23,7 @@ import se.dabox.cocobox.cpweb.module.report.subproject.transformer.SubprojectPar
 import se.dabox.service.common.RealmBackgroundCallable;
 import se.dabox.service.common.ajaxlongrun.Status;
 import se.dabox.service.common.ajaxlongrun.StatusSource;
+import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
 import se.dabox.service.proddir.data.Product;
 import se.dabox.util.collections.Factory;
 
@@ -33,7 +34,7 @@ import se.dabox.util.collections.Factory;
 public class OrgSubprojectReport extends RealmBackgroundCallable<DeferredFileOutputStream>
         implements StatusSource, StatusHolder {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new DwsJacksonObjectMapperFactory().newInstance();
 
     private static final int MAXSIZE = 32 * 1024 * 1024;
 

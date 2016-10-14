@@ -97,7 +97,15 @@ public class MailModule extends AbstractWebAuthModule {
 
         if (template == null) {
             LOGGER.warn("Mail template not found: {}", templateId);
+
             String url = NavigationUtil.toEmailListPageUrl(cycle, strOrgId);
+            return new RedirectUrlRequestTarget(url);
+        }
+
+        if (!copyMode && template.isStickyCheck()) {
+            LOGGER.warn("Trying to modify sticky template with id {}", templateId);
+
+            final String url = NavigationUtil.toEmailListPageUrl(cycle, strOrgId);
             return new RedirectUrlRequestTarget(url);
         }
 
@@ -171,6 +179,15 @@ public class MailModule extends AbstractWebAuthModule {
         final MailTemplate template = getOrgMailTemplate(cycle, Long.valueOf(templateId), org.
                 getId());
 
+
+        if (!copyMode && template.isStickyCheck()) {
+            LOGGER.warn("Trying to modify sticky template with id {}", templateId);
+
+            final String url = NavigationUtil.toEmailListPageUrl(cycle, strOrgId);
+            return new RedirectUrlRequestTarget(url);
+        }
+
+
         DruwaFormValidationSession<EmailSettingForm> formsess =
                 getValidationSession(EmailSettingForm.class, cycle);
 
@@ -208,7 +225,7 @@ public class MailModule extends AbstractWebAuthModule {
         String cancelUrl = backUrl;
 
         MeInitData initData =
-                new MeInitData(org.getId(), 
+                new MeInitData(org.getId(),
                 CpwebConstants.MAILEDITOR_SKIN,
                 brandingId,
                 template.getName(),
@@ -273,7 +290,7 @@ public class MailModule extends AbstractWebAuthModule {
             DruwaFormValidationSession<EmailSettingForm> formsess, String strOrgId) {
 
         if (template.getSticky() != null && template.getSticky()) {
-            toListPage(cycle, strOrgId);
+            return toListPage(cycle, strOrgId);
         }
 
         EmailSettingForm form = formsess.getObject();
