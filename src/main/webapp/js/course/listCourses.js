@@ -121,7 +121,20 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                 $container.append( $sessionList );
 
                 if( items.length === 0 ) {
-                  $container.append( $( '<p>No sessions have beend added yet</p>', { style: 'text-align: center;' } ) );
+                    $container.append( $( '<a/>' ), { style: 'text-align: center;', href: "#" } ).text('Add first session')
+                        .click(function(){
+                            $.post(settings.createSessionUrl, {"courseId": d.id}).done(function(data){
+                                if(data.status == "ok") {
+                                    window.location = settings.projectDetailsUrl + "/" + data.projectId;
+                                } else {
+                                    CCBMessengerError("Could not create empty course session: ", data.message);
+                                }
+                            }).fail(function(jqXHR, textStatus, errorThrown){
+                                CCBMessengerError("Could create empty course session.");
+                                console.log("Could not create empty course session:", errorThrown);
+                            });
+                            return false;
+                        });
                 }
                 items.forEach( function ( item ) {
                   var $item = $( '<li/>', { } );
@@ -285,6 +298,7 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                 $('#listcourses').on('click', '.details-control', function(e) {
                     var id = $(this).data("courseid");
                     e.preventDefault();
+                    console.log("edit: ", $(this), id);
                     openModal("course", settings.courseDetailsUrl + "/" + id);
                 });
 
