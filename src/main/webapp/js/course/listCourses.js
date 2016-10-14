@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2013 All Rights Reserved
  */
-define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
+define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( Handlebars ) {
     "use strict";
     var exports = {},
         settings;
@@ -80,21 +80,6 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
         });
     }
 
-    function copySession(sessionId) {
-
-        $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
-            console.log("copied: ", data);
-            if(data.status == "ok") {
-                window.location = settings.projectDetailsUrl + "/" + data.projectId;
-            } else {
-                CCBMessengerError("Could not copy session: ", data.message);
-            }
-        }).fail(function(jqXHR, textStatus, errorThrown){
-            CCBMessengerError("Could not copy session.");
-            console.log("Could not copy session:", errorThrown);
-        });
-    }
-
     exports.init = function(options) {
 
         settings = $.extend({
@@ -108,68 +93,23 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
             selectedCourses : []
         }, options || {});
 
-        function formatSession ( d ) {
-            function genHtml(items, addUrl) {
-                var $container = $( '<div/>', { style: "width: 100%; overflow: hidden;" } );
+        var itemTemplate = Handlebars.compile($('#sessions-template').html());
 
-                // var $button = $( '<a/>', { 'class': 'btn btn-primary pull-right', href: addUrl, style: 'margin-top: 6px;' } );
-                // $button.append( $( '<i/>', { 'class': 'glyphicon glyphicon-plus-sign' } ) );
-                // $button.append( $( '<span> Add Session</span>' ) );
-                // $container.append( $button );
-
-                var $sessionList = $( '<ul />', { style: 'max-width: 65vw; margin-top: 12px;' } );
-                $container.append( $sessionList );
-
-                if( items.length === 0 ) {
-                    $container.append( $( '<a/>' ), { style: 'text-align: center;', href: "#" } ).text('Add first session')
-                        .click(function(){
-                            $.post(settings.createSessionUrl, {"courseId": d.id}).done(function(data){
-                                if(data.status == "ok") {
-                                    window.location = settings.projectDetailsUrl + "/" + data.projectId;
-                                } else {
-                                    CCBMessengerError("Could not create empty course session: ", data.message);
-                                }
-                            }).fail(function(jqXHR, textStatus, errorThrown){
-                                CCBMessengerError("Could create empty course session.");
-                                console.log("Could not create empty course session:", errorThrown);
-                            });
-                            return false;
-                        });
-                }
-                items.forEach( function ( item ) {
-                  var $item = $( '<li/>', { } );
-                  // TODO: Preparations for marking sessions as favorites
-                  /*$item
-                    .append( $( '<span/>', {
-                      class: [ 'glyphicon', 'favorite-star', item.favorite ? 'glyphicon-star' : 'glyphicon-star-empty' ].join( ' ' ),
-                      style: 'font-size: 18px; margin-right: 4px; display: inline-block; top: -1px;'
-                    } )
-                      .on( 'click', function () {
-                        toggleFavorite( item.id )
-                          .then( function () {
-                            console.log( arguments )
-                          });
-                      } )
-                  );*/
-                  $item
-                    .append( $( '<a/>', { href: "#", title: item.name, style: 'overflow: hidden; text-overflow: ellipsis;' } )
-                      .text( item.name ).click(function(){window.location = item.url; return false;})
-                    ).append($("<a/>", { href: "#" }).text(" [Copy]").click(function(){copySession(item.id); return false;}));
-                  $sessionList.append( $item );
-                } );
-
-                return $container;
+        function formatSession ( row ) {
+            console.log("Format: ", row.id);
+            function genHtml(sessions) {
+                console.log("sessions = ", sessions);
+                return itemTemplate({courseId: row.id, sessions: sessions});
             }
             var deferred = $.Deferred();
-            $.ajax(settings.listSessionsUrl + "/" + d.course.id.id).done(function (data) {
+            $.ajax(settings.listSessionsUrl + "/" + row.id).done(function (data) {
                 deferred.resolve(
                     genHtml(data.map(function (item) {
                         return {
                             id: item.id.id,
-                            name: lookupName(item.id.id),
-                            url: settings.sessionDetailsUrl + "/" + item.id.id
+                            name: lookupName(item.id.id)
                         }
-                    }), settings.newSessionUrl + "/" + d.course.id.id));
+                    }), settings.newSessionUrl + "/" + row.id.id));
 
             });
             return deferred.promise();
@@ -347,6 +287,44 @@ define(['cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( ccbImodal ) {
                       return false;
                     }
                 } );
+                // Event handlers for template sessions-template
+
+                $(document).on('click', '.session-name', function(){
+                    var sessionId = $(this).parent('tr').data("session-id");
+                    window.location = settings.sessionDetailsUrl + "/" + sessionId;
+                    return false;
+                });
+
+                $(document).on('click', '.session-copy', function() {
+                    var sessionId = $(this).parent('tr').data("session-id");
+                    $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
+                        console.log("copied: ", data);
+                        if(data.status == "ok") {
+                            window.location = settings.projectDetailsUrl + "/" + data.projectId;
+                        } else {
+                            CCBMessengerError("Could not copy session: ", data.message);
+                        }
+                    }).fail(function(jqXHR, textStatus, errorThrown){
+                        CCBMessengerError("Could not copy session.");
+                        console.log("Could not copy session:", errorThrown);
+                    });
+                    return false;
+                });
+
+                $(document).on('click', '.session-create', function() {
+                    var courseId = $(this).parents('table').data("course-id");
+                    $.post(settings.createSessionUrl, {"courseId": courseId}).done(function (data) {
+                        if (data.status == "ok") {
+                            window.location = settings.projectDetailsUrl + "/" + data.projectId;
+                        } else {
+                            CCBMessengerError("Could not create empty course session: ", data.message);
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        CCBMessengerError("Could not create empty course session.");
+                        console.log("Could not create empty course session:", errorThrown);
+                    });
+                    return false;
+                });
             });
 
 

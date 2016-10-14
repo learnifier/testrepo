@@ -28,6 +28,22 @@ ${cpweb_foot}
     });
 
 </script>
+<script id="sessions-template" type="text/x-handlebars-template">
+    <table data-course-id="{{courseId}}" width="100%">
+        {{#each sessions}}
+        <tr data-session-id="{{id}}" style="width: 100%">
+            <td class="session-name">{{name}}</td>
+            <td class="session-copy">[Copy]</td>
+        </tr>
+        {{/each}}
+        {{#unless sessions.length}}
+        <tr style="width: 100%">
+            <td class="session-create"><a>[Add first session]</a></td>
+            <td></td>
+        </tr>
+        {{/unless}}
+    </table>
+</script>
 [/#assign]
 
 [@dws.skin skin="CPAuth3" head=cpweb_head foot=foot orgName=orgName]
@@ -48,7 +64,7 @@ ${cpweb_foot}
         <tr>
             <th></th>
             <th>Course Name</th>
-            <th>Sessions</th>
+            <th></th>
             [@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']
             <th></th>
             [/@]
