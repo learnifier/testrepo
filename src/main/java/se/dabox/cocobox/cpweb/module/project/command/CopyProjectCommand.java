@@ -77,7 +77,7 @@ public class CopyProjectCommand extends AbstractCopyCommand {
 
         CourseCatalogClient ccClient = CacheClients.getClient(cycle, CourseCatalogClient.class);
 
-        String oldProjName = orgProj.getUserTitle();
+        String oldProjName = orgProj.getName();
 
         // 1. Create project w/o cdd, databank and course session.
 
