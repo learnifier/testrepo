@@ -52,10 +52,6 @@ public class CreateProjectCommand {
 
         CourseCatalogClient ccClient = CacheClients.getClient(cycle, CourseCatalogClient.class);
 
-        // 1. Create project w/o cdd, databank and course session.
-
-//        Locale language = course.getLanguage(); // Slightly questionable
-
         TimeZone timezone = TimeZone.getDefault(); // Bad idea, just temporary
 
         Locale locale = CocositeUserHelper.getUserLocale(cycle);
@@ -81,18 +77,6 @@ public class CreateProjectCommand {
                 .findFirst()
                 .orElseThrow(() -> new AlreadyExistsException("Could not find a free project name to use.")); // Should not happen with random uuid
 
-        // 4. Create the new design
-//        final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
-//
-//        String cddXml = CddCodec.encode(cdd);
-//        CreateDesignRequest cdr = new CreateDesignRequest(caller, null, "", cddXml, "");
-//        String techInfo = CpDesignTechInfo.createStageTechInfo(project.getProjectId());
-//        cdr.setTechInfo(techInfo);
-//        CreateDesignResponse des = cdc.createDesign(cdr);
-//
-//        final long newDesignId = des.getDesignId();
-
-        // 5. Create session
         UpdateProjectRequestBuilder upr
                 = new UpdateProjectRequestBuilder(caller, newProject.getProjectId());
 
@@ -111,7 +95,6 @@ public class CreateProjectCommand {
 
         long databankId = ccbc.createDatabank(0, newProject.getProjectId());
 
-        // 6. Set data bank + design ids.
         upr.setStageDatabank(databankId);
         long designId = createDesign(course.getOrgId(), course.getName(), locale);
         upr.setDesignId(designId);
@@ -134,7 +117,6 @@ public class CreateProjectCommand {
 
         CreateDesignRequest createReq = new CreateDesignRequest(userId, bucketId, designName,
                 design, "");
-        //Enabled = auto-add in this context
         createReq.setEnabled(false);
         createReq.setLang(language);
 
