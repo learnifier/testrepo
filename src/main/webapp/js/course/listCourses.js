@@ -4,7 +4,8 @@
 define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( Handlebars, ccbImodal ) {
     "use strict";
     var exports = {},
-        settings;
+        settings,
+        sessionHash = {};
 
     function getExpanded() {
       try {
@@ -34,24 +35,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
       } catch ( e ) {}
     }
 
-    var sessionHash = { // TODO: Can probably simplify this now that "orphan projects" concept is gone.
-        _sessionHash: {},
-        addSession: function(id, val){
-            this._sessionHash[id] = val;
-        },
-        lookup: function(id) {
-            return this._sessionHash[id];
-        }
-    };
-
-    function lookupName(id) {
-        var entry = sessionHash.lookup([id]);
-        if(entry && entry.name) {
-            return  entry.name;
-        }
-        else return "Empty course session name";
-    }
-
     exports.init = function(options) {
 
         settings = $.extend({
@@ -77,12 +60,16 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
             $.ajax(settings.listSessionsUrl + "/" + row.id).done(function (data) {
                 deferred.resolve(
                     genHtml(data.map(function (item) {
-                        return {
-                            id: item.id.id,
-                            name: lookupName(item.id.id)
+                        var project = sessionHash[item.id.id];
+                        if(project) {
+                            return {
+                                id: item.id.id,
+                                name: (project && project.name)?project.name:"(Empty course session name)"
+                            }
+                        } else {
+                            return {}
                         }
                     }), settings.newSessionUrl + "/" + row.id.id));
-
             });
             return deferred.promise();
         }
@@ -255,7 +242,7 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
 
                 $.getJSON(settings.listProjectsUrl).done(function(data) {
                     data.aaData.forEach(function(project){
-                        sessionHash.addSession(project.courseSessionId, project);
+                        sessionHash[project.courseSessionId] = project;
                     });
                 });
 
