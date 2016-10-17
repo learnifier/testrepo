@@ -95,10 +95,10 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 setExpanded( id, false );
             }
             else {
-                row.child("Loading...").show();
+                row.child($('<tr class="details"><td>Loading...</td></tr>')).show();
                 setExpanded( id, true );
                 formatSession(row.data(), template).done(function(res){
-                    row.child(res);
+                    row.child($('<tr class="details"><td>' + res + '</td></tr>'));
                 });
             }
         }
