@@ -1,7 +1,7 @@
 /*
  * (c) Dabox AB 2013 All Rights Reserved
  */
-define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( Handlebars ) {
+define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( Handlebars, ccbImodal ) {
     "use strict";
     var exports = {},
         settings;
@@ -96,10 +96,12 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
         var itemTemplate = Handlebars.compile($('#sessions-template').html());
 
         function formatSession ( row ) {
-            console.log("Format: ", row.id);
             function genHtml(sessions) {
-                console.log("sessions = ", sessions);
-                return itemTemplate({courseId: row.id, sessions: sessions});
+                var context = {courseId: row.id, sessions: sessions};
+                if(sessions.length == 1) {
+                    context.session = sessions[0];
+                }
+                return itemTemplate(context);
             }
             var deferred = $.Deferred();
             $.ajax(settings.listSessionsUrl + "/" + row.id).done(function (data) {

@@ -30,12 +30,24 @@ ${cpweb_foot}
 </script>
 <script id="sessions-template" type="text/x-handlebars-template">
     <table data-course-id="{{courseId}}" width="100%">
+        {{!-- First check if we have a single session; we probably want to customize the look if we do. --}}
+        {{#if session}}
+        {{#with session}}
+        <tr data-session-id="{{id}}" style="width: 100%">
+            <td class="session-name">{{name}} - single edition</td>
+            <td class="session-copy">[Copy]</td>
+        </tr>
+        {{/with}}
+        {{else}}
+        {{!-- Normal case with >1 sessions --}}
         {{#each sessions}}
         <tr data-session-id="{{id}}" style="width: 100%">
             <td class="session-name">{{name}}</td>
             <td class="session-copy">[Copy]</td>
         </tr>
         {{/each}}
+        {{/if}}
+        {{!-- If sessions are missing, output a button to create first blank session --}}
         {{#unless sessions.length}}
         <tr style="width: 100%">
             <td class="session-create"><a>[Add first session]</a></td>
