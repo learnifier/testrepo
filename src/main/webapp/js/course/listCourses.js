@@ -95,10 +95,10 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 setExpanded( id, false );
             }
             else {
-                row.child($('<tr class="details"><td>Loading...</td></tr>')).show();
+                row.child($('<tr class="details"><td colspan="4">Loading...</td></tr>')).show();
                 setExpanded( id, true );
                 formatSession(row.data(), template).done(function(res){
-                    row.child($('<tr class="details"><td>' + res + '</td></tr>'));
+                    row.child($('<tr class="details"><td colspan="4">' + res + '</td></tr>'));
                 });
             }
         }
@@ -285,15 +285,17 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 });
 
                 /**
-                 * Toggle sessions list panel
+                 * Toggle sessions list panel.
                  */
                 $('#listcourses').on( 'click', 'tr', function ( e ) {
                     if ( $( e.target ).closest( '.details-control' ).length === 0 ) {
-                      var tr = $(this).closest('tr');
-                      var row = dt.row( tr );
-                      drawSessionSection(row, itemTemplate);
+                        var $tr = $(this).closest('tr');
+                        if($tr.data("id")) { // Check if we are on a real row or details row.
+                            var row = dt.row( $tr );
+                            drawSessionSection(row, itemTemplate);
+                            return false;
+                        }
                     }
-                    return false;
                 } );
 
                 /**
