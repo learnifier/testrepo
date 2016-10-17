@@ -52,34 +52,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
         else return "Empty course session name";
     }
 
-    function deleteCourse(id) {
-        var performDelete = function() {
-            var dlg = cocobox.longOp();
-
-            $.post(settings.deleteSessionUrl, {"id": id}).
-                    always(function (data) {
-                        dlg.abort();
-
-                        return data;
-                    }).
-                    done(function (data) {
-                        if (data.status === "ok") {
-                            window.location.href = window.location.href;
-                        } else if (data.status === "notempty") {
-                            cocobox.infoDialog("Unable to delete", "Only empty courses can be deleted");
-                        } else {
-                            cocobox.errorDialog("Unknown error", "Unknown status code from server: "+data.status);
-                        }
-                    }).fail(function() {
-                        dlg.abort();
-                    }).fail(cocobox.internal.ajaxError);
-        };
-
-        require(['dabox-common'], function() {
-            cocobox.confirmationDialogYesNo("Delete course?", "Do you want to delete this course?", performDelete);
-        });
-    }
-
     exports.init = function(options) {
 
         settings = $.extend({
@@ -93,15 +65,13 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
             selectedCourses : []
         }, options || {});
 
-        var itemTemplate = Handlebars.compile($('#sessions-template').html());
-
-        function formatSession ( row ) {
+        function formatSession ( row, template ) {
             function genHtml(sessions) {
                 var context = {courseId: row.id, sessions: sessions};
                 if(sessions.length == 1) {
                     context.session = sessions[0];
                 }
-                return itemTemplate(context);
+                return template(context);
             }
             var deferred = $.Deferred();
             $.ajax(settings.listSessionsUrl + "/" + row.id).done(function (data) {
@@ -117,7 +87,77 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
             return deferred.promise();
         }
 
+        function drawSessionSection(row, template) {
+            console.log("drawSessionSection: ", template);
+            var id = row.data().id;
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                setExpanded( id, false );
+            }
+            else {
+                row.child("Loading...").show();
+                setExpanded( id, true );
+                formatSession(row.data(), template).done(function(res){
+                    row.child(res);
+                });
+            }
+        }
+
+        function deleteCourse(id) {
+            var performDelete = function() {
+                var dlg = cocobox.longOp();
+
+                $.post(settings.deleteSessionUrl, {"id": id}).
+                always(function (data) {
+                    dlg.abort();
+
+                    return data;
+                }).
+                done(function (data) {
+                    if (data.status === "ok") {
+                        window.location.href = window.location.href;
+                    } else if (data.status === "notempty") {
+                        cocobox.infoDialog("Unable to delete", "Only empty courses can be deleted");
+                    } else {
+                        cocobox.errorDialog("Unknown error", "Unknown status code from server: "+data.status);
+                    }
+                }).fail(function() {
+                    dlg.abort();
+                }).fail(cocobox.internal.ajaxError);
+            };
+
+            require(['dabox-common'], function() {
+                cocobox.confirmationDialogYesNo("Delete course?", "Do you want to delete this course?", performDelete);
+            });
+        }
+
+        function openModal(imodalId, url){
+            var imodal = new ccbImodal.Server({
+                serviceName: imodalId,
+                url: url,
+                callbacks: {
+                    "close": function(data) {},
+                    "createAndForward": function(data){
+                        window.location = data.url;
+                    },
+                    "saveDone": function(data){
+                        window.location = settings.listCoursesPage;
+                        // dt.ajax.reload();
+                    }
+                }
+            });
+            imodal.open();
+        }
+
+        function addCourse(e){
+            if(e) {
+                e.preventDefault();
+            }
+            openModal("course", settings.newCourseUrl);
+        }
+
         $(document).ready(function () {
+            var itemTemplate = Handlebars.compile($('#sessions-template').html());
 
             require(['dataTables-bootstrap'], function () {
                 var columnDefs = [
@@ -145,7 +185,7 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                         "width": "70%",
                         "className": "block-link",
                         "data": function (row, type, set) {
-                            if (!row.nameDisplay | !row.nameFilter) {
+                            if (!row.nameDisplay || !row.nameFilter) {
                                 row.nameFilter = row.course.name + ' ' + row.course.id.id;
                                 row.nameDisplay = '<a data-courseid="' + row.course.id.id + '" class="courseLink" href="' + "#" + '">' + row.course.name + '</a> ';
                             }
@@ -208,28 +248,10 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                         var expanded = getExpanded();
                         if ( expanded.indexOf( data.id ) !== -1 ||
                              settings.selectedCourses.indexOf(data.id) !== -1) {
-                            drawSessionSection(dt.row(row));
+                            drawSessionSection(dt.row(row), itemTemplate);
                         }
                     }
                 });
-
-                function openModal(imodalId, url){
-                    var imodal = new ccbImodal.Server({
-                        serviceName: imodalId,
-                        url: url,
-                        callbacks: {
-                            "close": function(data) {},
-                            "createAndForward": function(data){
-                                window.location = data.url;
-                            },
-                            "saveDone": function(data){
-                                window.location = settings.listCoursesPage;
-                                // dt.ajax.reload();
-                            }
-                        }
-                    });
-                    imodal.open();
-                }
 
                 $.getJSON(settings.listProjectsUrl).done(function(data) {
                     data.aaData.forEach(function(project){
@@ -244,53 +266,39 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                     openModal("course", settings.courseDetailsUrl + "/" + id);
                 });
 
-                function addCourse(e){
-                    if(e) {
-                        e.preventDefault();
-                    }
-                    openModal("course", settings.newCourseUrl);
-                }
-
+                /**
+                 * Add course button + auto add course if settings.initiateCreate is set.
+                 */
                 $("#addcourse-btn").click(addCourse);
-                $(document).on("click", "#addcourse-link", addCourse);
+                // $(document).on("click", "#addcourse-link", addCourse);
                 if(settings.initiateCreate) {
                     addCourse();
                 }
 
+                /**
+                 * Delete button
+                 */
                 $('#listcourses').on( 'click', 'a[data-btntype=delcourse]', function (e) {
                     var row = dt.row($(this).closest('tr'));
                     deleteCourse(row.data().id);
-
-                    //Do not bubble this event, otherwise we get a toggle show/hide as well
-                    e.preventDefault();
                     return false;
                 });
 
-                function drawSessionSection(row) {
-                  var id = row.data().id;
-                  if ( row.child.isShown() ) {
-                      row.child.hide();
-                      setExpanded( id, false );
-                  }
-                  else {
-                      row.child("Loading...").show();
-                      setExpanded( id, true );
-                      formatSession(row.data()).done(function(res){
-                          row.child(res);
-                      });
-                  }
-                }
-
+                /**
+                 * Toggle sessions list panel
+                 */
                 $('#listcourses').on( 'click', 'tr', function ( e ) {
                     if ( $( e.target ).closest( '.details-control' ).length === 0 ) {
                       var tr = $(this).closest('tr');
                       var row = dt.row( tr );
-                      drawSessionSection(row);
-                      return false;
+                      drawSessionSection(row, itemTemplate);
                     }
+                    return false;
                 } );
-                // Event handlers for template sessions-template
 
+                /**
+                 * Event handlers for handlebars sessions-template
+                 */
                 $(document).on('click', '.session-name', function(){
                     var sessionId = $(this).parent('tr').data("session-id");
                     window.location = settings.sessionDetailsUrl + "/" + sessionId;
