@@ -61,10 +61,17 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 deferred.resolve(
                     genHtml(data.map(function (item) {
                         var project = sessionHash[item.id.id];
+                        console.log("genHtml item = ", item);
+                        console.log("genHtml project = ", project);
+
                         if(project) {
                             return {
                                 id: item.id.id,
-                                name: (project && project.name)?project.name:"(Empty course session name)"
+                                name: (project && project.name)?project.name:"(Empty course session name)",
+                                added: project.added,
+                                invited: project.invited,
+                                createdStr: project.createdStr,
+                                favorite: project.favorite
                             }
                         } else {
                             return {}
@@ -75,7 +82,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
         }
 
         function drawSessionSection(row, template) {
-            console.log("drawSessionSection: ", template);
             var id = row.data().id;
             if ( row.child.isShown() ) {
                 row.child.hide();
@@ -84,6 +90,7 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
             else {
                 row.child($('<tr class="details"><td colspan="4">Loading...</td></tr>')).show();
                 setExpanded( id, true );
+
                 formatSession(row.data(), template).done(function(res){
                     row.child($('<tr class="details"><td colspan="4">' + res + '</td></tr>'));
                 });
