@@ -1,17 +1,15 @@
 package se.dabox.cocobox.cpweb.module.project.command;
 
+import se.dabox.service.common.coursedesign.ComponentUtil;
+import se.dabox.service.common.coursedesign.ResourceUtil;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableComponent;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseScene;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableResource;
+import se.dabox.service.proddir.data.ProductId;
 
 import java.util.HashMap;
 import java.util.List;
-
-import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getProductIdFromResource;
-import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getProductIdFromType;
-import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getResourceFromProductId;
-import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getTypeFromProductId;
 
 /**
  *
@@ -33,7 +31,7 @@ class ReplaceCddMaterials {
      *
      * @param replaceHash Hash from old material ID -> new material ID.
      */
-    void replaceProducts(HashMap<String, String> replaceHash) {
+    void replaceProducts(HashMap<ProductId, ProductId> replaceHash) {
         final List<MutableComponent> components = mutableCdd.getComponents();
         if(components != null) {
             components.forEach(c -> replaceComponent(c, replaceHash));
@@ -55,10 +53,10 @@ class ReplaceCddMaterials {
         }
     }
 
-    private static void replaceComponent(MutableComponent component, HashMap<String, String> replaceHash) {
-        final String productId = getProductIdFromType(component.getType());
+    private static void replaceComponent(MutableComponent component, HashMap<ProductId, ProductId> replaceHash) {
+        final ProductId productId = ComponentUtil.getProductId(component);
         if(productId != null && replaceHash.containsKey(productId)) {
-            component.setType(getTypeFromProductId(replaceHash.get(productId)));
+            component.setType(ComponentUtil.getTypeFromProductId(replaceHash.get(productId)));
         }
         final List<MutableComponent> children = component.getChildren();
         if(children != null) {
@@ -66,17 +64,15 @@ class ReplaceCddMaterials {
         }
     }
 
-    private static void replaceResource(MutableResource resource, HashMap<String, String> replaceHash) {
-        final String materialId = resource.getMaterialId();
-        final String id = getProductIdFromResource(materialId);
+    private static void replaceResource(MutableResource resource, HashMap<ProductId, ProductId> replaceHash) {
+        final ProductId id = ResourceUtil.getProductId(resource);
         if(id != null && replaceHash.containsKey(id)) {
-            resource.setMaterialId(getResourceFromProductId(replaceHash.get(id)));
+            resource.setMaterialId(ResourceUtil.getResourceMaterialIdFromProductId(replaceHash.get(id)));
         }
 
-        final String constraint = resource.getConstraint();
-        final String constraintId = getProductIdFromResource(constraint);
+        final ProductId constraintId = ResourceUtil.getConstraintProductId(resource);
         if(constraintId != null && replaceHash.containsKey(constraintId)) {
-            resource.setConstraint(getResourceFromProductId(replaceHash.get(constraintId)));
+            resource.setConstraint(ResourceUtil.getResourceMaterialIdFromProductId(replaceHash.get(constraintId)));
         }
     }
 }

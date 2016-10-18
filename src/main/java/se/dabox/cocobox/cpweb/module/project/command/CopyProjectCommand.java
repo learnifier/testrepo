@@ -11,10 +11,12 @@ import se.dabox.service.common.ccbc.project.ProjectType;
 import se.dabox.service.common.ccbc.project.material.AddProjectProductRequest;
 import se.dabox.service.common.ccbc.project.material.AddProjectProductRequestBuilder;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
+import se.dabox.service.common.coursedesign.ComponentUtil;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.CreateDesignRequest;
 import se.dabox.service.common.coursedesign.CreateDesignResponse;
+import se.dabox.service.common.coursedesign.ResourceUtil;
 import se.dabox.service.common.coursedesign.techinfo.CpDesignTechInfo;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
@@ -39,7 +41,6 @@ import se.dabox.service.proddir.data.ProductId;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,9 +51,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getProductIdFromResource;
-import static se.dabox.cocobox.cpweb.module.project.command.MaterialIdUtils.getProductIdFromType;
 
 
 /**
@@ -126,7 +124,7 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         Set<Product> localComponents = getLocalComponents(mutableCdd);
 
         // 4. Copy them
-        HashMap<String, String> replaceHash = copyProjectProducts(caller, localComponents, newProject);
+        HashMap<ProductId, ProductId> replaceHash = copyProjectProducts(caller, localComponents, newProject);
 
         // 5. Replace old products with the new copies in cdd
         new ReplaceCddMaterials(mutableCdd).replaceProducts(replaceHash);
@@ -171,14 +169,11 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         return newProject.getProjectId();
     }
 
-    private void processComponent(MutableComponent component, Set<String> candidates) {
-        final String type = component.getType();
-        if(type != null) {
-            String id = getProductIdFromType(type);
+    private void processComponent(MutableComponent component, Set<ProductId> candidates) {
+            final ProductId id = ComponentUtil.getProductId(component);
             if(id != null) {
                 candidates.add(id);
             }
-        }
 
         final List<MutableComponent> children = component.getChildren();
         if(children != null) {
@@ -186,16 +181,15 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         }
     }
 
-    private void processResource(MutableResource resource, Set<String> candidates) {
-        final String materialId = resource.getMaterialId();
-        final String id = getProductIdFromResource(materialId);
+    private void processResource(MutableResource resource, Set<ProductId> candidates) {
+        final ProductId id = ResourceUtil.getProductId(resource);
         if(id != null) {
-            candidates.add(materialId);
+            candidates.add(id);
         }
     }
 
     private Set<Product> getLocalComponents(MutableCourseDesignDefinition mutableCdd) {
-        Set<String> candidates = new HashSet<>();
+        Set<ProductId> candidates = new HashSet<>();
         final List<MutableComponent> components = mutableCdd.getComponents();
         components.forEach(c -> processComponent(c, candidates));
         final List<MutableCourseScene> scenes = mutableCdd.getScenes();
@@ -209,13 +203,13 @@ public class CopyProjectCommand extends AbstractCopyCommand {
             resources.forEach(r -> processResource(r, candidates));
         }
         final ProductDirectoryClient pdClient = CacheClients.getClient(cycle, ProductDirectoryClient.class);
-        List<Product> ps = pdClient.getProducts(new ArrayList<>(candidates));
+        List<Product> ps = pdClient.getProducts(candidates.stream().map(ProductId::getId).collect(Collectors.toList()));
 
         return ps.stream().filter(Product::isProjectProduct).collect(Collectors.toSet());
     }
 
-    private HashMap<String, String> copyProjectProducts(long caller, Set<Product> ps, OrgProject toProject) {
-        return ps.stream().collect(HashMap<String, String>::new,
+    private HashMap<ProductId, ProductId> copyProjectProducts(long caller, Set<Product> ps, OrgProject toProject) {
+        return ps.stream().collect(HashMap<ProductId, ProductId>::new,
                 (m, p) -> {
                     Product copied = p.copy();
                     final ProductId productId = createId();
@@ -235,7 +229,7 @@ public class CopyProjectCommand extends AbstractCopyCommand {
 
                     updateProductOwner(caller, copied, toProject.getProjectId()); // Hmm, do we really need to explicitly set owner when we already created a ProjectProduct?
 
-                    m.put(p.getId().getId(), productId.getId());
+                    m.put(p.getId(), productId);
                 },
                 (m, u) -> {});
     }
