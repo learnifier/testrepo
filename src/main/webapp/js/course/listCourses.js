@@ -61,9 +61,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 deferred.resolve(
                     genHtml(data.map(function (item) {
                         var project = sessionHash[item.id.id];
-                        console.log("genHtml item = ", item);
-                        console.log("genHtml project = ", project);
-
                         if(project) {
                             return {
                                 id: item.id.id,
@@ -335,11 +332,12 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 });
 
                 $(document).on('click', 'td.favorite', function() {
+                    console.log("Gogo click fav");
                     var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
                     console.log("Click fav", sessionId);
                     $.post(settings.toggleFavoriteUrl, {"sessionId": sessionId}).done(function(data){
                         if (data.status == "ok") {
-                            window.location = window.location;
+                            // window.location = window.location;
                         } else {
                             CCBMessengerError("Could not mark session as favorite: ", data.message);
                         }
