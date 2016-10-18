@@ -20,6 +20,7 @@ ${cpweb_foot}
             projectDetailsUrl: "${helper.urlFor('project.ProjectModule','overview')}",
             deleteSessionUrl: "[@portalSecurity.permissionBlock permission='CP_DELETE_PROJECT']${helper.urlFor('course.CourseJsonModule','deleteCourse',[org.id])}[/@]",
             copySessionUrl: "${helper.urlFor('course.CourseJsonModule','copySession')}",
+            toggleFavoriteUrl: "${helper.urlFor('course.CourseJsonModule','toggleFavorite')}",
             selectedCourses : [${course!""}],
             [#if initiateCreate??]
             initiateCreate: "true"
@@ -54,7 +55,7 @@ ${cpweb_foot}
         <tbody>
         {{#each sessions}}
         <tr data-session-id="{{id}}" class="listcourses__session-table__row">
-            <td>
+            <td class="favorite">
                 {{#if favorite}}
                 <span class="glyphicon glyphicon-star"></span>
                 {{else}}

@@ -263,4 +263,48 @@ public class CourseJsonModule extends AbstractJsonAuthModule {
             return ImmutableMap.of("status", "error", "message", "Could not find a free name. Copy aborted.");
         }
     }
+
+    @WebAction(methods = HttpMethod.POST)
+    public Map<String, Object> onToggleFavorite(RequestCycle cycle) {
+        long caller = LoginUserAccountHelper.getUserId(cycle);
+        final String strCourseSessionId = cycle.getRequest().getParameter("sessionId");
+        final CourseCatalogClient ccc = getCourseCatalogClient(cycle);
+        final CatalogCourseSessionId courseSessionId = CatalogCourseSessionId.valueOf(Integer.parseInt(strCourseSessionId));
+        final CatalogCourseSession session = CollectionsUtil.singleItemOrNull(ccc.listSessions(new ListCatalogSessionRequestBuilder().withId(courseSessionId).build()));
+
+        if (session.getSource() != null && CocoboxCourseSourceConstants.PROJECT.equals(session.getSource().getType())) {
+            final String strProjectId = session.getSource().getId();
+            final CocoboxCoordinatorClient cocoboxCordinatorClient = getCocoboxCordinatorClient(cycle);
+            Long projectId = CpwebParameterUtil.stringToLong(strProjectId);
+            OrgProject project = null;
+            if (projectId != null) {
+                project = cocoboxCordinatorClient.getProject(projectId);
+            }
+            if (project == null) {
+                return ImmutableMap.of("status", "error", "message", "Project missing.");
+            }
+
+            checkPermission(cycle, project);
+            checkProjectPermission(cycle, project, CocoboxPermissions.CP_CREATE_PROJECT);
+            final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+            final List<Long> favorites = ccbc.getFavorites(caller, project.getOrgId());
+            final boolean state;
+            if(favorites != null && favorites.contains(projectId)) {
+                ccbc.deleteFavorite(caller, projectId);
+                state = false;
+            } else {
+                ccbc.addFavorite(caller, projectId);
+                state = true;
+            }
+
+            return ImmutableMap.of(
+                    "status", "ok",
+                    "state", state);
+
+        } else {
+            throw new IllegalStateException("Can set external projects as favorite.");
+        }
+    }
+
+
 }

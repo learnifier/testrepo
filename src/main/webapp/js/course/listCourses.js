@@ -333,6 +333,22 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                     });
                     return false;
                 });
+
+                $(document).on('click', 'td.favorite', function() {
+                    var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
+                    console.log("Click fav", sessionId);
+                    $.post(settings.toggleFavoriteUrl, {"sessionId": sessionId}).done(function(data){
+                        if (data.status == "ok") {
+                            window.location = window.location;
+                        } else {
+                            CCBMessengerError("Could not mark session as favorite: ", data.message);
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        CCBMessengerError("Could not create empty course session.");
+                        console.log("Could not create empty course session:", errorThrown);
+                    });
+                });
+
             });
 
 
