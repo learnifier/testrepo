@@ -294,19 +294,21 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                     return false;
                 });
 
-                $(document).on('click', '.session-copy', function() {
-                    var sessionId = $(this).parent('tr').data("session-id");
-                    $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
-                        console.log("copied: ", data);
-                        if(data.status == "ok") {
-                            window.location = settings.projectDetailsUrl + "/" + data.projectId;
-                        } else {
-                            CCBMessengerError("Could not copy session: ", data.message);
-                        }
-                    }).fail(function(jqXHR, textStatus, errorThrown){
-                        CCBMessengerError("Could not copy session.");
-                        console.log("Could not copy session:", errorThrown);
-                    });
+                $(document).on('click', '.session-copy__button', function () {
+                    var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
+                    if ( sessionId ) {
+                      $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
+                          console.log("copied: ", data);
+                          if(data.status == "ok") {
+                              window.location = settings.projectDetailsUrl + "/" + data.projectId;
+                          } else {
+                              CCBMessengerError("Could not copy session: ", data.message);
+                          }
+                      }).fail(function(jqXHR, textStatus, errorThrown){
+                          CCBMessengerError("Could not copy session.");
+                          console.log("Could not copy session:", errorThrown);
+                      });
+                    }
                     return false;
                 });
 
