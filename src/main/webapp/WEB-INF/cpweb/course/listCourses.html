@@ -29,29 +29,42 @@ ${cpweb_foot}
 
 </script>
 <script id="sessions-template" type="text/x-handlebars-template">
-    <table data-course-id="{{courseId}}" width="100%">
+    <table data-course-id="{{courseId}}" width="100%" class="listcourses__session-table">
         {{!-- First check if we have a single session; we probably want to customize the look if we do. --}}
-        {{#if session}}
+        {{#if sessionnnnnnnn}}
         {{#with session}}
-        <tr data-session-id="{{id}}" style="width: 100%">
+        <tr data-session-id="{{id}}" class="listcourses__session-table__row">
             <td class="session-name">{{name}} - single edition</td>
-            <td class="session-copy">[Copy]</td>
+            <td class="session-copy">
+              <a class="session-copy__button" href="#" class="btn btn-primary">Copy</a>
+            </td>
         </tr>
         {{/with}}
         {{else}}
         {{!-- Normal case with >1 sessions --}}
         {{#each sessions}}
-        <tr data-session-id="{{id}}" style="width: 100%">
-            <td class="session-name">{{name}}</td>
-            <td class="session-copy">[Copy]</td>
+        <tr data-session-id="{{id}}" class="listcourses__session-table__row">
+            <td class="session-name">
+              <div class="session-cell--container">
+                <span class="glyphicon glyphicon-calendar session-icon"></span>
+                <span>{{name}}</span>
+              </div>
+            </td>
+            <td class="session-copy">
+              <a class="session-copy__button" href="#">Copy</a>
+            </td>
         </tr>
         {{/each}}
         {{/if}}
         {{!-- If sessions are missing, output a button to create first blank session --}}
         {{#unless sessions.length}}
-        <tr style="width: 100%">
-            <td class="session-create"><a>[Add first session]</a></td>
-            <td></td>
+        <tr class="listcourses__session-table__row">
+            <td colspan="2" class="session-create">
+              <button class="session-create__add">
+                <span class="glyphicon glyphicon-chevron-right session-icon"></span>
+                <span>Add first session</span>
+              </button>
+            </td>
         </tr>
         {{/unless}}
     </table>
@@ -87,4 +100,3 @@ ${cpweb_foot}
     </table>
 </div>
 [/@dws.skin]
-
