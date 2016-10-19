@@ -337,7 +337,7 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                     console.log("Click fav", sessionId);
                     $.post(settings.toggleFavoriteUrl, {"sessionId": sessionId}).done(function(data){
                         if (data.status == "ok") {
-                            // window.location = window.location;
+                            window.location = window.location;
                         } else {
                             CCBMessengerError("Could not mark session as favorite: ", data.message);
                         }
