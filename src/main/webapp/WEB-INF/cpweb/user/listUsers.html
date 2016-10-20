@@ -9,15 +9,7 @@
         var newUserUrl = "${helper.urlFor('CreateUserModule','create',[org.id])}";
         var listUsersAjaxSource =  "${helper.urlFor('CpJsonModule','listUsers',[org.id])}";
 
-        require(["${contextPath}/js/user/listUsers.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-           //No initialization needed
-        });
-
-    </script>
-
-    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
-    <script>
-        $("#addUserBtn").click(function () {
+        function createUserModal(){
             require(["[@modal.javascript /]"], function(modal) {
                 modal.open({
                     src: "${helper.urlFor('CreateUserModule','create',[org.id])}",
@@ -30,7 +22,20 @@
                     proceedUrl: "${helper.urlFor('CpMainModule','listUsers',[org.id])}"
                 });
             });
+        }
 
+        require(["${contextPath}/js/user/listUsers.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
+           s.init({
+               createUserFn: createUserModal
+           });
+        });
+
+    </script>
+
+    [@portalSecurity.permissionBlock permission="CP_CREATE_USER"]
+    <script>
+        $("#addUserBtn").click(function () {
+            createUserModal();
             return false;
         });
     </script>
