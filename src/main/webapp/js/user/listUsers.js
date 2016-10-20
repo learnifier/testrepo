@@ -8,11 +8,7 @@ define([], function() {
 
     exports.init = function(options) {
         settings = $.extend({
-            listTagsUrl: undefined,
-            updateTagNameUrl: undefined,
-            deleteTagUrl: undefined,
-            addTagUrl: undefined,
-            editMode: false
+            createUserFn: undefined
         }, options || {});
 
         $(document).ready(function() {
@@ -83,13 +79,14 @@ define([], function() {
                     "language": {
                         "search": "",
                         "zeroRecords": "No user matches your query",
-                        "emptyTable": "<span class='emptytable'>Start now by creating your <a href='" + newUserUrl + "'>first user</a></span>",
+                        "emptyTable": '<span class="emptytable">Start now by creating your <a href="#" id="addFirstUser">first user</a></span>',
                         "loadingRecords": "<p>Loading users...</p><img src='" + spinnerUrl + "' />"
                     }
                 });
             });
         });
-    }
+        $(document).on('click', '#addFirstUser', settings.createUserFn);
+    };
     return exports;
 });
 
