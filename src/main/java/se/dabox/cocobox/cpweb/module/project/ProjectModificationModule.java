@@ -93,8 +93,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import se.dabox.cocosite.webmessage.WebMessage;
+import se.dabox.cocosite.webmessage.WebMessages;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequest;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
+import se.dabox.service.common.coursedesign.CourseDesign;
+import se.dabox.service.common.coursedesign.CourseDesignClient;
+import se.dabox.service.common.coursedesign.UpdateDesignRequest;
+import se.dabox.util.collections.ValueUtils;
 
 /**
  *
@@ -556,6 +563,29 @@ public class ProjectModificationModule extends AbstractJsonAuthModule {
                         setDemo(!prj.isDemo()).createUpdateProjectRequest();
 
         getCocoboxCordinatorClient(cycle).updateOrgProject(req);
+
+        return NavigationUtil.toProjectPage(prjId);
+    }
+
+    @WebAction(methods = HttpMethod.POST)
+    public RequestTarget onUpdatePrimaryCdd(final RequestCycle cycle, String strProjectId) {
+        String cdd = DruwaParamHelper.getMandatoryParam(LOGGER, cycle.getRequest(), "cdd");
+
+         long prjId = Long.parseLong(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject prj = ccbc.getProject(prjId);
+        checkProjectPermission(cycle, prj, CocoboxPermissions.CP_EDIT_PROJECT_COURSEDESIGN);
+
+        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
+        CourseDesign design = cdClient.getDesign(ValueUtils.coalesce(prj.getStageDesignId(), prj.
+                getDesignId()));
+
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
+        UpdateDesignRequest udr = new UpdateDesignRequest(design.getDesignId(), caller, cdd);
+        cdClient.updateDesign(udr);
+
+        WebMessages.getInstance(cycle).addMessage(WebMessage.createTextMessage("Design updated"));
 
         return NavigationUtil.toProjectPage(prjId);
     }

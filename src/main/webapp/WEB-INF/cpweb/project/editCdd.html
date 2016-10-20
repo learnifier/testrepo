@@ -1,0 +1,32 @@
+[#ftl strip_text="true" /]
+
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_foot ]
+[/#assign]
+
+[#assign cpweb_head]
+${cpweb_head}
+[/#assign]
+
+
+
+
+
+[#assign title = (prj.name!'') + " overview ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head foot=cpweb_foot orgName=title]
+    [@pInfo.projectInfo selected="overview"][/@pInfo.projectInfo]
+
+    [#if stage]
+      <h1>Update this project's stage design</h1>
+    [#else]
+      <h1>Update this project's primary design</h1>
+    [/#if]
+
+    <form action="${helper.urlFor('project.ProjectModificationModule', 'updatePrimaryCdd',[prj.projectId])}" method="post">
+        <textarea name="cdd" style="width: 100%; height: 400px">${(design!'')?xml}</textarea>
+        <button class='btn btn-primary' type='submit'>Update</button>
+    </form>
+
+[/@dws.skin]

@@ -394,6 +394,39 @@ public class ProjectModule extends AbstractProjectWebModule {
         return new StringRequestTarget("text/xml", design.getDesign());
     }
 
+    /**
+     * Update the Course Design Definition (CDD). The stage design is updated if it exists
+     * otherwise the primary is updated. This is a hidden feature
+     *
+     * @param cycle
+     * @param projectId
+     * @return
+     */
+    @WebAction
+    public RequestTarget onEditCdd(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT_COURSEDESIGN);
+
+        if (project.getDesignId() == null) {
+            return new StringRequestTarget("Project doesn't have a primary design");
+        }
+
+        CourseDesignClient cdClient = CacheClients.getClient(cycle, CourseDesignClient.class);
+        CourseDesign design = cdClient.getDesign(ValueUtils.coalesce(project.getStageDesignId(),
+                project.getDesignId()));
+
+        Map<String, Object> map = createMap();
+        addCommonMapValues(map, project, cycle);
+        map.put("design", design.getDesign());
+        map.put("stage", project.getStageDesignId() != null);
+
+
+        return new FreemarkerRequestTarget("/project/editCdd.html", map);
+    }
+
     @WebAction
     public RequestTarget onDiscussion(RequestCycle cycle, String projectId) {
         OrgProject project =
