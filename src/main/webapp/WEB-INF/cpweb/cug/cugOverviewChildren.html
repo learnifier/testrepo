@@ -13,7 +13,7 @@ ${cpweb_foot}
     var cugChildrenUrl = "${helper.urlFor('cug.ClientUserGroupModule','children',[org.id,cug.groupId])}";
     var partialCugOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
 
-    var listChildrenAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupChildren',[org.id, cug.groupId])}";
+    var listChildrenAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupChildren',[cug.groupId])}";
 
     require(["${contextPath}/js/cug/cugChildrenOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
         //No initialization needed

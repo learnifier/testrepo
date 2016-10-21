@@ -12,10 +12,12 @@
         var newUserUrl = "${helper.urlFor('cug.CreateClientUserGroupModule','create',[org.id])}";
         var userOverviewUrl = "${helper.urlFor('cug.ClientUserGroupModule','overview',[org.id])}";
 
-        var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[org.id, cug.groupId])}";
+        var listMembersAjaxSource =  "${helper.urlFor('cug.ClientUserGroupJsonModule','listClientUserGroupMembers',[cug.groupId])}";
 
         require(["${contextPath}/js/cug/cugMembersOverview.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
-           //No initialization needed
+           s.init({
+               removeMemberUrl: "${helper.urlFor('cug.ClientUserGroupJsonModule','removeClientUserGroupMembers',[cug.groupId])}"
+           })
         });
         function addMemberListener() {
           require(['dabox-common', 'dabox-jquery'], function() {
@@ -57,7 +59,7 @@
     
     <section class="ccb-table-list-actions">
         [#if portalSecurity.hasPermission("CP_EDIT_USER")]
-        <button class="btn btn-primary-outlined btn-sm" onclick="return cpweb.rosterDelete(this, $('#cugmembersform'), 'removeMembers', '${ctext("cpweb.cug.members.remove.title")?js_string}', '${ctext("cpweb.cug.members.remove.text")?js_string}');"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+        <button id="remove-member-button" class="btn btn-primary-outlined btn-sm><span class="glyphicon glyphicon-trash"></span> Remove</button>
         [/#if]
     </section>
 
