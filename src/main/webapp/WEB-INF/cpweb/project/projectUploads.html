@@ -1,0 +1,38 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+${cpweb_head}
+
+[/#assign]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+[/#assign]
+
+[#assign title = (prj.name!'') + " uploads ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
+
+[@pInfo.projectInfo selected="uploads"][/@pInfo.projectInfo]
+
+
+<h1>[@dws.txt key="cpweb.project.uploads.title" /]</h1>
+
+<form method="POST" action="{helper.urlFor('project.ProjectModificationModule','assignRoleEmail',[prj.projectId])}" class="form">
+    <div class="form-group">
+        [@modal.formParams /]
+        <button type="submit" class="btn btn-primary">A random button</button>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div>
+            Downloads will appear here.
+        </div>
+    </div>
+</div>
+
+[/@dws.skin]
+

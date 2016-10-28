@@ -800,6 +800,25 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
 
+    @WebAction
+    public RequestTarget onUploads(RequestCycle cycle, String projectId) {
+        OrgProject project =
+                getProject(cycle, projectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Map<String, Object> map = createMap();
+        map.put("project", project);
+
+        addCommonMapValues(map, project, cycle);
+
+
+
+        return new FreemarkerRequestTarget("/project/projectUploads.html", map);
+    }
+
+
 
     private WebModuleRedirectRequestTarget toSomewhere(String projectId) {
         return new WebModuleRedirectRequestTarget(ProjectModule.class, "roster",
