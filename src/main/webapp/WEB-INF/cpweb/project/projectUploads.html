@@ -25,13 +25,17 @@ ${cpweb_foot}
                 data.result.forEach(function(participant){
                     var $entry = $("<li/>").text(participant.participantName);
                     if(participant.uploads) {
+                        console.log("uploads:", participant.uploads);
                         var $uploadEntry = $("<ul/>");
                         participant.uploads.forEach(function(upload){
-                           $uploadEntry.add($("<li/>").text(upload.fileName))
+                            console.log("...");
+                           $uploadEntry.append($("<li/>").html(upload.fileName + ' <span class="glyphicon glyphicon-trash"></span>'));
                         });
                         $entry.append($uploadEntry);
                     }
                     $list.append($entry);
+                    console.log("Participant:", participant, $entry);
+
                 });
                 $("#downloads-container").html($list);
 
