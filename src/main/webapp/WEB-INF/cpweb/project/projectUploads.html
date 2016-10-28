@@ -18,8 +18,7 @@ ${cpweb_foot}
     };
 
     require(['messenger', 'es6-shim'], function() {
-        $.getJSON(settings.listUploadsUrl).done(function(data) {
-            console.log("This is the dta:", data);
+        $.getJSON(settings.listUploadsUrl).done(function(data) { // TODO: Should go handlebars here.            console.log("This is the dta:", data);
             if(data.status == "ok") {
                 var $list = $("<ul/>")
                 data.result.forEach(function(participant){

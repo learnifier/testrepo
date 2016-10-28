@@ -101,7 +101,7 @@ import static se.dabox.service.common.ccbc.participation.filter.FilterParticipat
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 @WebModuleMountpoint("/project.json")
-public class ProjectJsonModule extends AbstractJsonAuthModule {
+public class ProjectJsonModule extends AbstractProjectJsModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ProjectJsonModule.class);
@@ -135,7 +135,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         final List<ClientUserGroup> cugs = cugClient.listGroups(prj.getOrgId());
 
@@ -160,7 +160,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         final List<ClientUserGroup> cugs = cugClient.listGroups(prj.getOrgId());
 
@@ -186,7 +186,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
 
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         final List<ClientUserGroup> cugs = cugClient.listGroups(prj.getOrgId());
 
@@ -234,7 +234,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
         try {
             List<UserAccount> users = Clients.getClient(cycle, UserAccountService.class).
                     getUserGroupAccounts(prj.getUserGroupId());
@@ -270,7 +270,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
         List<UserAccount> users =
                 Clients.getClient(cycle, UserAccountService.class).
                         getUserGroupAccounts(prj.getUserGroupId());
@@ -345,7 +345,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         List<MailTemplate> mailTemplates = getMailTemplates(cycle, prj.getOrgId());
 
@@ -360,7 +360,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         ProjectMaterialCoordinatorClient pmcClient = getProjectMaterialCoordinatorClient(cycle);
         List<Material> materials = getProjectMaterials(pmcClient, prjId, cycle);
@@ -374,7 +374,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         ListProjectAdminJson json = new ListProjectAdminJson(cycle, ccbc);
 
@@ -387,7 +387,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         DruwaFormValidationSession<SetRegCreditLimitForm> formsess =
                 getValidationSession(SetRegCreditLimitForm.class, cycle);
@@ -432,7 +432,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         DruwaFormValidationSession<SetRegPasswordForm> formsess =
                 getValidationSession(SetRegPasswordForm.class, cycle);
@@ -479,7 +479,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         DruwaFormValidationSession<SetRegPasswordForm> formsess =
                 getValidationSession(SetRegPasswordForm.class, cycle);
@@ -500,7 +500,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "autoical"));
@@ -544,7 +544,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
@@ -568,7 +568,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
@@ -590,7 +590,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
@@ -613,7 +613,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
+        checkPermission(cycle, project, strProjectId, LOGGER);
 
         boolean enabled = Boolean.valueOf(DruwaParamHelper.getMandatoryParam(null, cycle.
                 getRequest(), "enabled"));
@@ -636,7 +636,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         List<Locale> countries =
                 NewProjectModule.getProjectCountries(cycle);
@@ -662,7 +662,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         List<Locale> countries =
                 NewProjectModule.getProjectLocales(cycle);
@@ -688,7 +688,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         RecentList<TimeZone> timeZones =
                 OrgProjectTimezoneFactory.newRecentList(cycle, prj.getOrgId());
@@ -707,7 +707,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         OrgProject prj = ccbc.getProject(prjId);
-        checkPermission(cycle, prj, strProjectId);
+        checkPermission(cycle, prj, strProjectId, LOGGER);
 
         boolean publishing = new IsProjectPublishingCommand().isPublishing(prj);
 
@@ -757,60 +757,6 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         }
 
         return jsonTarget(toSearchUserJson(accounts, pageLimit, page));
-    }
-
-    @WebAction
-    public RequestTarget onListUploads(RequestCycle cycle, String strProjectId) {
-        long prjId = Long.valueOf(strProjectId);
-
-        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        OrgProject project = ccbc.getProject(prjId);
-        checkPermission(cycle, project, strProjectId);
-
-        final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
-
-        List<Map<String, ?>> res = new ArrayList<>();
-
-        if(participations != null) {
-            participations.stream().forEach(p -> {
-                Map<String, Object> user = new HashMap<>();
-                user.put("participantId", p.getParticipationId());
-                user.put("participantName", "Kalle Kula");
-                List<Map<String, Object>> uploads = new ArrayList<>();
-                final ProjectParticipationState state = ccbc.getParticipationState(p.getParticipationId());
-                if(state != null) {
-                    final Map<String, String> stateMap = state.getMap();
-
-                    if(stateMap != null) {
-                        stateMap.entrySet().stream()
-                                .filter(e ->
-                                        e.getKey() != null && e.getKey().startsWith(UPLOAD_PREFIX))
-                                .forEach(e -> {
-                                    try {
-                                        final Map<String, ?> json = JsonUtils.decode(e.getValue());
-                                        if(json != null && json.containsKey("cid") && json.containsKey("fileName") && json.containsKey("crl")){
-                                            final ImmutableMap.Builder<String, Object> uploadBuilder = ImmutableMap.builder();
-                                            uploadBuilder.put("cid", json.get("cid"));
-                                            uploadBuilder.put("fileName", json.get("fileName"));
-                                            uploadBuilder.put("crl", json.get("crl"));
-                                            if(json.containsKey("comment")) {
-                                                uploadBuilder.put("comment", json.get("comment"));
-                                            }
-                                            uploads.add(uploadBuilder.build());
-                                        }
-                                    } catch(JsonException ex) {
-                                        LOGGER.warn("Ignoring malformed JSON: ", e.getValue());
-                                    }
-                                });
-                    }
-                }
-                user.put("uploads", uploads);
-                res.add(user);
-            });
-        }
-        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
-                "status", "ok",
-                "result", res)));
     }
 
 
@@ -992,19 +938,6 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         section.put("children", otherList);
 
         return section;
-    }
-
-    protected void checkPermission(RequestCycle cycle, OrgProject project, String strProjectId) {
-        if (project == null) {
-            LOGGER.warn("Project {} doesn't exist.", strProjectId);
-
-            ErrorCodeRequestTarget error
-                    = new ErrorCodeRequestTarget(HttpServletResponse.SC_NOT_FOUND);
-
-            throw new RetargetException(error);
-        } else {
-            super.checkPermission(cycle, project);
-        }
     }
 
     private static class ProductMaterialCombo {
