@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.RetargetException;
@@ -11,6 +12,7 @@ import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ import se.dabox.service.common.ccbc.project.MailBounce;
 import se.dabox.service.common.ccbc.project.MailBounceUtil;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
+import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectTask;
@@ -51,6 +54,8 @@ import se.dabox.service.common.ccbc.project.catalog.CatalogMode;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
+import se.dabox.service.common.json.JsonException;
+import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -100,6 +105,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(ProjectJsonModule.class);
+
+    private static final String UPLOAD_PREFIX = "fileupload.";
 
     private static List<Material> getMissingProducts(
             List<String> prodIdList,
@@ -194,7 +201,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         final CocoboxCoordinatorClient ccbcClient = getCocoboxCordinatorClient(cycle);
         Set<Long> participants =
                 ccbcClient.listProjectParticipations(prj.getProjectId())
-                .stream().map(ProjectParticipation::getUserId).collect(Collectors.toSet());
+                        .stream().map(ProjectParticipation::getUserId).collect(Collectors.toSet());
         long added = uas.stream()
                 .filter(ua -> !participants.contains(ua.getUserId()))
                 .map(ua -> {
@@ -266,7 +273,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         checkPermission(cycle, prj, strProjectId);
         List<UserAccount> users =
                 Clients.getClient(cycle, UserAccountService.class).
-                getUserGroupAccounts(prj.getUserGroupId());
+                        getUserGroupAccounts(prj.getUserGroupId());
 
         List<ProjectParticipation> participations =
                 ccbc.listProjectParticipations(new ListProjectParticipationsRequest(prjId, true));
@@ -395,7 +402,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
         LangBundle bundle =
                 LangServiceClientFactory.getInstance(cycle).getLangBundle(
-                CocoSiteConstants.DEFAULT_LANG_BUNDLE, userLocale.toString(), true);
+                        CocoSiteConstants.DEFAULT_LANG_BUNDLE, userLocale.toString(), true);
         String prefix = "cpweb.registration.creditlimit";
 
         if (!formsess.process()) {
@@ -416,7 +423,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return new FormbeanJsRequestTargetFactory(cycle, bundle, prefix).
                 getSuccessfulMap(Collections.
-                singletonMap("status", "OK"));
+                        singletonMap("status", "OK"));
     }
 
     @WebAction
@@ -440,7 +447,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
         LangBundle bundle =
                 LangServiceClientFactory.getInstance(cycle).getLangBundle(
-                CocoSiteConstants.DEFAULT_LANG_BUNDLE, userLocale.toString(), true);
+                        CocoSiteConstants.DEFAULT_LANG_BUNDLE, userLocale.toString(), true);
         String prefix = "cpweb.registration.password";
 
         if (!formsess.process()) {
@@ -461,7 +468,7 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         return new FormbeanJsRequestTargetFactory(cycle, bundle, prefix).
                 getSuccessfulMap(Collections.
-                singletonMap("status", "OK"));
+                        singletonMap("status", "OK"));
     }
 
     @WebAction
@@ -519,10 +526,10 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
 
         String str = String.
                 format(
-                "Would set the autoical setting on project %d to %s (and sendUpdates: %s) and then return a json status response",
-                prjId,
-                enabled,
-                sendUpdates);
+                        "Would set the autoical setting on project %d to %s (and sendUpdates: %s) and then return a json status response",
+                        prjId,
+                        enabled,
+                        sendUpdates);
 
         Map<String, String> map = MapUtil.createHash(2);
         map.put("message", str);
@@ -752,6 +759,61 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
         return jsonTarget(toSearchUserJson(accounts, pageLimit, page));
     }
 
+    @WebAction
+    public RequestTarget onListUploads(RequestCycle cycle, String strProjectId) {
+        long prjId = Long.valueOf(strProjectId);
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        OrgProject project = ccbc.getProject(prjId);
+        checkPermission(cycle, project, strProjectId);
+
+        final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
+
+        List<Map<String, ?>> res = new ArrayList<>();
+
+        if(participations != null) {
+            participations.stream().forEach(p -> {
+                Map<String, Object> user = new HashMap<>();
+                user.put("participantId", p.getParticipationId());
+                user.put("participantName", "Kalle Kula");
+                List<Map<String, Object>> uploads = new ArrayList<>();
+                final ProjectParticipationState state = ccbc.getParticipationState(p.getParticipationId());
+                if(state != null) {
+                    final Map<String, String> stateMap = state.getMap();
+
+                    if(stateMap != null) {
+                        stateMap.entrySet().stream()
+                                .filter(e ->
+                                        e.getKey() != null && e.getKey().startsWith(UPLOAD_PREFIX))
+                                .forEach(e -> {
+                                    try {
+                                        final Map<String, ?> json = JsonUtils.decode(e.getValue());
+                                        if(json != null && json.containsKey("cid") && json.containsKey("fileName") && json.containsKey("crl")){
+                                            final ImmutableMap.Builder<String, Object> uploadBuilder = ImmutableMap.builder();
+                                            uploadBuilder.put("cid", json.get("cid"));
+                                            uploadBuilder.put("fileName", json.get("fileName"));
+                                            uploadBuilder.put("crl", json.get("crl"));
+                                            if(json.containsKey("comment")) {
+                                                uploadBuilder.put("comment", json.get("comment"));
+                                            }
+                                            uploads.add(uploadBuilder.build());
+                                        }
+                                    } catch(JsonException ex) {
+                                        LOGGER.warn("Ignoring malformed JSON: ", e.getValue());
+                                    }
+                                });
+                    }
+                }
+                user.put("uploads", uploads);
+                res.add(user);
+            });
+        }
+        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+                "status", "ok",
+                "result", res)));
+    }
+
+
     private UserAccountService getUserAccountService(RequestCycle cycle) {
         UserAccountService uaClient = CacheClients.getClient(cycle, UserAccountService.class);
 
@@ -860,8 +922,8 @@ public class ProjectJsonModule extends AbstractJsonAuthModule {
     }
 
     public static List<Material> getProjectMaterials(ProjectMaterialCoordinatorClient pmcClient,
-            long prjId,
-            RequestCycle cycle) {
+                                                     long prjId,
+                                                     RequestCycle cycle) {
 
         List<OrgMaterial> orgMats = pmcClient.getProjectOrgMaterials(prjId);
 

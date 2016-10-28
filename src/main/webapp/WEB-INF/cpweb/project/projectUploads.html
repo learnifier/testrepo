@@ -9,6 +9,42 @@ ${cpweb_head}
 
 [#assign cpweb_foot ]
 ${cpweb_foot}
+<script>
+    "use strict";
+    $('#menu-projects').addClass('active');
+
+    var settings = {
+        listUploadsUrl: "${helper.urlFor('project.ProjectJsonModule', 'listUploads',[prj.projectId])}"
+    };
+
+    require(['messenger', 'es6-shim'], function() {
+        $.getJSON(settings.listUploadsUrl).done(function(data) {
+            console.log("This is the dta:", data);
+            if(data.status == "ok") {
+                var $list = $("<ul/>")
+                data.result.forEach(function(participant){
+                    var $entry = $("<li/>").text(participant.participantName);
+                    if(participant.uploads) {
+                        var $uploadEntry = $("<ul/>");
+                        participant.uploads.forEach(function(upload){
+                           $uploadEntry.add($("<li/>").text(upload.fileName))
+                        });
+                        $entry.append($uploadEntry);
+                    }
+                    $list.append($entry);
+                });
+                $("#downloads-container").html($list);
+
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown){
+            console.log("Could not fetch uploads: ", errorThrown);
+            CCBMessengerError("Could not fetch uploaded files.");
+        });
+    });
+
+</script>
+
+
 [/#assign]
 
 [#assign title = (prj.name!'') + " uploads ("+orgName+")" /]
@@ -28,7 +64,7 @@ ${cpweb_foot}
 
 <div class="row">
     <div class="col-sm-12">
-        <div>
+        <div id="downloads-container">
             Downloads will appear here.
         </div>
     </div>
