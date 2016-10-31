@@ -260,7 +260,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 $('#listcourses').on('click', '.details-control', function(e) {
                     var id = $(e.target).data("courseid");
                     e.preventDefault();
-                    console.log("edit: ", $(this), id);
                     openModal("course", settings.courseDetailsUrl + "/" + id);
                 });
 
@@ -268,7 +267,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                  * Add course button + auto add course if settings.initiateCreate is set.
                  */
                 $("#addcourse-btn").click(addCourse);
-                // $(document).on("click", "#addcourse-link", addCourse);
                 if(settings.initiateCreate) {
                     addCourse();
                 }
@@ -309,7 +307,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                     var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
                     if ( sessionId ) {
                         $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
-                            console.log("copied: ", data);
                             if(data.status == "ok") {
                                 readProjects().done(function(){
                                     dt.ajax.reload();
@@ -342,11 +339,15 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 });
 
                 $(document).on('click', 'td.favorite', function() {
-                    var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
-                    console.log("Click fav", sessionId);
+                    var $star = $(this).find("span"),
+                        sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
                     $.post(settings.toggleFavoriteUrl, {"sessionId": sessionId}).done(function(data){
                         if (data.status == "ok") {
-                            window.location = window.location;
+                            if(data.state) {
+                                $star.removeClass("glyphicon-star-empty").addClass("glyphicon-star");
+                            } else {
+                                $star.removeClass("glyphicon-star").addClass("glyphicon-star-empty");
+                            }
                         } else {
                             CCBMessengerError("Could not mark session as favorite: ", data.message);
                         }
