@@ -7,32 +7,42 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
         settings,
         sessionHash = {};
 
+    function readProjects(){
+        var p = $.getJSON(settings.listProjectsUrl);
+        p.done(function(data) {
+            data.aaData.forEach(function(project){
+                sessionHash[project.courseSessionId] = project;
+            });
+        });
+        return p;
+    }
+
     function getExpanded() {
-      try {
-        var stored = localStorage.getItem( 'session-expanded' ) || '[]';
-        return JSON.parse( stored );
-      } catch ( e ) {
-        return [];
-      }
+        try {
+            var stored = localStorage.getItem( 'session-expanded' ) || '[]';
+            return JSON.parse( stored );
+        } catch ( e ) {
+            return [];
+        }
     }
 
     function setExpanded( id, isExpanded ) {
-      try {
-        var parsed = getExpanded();
-        var i = parsed.indexOf( id );
-        if ( isExpanded ) {
-          if ( i !== -1 ) {
-            return;
-          }
-          parsed.push( id );
-        } else {
-          if ( i === -1 ) {
-            return;
-          }
-          parsed.splice( i, 1 )
-        }
-        localStorage.setItem( 'session-expanded', JSON.stringify( parsed ) );
-      } catch ( e ) {}
+        try {
+            var parsed = getExpanded();
+            var i = parsed.indexOf( id );
+            if ( isExpanded ) {
+                if ( i !== -1 ) {
+                    return;
+                }
+                parsed.push( id );
+            } else {
+                if ( i === -1 ) {
+                    return;
+                }
+                parsed.splice( i, 1 )
+            }
+            localStorage.setItem( 'session-expanded', JSON.stringify( parsed ) );
+        } catch ( e ) {}
     }
 
     exports.init = function(options) {
@@ -78,9 +88,9 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
             return deferred.promise();
         }
 
-        function drawSessionSection(row, template) {
+        function drawSessionSection(row, template, refresh) {
             var id = row.data().id;
-            if ( row.child.isShown() ) {
+            if (!refresh && row.child.isShown() ) {
                 row.child.hide();
                 setExpanded( id, false );
             }
@@ -216,39 +226,36 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                     });
                 }
 
-
-                var dt = $('#listcourses').DataTable({
-                    "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
-                    "order": [[1, 'asc']],
-                    "columnDefs": columnDefs,
-                    "ajax": {
-                        "url": settings.listCoursesUrl,
-                        "dataSrc": ""
-                    },
-                    "pageLength": 25,
-                    "pagingType": "full_numbers",
-                    "deferRender": true,
-                    "language": {
-                        "search": "",
-                        "zeroRecords": "No projects matches your query",
-                        "emptyTable": "<span class='emptytable'>Start now by creating your <a id='addcourse-link' href='#'>first course</a></span>",
-                        "loadingRecords": "<p>Loading courses...</p><img src='" + settings.spinnerUrl + "' />"
-                    },
-                    "createdRow": function ( row, data, index ) {
-                        $( row ).attr( 'data-id', data.id );
-                        var expanded = getExpanded();
-                        if ( expanded.indexOf( data.id ) !== -1 ||
-                             settings.selectedCourses.indexOf(data.id) !== -1) {
-                            drawSessionSection(dt.row(row), itemTemplate);
+                var dt;
+                readProjects().done(function(){
+                    dt = $('#listcourses').DataTable({
+                        "dom": '<"row"<"col-sm-6"f><"col-sm-6">><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
+                        "order": [[1, 'asc']],
+                        "columnDefs": columnDefs,
+                        "ajax": {
+                            "url": settings.listCoursesUrl,
+                            "dataSrc": ""
+                        },
+                        "pageLength": 25,
+                        "pagingType": "full_numbers",
+                        "deferRender": true,
+                        "language": {
+                            "search": "",
+                            "zeroRecords": "No projects matches your query",
+                            "emptyTable": "<span class='emptytable'>Start now by creating your <a id='addcourse-link' href='#'>first course</a></span>",
+                            "loadingRecords": "<p>Loading courses...</p><img src='" + settings.spinnerUrl + "' />"
+                        },
+                        "createdRow": function ( row, data, index ) {
+                            $( row ).attr( 'data-id', data.id );
+                            var expanded = getExpanded();
+                            if ( expanded.indexOf( data.id ) !== -1 ||
+                                settings.selectedCourses.indexOf(data.id) !== -1) {
+                                drawSessionSection(dt.row(row), itemTemplate, false);
+                            }
                         }
-                    }
-                });
-
-                $.getJSON(settings.listProjectsUrl).done(function(data) {
-                    data.aaData.forEach(function(project){
-                        sessionHash[project.courseSessionId] = project;
                     });
                 });
+
 
                 $('#listcourses').on('click', '.details-control', function(e) {
                     var id = $(e.target).data("courseid");
@@ -283,7 +290,7 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                         var $tr = $(this).closest('tr');
                         if($tr.data("id")) { // Check if we are on a real row or details row.
                             var row = dt.row( $tr );
-                            drawSessionSection(row, itemTemplate);
+                            drawSessionSection(row, itemTemplate, false);
                             return false;
                         }
                     }
@@ -301,17 +308,20 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 $(document).on('click', '.session-copy__button', function () {
                     var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
                     if ( sessionId ) {
-                      $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
-                          console.log("copied: ", data);
-                          if(data.status == "ok") {
-                              window.location = settings.projectDetailsUrl + "/" + data.projectId;
-                          } else {
-                              CCBMessengerError("Could not copy session: ", data.message);
-                          }
-                      }).fail(function(jqXHR, textStatus, errorThrown){
-                          CCBMessengerError("Could not copy session.");
-                          console.log("Could not copy session:", errorThrown);
-                      });
+                        $.post(settings.copySessionUrl, {"sessionId": sessionId}).done(function(data){
+                            console.log("copied: ", data);
+                            if(data.status == "ok") {
+                                readProjects().done(function(){
+                                    dt.ajax.reload();
+                                });
+                                CCBMessengerInfo("Copied session");
+                            } else {
+                                CCBMessengerError("Could not copy session: ", data.message);
+                            }
+                        }).fail(function(jqXHR, textStatus, errorThrown){
+                            CCBMessengerError("Could not copy session.");
+                            console.log("Could not copy session:", errorThrown);
+                        });
                     }
                     return false;
                 });
@@ -332,7 +342,6 @@ define(['handlebars', 'cocobox/ccb-imodal', 'es6-shim', 'messenger'], function( 
                 });
 
                 $(document).on('click', 'td.favorite', function() {
-                    console.log("Gogo click fav");
                     var sessionId = $(this).closest('tr[data-session-id]').data( 'session-id' );
                     console.log("Click fav", sessionId);
                     $.post(settings.toggleFavoriteUrl, {"sessionId": sessionId}).done(function(data){
