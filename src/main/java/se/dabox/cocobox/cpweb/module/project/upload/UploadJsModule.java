@@ -18,6 +18,7 @@ import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,8 +54,14 @@ public class UploadJsModule extends AbstractProjectJsModule {
         if(participations != null) {
             participations.stream().forEach(p -> {
                 Map<String, Object> user = new HashMap<>();
+
+                UserAccount userAccount = getUserAccountServiceClient(cycle).getUserAccount(p.getUserId());
+                if(userAccount == null) {
+                    return;
+                }
                 user.put("participantId", p.getParticipationId());
-                user.put("participantName", "Kalle Kula");
+                user.put("participantName", userAccount.getDisplayName());
+
                 List<Map<String, Object>> uploads = new ArrayList<>();
                 final ProjectParticipationState state = ccbc.getParticipationState(p.getParticipationId());
                 if(state != null) {

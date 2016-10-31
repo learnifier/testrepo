@@ -14,7 +14,7 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 
     var settings = {
-        listUploadsUrl: "${helper.urlFor('project.ProjectJsonModule', 'listUploads',[prj.projectId])}"
+        listUploadsUrl: "${helper.urlFor('project.upload.UploadJsModule', 'listUploads',[prj.projectId])}"
     };
 
     require(['messenger', 'es6-shim'], function() {
