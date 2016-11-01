@@ -77,6 +77,7 @@ public class UploadJsModule extends AbstractProjectJsModule {
                 if(userAccount == null) {
                     return;
                 }
+                String participantName = userAccount.getDisplayName()!=null?userAccount.getDisplayName():"(Unnamed user)";
                 final ProjectParticipationState state = ccbc.getParticipationState(participant.getParticipationId());
                 if(state != null) {
                     final Map<String, String> stateMap = state.getMap();
@@ -110,7 +111,7 @@ public class UploadJsModule extends AbstractProjectJsModule {
 
                                             if(!participantMap.containsKey(participant.getUserId())) {
                                                 participantMap.put(participant.getUserId(), ImmutableMap.of(
-                                                        "participantName", userAccount.getDisplayName(),
+                                                        "participantName", participantName,
                                                         "uploads", new ArrayList<Map<String, Object>>()
                                                 ));
                                             }
