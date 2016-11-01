@@ -46,15 +46,16 @@ ${cpweb_foot}
 
             function UploadModel() {
                 var self = this;
-                this.remove = function(){
-                    var upload = this;
-                    console.log("Removing upload: ", upload);
+                this.remove = function(upload, parent){
+                    console.log("Removing upload: ", upload, parent);
                     $.post(settings.removeUploadUrl, { participationId: upload.participationId, uploadId: upload.uploadId}).done(function(data){
                         if(data.status == "ok") {
-                            var index = self.uploadComponents().indexOf(uploadId);
+                            console.log("Before: ", self.uploadComponents());
+                            var index = parent.uploads.indexOf(upload);
                             if(index != -1) {
-                                self.uploadComponents.splice(index, 1);
+                                parent.uploads.splice(index, 1);
                             }
+                            console.log("After: ", self.uploadComponents(), index);
                             CCBMessengerInfo("Upload deleted.");
                         } else {
                             CCBMessengerError("Could not delete upload.");
@@ -87,13 +88,6 @@ ${cpweb_foot}
 
 <h1>[@dws.txt key="cpweb.project.uploads.title" /]</h1>
 
-<form method="POST" action="{helper.urlFor('project.ProjectModificationModule','assignRoleEmail',[prj.projectId])}" class="form">
-    <div class="form-group">
-        [@modal.formParams /]
-        <button type="submit" class="btn btn-primary">A random button</button>
-    </div>
-</form>
-
 <div class="row">
     <div class="col-sm-12">
         <div id="downloads-container">
@@ -102,7 +96,7 @@ ${cpweb_foot}
                 <div data-bind="foreach: participants">
                     <h3 data-bind="text: participantName"></h3>
                     <ul data-bind="foreach: uploads">
-                        <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: $root.remove" class="glyphicon glyphicon-trash"></span></li>
+                        <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span></li>
                     </ul>
                 </div>
             </div>
