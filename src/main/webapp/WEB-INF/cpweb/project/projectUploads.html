@@ -47,15 +47,12 @@ ${cpweb_foot}
             function UploadModel() {
                 var self = this;
                 this.remove = function(upload, parent){
-                    console.log("Removing upload: ", upload, parent);
                     $.post(settings.removeUploadUrl, { participationId: upload.participationId, uploadId: upload.uploadId}).done(function(data){
                         if(data.status == "ok") {
-                            console.log("Before: ", self.uploadComponents());
                             var index = parent.uploads.indexOf(upload);
                             if(index != -1) {
                                 parent.uploads.splice(index, 1);
                             }
-                            console.log("After: ", self.uploadComponents(), index);
                             CCBMessengerInfo("Upload deleted.");
                         } else {
                             CCBMessengerError("Could not delete upload.");
@@ -91,15 +88,26 @@ ${cpweb_foot}
 <div class="row">
     <div class="col-sm-12">
         <div id="downloads-container">
+            <!-- ko if: uploadComponents().length == 0 -->
+            <em>There are no uploads in this project</em>
+            <!-- /ko -->
+            <!-- ko if: uploadComponents().length != 0 -->
             <div data-bind="foreach: uploadComponents">
                 <h1 data-bind="text: componentName"></h1>
                 <div data-bind="foreach: participants">
                     <h3 data-bind="text: participantName"></h3>
+                    <!-- ko if: uploads().length == 0 -->
+                    <em>No uploads</em>
+                    <!-- /ko -->
+                    <!-- ko if: uploads().length != 0 -->
                     <ul data-bind="foreach: uploads">
                         <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span></li>
                     </ul>
+                    <!-- /ko -->
                 </div>
             </div>
+            <!-- /ko -->
+
         </div>
     </div>
 </div>
