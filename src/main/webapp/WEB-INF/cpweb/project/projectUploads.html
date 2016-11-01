@@ -19,37 +19,27 @@ ${cpweb_foot}
 
     require(['knockout', 'messenger', 'es6-shim'], function(ko) {
         $.getJSON(settings.listUploadsUrl).done(function(data) {
+
             console.log("Alright we got ", data.result);
+
+            if(data.status == "ok") {
+                var components = Object.keys(data.result).map(function(key){
+                    return { cid: key, participants: data.result[key] };
+                });
+                console.log("Rehashed: ", components);
+            }
+
+
             function UploadModel() {
                 this.remove = function(){
                     var upload = this;
                   console.log("Removing upload: ", upload);
                 };
-                this.uploadComponents = ko.observableArray([{ title: 'This is a component', participants: data.result} ]);
+                this.uploadComponents = ko.observableArray(components);
             }
             var model = new UploadModel();
             ko.applyBindings(model, $("#downloads-container")[0])
 
-            if(data.status == "ok") {
-                var $list = $("<ul/>")
-                data.result.forEach(function(participant){
-                    var $entry = $("<li/>").text(participant.participantName);
-                    if(participant.uploads) {
-                        console.log("uploads:", participant.uploads);
-                        var $uploadEntry = $("<ul/>");
-                        participant.uploads.forEach(function(upload){
-                            console.log("...");
-                           $uploadEntry.append($("<li/>").html(upload.fileName + ' <span class="glyphicon glyphicon-trash"></span>'));
-                        });
-                        $entry.append($uploadEntry);
-                    }
-                    $list.append($entry);
-                    console.log("Participant:", participant, $entry);
-
-                });
-//                $("#downloads-container").html($list);
-
-            }
         }).fail(function(jqXHR, textStatus, errorThrown){
             console.log("Could not fetch uploads: ", errorThrown);
             CCBMessengerError("Could not fetch uploaded files.");
@@ -80,14 +70,14 @@ ${cpweb_foot}
     <div class="col-sm-12">
         <div id="downloads-container">
             <div data-bind="foreach: uploadComponents">
-                <h2 data-bind="text: title"></h2>
+                <h2 data-bind="text: cid"></h2>
                 <table>
-                    <tbody data-bind="foreach: participants">
+                    <tbody xdata-bind="foreach: participants">
                     <tr>
-                        <td data-bind="text: participantName"></td>
+                        <td xdata-bind="text: participantName"></td>
                         <td>
-                            <ul data-bind="foreach: uploads">
-                                <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: $root.remove" class="glyphicon glyphicon-trash"></span></li>
+                            <ul xdata-bind="foreach: uploads">
+                                <li><span xdata-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: $root.remove" class="glyphicon glyphicon-trash"></span></li>
                             </ul>
                         </td>
                     </tr>
