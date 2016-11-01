@@ -24,7 +24,18 @@ ${cpweb_foot}
 
             if(data.status == "ok") {
                 var components = Object.keys(data.result).map(function(key){
-                    return { cid: key, participants: data.result[key] };
+                    var item = data.result[key];
+                    return {
+                        cid: key, componentName: item.componentName,
+                        participants: Object.keys(item.component).map(function(userId){
+                            var component = item.component;
+                            console.log("Inner: ", component, userId, component[userId]);
+                            return {
+                                participantName: component[userId].participantName,
+                                uploads: component[userId].uploads
+                            }
+                        })
+                    };
                 });
                 console.log("Rehashed: ", components);
             }
@@ -70,14 +81,14 @@ ${cpweb_foot}
     <div class="col-sm-12">
         <div id="downloads-container">
             <div data-bind="foreach: uploadComponents">
-                <h2 data-bind="text: cid"></h2>
+                <h2 data-bind="text: componentName"></h2>
                 <table>
-                    <tbody xdata-bind="foreach: participants">
+                    <tbody data-bind="foreach: participants">
                     <tr>
-                        <td xdata-bind="text: participantName"></td>
+                        <td data-bind="text: participantName"></td>
                         <td>
-                            <ul xdata-bind="foreach: uploads">
-                                <li><span xdata-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: $root.remove" class="glyphicon glyphicon-trash"></span></li>
+                            <ul data-bind="foreach: uploads">
+                                <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: $root.remove" class="glyphicon glyphicon-trash"></span></li>
                             </ul>
                         </td>
                     </tr>

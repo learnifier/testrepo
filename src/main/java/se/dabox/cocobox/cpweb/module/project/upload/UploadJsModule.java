@@ -50,8 +50,8 @@ public class UploadJsModule extends AbstractProjectJsModule {
 
         // TODO: List course components to retrieve name of download components.
 
-        // cid => partId => { participantName: name, uploads: [ { crl: "", fileName: "", commment: "" } ] }
-        Map<String, Map<Long, Map<String, Object>>>uploads = new HashMap<>();
+        // cid => { componentName: "", component: partId => { participantName: name, uploads: [ { crl: "", fileName: "", commment: "" } ] }
+        Map<String, Map<String, Object>> uploads = new HashMap<>();
 
         if(participations != null) {
             participations.forEach(participant -> {
@@ -81,10 +81,13 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                             final ImmutableMap<String, Object> upload = uploadBuilder.build();
 
                                             if(!uploads.containsKey(cid)) {
-                                                uploads.put(cid, new HashMap<>());
+                                                uploads.put(cid, ImmutableMap.of(
+                                                        "componentName", "A component name", // TODO: Use proper name
+                                                        "component", new HashMap<Long, Map<String, Object>>()
+                                                ));
 
                                             }
-                                            Map<Long, Map<String, Object>> participantMap = uploads.get(cid);
+                                            final Map<Long, Map<String, Object>> participantMap = (Map<Long, Map<String, Object>>)uploads.get(cid).get("component");
 
                                             if(!participantMap.containsKey(participant.getUserId())) {
                                                 participantMap.put(participant.getUserId(), ImmutableMap.of(
