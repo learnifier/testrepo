@@ -21,6 +21,7 @@ import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,23 +48,18 @@ public class UploadJsModule extends AbstractProjectJsModule {
 
         final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
 
+        // TODO: List course components to retrieve name of download components.
 
-        List<Map<String, ?>> res = new ArrayList<>();
-
+        // cid => partId => { participantName: name, uploads: [ { crl: "", fileName: "", commment: "" } ] }
+        Map<String, Map<Long, Map<String, Object>>>uploads = new HashMap<>();
 
         if(participations != null) {
-            participations.stream().forEach(p -> {
-                Map<String, Object> user = new HashMap<>();
-
-                UserAccount userAccount = getUserAccountServiceClient(cycle).getUserAccount(p.getUserId());
+            participations.forEach(participant -> {
+                UserAccount userAccount = getUserAccountServiceClient(cycle).getUserAccount(participant.getUserId());
                 if(userAccount == null) {
                     return;
                 }
-                user.put("participantId", p.getParticipationId());
-                user.put("participantName", userAccount.getDisplayName());
-
-                List<Map<String, Object>> uploads = new ArrayList<>();
-                final ProjectParticipationState state = ccbc.getParticipationState(p.getParticipationId());
+                final ProjectParticipationState state = ccbc.getParticipationState(participant.getParticipationId());
                 if(state != null) {
                     final Map<String, String> stateMap = state.getMap();
 
@@ -75,14 +71,31 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                     try {
                                         final Map<String, ?> json = JsonUtils.decode(e.getValue());
                                         if(json != null && json.containsKey("cid") && json.containsKey("fileName") && json.containsKey("crl")){
+                                            String cid = (String)json.get("cid");
                                             final ImmutableMap.Builder<String, Object> uploadBuilder = ImmutableMap.builder();
-                                            uploadBuilder.put("cid", json.get("cid"));
                                             uploadBuilder.put("fileName", json.get("fileName"));
                                             uploadBuilder.put("crl", json.get("crl"));
                                             if(json.containsKey("comment")) {
                                                 uploadBuilder.put("comment", json.get("comment"));
                                             }
-                                            uploads.add(uploadBuilder.build());
+                                            final ImmutableMap<String, Object> upload = uploadBuilder.build();
+
+                                            if(!uploads.containsKey(cid)) {
+                                                uploads.put(cid, new HashMap<>());
+
+                                            }
+                                            Map<Long, Map<String, Object>> participantMap = uploads.get(cid);
+
+                                            if(!participantMap.containsKey(participant.getUserId())) {
+                                                participantMap.put(participant.getUserId(), ImmutableMap.of(
+                                                        "participantName", userAccount.getDisplayName(),
+                                                        "uploads", new ArrayList<Map<String, Object>>()
+                                                ));
+                                            }
+
+                                            // TODO: Can I avoid this funky cast?
+                                            final List<Map<String, Object>> uploadList = (List<Map<String, Object>>)participantMap.get(participant.getUserId()).get("uploads");
+                                            uploadList.add(upload);
                                         }
                                     } catch(JsonException ex) {
                                         LOGGER.warn("Ignoring malformed JSON: ", e.getValue());
@@ -90,13 +103,11 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                 });
                     }
                 }
-                user.put("uploads", uploads);
-                res.add(user);
             });
         }
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
                 "status", "ok",
-                "result", res)));
+                "result", uploads)));
     }
 
 }
