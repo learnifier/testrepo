@@ -81,19 +81,13 @@ ${cpweb_foot}
     <div class="col-sm-12">
         <div id="downloads-container">
             <div data-bind="foreach: uploadComponents">
-                <h2 data-bind="text: componentName"></h2>
-                <table>
-                    <tbody data-bind="foreach: participants">
-                    <tr>
-                        <td data-bind="text: participantName"></td>
-                        <td>
+                <h1 data-bind="text: componentName"></h1>
+                <div data-bind="foreach: participants">
+                        <h3 data-bind="text: participantName"></h3>
                             <ul data-bind="foreach: uploads">
                                 <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: $root.remove" class="glyphicon glyphicon-trash"></span></li>
                             </ul>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                </div>
             </div>
         </div>
     </div>
