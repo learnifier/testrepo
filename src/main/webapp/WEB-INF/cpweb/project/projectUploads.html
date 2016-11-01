@@ -14,7 +14,8 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 
     var settings = {
-        listUploadsUrl: "${helper.urlFor('project.upload.UploadJsModule', 'listUploads',[prj.projectId])}"
+        listUploadsUrl: "${helper.urlFor('project.upload.UploadJsModule', 'listUploads',[prj.projectId])}",
+        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}"
     };
 
     require(['knockout', 'messenger', 'es6-shim'], function(ko) {
@@ -32,7 +33,6 @@ ${cpweb_foot}
                         cid: cid, componentName: componentMap.componentName,
                         participants: Object.keys(componentMap.component).sort().map(function(userId){
                             var component = componentMap.component;
-                            console.log("Inner: ", component, userId, component[userId]);
                             return {
                                 participantName: component[userId].participantName,
                                 uploads: component[userId].uploads
@@ -45,9 +45,23 @@ ${cpweb_foot}
 
 
             function UploadModel() {
+                var self = this;
                 this.remove = function(){
                     var upload = this;
                     console.log("Removing upload: ", upload);
+                    $.post(settings.removeUploadUrl, { participationId: upload.participationId, uploadId: upload.uploadId}).done(function(data){
+                        if(data.status == "ok") {
+                            var index = self.uploadComponents().indexOf(uploadId);
+                            if(index != -1) {
+                                self.uploadComponents.splice(index, 1);
+                            }
+                            CCBMessengerInfo("Upload deleted.");
+                        } else {
+                            CCBMessengerError("Could not delete upload.");
+                        }
+                    }).fail(function(){
+                        CCBMessengerError("Could not delete upload.");
+                    });
                 };
                 this.uploadComponents = ko.observableArray(components);
             }

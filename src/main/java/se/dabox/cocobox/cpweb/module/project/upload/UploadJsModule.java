@@ -6,31 +6,33 @@ package se.dabox.cocobox.cpweb.module.project.upload;
 import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
+import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
+import se.dabox.cocosite.upweb.lang.UpLangBundleConstants;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
-import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.webutils.freemarker.text.CocoTextConfiguration;
+import se.dabox.util.idgen.ObjectId;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -94,6 +96,8 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                             final ImmutableMap.Builder<String, Object> uploadBuilder = ImmutableMap.builder();
                                             uploadBuilder.put("fileName", json.get("fileName"));
                                             uploadBuilder.put("crl", json.get("crl"));
+                                            uploadBuilder.put("uploadId", e.getKey());
+                                            uploadBuilder.put("participationId", participant.getParticipationId());
                                             if(json.containsKey("comment")) {
                                                 uploadBuilder.put("comment", json.get("comment"));
                                             }
@@ -116,6 +120,7 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                                 ));
                                             }
 
+
                                             final List<Map<String, Object>> uploadList = (List<Map<String, Object>>)participantMap.get(participant.getUserId()).get("uploads");
                                             uploadList.add(upload);
                                         }
@@ -130,6 +135,43 @@ public class UploadJsModule extends AbstractProjectJsModule {
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
                 "status", "ok",
                 "result", uploads)));
+    }
+
+    @WebAction
+    public RequestTarget onRemoveUpload(RequestCycle cycle) {
+
+        final WebRequest req = cycle.getRequest();
+        final String strParticipationId = req.getParameter("participationId");
+        final String uploadId = req.getParameter("uploadId");
+
+        if(strParticipationId == null || "".equals(strParticipationId)) {
+            throw new IllegalArgumentException("participationId missing");
+        }
+        if(uploadId == null || "".equals(uploadId)) {
+            throw new IllegalArgumentException("uploadId missing");
+        }
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final ProjectParticipation participation = ccbc.getProjectParticipation(Long.valueOf(strParticipationId));
+
+        OrgProject project = ccbc.getProject(participation.getProjectId());
+        checkPermission(cycle, project);
+
+        final ProjectParticipationState state = ccbc.getParticipationState(participation.getParticipationId());
+
+        if(state == null) {
+            throw new NotFoundException("Could not find upload.");
+        }
+        if(state.getMap().containsKey(uploadId)) {
+            ccbc.setParticipationState(participation.getParticipationId(), uploadId, null);
+        } else {
+            return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+                    "status", "error",
+                    "message", "Can not find upload to remove")));
+        }
+
+
+        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of("status", "ok")));
     }
 
 }
