@@ -35,7 +35,7 @@ ${cpweb_foot}
                             var component = componentMap.component;
                             return {
                                 participantName: component[userId].participantName,
-                                uploads: component[userId].uploads
+                                uploads: ko.observableArray(component[userId].uploads)
                             }
                         })
                     };
