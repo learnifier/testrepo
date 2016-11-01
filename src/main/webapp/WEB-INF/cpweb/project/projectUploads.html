@@ -25,11 +25,12 @@ ${cpweb_foot}
             if(data.status == "ok") {
                 // Knockout can't handle hashes, so lets restructure the data from
                 // hash to array of hash with name and value.
-                var components = Object.keys(data.result).map(function(cid){
+                // TODO: I sort in cid and userId, should be names or possibly a counter.
+                var components = Object.keys(data.result).sort().map(function(cid){
                     var componentMap = data.result[cid];
                     return {
                         cid: cid, componentName: componentMap.componentName,
-                        participants: Object.keys(componentMap.component).map(function(userId){
+                        participants: Object.keys(componentMap.component).sort().map(function(userId){
                             var component = componentMap.component;
                             console.log("Inner: ", component, userId, component[userId]);
                             return {

@@ -16,15 +16,22 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
+import se.dabox.service.common.coursedesign.CourseDesign;
+import se.dabox.service.common.coursedesign.v1.CddCodec;
+import se.dabox.service.common.coursedesign.v1.Component;
+import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -48,7 +55,18 @@ public class UploadJsModule extends AbstractProjectJsModule {
 
         final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
 
-        // TODO: List course components to retrieve name of download components.
+        final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
+        if(design == null) {
+            return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+                    "status", "ok",
+                    "result", Collections.emptyList())));
+        }
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+        final Map<String, String> cidMap = cdd.getAllComponents().stream()
+                .filter(c -> "upload".equals(c.getType()))
+                .collect(Collectors.toMap(
+                        c -> c.getCid().toString(),
+                        c -> c.getProperties().containsKey("title")?c.getProperties().get("title"):"(Unnamed upload)"));
 
         // cid => { componentName: "", component: partId => { participantName: name, uploads: [ { crl: "", fileName: "", commment: "" } ] }
         Map<String, Map<String, Object>> uploads = new HashMap<>();
@@ -82,11 +100,12 @@ public class UploadJsModule extends AbstractProjectJsModule {
 
                                             if(!uploads.containsKey(cid)) {
                                                 uploads.put(cid, ImmutableMap.of(
-                                                        "componentName", "A component name", // TODO: Use proper name
+                                                        "componentName", cidMap.containsKey(cid)?cidMap.get(cid):"(Unnamed upload)",
                                                         "component", new HashMap<Long, Map<String, Object>>()
                                                 ));
 
                                             }
+                                            // TODO: Can I avoid this funky cast (and the one further down)?
                                             final Map<Long, Map<String, Object>> participantMap = (Map<Long, Map<String, Object>>)uploads.get(cid).get("component");
 
                                             if(!participantMap.containsKey(participant.getUserId())) {
@@ -96,7 +115,6 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                                 ));
                                             }
 
-                                            // TODO: Can I avoid this funky cast?
                                             final List<Map<String, Object>> uploadList = (List<Map<String, Object>>)participantMap.get(participant.getUserId()).get("uploads");
                                             uploadList.add(upload);
                                         }

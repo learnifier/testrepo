@@ -22,6 +22,7 @@ import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorC
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
 import se.dabox.service.common.context.DwsRealmHelper;
+import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.cr.ContentRepoClient;
 import se.dabox.service.common.cr.DwsContentRepoClient;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -90,7 +91,12 @@ public abstract class AbstractModule {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
 
-    protected UserAccountService getUserAccountServiceClient(ServiceRequestCycle cycle) throws ClientFactoryException {
+    public static CourseDesignClient getCourseDesignClient(
+            ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, CourseDesignClient.class);
+    }
+
+    public UserAccountService getUserAccountServiceClient(ServiceRequestCycle cycle) throws ClientFactoryException {
         return CacheClients.getClient(cycle, UserAccountService.class);
     }
 
