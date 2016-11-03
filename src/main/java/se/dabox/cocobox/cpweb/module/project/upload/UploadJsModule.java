@@ -13,7 +13,6 @@ import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
-import se.dabox.cocosite.upweb.lang.UpLangBundleConstants;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -25,8 +24,6 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.UserAccount;
-import se.dabox.service.webutils.freemarker.text.CocoTextConfiguration;
-import se.dabox.util.idgen.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -174,4 +171,8 @@ public class UploadJsModule extends AbstractProjectJsModule {
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of("status", "ok")));
     }
 
+    @WebAction
+    public RequestTarget onDownload(RequestCycle cycle) {
+        return null;
+    }
 }

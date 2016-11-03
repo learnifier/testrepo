@@ -15,13 +15,12 @@ ${cpweb_foot}
 
     var settings = {
         listUploadsUrl: "${helper.urlFor('project.upload.UploadJsModule', 'listUploads',[prj.projectId])}",
-        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}"
+        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}",
+        downloadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'download')}"
     };
 
     require(['knockout', 'messenger', 'es6-shim'], function(ko) {
         $.getJSON(settings.listUploadsUrl).done(function(data) {
-
-            console.log("Alright we got ", data.result);
 
             if(data.status == "ok") {
                 // Knockout can't handle hashes, so lets restructure the data from
@@ -40,7 +39,6 @@ ${cpweb_foot}
                         })
                     };
                 });
-                console.log("Rehashed: ", components);
             }
 
 
