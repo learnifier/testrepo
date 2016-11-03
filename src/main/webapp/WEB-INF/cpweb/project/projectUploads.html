@@ -118,16 +118,21 @@ ${cpweb_foot}
                 <!-- /ko -->
                 <!-- ko if: uploads().length != 0 -->
                 <div class="list-group" data-bind="foreach: uploads">
-                        <span class="list-group-item">
-                            <!-- ko if: downloadUrl -->
-                            <a data-bind="attr: { href: downloadUrl }, text: fileName"></a>
-                            <!-- /ko -->
-                            <!-- ko ifnot: downloadUrl -->
-                            <span data-bind="text: fileName"></span>
-                            <!-- /ko -->
-                            <span data-bind="text: comment"></span>
-                            <span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span>
+                    <span class="list-group-item">
+                        <span
+                          data-bind="click: function(){$root.remove($data, $parent);}"
+                          style="float: right; cursor: pointer"
+                          class="glyphicon glyphicon-trash"
+                        >
                         </span>
+                        <!-- ko if: downloadUrl -->
+                        <a data-bind="attr: { href: downloadUrl }, text: fileName" style="display: block;"></a>
+                        <!-- /ko -->
+                        <!-- ko ifnot: downloadUrl -->
+                        <span data-bind="text: fileName" style="display: block;"></span>
+                        <!-- /ko -->
+                        &ndash; <span data-bind="text: comment" style="font-style: italic"></span>
+                    </span>
                 </div>
                 <!-- /ko -->
             </div>
@@ -137,4 +142,3 @@ ${cpweb_foot}
     </div>
 </script>
 [/@dws.skin]
-
