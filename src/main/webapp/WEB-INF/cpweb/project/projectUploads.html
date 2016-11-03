@@ -94,25 +94,30 @@ ${cpweb_foot}
 
 <div class="row">
     <div class="col-sm-12">
-        <div id="downloads-container">
-            <!-- ko if: initializing -->
-            <span>Loading...</span>
-            <!-- /ko -->
+        <div data-bind="template: 'downloadsTemplate'"></div>
+    </div>
+</div>
 
-            <!-- ko ifnot: initializing -->
-            <!-- ko if: uploadComponents().length == 0 -->
-            <em>There are no uploads in this project</em>
-            <!-- /ko -->
-            <!-- ko if: uploadComponents().length != 0 -->
-            <div data-bind="foreach: uploadComponents">
-                <h1 data-bind="text: componentName"></h1>
-                <div data-bind="foreach: participants">
-                    <h3 data-bind="text: participantName"></h3>
-                    <!-- ko if: uploads().length == 0 -->
-                    <em>No uploads</em>
-                    <!-- /ko -->
-                    <!-- ko if: uploads().length != 0 -->
-                    <div class="list-group" data-bind="foreach: uploads">
+<script id="downloadsTemplate" type="text/html">
+    <div id="downloads-container">
+        <!-- ko if: initializing -->
+        <span>Loading...</span>
+        <!-- /ko -->
+
+        <!-- ko ifnot: initializing -->
+        <!-- ko if: uploadComponents().length == 0 -->
+        <em>There are no uploads in this project</em>
+        <!-- /ko -->
+        <!-- ko if: uploadComponents().length != 0 -->
+        <div data-bind="foreach: uploadComponents">
+            <h1 data-bind="text: componentName"></h1>
+            <div data-bind="foreach: participants">
+                <h3 data-bind="text: participantName"></h3>
+                <!-- ko if: uploads().length == 0 -->
+                <em>No uploads</em>
+                <!-- /ko -->
+                <!-- ko if: uploads().length != 0 -->
+                <div class="list-group" data-bind="foreach: uploads">
                         <span class="list-group-item">
                             <!-- ko if: downloadUrl -->
                             <a data-bind="attr: { href: downloadUrl }, text: fileName"></a>
@@ -123,16 +128,13 @@ ${cpweb_foot}
                             <span data-bind="text: comment"></span>
                             <span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span>
                         </span>
-                    </div>
-                    <!-- /ko -->
                 </div>
+                <!-- /ko -->
             </div>
-            <!-- /ko -->
-            <!-- /ko -->
-
         </div>
+        <!-- /ko -->
+        <!-- /ko -->
     </div>
-</div>
-
+</script>
 [/@dws.skin]
 
