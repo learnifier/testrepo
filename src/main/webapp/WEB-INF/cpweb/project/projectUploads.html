@@ -62,6 +62,9 @@ ${cpweb_foot}
                     });
                 };
                 this.uploadComponents = ko.observableArray(components);
+                this.download = function(){
+                   alert('download will be here')
+                };
             }
             var model = new UploadModel();
             ko.applyBindings(model, $("#downloads-container")[0])
@@ -100,9 +103,9 @@ ${cpweb_foot}
                     <em>No uploads</em>
                     <!-- /ko -->
                     <!-- ko if: uploads().length != 0 -->
-                    <ul data-bind="foreach: uploads">
-                        <li><span data-bind="text: fileName + ' - ' + comment"></span><span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span></li>
-                    </ul>
+                    <div class="list-group" data-bind="foreach: uploads">
+                        <span class="list-group-item"><a href="#" data-bind="text: fileName, click: $root.download"></a> <span data-bind="text: $data.comment?$data.comment:'xx'"></span> <span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span></span>
+                    </div>
                     <!-- /ko -->
                 </div>
             </div>
