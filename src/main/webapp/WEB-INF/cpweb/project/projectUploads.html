@@ -19,6 +19,35 @@ ${cpweb_foot}
     };
 
     require(['knockout', 'messenger', 'es6-shim'], function(ko) {
+        function UploadModel() {
+            var self = this;
+            this.initializing = ko.observable(true);
+            this.uploadComponents = ko.observableArray();
+            this.remove = function(upload, parent){
+                $.post(settings.removeUploadUrl, { participationId: upload.participationId, uploadId: upload.uploadId}).done(function(data){
+                    if(data.status == "ok") {
+                        var index = parent.uploads.indexOf(upload);
+                        if(index != -1) {
+                            parent.uploads.splice(index, 1);
+                        }
+                        CCBMessengerInfo("Upload deleted.");
+                    } else {
+                        CCBMessengerError("Could not delete upload.");
+                    }
+                }).fail(function(){
+                    CCBMessengerError("Could not delete upload.");
+                });
+            };
+            this.downloadUrl = function(){
+                var uploadId = this.uploadId, participationId = this.participationId;
+                var url = settings.downloadUrl + "/" + participationId + "/" + uploadId;
+                return url;
+//                    window.open(url, "_blank");
+            };
+        }
+        var model = new UploadModel();
+        ko.applyBindings(model, $("#downloads-container")[0])
+
         $.getJSON(settings.listUploadsUrl).done(function(data) {
 
             if(data.status == "ok") {
@@ -38,37 +67,12 @@ ${cpweb_foot}
                         })
                     };
                 });
+                model.uploadComponents(components);
+                model.initializing(false);
+            } else {
+                console.log("Could not fetch uploads: " + data.message);
+                CCBMessengerError("Could not fetch uploaded files.");
             }
-
-
-            function UploadModel() {
-                var self = this;
-                this.remove = function(upload, parent){
-                    $.post(settings.removeUploadUrl, { participationId: upload.participationId, uploadId: upload.uploadId}).done(function(data){
-                        if(data.status == "ok") {
-                            var index = parent.uploads.indexOf(upload);
-                            if(index != -1) {
-                                parent.uploads.splice(index, 1);
-                            }
-                            CCBMessengerInfo("Upload deleted.");
-                        } else {
-                            CCBMessengerError("Could not delete upload.");
-                        }
-                    }).fail(function(){
-                        CCBMessengerError("Could not delete upload.");
-                    });
-                };
-                this.uploadComponents = ko.observableArray(components);
-                this.downloadUrl = function(){
-                    var uploadId = this.uploadId, participationId = this.participationId;
-                    var url = settings.downloadUrl + "/" + participationId + "/" + uploadId;
-                    return url;
-//                    window.open(url, "_blank");
-                };
-            }
-            var model = new UploadModel();
-            ko.applyBindings(model, $("#downloads-container")[0])
-
         }).fail(function(jqXHR, textStatus, errorThrown){
             console.log("Could not fetch uploads: ", errorThrown);
             CCBMessengerError("Could not fetch uploaded files.");
@@ -91,6 +95,11 @@ ${cpweb_foot}
 <div class="row">
     <div class="col-sm-12">
         <div id="downloads-container">
+            <!-- ko if: initializing -->
+            <span>Loading...</span>
+            <!-- /ko -->
+
+            <!-- ko ifnot: initializing -->
             <!-- ko if: uploadComponents().length == 0 -->
             <em>There are no uploads in this project</em>
             <!-- /ko -->
@@ -108,7 +117,7 @@ ${cpweb_foot}
                             <!-- ko if: downloadUrl -->
                             <a data-bind="attr: { href: downloadUrl }, text: fileName"></a>
                             <!-- /ko -->
-                            <!-- ko if: !downloadUrl -->
+                            <!-- ko ifnot: downloadUrl -->
                             <span data-bind="text: fileName"></span>
                             <!-- /ko -->
                             <span data-bind="text: comment"></span>
@@ -118,6 +127,7 @@ ${cpweb_foot}
                     <!-- /ko -->
                 </div>
             </div>
+            <!-- /ko -->
             <!-- /ko -->
 
         </div>
