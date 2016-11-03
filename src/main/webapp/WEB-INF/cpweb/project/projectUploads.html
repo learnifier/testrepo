@@ -15,8 +15,7 @@ ${cpweb_foot}
 
     var settings = {
         listUploadsUrl: "${helper.urlFor('project.upload.UploadJsModule', 'listUploads',[prj.projectId])}",
-        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}",
-        downloadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'download')}"
+        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}"
     };
 
     require(['knockout', 'messenger', 'es6-shim'], function(ko) {
@@ -60,8 +59,11 @@ ${cpweb_foot}
                     });
                 };
                 this.uploadComponents = ko.observableArray(components);
-                this.download = function(){
-                   alert('download will be here')
+                this.downloadUrl = function(){
+                    var uploadId = this.uploadId, participationId = this.participationId;
+                    var url = settings.downloadUrl + "/" + participationId + "/" + uploadId;
+                    return url;
+//                    window.open(url, "_blank");
                 };
             }
             var model = new UploadModel();
@@ -102,7 +104,16 @@ ${cpweb_foot}
                     <!-- /ko -->
                     <!-- ko if: uploads().length != 0 -->
                     <div class="list-group" data-bind="foreach: uploads">
-                        <span class="list-group-item"><a href="#" data-bind="text: fileName, click: $root.download"></a> <span data-bind="text: $data.comment?$data.comment:'xx'"></span> <span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span></span>
+                        <span class="list-group-item">
+                            <!-- ko if: downloadUrl -->
+                            <a data-bind="attr: { href: downloadUrl }, text: fileName"></a>
+                            <!-- /ko -->
+                            <!-- ko if: !downloadUrl -->
+                            <span data-bind="text: fileName"></span>
+                            <!-- /ko -->
+                            <span data-bind="text: comment"></span>
+                            <span data-bind="click: function(){$root.remove($data, $parent);}" class="glyphicon glyphicon-trash"></span>
+                        </span>
                     </div>
                     <!-- /ko -->
                 </div>

@@ -9,7 +9,9 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
+import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
@@ -23,6 +25,7 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.service.contentrepo.util.InvalidUriException;
 import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
@@ -95,8 +98,15 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                             uploadBuilder.put("crl", json.get("crl"));
                                             uploadBuilder.put("uploadId", e.getKey());
                                             uploadBuilder.put("participationId", participant.getParticipationId());
+                                            try {
+                                                uploadBuilder.put("downloadUrl", getContentRepoClient().getDownloadUrl((String) json.get("crl")));
+                                            } catch (NotFoundException | InvalidUriException ex) {
+                                                uploadBuilder.put("downloadUrl", "");
+                                            }
                                             if(json.containsKey("comment")) {
                                                 uploadBuilder.put("comment", json.get("comment"));
+                                            } else {
+                                                uploadBuilder.put("comment", "");
                                             }
                                             final ImmutableMap<String, Object> upload = uploadBuilder.build();
 
@@ -167,12 +177,6 @@ public class UploadJsModule extends AbstractProjectJsModule {
                     "message", "Can not find upload to remove")));
         }
 
-
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of("status", "ok")));
-    }
-
-    @WebAction
-    public RequestTarget onDownload(RequestCycle cycle) {
-        return null;
     }
 }
