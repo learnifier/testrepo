@@ -42,9 +42,9 @@ public class ProductDurationDefaultValuePopulator {
 
     void populate(Map<String, String> defaultValueMap,
             Map<String, Set<ExtendedComponentFieldName>> fieldMapSet,
-            List<Component> componenents) {
+            List<Component> components) {
 
-        List<Component> allComponents = ComponentUtil.getFlatList(componenents);
+        List<Component> allComponents = ComponentUtil.getFlatList(components);
 
         Map<String, String> productDurationMap = getProductDurationMap();
         Map<String,Component> componentMap = getComponentMap(allComponents);

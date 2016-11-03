@@ -3,8 +3,6 @@
  */
 package se.dabox.cocobox.cpweb.module.core;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.unixdeveloper.druwa.DruwaApplication;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
@@ -16,15 +14,15 @@ import se.dabox.cocosite.druwa.ServiceClientFactory;
 import se.dabox.dws.client.ApiHelper;
 import se.dabox.service.branding.client.BrandingClient;
 import se.dabox.service.client.CacheClients;
+import se.dabox.service.client.ClientFactoryException;
 import se.dabox.service.client.Clients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.OrgProductClient;
-import se.dabox.service.common.ccbc.folder.OrgMaterialFolder;
 import se.dabox.service.common.ccbc.folder.OrgMaterialFolderClient;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.context.DwsExecutionContext;
 import se.dabox.service.common.context.DwsExecutionContextHelper;
 import se.dabox.service.common.context.DwsRealmHelper;
+import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.cr.ContentRepoClient;
 import se.dabox.service.common.cr.DwsContentRepoClient;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -32,8 +30,12 @@ import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient
 import se.dabox.service.common.proddir.ProductDirectoryClient;
 import se.dabox.service.coursecatalog.client.CourseCatalogClient;
 import se.dabox.service.cug.client.ClientUserGroupClient;
+import se.dabox.service.login.client.UserAccountService;
 import se.dabox.service.randdata.client.RandomDataClient;
 import se.dabox.service.webutils.druwa.DwsWebsiteConstants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -88,6 +90,16 @@ public abstract class AbstractModule {
             ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
+
+    public static CourseDesignClient getCourseDesignClient(
+            ServiceRequestCycle cycle) {
+        return CacheClients.getClient(cycle, CourseDesignClient.class);
+    }
+
+    public UserAccountService getUserAccountServiceClient(ServiceRequestCycle cycle) throws ClientFactoryException {
+        return CacheClients.getClient(cycle, UserAccountService.class);
+    }
+
 
     public static CourseCatalogClient getCourseCatalogClient(
             ServiceRequestCycle cycle) {

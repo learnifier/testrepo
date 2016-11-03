@@ -3,6 +3,7 @@
  */
 package se.dabox.cocobox.cpweb.module.project;
 
+import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.HttpMethod;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -12,6 +13,7 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.freemarker.FreemarkerRequestTarget;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import net.unixdeveloper.druwa.request.StringRequestTarget;
 import net.unixdeveloper.druwa.request.WebModuleRedirectRequestTarget;
@@ -83,6 +85,8 @@ import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.coursedesign.v1.CourseDesignInfo;
 import se.dabox.service.common.coursedesign.v1.CourseDesignXmlMutator;
 import se.dabox.service.common.coursedesign.v1.mutable.MutableCourseDesignInfo;
+import se.dabox.service.common.json.JsonException;
+import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
 import se.dabox.service.common.material.Material;
@@ -97,7 +101,9 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.ValueUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -799,6 +805,22 @@ public class ProjectModule extends AbstractProjectWebModule {
         }
     }
 
+
+    @WebAction
+    public RequestTarget onUploads(RequestCycle cycle, String strProjectId) {
+        OrgProject project =
+                getProject(cycle, strProjectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_EDIT_PROJECT);
+
+        Map<String, Object> map = createMap();
+        map.put("project", project);
+
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/projectUploads.html", map);
+    }
 
 
     private WebModuleRedirectRequestTarget toSomewhere(String projectId) {

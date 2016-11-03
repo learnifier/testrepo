@@ -178,6 +178,10 @@
             <li class="[#if selected == 'settings']active[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             [/@]
 
+            [#if dwsrt.hasFeature("uploadassignment")]
+            <li class="[#if selected == 'uploads']active[/#if]"><a href="${helper.urlFor('ProjectModule','uploads',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.uploads' /]</span></a></li>
+            [/#if]
+
         </ul>
     </nav>
     </div>
