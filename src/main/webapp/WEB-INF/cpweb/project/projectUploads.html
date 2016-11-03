@@ -20,7 +20,6 @@ ${cpweb_foot}
 
     require(['knockout', 'messenger', 'es6-shim'], function(ko) {
         function UploadModel() {
-            var self = this;
             this.initializing = ko.observable(true);
             this.uploadComponents = ko.observableArray();
             this.remove = function(upload, parent){
@@ -42,7 +41,6 @@ ${cpweb_foot}
                 var uploadId = this.uploadId, participationId = this.participationId;
                 var url = settings.downloadUrl + "/" + participationId + "/" + uploadId;
                 return url;
-//                    window.open(url, "_blank");
             };
         }
         var model = new UploadModel();
@@ -53,16 +51,25 @@ ${cpweb_foot}
             if(data.status == "ok") {
                 // Knockout can't handle hashes, so lets restructure the data from
                 // hash to array of hash with name and value.
-                // TODO: I sort in cid and userId, should be names or possibly a counter.
                 var components = Object.keys(data.result).sort().map(function(cid){
                     var componentMap = data.result[cid];
                     return {
                         cid: cid, componentName: componentMap.componentName,
                         participants: Object.keys(componentMap.component).sort().map(function(userId){
-                            var component = componentMap.component;
+                            var component = componentMap.component, uploads;
+                            uploads = component[userId].uploads.sort(function(a, b){
+                                if (a.uploadId > b.uploadId) {
+                                    return 1;
+                                }
+                                if (a.uploadId < b.uploadId) {
+                                    return -1;
+                                }
+                                return 0;
+
+                            });
                             return {
                                 participantName: component[userId].participantName,
-                                uploads: ko.observableArray(component[userId].uploads)
+                                uploads: ko.observableArray(uploads)
                             }
                         })
                     };
