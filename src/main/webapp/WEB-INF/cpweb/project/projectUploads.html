@@ -18,23 +18,28 @@ ${cpweb_foot}
         removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}"
     };
 
-    require(['knockout', 'messenger', 'es6-shim'], function(ko) {
+    require(['knockout', 'messenger', 'es6-shim', 'dabox-common'], function(ko) {
         function UploadModel() {
             this.initializing = ko.observable(true);
             this.uploadComponents = ko.observableArray();
             this.remove = function(upload, parent){
-                $.post(settings.removeUploadUrl, { participationId: upload.participationId, uploadId: upload.uploadId}).done(function(data){
-                    if(data.status == "ok") {
-                        var index = parent.uploads.indexOf(upload);
-                        if(index != -1) {
-                            parent.uploads.splice(index, 1);
+                cocobox.confirmationDialog("Delete upload?", "Do you want to delete this upload?", function() {
+                    $.post(settings.removeUploadUrl, {
+                        participationId: upload.participationId,
+                        uploadId: upload.uploadId
+                    }).done(function (data) {
+                        if (data.status == "ok") {
+                            var index = parent.uploads.indexOf(upload);
+                            if (index != -1) {
+                                parent.uploads.splice(index, 1);
+                            }
+                            CCBMessengerInfo("Upload deleted.");
+                        } else {
+                            CCBMessengerError("Could not delete upload.");
                         }
-                        CCBMessengerInfo("Upload deleted.");
-                    } else {
+                    }).fail(function () {
                         CCBMessengerError("Could not delete upload.");
-                    }
-                }).fail(function(){
-                    CCBMessengerError("Could not delete upload.");
+                    });
                 });
             };
             this.downloadUrl = function(){
