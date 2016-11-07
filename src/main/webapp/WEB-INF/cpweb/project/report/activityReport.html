@@ -31,16 +31,24 @@ ${cpweb_foot}
                     $('#r_project_activity').html($('<td class="errormessage">').text('We were unable to generate this report right now. Please, try again later.'));
                 },
                 success: function(data) {
-                  if (data.aaData[0].activities != undefined ) {
-                      data.aaData = manipulateData(data.aaData);
-                      var activities = data.aaData[0].activities;
-                      var activityCount = activities.length;
-                      extractCols(activities, activityCount);
-                      renderColDefs(activityCount);
-                      initializeTable(data.aaData);
-                    } else {
-                      $('#r_project_activity').html($('<td class="errormessage">').text('There are no activities to report on in this project. Please, add an activity and come back to generate this report.'));
+                    //Find a row that has activities
+                    for(var i = 0; i<data.aaData.length; i++) {
+                        if (data.aaData[i].activities === undefined) {
+                            continue;
+                        }
+                        data.aaData = manipulateData(data.aaData);
+                        var activities = data.aaData[i].activities;
+                        var activityCount = activities.length;
+                        extractCols(activities, activityCount);
+                        renderColDefs(activityCount);
+                        initializeTable(data.aaData, activities);
+                        return;
                     }
+
+                    $('#r_project_activity').
+                            html($('<td class="errormessage">').
+                            text('There are no activities to report on in this project. Please, add an activity and come back to generate this report.'));
+
                 }
             });
 
@@ -95,11 +103,15 @@ ${cpweb_foot}
                             return data + " of " + (activityCount-1);
                         };
                     } else if (i === 0) {
-                        enderFn = function(data) {
+                        renderFn = function(data) {
                             return data;
                         };
                     } else {
                         renderFn = function(data) {
+                            if (data === undefined) {
+                                return "";
+                            }
+
                             return statusNames[data];
                         };
                     }
@@ -129,9 +141,9 @@ ${cpweb_foot}
                 };
             };
 
-            function generateFooter(JSONdata) {
+            function generateFooter(JSONdata, activities) {
                 var sumColumns = [];
-                for (var i = 0; i < JSONdata[0].activities.length - 1; i++) {
+                for (var i = 0; i < activities.length - 1; i++) {
                     sumColumns[i] = 0;
                 }
 
@@ -168,7 +180,7 @@ ${cpweb_foot}
                 $(nFootRelativeRow).append($('<td>'));
             }
 
-            function initializeTable(JSONdata) {
+            function initializeTable(JSONdata, activities) {
                 oTable = $('#r_project_activity').dataTable({
                     "columns": tableJSON,
                     "dom": '<"row"<"col-sm-6"f><"col-sm-6"T>><"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
@@ -202,7 +214,7 @@ ${cpweb_foot}
                     }
                 });
 
-                generateFooter(JSONdata);
+                generateFooter(JSONdata, activities);
             };
        });
     });
