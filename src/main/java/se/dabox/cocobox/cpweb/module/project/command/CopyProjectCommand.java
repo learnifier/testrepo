@@ -1,9 +1,12 @@
 package se.dabox.cocobox.cpweb.module.project.command;
 
 import net.unixdeveloper.druwa.RequestCycle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.AlreadyExistsException;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.project.MissingProjectProductException;
 import se.dabox.service.common.ccbc.project.NewProjectRequest;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.Project;
@@ -45,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -58,6 +62,9 @@ import java.util.stream.Stream;
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
 public class CopyProjectCommand extends AbstractCopyCommand {
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(CopyProjectCommand.class);
 
     public CopyProjectCommand(RequestCycle cycle) {
         super(cycle);
@@ -120,16 +127,35 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         final MutableCourseDesignDefinition mutableCdd = decodedDesign.toMutable();
 
 
-        // 3. Get list of local products we should copy from old cdd.
-        Set<Product> localComponents = getLocalComponents(mutableCdd);
+        // 3. Get a partitioned list of local/other products
+        Map<Boolean, List<Product>> partProducts = getPartitionedProducts(mutableCdd);
+        List<Product> localProducts = partProducts.get(true);
+        List<Product> otherProducts = partProducts.get(false);
 
-        // 4. Copy them
-        HashMap<ProductId, ProductId> replaceHash = copyProjectProducts(caller, localComponents, newProject);
+        // 4.1 Copy local products
+        HashMap<ProductId, ProductId> replaceHash = copyProjectProducts(caller, localProducts, newProject);
+
+        // 4.2 Activate other products
+        otherProducts.forEach(p -> {
+            AddProjectProductRequestBuilder reqBuilder = new AddProjectProductRequestBuilder();
+            reqBuilder.setProductId(p.getId().getId());
+            reqBuilder.setProjectId(newProject.getProjectId());
+            reqBuilder.setSkipActivation(true);
+
+            try {
+                getProjectMaterialCoordinatorClient(cycle).addProjectProduct(reqBuilder.build());
+            } catch (MissingProjectProductException mppe) {
+                LOGGER.warn("Product {} is not available for client. Ignoring it.", p.getId().
+                        getId());
+            } catch (Exception ex) {
+                LOGGER.warn("Failed to add product, ignoring error.", ex);
+            }
+        });
 
         // 5. Replace old products with the new copies in cdd
         new ReplaceCddMaterials(mutableCdd).replaceProducts(replaceHash);
 
-        // 4. Create the new design
+        // 6. Create the new design
         final CourseDesignDefinition cdd = mutableCdd.toCourseDesignDefinition();
 
         String cddXml = CddCodec.encode(cdd);
@@ -162,7 +188,7 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         long databankId = ccbc.createDatabank(0, newProject.getProjectId());
 
         upr.setStageDatabank(databankId);
-        upr.setDesignId(newDesignId);
+//        upr.setDesignId(newDesignId);
         upr.setStageDesignId(newDesignId);
         ccbc.updateOrgProject(upr.createUpdateProjectRequest());
 
@@ -170,10 +196,10 @@ public class CopyProjectCommand extends AbstractCopyCommand {
     }
 
     private void processComponent(MutableComponent component, Set<ProductId> candidates) {
-            final ProductId id = ComponentUtil.getProductId(component);
-            if(id != null) {
-                candidates.add(id);
-            }
+        final ProductId id = ComponentUtil.getProductId(component);
+        if(id != null) {
+            candidates.add(id);
+        }
 
         final List<MutableComponent> children = component.getChildren();
         if(children != null) {
@@ -188,7 +214,7 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         }
     }
 
-    private Set<Product> getLocalComponents(MutableCourseDesignDefinition mutableCdd) {
+    private Map<Boolean, List<Product>> getPartitionedProducts(MutableCourseDesignDefinition mutableCdd) {
         Set<ProductId> candidates = new HashSet<>();
         final List<MutableComponent> components = mutableCdd.getComponents();
         components.forEach(c -> processComponent(c, candidates));
@@ -205,10 +231,10 @@ public class CopyProjectCommand extends AbstractCopyCommand {
         final ProductDirectoryClient pdClient = CacheClients.getClient(cycle, ProductDirectoryClient.class);
         List<Product> ps = pdClient.getProducts(candidates.stream().map(ProductId::getId).collect(Collectors.toList()));
 
-        return ps.stream().filter(Product::isProjectProduct).collect(Collectors.toSet());
+        return ps.stream().collect(Collectors.partitioningBy(Product::isProjectProduct));
     }
 
-    private HashMap<ProductId, ProductId> copyProjectProducts(long caller, Set<Product> ps, OrgProject toProject) {
+    private HashMap<ProductId, ProductId> copyProjectProducts(long caller, List<Product> ps, OrgProject toProject) {
         return ps.stream().collect(HashMap<ProductId, ProductId>::new,
                 (m, p) -> {
                     Product copied = p.copy();
