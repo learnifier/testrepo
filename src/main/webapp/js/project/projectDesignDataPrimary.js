@@ -31,6 +31,34 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
 
         }
 
+        $(document).on('click', '.copy-place', function(){
+           var $button = $(this),
+               id = $button.data('copy-place-id'),
+               val = $('#' + id).closest('.details').find('.locUrl input').val(),
+               valExtra = $('#' + id).closest('.details').find('.locUrlExtra input').val();
+            console.log("Do copy " + id);
+            console.log("Val = ", val);
+            $(".locUrl input").each(function(){
+                var $locUrl = $(this);
+                console.log("Candidate: ", $locUrl);
+                console.log("Candidate: ", $locUrl.val());
+                if(!$locUrl.val()) {
+                    $locUrl.val(val)
+                }
+            });
+            // TODO: Should lookup both values at once
+            $(".locUrlExtra input").each(function(){
+                var $locUrlExtra = $(this);
+                console.log("Candidate2: ", $locUrlExtra);
+                console.log("Candidate2: ", $locUrlExtra.val());
+                if(!$locUrlExtra.val()) {
+                    $locUrlExtra.val(valExtra)
+                }
+            });
+
+
+        });
+
         function createMapsUrl(place) {
 
             var longLat;
@@ -88,6 +116,7 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
         place: true,
         required: false
     });
+
 
     validator.element("input[type=locUrlExtra]");
 
