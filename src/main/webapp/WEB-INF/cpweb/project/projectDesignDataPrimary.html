@@ -160,10 +160,12 @@ ${cpweb_head}
 [/#if]
 
 <label for="f${component.cid}_${field.name}" class="control-label">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
-<input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
+<div style="position: relative">
+<input style="right: 30px" type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
 [#if field.name = 'locUrlExtra']<span style="display: none" class="copy-place glyph glyphicon glyphicon-copy" data-copy-place-id="f${component.cid}_${field.name}" title="Copy this place to all empty fields"><span>[/#if]
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
+</div>
 [/#if]
 [#if field.dataType == "DATETIME"]
 <span class="pull-right">  ${prj.timezone.getDisplayName(userLocale)?xhtml}</span>
