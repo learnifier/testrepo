@@ -160,10 +160,10 @@ ${cpweb_head}
 [/#if]
 
 <label for="f${component.cid}_${field.name}" class="control-label">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
-<div style="align-items: center; flex: 1 0 0px;">
-    <div style="vertical-align: middle;width: 100%;-webkit-box-flex: 1;padding: 0.5rem 0.5rem 0.5rem 1rem; font-size: 1rem; border-radius: 6px; border: 0px; outline: 0px; background-color: white;">
-        <div style="vertical-align: middle;width: 100%;-webkit-box-flex: 1;display: table-cell;">
-            <input style="padding: 0px; border: 0px; outline: 0px; font-size: 1.2rem; width: 100%; background-color: white; margin-right: 0.5rem;" type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
+<div style="align-items: center;">
+    <div style="vertical-align: middle;width: 100%;">
+        <div style="vertical-align: middle;width: 100%;display: table-cell;">
+            <input type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
         </div>
         [#if field.name = 'locUrlExtra']
         <div style="display: table-cell;vertical-align: middle;padding-left: .5rem;">
