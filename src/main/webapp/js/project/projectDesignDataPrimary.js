@@ -23,7 +23,9 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
 
                 console.log(mapsUrl);
                 //log($(elementId).closest('.details').find('.locUrl input'));
+                console.log("X1: ", $('#' + elementId));
                 $('#' + elementId).next(".copy-place").show();
+                console.log("X1: ", $('#' + elementId).next(".copy-place"));
 
                 $('#' + elementId).next('label.error').remove();
 
