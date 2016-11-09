@@ -160,11 +160,21 @@ ${cpweb_head}
 [/#if]
 
 <label for="f${component.cid}_${field.name}" class="control-label">[@dws.txt key="cpweb.designdata.field."+field.name /]</label>
-<div style="position: relative">
-<input style="right: 30px" type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
-[#if field.name = 'locUrlExtra']<span style="display: none" class="copy-place glyph glyphicon glyphicon-copy" data-copy-place-id="f${component.cid}_${field.name}" title="Copy this place to all empty fields"><span>[/#if]
+<div style="align-items: center; flex: 1 0 0px;">
+    <div style="vertical-align: middle;width: 100%;-webkit-box-flex: 1;padding: 0.5rem 0.5rem 0.5rem 1rem; font-size: 1rem; border-radius: 6px; border: 0px; outline: 0px; background-color: white;">
+        <div style="vertical-align: middle;width: 100%;-webkit-box-flex: 1;display: table-cell;">
+            <input style="padding: 0px; border: 0px; outline: 0px; font-size: 1.2rem; width: 100%; background-color: white; margin-right: 0.5rem;" type="${fieldType}" ${extraAttrs} id="f${component.cid}_${field.name}" name="f${component.cid}_${field.name}" value="[@fieldValue fname /]" data-ccbfieldname="${field.name}" class="form-control [#if field.name = 'locUrlExtra']place[/#if]" [#if field.mandatory]required[/#if] />
+        </div>
+        [#if field.name = 'locUrlExtra']
+        <div style="display: table-cell;vertical-align: middle;padding-left: .5rem;">
+            <span style="display: block; cursor: pointer;" class="copy-place glyph glyphicon glyphicon-copy" data-copy-place-id="f${component.cid}_${field.name}" title="Copy this place to all empty fields"></span>
+        </div>
+        [/#if]
+    </div>
+</div>
 [#if field.name = "duration"]
 <span style="font-weight: bold;">  min</span>
+</div>
 </div>
 [/#if]
 [#if field.dataType == "DATETIME"]
