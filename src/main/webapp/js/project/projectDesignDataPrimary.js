@@ -13,6 +13,7 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
 
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
                 var place = autocomplete.getPlace();
+                console.log("place_changed", place);
                 if (!place.geometry) {
                     return;
                 }
@@ -22,6 +23,9 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
 
                 console.log(mapsUrl);
                 //log($(elementId).closest('.details').find('.locUrl input'));
+                console.log("X1: ", $('#' + elementId));
+                $('#' + elementId).next(".copy-place").show();
+                console.log("X1: ", $('#' + elementId).next(".copy-place"));
 
                 $('#' + elementId).next('label.error').remove();
 
@@ -30,6 +34,37 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
             });
 
         }
+
+        $(document).on('change', '.locUrl input', function(){
+            console.log("Change locUrl: ", $(this).val());
+        });
+
+        // Remove copy button if field is emptied.
+        $(".locUrlExtra input").each(function(){
+            if($(this).val()) {
+                $(this).next(".copy-place").show();
+            }
+        });
+        $(document).on('change', '.locUrlExtra input', function(){
+            if(!$(this).val()) {
+                $(this).next(".copy-place").hide();
+            }
+        });
+
+        $(document).on('click', '.copy-place', function(){
+           var $button = $(this),
+               id = $button.data('copy-place-id'),
+               val = $('#' + id).closest('.details').find('.locUrl input').val(),
+               valExtra = $('#' + id).closest('.details').find('.locUrlExtra input').val();
+            $(".locUrl input").each(function(){
+                var $locUrl = $(this),
+                    $locUrlExtra = $(this).closest('li').next().find('input');
+                if(!$locUrl.val()) {
+                    $locUrl.val(val);
+                    $locUrlExtra.val(valExtra);
+                }
+            });
+        });
 
         function createMapsUrl(place) {
 
@@ -88,6 +123,7 @@ define([ccbPage.googleMapsEnabled ? 'async!//maps.googleapis.com/maps/api/js?v=3
         place: true,
         required: false
     });
+
 
     validator.element("input[type=locUrlExtra]");
 
