@@ -823,9 +823,20 @@ public class ProjectModule extends AbstractProjectWebModule {
     }
 
 
-    private WebModuleRedirectRequestTarget toSomewhere(String projectId) {
-        return new WebModuleRedirectRequestTarget(ProjectModule.class, "roster",
-                projectId);
+    @WebAction
+    public RequestTarget onEvents(RequestCycle cycle, String strProjectId) {
+        OrgProject project =
+                getProject(cycle, strProjectId);
+
+        checkPermission(cycle, project);
+        checkProjectPermission(cycle, project, CocoboxPermissions.CP_VIEW_PROJECT);
+
+        Map<String, Object> map = createMap();
+        map.put("project", project);
+
+        addCommonMapValues(map, project, cycle);
+
+        return new FreemarkerRequestTarget("/project/projectEvents.html", map);
     }
 
 
