@@ -1,0 +1,84 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+${cpweb_head}
+
+[/#assign]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    "use strict";
+    $('#menu-projects').addClass('active');
+
+    var settings = {
+        listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents',[prj.projectId])}"
+    };
+
+    require(['knockout', 'messenger', 'es6-shim', 'dabox-common'], function(ko) {
+        function EventsModel() {
+            this.initializing = ko.observable(true);
+            this.events = ko.observableArray();
+        }
+        var model = new EventsModel();
+        ko.applyBindings(model, $("#events-container")[0])
+
+        $.getJSON(settings.listEventsUrl).done(function(data) {
+
+            if(data.status == "ok") {
+                console.log("WE got data: ", data);
+                model.events(data.result);
+                model.initializing(false);
+            } else {
+                console.log("Could not fetch events: " + data.message);
+                CCBMessengerError("Could not fetch list of events.");
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown){
+            console.log("Could not fetch events: ", errorThrown);
+            CCBMessengerError("Could not fetch list of events.");
+        });
+    });
+
+</script>
+
+
+[/#assign]
+
+[#assign title = (prj.name!'') + " events ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
+
+[@pInfo.projectInfo selected="events"][/@pInfo.projectInfo] <!-- remove if we decide to skip tabs here -->
+
+
+<h1>[@dws.txt key="cpweb.project.events.title" /]</h1>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div data-bind="template: 'eventsTemplate'"></div>
+    </div>
+</div>
+
+<script id="eventsTemplate" type="text/html">
+    <div id="events-container">
+        <!-- ko if: initializing -->
+        <span>Loading...</span>
+        <!-- /ko -->
+
+        <!-- ko ifnot: initializing -->
+        <!-- ko if: events().length == 0 -->
+        <em>There are no events in this project</em>
+        <!-- /ko -->
+        <!-- ko if: events().length != 0 -->
+        <div data-bind="foreach: events">
+            <h1 data-bind="text: properties.title"></h1>
+            <div data-bind="foreach: participants">
+                an event
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+</script>
+[/@dws.skin]
