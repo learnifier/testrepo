@@ -24,15 +24,21 @@ import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.service.common.mailsender.pmt.Part;
 import se.dabox.service.contentrepo.util.InvalidUriException;
 import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static sun.misc.VM.getState;
 
 /**
  *
@@ -53,7 +59,27 @@ public class EventJsModule extends AbstractProjectJsModule {
         checkPermission(cycle, project, strProjectId, LOGGER);
 
         final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
+        final List<Map<String, Object>> eventPart;
+        if(participations == null) {
+            eventPart = Collections.emptyList();
+        } else {
+            final List<Long> userIds = participations.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+            final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
 
+            // TODO: The eventPart array need to be remade per event once we have the event participation info available.
+            eventPart = participations.stream()
+                    .filter(p -> uaMap.containsKey(p.getUserId()))
+                    .map(p -> {
+                        final UserAccount ua = uaMap.get(p.getUserId());
+                        return ImmutableMap.<String, Object>of(
+                                "userId", ua.getUserId(),
+                                "displayName", ua.getDisplayName(),
+                                "email", ua.getPrimaryEmail(),
+                                "eventState", getState()
+                        );
+                    })
+                    .collect(Collectors.toList());
+        }
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
         if(design == null) {
@@ -62,9 +88,17 @@ public class EventJsModule extends AbstractProjectJsModule {
                     "result", Collections.emptyList())));
         }
 
+
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-        final List<Component> events = cdd.getAllComponents().stream()
+        final List<Map<String, Object>> events = cdd.getAllComponents().stream()
                 .filter(c -> c.getType().startsWith("ev_"))
+                .map(c ->
+                        ImmutableMap.of(
+                                "cid", c.getCid(),
+                                "title", c.getProperties().getOrDefault("title", "(Unnamed event)"),
+                                "participants", eventPart
+                        )
+                )
                 .collect(Collectors.toList());
 
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
@@ -72,4 +106,50 @@ public class EventJsModule extends AbstractProjectJsModule {
                 "result", events)));
     }
 
+    @WebAction
+    public RequestTarget onChangeEventState(RequestCycle cycle) {
+
+        final WebRequest req = cycle.getRequest();
+        final String strParticipationId = req.getParameter("participationId");
+        final String eventCid = req.getParameter("eventCid");
+        final String strState = req.getParameter("state");
+
+        if(strParticipationId == null || "".equals(strParticipationId)) {
+            throw new IllegalArgumentException("participationId missing");
+        }
+        if(eventCid == null || "".equals(eventCid)) {
+            throw new IllegalArgumentException("eventCid missing");
+        }
+
+        if(strState == null || "".equals(strState)) {
+            throw new IllegalArgumentException("state missing");
+        }
+
+        final ParticipantEventState state;
+        try {
+            state = ParticipantEventState.valueOf(strState);
+        } catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("invalid state");
+        }
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final ProjectParticipation participation = ccbc.getProjectParticipation(Long.valueOf(strParticipationId));
+
+        OrgProject project = ccbc.getProject(participation.getProjectId());
+        checkPermission(cycle, project);
+
+        // TODO: Actually change state...
+
+        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+                "status", "ok",
+                "state", state.toString()
+        )));
+    }
+
+
+    static Random rand = new Random(); // TODO: Just for testing before we implement event participations for real.
+    private ParticipantEventState getState() {
+        final ParticipantEventState[] vals = ParticipantEventState.values();
+        return vals[rand.nextInt(vals.length)];
+    }
 }
