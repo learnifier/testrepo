@@ -14,31 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.NotFoundException;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
-import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
-import se.dabox.service.common.coursedesign.v1.Component;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
-import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
-import se.dabox.service.common.mailsender.pmt.Part;
-import se.dabox.service.contentrepo.util.InvalidUriException;
 import se.dabox.service.login.client.UserAccount;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static sun.misc.VM.getState;
 
 /**
  *
@@ -125,9 +113,9 @@ public class EventJsModule extends AbstractProjectJsModule {
             throw new IllegalArgumentException("state missing");
         }
 
-        final ParticipantEventState state;
+        final ParticipationEventState state;
         try {
-            state = ParticipantEventState.valueOf(strState);
+            state = ParticipationEventState.valueOf(strState);
         } catch(IllegalArgumentException e) {
             throw new IllegalArgumentException("invalid state");
         }
@@ -148,8 +136,8 @@ public class EventJsModule extends AbstractProjectJsModule {
 
 
     static Random rand = new Random(); // TODO: Just for testing before we implement event participations for real.
-    private ParticipantEventState getState() {
-        final ParticipantEventState[] vals = ParticipantEventState.values();
+    private ParticipationEventState getState() {
+        final ParticipationEventState[] vals = ParticipationEventState.values();
         return vals[rand.nextInt(vals.length)];
     }
 }
