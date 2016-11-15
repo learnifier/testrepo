@@ -69,6 +69,17 @@ public class EventJsModule extends AbstractProjectJsModule {
                     .collect(Collectors.toList());
         }
 
+
+        final Map<Long, List<ParticipationEvent>> participationEvents;
+
+        if(participations != null) {
+            participationEvents = ParticipationEventHelper.getParticipationEvents(cycle, participations.stream().map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
+        } else {
+            participationEvents = Collections.emptyMap();
+        }
+
+        // We now have a map from userId -> UserAccount and map from participationId -> ParticipationEvent.
+
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
         if(design == null) {
             return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
