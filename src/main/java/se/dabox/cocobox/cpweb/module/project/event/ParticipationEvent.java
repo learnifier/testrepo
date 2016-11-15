@@ -10,11 +10,17 @@ public class ParticipationEvent {
     private final ParticipationEventState state;
     private final Date updated;
     private final ParticipationEventChannel channel;
+    private final String cid;
 
-    public ParticipationEvent(ParticipationEventState state, Date updated, ParticipationEventChannel channel) {
+    public ParticipationEvent(String cid, ParticipationEventState state, Date updated, ParticipationEventChannel channel) {
+        this.cid = cid;
         this.state = state;
         this.updated = updated;
         this.channel = channel;
+    }
+
+    public String getCid() {
+        return cid;
     }
 
     public ParticipationEventState getState() {
@@ -35,6 +41,7 @@ public class ParticipationEvent {
                 "state=" + state +
                 ", updated=" + updated +
                 ", channel=" + channel +
+                ", cid='" + cid + '\'' +
                 '}';
     }
 }

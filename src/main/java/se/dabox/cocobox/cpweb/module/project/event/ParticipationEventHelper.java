@@ -2,13 +2,20 @@ package se.dabox.cocobox.cpweb.module.project.event;
 
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
+import se.dabox.service.common.json.JsonException;
+import se.dabox.service.common.json.JsonUtils;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -19,20 +26,67 @@ public class ParticipationEventHelper {
 
     private static final String EVENT_PREFIX = "event.";
 
-    static List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(EventJsModule.class);
+
+    public static List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final ProjectParticipationState state = ccbc.getParticipationState(participationId);
         final Map<String, String> stateMap = state.getMap();
 
         if (stateMap != null) {
-            final Stream<Map.Entry<String, String>> entryStream = stateMap.entrySet().stream()
-                    .filter(e ->
-                            e.getKey() != null && e.getKey().startsWith(EVENT_PREFIX));
+            final List<ParticipationEvent> events = stateMap.entrySet().stream()
+                    .filter(e -> e.getKey() != null && e.getKey().startsWith(EVENT_PREFIX))
+                    .map(e -> fromJson(e.getKey(), e.getValue()))
+                    .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
+                    .collect(Collectors.toList());
+            return events;
         }
         return Collections.emptyList();
     }
 
-    public static CocoboxCoordinatorClient getCocoboxCordinatorClient(
+    private static Optional<ParticipationEvent> fromJson(String stateName, String jsonString) {
+        // TODO: Should use json annotation somehow to create ParticipationEvent objects.
+        final String cid = stateName.substring(EVENT_PREFIX.length()); // event.{cid}
+        try {
+            final Map<String, ?> json = JsonUtils.decode(jsonString);
+
+            ParticipationEventState state = null;
+            if(json.containsKey("state")) {
+                try {
+                    state = ParticipationEventState.valueOf((String) json.get("state"));
+                } catch(IllegalArgumentException|NullPointerException e) {
+                    LOGGER.warn("Ignoring event with malformed state data: {}", json.get("state"));
+                    return Optional.empty();
+                }
+            }
+
+            ParticipationEventChannel channel = null;
+            if(json.containsKey("channel")) {
+                try {
+                    channel = ParticipationEventChannel.valueOf((String) json.get("channel"));
+                } catch(IllegalArgumentException|NullPointerException e) {
+                    LOGGER.warn("Ignoring event with malformed channel data: {}", json.get("channel"));
+                    return Optional.empty();
+                }
+            }
+
+            Date updated = null;
+//            if(json.containsKey("updated")) {
+//                try {
+//                    updated =  json.get("updated")); // Not sure what date format i will have
+//                } catch(IllegalArgumentException|NullPointerException e) {
+//                    LOGGER.warn("Ignoring malformed date: {}", json.get("updated"));
+//                }
+//            }
+
+            return Optional.of(new ParticipationEvent(cid, state, updated, channel));
+        } catch(JsonException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static CocoboxCoordinatorClient getCocoboxCordinatorClient(
             ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }
