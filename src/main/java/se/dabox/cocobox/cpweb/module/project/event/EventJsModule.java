@@ -110,6 +110,7 @@ public class EventJsModule extends AbstractProjectJsModule {
                                         .put("displayName", ua.getDisplayName() != null ? ua.getDisplayName() : "(unnamed participant)") // TODO: What do i do when these vals are empty?)
                                         .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)");
 
+                                partB.put("participationId", participation.getParticipationId());
                                 final List<ParticipationEvent> pes = participationEvents.getOrDefault(participation, Collections.emptyList());
                                 pes.stream().filter(pe -> cidStr.equals(pe.getCid()))
                                         .findFirst().map(pe -> {
@@ -138,7 +139,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         final WebRequest req = cycle.getRequest();
         final String strParticipationId = req.getParameter("participationId");
-        final String eventCid = req.getParameter("eventCid");
+        final String eventCid = req.getParameter("cid");
         final String strState = req.getParameter("state");
 
         if(strParticipationId == null || "".equals(strParticipationId)) {
