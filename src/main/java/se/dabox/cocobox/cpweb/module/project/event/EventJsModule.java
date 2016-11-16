@@ -110,16 +110,19 @@ public class EventJsModule extends AbstractProjectJsModule {
                                         .put("displayName", ua.getDisplayName() != null ? ua.getDisplayName() : "(unnamed participant)") // TODO: What do i do when these vals are empty?)
                                         .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)");
 
-                                final List<ParticipationEvent> pes = participationEvents.get(participation);
-                                if(pes != null) {
-                                    pes.stream()
-                                            .filter(pe -> cidStr.equals(pe.getCid()))
-                                            .findFirst().ifPresent(pe -> {
-                                        partB.put("eventState", pe.getState());
-                                        partB.put("channel", pe.getChannel());
-                                        partB.put("updated", pe.getUpdated());
-                                    });
-                                }
+                                final List<ParticipationEvent> pes = participationEvents.getOrDefault(participation, Collections.emptyList());
+                                pes.stream().filter(pe -> cidStr.equals(pe.getCid()))
+                                        .findFirst().map(pe -> {
+                                    partB.put("eventState", pe.getState());
+                                    partB.put("channel", pe.getChannel());
+                                    partB.put("updated", pe.getUpdated());
+                                    return null;
+                                }).orElseGet(() -> {
+                                    partB.put("eventState", "");
+                                    partB.put("channel", "");
+                                    partB.put("updated", "");
+                                    return null;
+                                });
                                 return partB.build();
                             }).collect(Collectors.toList()));
                 }).collect(Collectors.toList());
