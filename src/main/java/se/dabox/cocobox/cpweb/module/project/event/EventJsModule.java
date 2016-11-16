@@ -55,18 +55,18 @@ public class EventJsModule extends AbstractProjectJsModule {
             final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
 
             // TODO: The eventPart array need to be remade per event once we have the event participation info available.
-            eventPart = participations.stream()
-                    .filter(p -> uaMap.containsKey(p.getUserId()))
-                    .map(p -> {
-                        final UserAccount ua = uaMap.get(p.getUserId());
-                        return ImmutableMap.<String, Object>of(
-                                "userId", ua.getUserId(),
-                                "displayName", ua.getDisplayName(),
-                                "email", ua.getPrimaryEmail(),
-                                "eventState", getState()
-                        );
-                    })
-                    .collect(Collectors.toList());
+//            eventPart = participations.stream()
+//                    .filter(p -> uaMap.containsKey(p.getUserId()))
+//                    .map(p -> {
+//                        final UserAccount ua = uaMap.get(p.getUserId());
+//                        return ImmutableMap.<String, Object>of(
+//                                "userId", ua.getUserId(),
+//                                "displayName", ua.getDisplayName(),
+//                                "email", ua.getPrimaryEmail(),
+//                                "eventState", getState()
+//                        );
+//                    })
+//                    .collect(Collectors.toList());
         }
 
 
@@ -87,7 +87,6 @@ public class EventJsModule extends AbstractProjectJsModule {
                     "result", Collections.emptyList())));
         }
 
-
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
         final List<Map<String, Object>> events = cdd.getAllComponents().stream()
                 .filter(c -> c.getType().startsWith("ev_"))
@@ -95,7 +94,7 @@ public class EventJsModule extends AbstractProjectJsModule {
                         ImmutableMap.of(
                                 "cid", c.getCid(),
                                 "title", c.getProperties().getOrDefault("title", "(Unnamed event)"),
-                                "participants", eventPart
+                                "participants", participationEvents
                         )
                 )
                 .collect(Collectors.toList());
@@ -104,6 +103,7 @@ public class EventJsModule extends AbstractProjectJsModule {
                 "status", "ok",
                 "result", events)));
     }
+
 
     @WebAction
     public RequestTarget onChangeEventState(RequestCycle cycle) {

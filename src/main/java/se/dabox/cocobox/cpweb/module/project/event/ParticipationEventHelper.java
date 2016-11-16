@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * Helper class to read/write event participation data.
+ *
+ * TODO: I intend to make this more generic, so it can be used for all participation state data that is saved in json format.
+ *
+ * TODO: Should perhaps add functions to return data mapped on cid.
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
