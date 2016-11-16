@@ -100,6 +100,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
                     return ImmutableMap.of(
                             "cid", component.getCid(),
+                            "title", component.getProperties().getOrDefault("title", "(Unnamed event)"),
                             "participations", participations.stream().map(participation -> {
                                 UserAccount ua = uaMap.get(participation.getUserId());
                                 return ImmutableMap.of(
