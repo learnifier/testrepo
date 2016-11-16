@@ -13,6 +13,7 @@ import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
+import se.dabox.cocobox.cpweb.module.project.roster.ParticipationIdProjectProductDeleteCheck;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
@@ -20,12 +21,15 @@ import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.service.common.mailsender.pmt.Part;
 import se.dabox.service.login.client.UserAccount;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -47,36 +51,16 @@ public class EventJsModule extends AbstractProjectJsModule {
         checkPermission(cycle, project, strProjectId, LOGGER);
 
         final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
-        final List<Map<String, Object>> eventPart;
         if(participations == null) {
-            eventPart = Collections.emptyList();
-        } else {
-            final List<Long> userIds = participations.stream().map(p -> p.getUserId()).collect(Collectors.toList());
-            final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
-
-            // TODO: The eventPart array need to be remade per event once we have the event participation info available.
-//            eventPart = participations.stream()
-//                    .filter(p -> uaMap.containsKey(p.getUserId()))
-//                    .map(p -> {
-//                        final UserAccount ua = uaMap.get(p.getUserId());
-//                        return ImmutableMap.<String, Object>of(
-//                                "userId", ua.getUserId(),
-//                                "displayName", ua.getDisplayName(),
-//                                "email", ua.getPrimaryEmail(),
-//                                "eventState", getState()
-//                        );
-//                    })
-//                    .collect(Collectors.toList());
+            return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+                    "status", "ok",
+                    "result", Collections.emptyList())));
         }
+        final List<Long> userIds = participations.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+        final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
 
-
-        final Map<Long, List<ParticipationEvent>> participationEvents;
-
-        if(participations != null) {
-            participationEvents = ParticipationEventHelper.getParticipationEvents(cycle, participations.stream().map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
-        } else {
-            participationEvents = Collections.emptyMap();
-        }
+        // Hashed on participationId
+        final Map<Long, List<ParticipationEvent>> participationEvents = ParticipationEventHelper.getParticipationEvents(cycle, participations.stream().map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         // We now have a map from userId -> UserAccount and map from participationId -> ParticipationEvent.
 
@@ -88,16 +72,44 @@ public class EventJsModule extends AbstractProjectJsModule {
         }
 
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+
+//        final List<Map<String, Object>> events = cdd.getAllComponents().stream()
+//                .filter(component -> component.getType().startsWith("ev_"))
+//                .map(component -> {
+//                    // Extract participations with this cid from participationEvents.
+//                    String cidStr = component.getCid().toString();
+//                    List<ParticipationEvent> pes = new ArrayList<>();
+//                    participationEvents.entrySet().forEach(e -> {
+//                        e.getValue().forEach(es -> {
+//                            if (cidStr.equals(es.getCid())) {
+//                                pes.add(es);
+//                            }
+//                        });
+//                    });
+//                    return ImmutableMap.of(
+//                            "cid", component.getCid(),
+//                            "title", component.getProperties().getOrDefault("title", "(Unnamed event)"),
+//                            "participants", pes
+//                    );
+//                }).collect(Collectors.toList());
+
         final List<Map<String, Object>> events = cdd.getAllComponents().stream()
-                .filter(c -> c.getType().startsWith("ev_"))
-                .map(c ->
-                        ImmutableMap.of(
-                                "cid", c.getCid(),
-                                "title", c.getProperties().getOrDefault("title", "(Unnamed event)"),
-                                "participants", participationEvents
-                        )
-                )
-                .collect(Collectors.toList());
+                .filter(component -> component.getType().startsWith("ev_"))
+                .map(component -> {
+                    // Extract participations with this cid from participationEvents.
+
+                    return ImmutableMap.of(
+                            "cid", component.getCid(),
+                            "participations", participations.stream().map(participation -> {
+                                UserAccount ua = uaMap.get(participation.getUserId());
+                                return ImmutableMap.of(
+                                        "userId", ua.getUserId(),
+                                        "displayName", ua.getDisplayName()!=null?ua.getDisplayName():"(unnamed participant)", // TODO: What do i do when these vals are empty?
+                                        "email", ua.getPrimaryEmail()!=null?ua.getPrimaryEmail():"(email not set)",
+                                        "eventState", getState() // TODO: Dig out actual participation if present
+                                );
+                            }).collect(Collectors.toList()));
+                }).collect(Collectors.toList());
 
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
                 "status", "ok",
