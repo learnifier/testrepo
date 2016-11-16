@@ -71,6 +71,25 @@ public class ParticipationEventHelper {
         return Collections.emptyMap();
     }
 
+    public static ParticipationEvent getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        ProjectParticipationState state = ccbc.getParticipationState(participationId);
+
+        if(state != null) {
+            final Map<String, String> stateMap = state.getMap();
+
+            if (stateMap != null) {
+                return stateMap.entrySet().stream()
+                        .filter(e -> e.getKey() != null && e.getKey().equals(EVENT_PREFIX + cid))
+                        .map(e -> fromJson(e.getKey(), e.getValue()))
+                        .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
+                        .findFirst()
+                        .orElse(null);
+            }
+        }
+        return null;
+    }
+
     private static Optional<ParticipationEvent> fromJson(String stateName, String jsonString) {
         // TODO: Should use json annotation somehow to create ParticipationEvent objects.
         final String cid = stateName.substring(EVENT_PREFIX.length()); // event.{cid}
