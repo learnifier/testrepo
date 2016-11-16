@@ -32,6 +32,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.apache.http.client.methods.RequestBuilder.put;
+
 /**
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
@@ -97,18 +99,28 @@ public class EventJsModule extends AbstractProjectJsModule {
                 .filter(component -> component.getType().startsWith("ev_"))
                 .map(component -> {
                     // Extract participations with this cid from participationEvents.
-
+                    final String cidStr = component.getCid().toString();
                     return ImmutableMap.of(
-                            "cid", component.getCid(),
+                            "cid", cidStr,
                             "title", component.getProperties().getOrDefault("title", "(Unnamed event)"),
                             "participations", participations.stream().map(participation -> {
                                 UserAccount ua = uaMap.get(participation.getUserId());
-                                return ImmutableMap.of(
-                                        "userId", ua.getUserId(),
-                                        "displayName", ua.getDisplayName()!=null?ua.getDisplayName():"(unnamed participant)", // TODO: What do i do when these vals are empty?
-                                        "email", ua.getPrimaryEmail()!=null?ua.getPrimaryEmail():"(email not set)",
-                                        "eventState", getState() // TODO: Dig out actual participation if present
-                                );
+                                final ImmutableMap.Builder<String, Object> partB = ImmutableMap.<String, Object>builder()
+                                        .put("userId", ua.getUserId())
+                                        .put("displayName", ua.getDisplayName() != null ? ua.getDisplayName() : "(unnamed participant)") // TODO: What do i do when these vals are empty?)
+                                        .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)");
+
+                                final List<ParticipationEvent> pes = participationEvents.get(participation);
+                                if(pes != null) {
+                                    pes.stream()
+                                            .filter(pe -> cidStr.equals(pe.getCid()))
+                                            .findFirst().ifPresent(pe -> {
+                                        partB.put("eventState", pe.getState());
+                                        partB.put("channel", pe.getChannel());
+                                        partB.put("updated", pe.getUpdated());
+                                    });
+                                }
+                                return partB.build();
                             }).collect(Collectors.toList()));
                 }).collect(Collectors.toList());
 

@@ -23,6 +23,14 @@ ${cpweb_foot}
         function EventsModel() {
             this.initializing = ko.observable(true);
             this.events = ko.observableArray();
+            this.processEventState = function(data){
+                console.log("Process State: ", this, data);
+                if(data.eventState) {
+                    return "State is set: " + data.eventState;
+                } else {
+                    return "Not set"
+                }
+            };
         }
         var model = new EventsModel();
         ko.applyBindings(model, $("#events-container")[0])
@@ -76,7 +84,7 @@ ${cpweb_foot}
         <div data-bind="foreach: events">
             <h1 data-bind="text: title"></h1>
             <div data-bind="foreach: participations">
-                <div><span data-bind="text: displayName"></span> - <span data-bind="text: email"></span> - <span data-bind="text: eventState"></span> - <a href="#">Resend invitation</a></div>
+                <div><span data-bind="text: displayName"></span> - <span data-bind="text: email"></span> - <span data-bind="text: function(){return $root.processEventState($data);}()"></span> - <a href="#">Resend invitation</a></div>
             </div>
         </div>
         <!-- /ko -->
