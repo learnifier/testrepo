@@ -1,5 +1,6 @@
 package se.dabox.cocobox.cpweb.module.project.event;
 
+import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
@@ -9,7 +10,9 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
+import se.dabox.util.idgen.ObjectId;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +20,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.reflections.util.ConfigurationBuilder.build;
+import static se.dabox.service.common.coursedesign.v1.ExternalResourceReferenceType.crl;
 
 /**
  * Helper class to read/write event participation data.
@@ -135,6 +141,22 @@ public class ParticipationEventHelper {
             return Optional.empty();
         }
     }
+
+    public static void setParticipationEvent(RequestCycle cycle, ParticipationEvent event, long participationId) {
+        final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+
+        String field = EVENT_PREFIX + event.getCid();
+
+        final ImmutableMap<String, ? extends Serializable> vals = ImmutableMap.of(
+                "cid", event.getCid(),
+                "state", event.getState(),
+                "channel", event.getChannel(),
+                "updated", event.getUpdated());
+
+        ccbc.setParticipationState(participationId, field, JsonUtils.encode(vals));
+    }
+
+
 
     private static CocoboxCoordinatorClient getCocoboxCordinatorClient(
             ServiceRequestCycle cycle) {

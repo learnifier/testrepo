@@ -26,6 +26,7 @@ import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -111,19 +112,18 @@ public class EventJsModule extends AbstractProjectJsModule {
                                         .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)");
 
                                 partB.put("participationId", participation.getParticipationId());
-                                final List<ParticipationEvent> pes = participationEvents.getOrDefault(participation, Collections.emptyList());
-                                pes.stream().filter(pe -> cidStr.equals(pe.getCid()))
-                                        .findFirst().map(pe -> {
-                                    partB.put("eventState", pe.getState());
-                                    partB.put("channel", pe.getChannel());
-                                    partB.put("updated", pe.getUpdated());
-                                    return null;
-                                }).orElseGet(() -> {
+                                final List<ParticipationEvent> pes = participationEvents.getOrDefault(participation.getParticipationId(), Collections.emptyList());
+                                final ParticipationEvent participationEvent = pes.stream().filter(pe -> cidStr.equals(pe.getCid()))
+                                        .findFirst().orElse(null);
+                                if(participationEvent != null) {
+                                    partB.put("eventState", participationEvent.getState());
+                                    partB.put("channel", participationEvent.getChannel());
+                                    partB.put("updated", participationEvent.getUpdated()!=null?participationEvent.getUpdated():""); // TODO: Remove if when date parsing works
+                                } else {
                                     partB.put("eventState", "");
                                     partB.put("channel", "");
                                     partB.put("updated", "");
-                                    return null;
-                                });
+                                }
                                 return partB.build();
                             }).collect(Collectors.toList()));
                 }).collect(Collectors.toList());
@@ -139,14 +139,14 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         final WebRequest req = cycle.getRequest();
         final String strParticipationId = req.getParameter("participationId");
-        final String eventCid = req.getParameter("cid");
+        final String cid = req.getParameter("cid");
         final String strState = req.getParameter("state");
 
         if(strParticipationId == null || "".equals(strParticipationId)) {
             throw new IllegalArgumentException("participationId missing");
         }
-        if(eventCid == null || "".equals(eventCid)) {
-            throw new IllegalArgumentException("eventCid missing");
+        if(cid == null || "".equals(cid)) {
+            throw new IllegalArgumentException("cid missing");
         }
 
         if(strState == null || "".equals(strState)) {
@@ -161,12 +161,13 @@ public class EventJsModule extends AbstractProjectJsModule {
         }
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        final ProjectParticipation participation = ccbc.getProjectParticipation(Long.valueOf(strParticipationId));
+        long partId = Long.valueOf(strParticipationId);
+        final ProjectParticipation participation = ccbc.getProjectParticipation(partId);
 
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        // TODO: Actually change state...
+        ParticipationEventHelper.setParticipationEvent(cycle, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
 
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
                 "status", "ok",
