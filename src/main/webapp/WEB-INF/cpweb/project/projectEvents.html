@@ -31,11 +31,19 @@ ${cpweb_foot}
                     "participationId": partData.participationId,
                     "state": state
                 }).done(function(data){
-
                     console.log("Succeeded", data);
                 }).fail(function(){
                     console.log("Failed");
                 });
+            };
+            this.formatDate = function(millis){
+                if(millis) {
+                    var date = new Date(millis);
+                    console.log("date: ", date.toString());
+                    return date.toString();
+                } else {
+                    return "(no date)";
+                }
             };
         }
         var model = new EventsModel();
@@ -92,6 +100,7 @@ ${cpweb_foot}
                 <div>
                     <span data-bind="text: displayName"></span>
                     - <span data-bind="text: email"></span>
+                    - Date: <span data-bind="text: function(){return $root.formatDate(updated)}()"></span>
                     - <span data-bind="text: eventState"></span>
                     - Set:
                     <a data-bind="click: function(){$root.changeState($parents[0], $data, 'CONFIRMED');}" href="#">CONFIRMED</a>
