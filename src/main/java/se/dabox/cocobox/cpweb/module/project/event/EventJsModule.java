@@ -51,7 +51,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
 
     @WebAction
-    public RequestTarget onListEvents(RequestCycle cycle, String strProjectId) {
+    public Map<String, Object> onListEvents(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
@@ -60,23 +60,23 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
         if(participations == null) {
-            return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+            return ImmutableMap.of(
                     "status", "ok",
-                    "result", Collections.emptyList())));
+                    "result", Collections.emptyList());
         }
         final List<Long> userIds = participations.stream().map(p -> p.getUserId()).collect(Collectors.toList());
         final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
 
         // Hashed on participationId
-        final Map<Long, List<ParticipationEvent>> participationEvents = ParticipationEventHelper.getParticipationEvents(cycle, participations.stream().map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
-
-        // We now have a map from userId -> UserAccount and map from participationId -> ParticipationEvent.
+        final Map<Long, List<ParticipationEvent>> participationEvents =
+                ParticipationEventHelper.getParticipationEvents(cycle, participations.stream()
+                        .map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
         if(design == null) {
-            return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+            return ImmutableMap.of(
                     "status", "ok",
-                    "result", Collections.emptyList())));
+                    "result", Collections.emptyList());
         }
 
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
@@ -103,7 +103,7 @@ public class EventJsModule extends AbstractProjectJsModule {
                                 if(participationEvent != null) {
                                     partB.put("eventState", participationEvent.getState());
                                     partB.put("channel", participationEvent.getChannel());
-                                    partB.put("updated", participationEvent.getUpdated()!=null?participationEvent.getUpdated():""); // TODO: Remove if when date parsing works
+                                    partB.put("updated", participationEvent.getUpdated());
                                 } else {
                                     partB.put("eventState", "");
                                     partB.put("channel", "");
@@ -113,26 +113,16 @@ public class EventJsModule extends AbstractProjectJsModule {
                             }).collect(Collectors.toList()));
                 }).collect(Collectors.toList());
 
-        try {
-            final String s = MAPPER.writeValueAsString(
-                    ImmutableMap.of(
-                            "status", "ok",
-                            "result", events
-                    ));
-            return new JsonRequestTarget(s);
-        } catch (JsonProcessingException e) {
-//            return new JsonRequestTarget(MAPPER.writeValueAsString(ImmutableMap.of(
-//                    "status", "ok",
-//                    "result", events
-//            )));
-            return null;
-        }
+        return ImmutableMap.of(
+                "status", "ok",
+                "result", events
+        );
 
     }
 
 
     @WebAction
-    public RequestTarget onChangeEventState(RequestCycle cycle) {
+    public Map<String, Object> onChangeEventState(RequestCycle cycle) {
 
         final WebRequest req = cycle.getRequest();
         final String strParticipationId = req.getParameter("participationId");
@@ -166,16 +156,9 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         ParticipationEventHelper.setParticipationEvent(cycle, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
 
-        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
+        return ImmutableMap.of(
                 "status", "ok",
                 "state", state.toString()
-        )));
-    }
-
-
-    static Random rand = new Random(); // TODO: Just for testing before we implement event participations for real.
-    private ParticipationEventState getState() {
-        final ParticipationEventState[] vals = ParticipationEventState.values();
-        return vals[rand.nextInt(vals.length)];
+        );
     }
 }
