@@ -91,20 +91,15 @@ public class EventJsModule extends AbstractProjectJsModule {
                                 final ImmutableMap.Builder<String, Object> partB = ImmutableMap.<String, Object>builder()
                                         .put("userId", ua.getUserId())
                                         .put("displayName", ua.getDisplayName() != null ? ua.getDisplayName() : "(unnamed participant)") // TODO: What do i do when these vals are empty?)
-                                        .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)");
-
-                                partB.put("participationId", participation.getParticipationId());
+                                        .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)")
+                                        .put("participationId", participation.getParticipationId());
                                 final List<ParticipationEvent> pes = participationEvents.getOrDefault(participation.getParticipationId(), Collections.emptyList());
                                 final ParticipationEvent participationEvent = pes.stream().filter(pe -> cidStr.equals(pe.getCid()))
                                         .findFirst().orElse(null);
                                 if(participationEvent != null) {
-                                    partB.put("eventState", participationEvent.getState());
-                                    partB.put("channel", participationEvent.getChannel());
-                                    partB.put("updated", participationEvent.getUpdated());
+                                    partB.put("participationEvent", participationEvent);
                                 } else {
-                                    partB.put("eventState", "");
-                                    partB.put("channel", "");
-                                    partB.put("updated", "");
+                                    partB.put("participationEvent", new ParticipationEvent(cidStr, null, null, null));
                                 }
                                 return partB.build();
                             }).collect(Collectors.toList()));

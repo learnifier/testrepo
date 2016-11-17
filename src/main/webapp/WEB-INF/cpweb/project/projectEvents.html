@@ -100,8 +100,9 @@ ${cpweb_foot}
                 <div>
                     <span data-bind="text: displayName"></span>
                     - <span data-bind="text: email"></span>
-                    - Date: <span data-bind="text: function(){return $root.formatDate(updated)}()"></span>
-                    - <span data-bind="text: eventState"></span>
+                    - Date: <span data-bind="text: function(){return $root.formatDate(participationEvent.updated)}()"></span>
+                    - <span data-bind="text: participationEvent.state"></span>
+                    - <span data-bind="text: participationEvent.channel"></span>
                     - Set:
                     <a data-bind="click: function(){$root.changeState($parents[0], $data, 'CONFIRMED');}" href="#">CONFIRMED</a>
                     /
