@@ -1,5 +1,6 @@
 package se.dabox.cocobox.cpweb.module.project.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
@@ -8,11 +9,13 @@ import org.slf4j.LoggerFactory;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
+import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +35,7 @@ import java.util.stream.Stream;
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
 public class ParticipationEventHelper {
+    private static final ObjectMapper MAPPER = new DwsJacksonObjectMapperFactory().newInstance();
 
     private static final String EVENT_PREFIX = "event.";
 
@@ -105,7 +109,17 @@ public class ParticipationEventHelper {
         return null;
     }
 
+
     private static Optional<ParticipationEvent> fromJson(String stateName, String jsonString) {
+        try {
+            final ParticipationEvent obj = MAPPER.readValue(jsonString, ParticipationEvent.class);
+            return Optional.of(obj);
+        } catch(IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<ParticipationEvent> fromJsonOld(String stateName, String jsonString) {
         // TODO: Should use json annotation somehow to create ParticipationEvent objects.
         final String cid = stateName.substring(EVENT_PREFIX.length()); // event.{cid}
         try {
