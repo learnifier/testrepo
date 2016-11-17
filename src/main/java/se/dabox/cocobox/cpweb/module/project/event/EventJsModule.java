@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.apache.http.client.methods.RequestBuilder.put;
-
 /**
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
@@ -58,7 +56,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         // Hashed on participationId
         final Map<Long, List<ParticipationEvent>> participationEvents =
-                new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX).getParticipationEvents(cycle, participations.stream()
+                new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX).getParticipationEvents(participations.stream()
                         .map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
@@ -138,7 +136,11 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX).setParticipationEvent(cycle, cid, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
+        new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX)
+                .setParticipationEvent(
+                        cid,
+                        new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB),
+                        partId);
 
         return ImmutableMap.of(
                 "status", "ok",

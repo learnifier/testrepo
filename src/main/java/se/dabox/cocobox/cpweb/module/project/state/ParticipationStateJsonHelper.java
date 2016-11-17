@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 public class ParticipationStateJsonHelper<T> {
     private static final ObjectMapper MAPPER = new DwsJacksonObjectMapperFactory().newInstance();
 
-    Class<T> typeParameterClass;
+    private final Class<T> typeParameterClass;
     private final RequestCycle cycle;
     private final String prefix;
     private static final Logger LOGGER =
@@ -49,59 +49,54 @@ public class ParticipationStateJsonHelper<T> {
 
     /**
      *
-     * @param cycle
      * @param participationId
      * @return List of ParticipationsEvent .
      */
-    public @Nonnull List<T> getParticipationEvents(RequestCycle cycle, long participationId) {
+    public @Nonnull List<T> getParticipationEvents(long participationId) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final ProjectParticipationState state = ccbc.getParticipationState(participationId);
         final Map<String, String> stateMap = state.getMap();
 
         if (stateMap != null) {
-            final List<T> events = stateMap.entrySet().stream()
+            return stateMap.entrySet().stream()
                     .filter(e -> e.getKey() != null && e.getKey().startsWith(prefix))
                     .map(e -> fromJson(e.getValue()))
                     .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                     .collect(Collectors.toList());
-            return events;
         }
         return Collections.emptyList();
     }
 
     /**
      *
-     * @param cycle
      * @param participationIds
      * @return
      */
-    public Map<Long, List<T>> getParticipationEvents(RequestCycle cycle, List<Long> participationIds) {
+    public Map<Long, List<T>> getParticipationEvents(List<Long> participationIds) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final List<ProjectParticipationState> states = ccbc.getParticipationState(participationIds);
 
         if(states != null) {
-            final Map<Long, List<T>> partStateMap = states.stream()
+            return states.stream()
                     .collect(Collectors.toMap(
                             ProjectParticipationState::getParticipationId,
                             state -> {
                                 final Map<String, String> stateMap = state.getMap();
 
                                 if (stateMap != null) {
-                                    final List<T> events = stateMap.entrySet().stream()
+                                    return stateMap.entrySet().stream()
                                             .filter(e -> e.getKey() != null && e.getKey().startsWith(prefix))
                                             .map(e -> fromJson(e.getValue()))
                                             .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                                             .collect(Collectors.toList());
-                                    return events;
                                 }
                                 return Collections.emptyList();
                             }));
-            return partStateMap;
         }
         return Collections.emptyMap();
     }
 
-    public @Nullable T getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
+    public @Nullable T getParticipationEvent(long participationId, String cid) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         ProjectParticipationState state = ccbc.getParticipationState(participationId);
 
@@ -129,7 +124,7 @@ public class ParticipationStateJsonHelper<T> {
         }
     }
 
-    public void setParticipationEvent(RequestCycle cycle, String id, ParticipationEvent event, long participationId) {
+    public void setParticipationEvent(String id, ParticipationEvent event, long participationId) {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
         String field = prefix + id;
