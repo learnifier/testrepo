@@ -128,13 +128,13 @@ public class ParticipationEventHelper {
             }
 
             Date updated = null;
-//            if(json.containsKey("updated")) {
-//                try {
-//                    updated =  json.get("updated")); // Not sure what date format i will have
-//                } catch(IllegalArgumentException|NullPointerException e) {
-//                    LOGGER.warn("Ignoring malformed date: {}", json.get("updated"));
-//                }
-//            }
+            if(json.containsKey("updated")) {
+                try {
+                    updated =  new Date((Long)json.get("updated")); // TODO: Will probably change when we decide on da
+                } catch(NumberFormatException e) {
+                    LOGGER.warn("Ignoring malformed date: {}", json.get("updated"));
+                }
+            }
 
             return Optional.of(new ParticipationEvent(cid, state, updated, channel));
         } catch(JsonException e) {
