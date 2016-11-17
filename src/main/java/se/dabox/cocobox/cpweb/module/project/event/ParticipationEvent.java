@@ -1,5 +1,7 @@
 package se.dabox.cocobox.cpweb.module.project.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 
 /**
@@ -7,35 +9,19 @@ import java.util.Date;
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
 public class ParticipationEvent {
-    private ParticipationEventState state;
-    private Date updated;
-    private ParticipationEventChannel channel;
-    private String cid;
-    public ParticipationEvent() {
+    private final ParticipationEventState state;
+    private final Date updated;
+    private final ParticipationEventChannel channel;
+    private final String cid;
 
-    }
-
-    public ParticipationEvent(String cid, ParticipationEventState state, Date updated, ParticipationEventChannel channel) {
+    public ParticipationEvent(@JsonProperty("cid") String cid,
+                              @JsonProperty("state") ParticipationEventState state,
+                              @JsonProperty("updated") Date updated,
+                              @JsonProperty("channel") ParticipationEventChannel channel) {
         this.cid = cid;
         this.state = state;
         this.updated = updated;
         this.channel = channel;
-    }
-
-    public void setState(ParticipationEventState state) {
-        this.state = state;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
-
-    public void setChannel(ParticipationEventChannel channel) {
-        this.channel = channel;
-    }
-
-    public void setCid(String cid) {
-        this.cid = cid;
     }
 
     public String getCid() {
