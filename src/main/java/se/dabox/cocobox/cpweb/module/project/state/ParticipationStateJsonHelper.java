@@ -1,4 +1,4 @@
-package se.dabox.cocobox.cpweb.module.project.event;
+package se.dabox.cocobox.cpweb.module.project.state;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,7 @@ import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.dabox.cocobox.cpweb.module.project.event.ParticipationEvent;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
@@ -40,7 +41,7 @@ public class ParticipationStateJsonHelper<T> {
      * @param cycle
      * @param prefix Prefix of state data. Should include the trailing dot (e.g. "event.").
      */
-    ParticipationStateJsonHelper(Class<T> typeParameterClass, RequestCycle cycle, String prefix) {
+    public ParticipationStateJsonHelper(Class<T> typeParameterClass, RequestCycle cycle, String prefix) {
         this.typeParameterClass = typeParameterClass;
         this.cycle = cycle;
         this.prefix = prefix;
