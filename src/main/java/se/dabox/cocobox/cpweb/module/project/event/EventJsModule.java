@@ -51,12 +51,12 @@ public class EventJsModule extends AbstractProjectJsModule {
                     "status", "ok",
                     "result", Collections.emptyList());
         }
-        final List<Long> userIds = participations.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+        final List<Long> userIds = participations.stream().map(ProjectParticipation::getUserId).collect(Collectors.toList());
         final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
 
         // Hashed on participationId
         final Map<Long, List<ParticipationEvent>> participationEvents =
-                new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX).getParticipationEvents(participations.stream()
+                new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, PREFIX).getParticipationEvents(participations.stream()
                         .map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
@@ -136,7 +136,7 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX)
+        new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, PREFIX)
                 .setParticipationEvent(
                         cid,
                         new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB),
