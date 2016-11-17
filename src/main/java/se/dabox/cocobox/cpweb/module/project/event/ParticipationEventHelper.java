@@ -10,6 +10,7 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
+import se.dabox.service.common.mailsender.pmt.Part;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,10 +34,21 @@ import java.util.stream.Stream;
 public class ParticipationEventHelper {
     private static final ObjectMapper MAPPER = new DwsJacksonObjectMapperFactory().newInstance();
 
-    private static final String EVENT_PREFIX = "event.";
+    private final RequestCycle cycle;
+    private final String prefix;
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
+
+    /**
+     *
+     * @param cycle
+     * @param prefix Prefix of state data. Should include the trailing dot (e.g. "event.").
+     */
+    ParticipationEventHelper(RequestCycle cycle, String prefix) {
+        this.cycle = cycle;
+        this.prefix = prefix;
+    }
 
     /**
      * Get a list of events for this participation.
@@ -44,14 +56,14 @@ public class ParticipationEventHelper {
      * @param participationId
      * @return List of ParticipationsEvent .
      */
-    public static @Nonnull List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
+    public @Nonnull List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final ProjectParticipationState state = ccbc.getParticipationState(participationId);
         final Map<String, String> stateMap = state.getMap();
 
         if (stateMap != null) {
             final List<ParticipationEvent> events = stateMap.entrySet().stream()
-                    .filter(e -> e.getKey() != null && e.getKey().startsWith(EVENT_PREFIX))
+                    .filter(e -> e.getKey() != null && e.getKey().startsWith(prefix))
                     .map(e -> fromJson(e.getKey(), e.getValue()))
                     .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                     .collect(Collectors.toList());
@@ -60,7 +72,7 @@ public class ParticipationEventHelper {
         return Collections.emptyList();
     }
 
-    public static Map<Long, List<ParticipationEvent>> getParticipationEvents(RequestCycle cycle, List<Long> participationIds) {
+    public Map<Long, List<ParticipationEvent>> getParticipationEvents(RequestCycle cycle, List<Long> participationIds) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final List<ProjectParticipationState> states = ccbc.getParticipationState(participationIds);
 
@@ -73,7 +85,7 @@ public class ParticipationEventHelper {
 
                                 if (stateMap != null) {
                                     final List<ParticipationEvent> events = stateMap.entrySet().stream()
-                                            .filter(e -> e.getKey() != null && e.getKey().startsWith(EVENT_PREFIX))
+                                            .filter(e -> e.getKey() != null && e.getKey().startsWith(prefix))
                                             .map(e -> fromJson(e.getKey(), e.getValue()))
                                             .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                                             .collect(Collectors.toList());
@@ -86,7 +98,7 @@ public class ParticipationEventHelper {
         return Collections.emptyMap();
     }
 
-    public static @Nullable ParticipationEvent getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
+    public @Nullable ParticipationEvent getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         ProjectParticipationState state = ccbc.getParticipationState(participationId);
 
@@ -95,7 +107,7 @@ public class ParticipationEventHelper {
 
             if (stateMap != null) {
                 return stateMap.entrySet().stream()
-                        .filter(e -> e.getKey() != null && e.getKey().equals(EVENT_PREFIX + cid))
+                        .filter(e -> e.getKey() != null && e.getKey().equals(prefix + cid))
                         .map(e -> fromJson(e.getKey(), e.getValue()))
                         .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                         .findFirst()
@@ -106,7 +118,7 @@ public class ParticipationEventHelper {
     }
 
 
-    private static Optional<ParticipationEvent> fromJson(String stateName, String jsonString) {
+    private Optional<ParticipationEvent> fromJson(String stateName, String jsonString) {
         try {
             final ParticipationEvent obj = MAPPER.readValue(jsonString, ParticipationEvent.class);
             return Optional.of(obj);
@@ -115,10 +127,10 @@ public class ParticipationEventHelper {
         }
     }
 
-    public static void setParticipationEvent(RequestCycle cycle, String id, ParticipationEvent event, long participationId) {
+    public void setParticipationEvent(RequestCycle cycle, String id, ParticipationEvent event, long participationId) {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
-        String field = EVENT_PREFIX + id;
+        String field = prefix + id;
 
         try {
             String st = MAPPER.writeValueAsString(event);
@@ -130,7 +142,7 @@ public class ParticipationEventHelper {
 
 
 
-    private static CocoboxCoordinatorClient getCocoboxCordinatorClient(
+    private CocoboxCoordinatorClient getCocoboxCordinatorClient(
             ServiceRequestCycle cycle) {
         return CacheClients.getClient(cycle, CocoboxCoordinatorClient.class);
     }

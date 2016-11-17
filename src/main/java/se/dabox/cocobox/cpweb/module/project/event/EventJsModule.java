@@ -46,6 +46,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
+    private static final String PREFIX = ".event";
 
     @WebAction
     public Map<String, Object> onListEvents(RequestCycle cycle, String strProjectId) {
@@ -66,7 +67,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         // Hashed on participationId
         final Map<Long, List<ParticipationEvent>> participationEvents =
-                ParticipationEventHelper.getParticipationEvents(cycle, participations.stream()
+                new ParticipationEventHelper(cycle, PREFIX).getParticipationEvents(cycle, participations.stream()
                         .map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
@@ -146,7 +147,7 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        ParticipationEventHelper.setParticipationEvent(cycle, cid, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
+        new ParticipationEventHelper(cycle, PREFIX).setParticipationEvent(cycle, cid, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
 
         return ImmutableMap.of(
                 "status", "ok",
