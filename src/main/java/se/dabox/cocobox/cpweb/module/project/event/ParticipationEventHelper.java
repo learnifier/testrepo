@@ -1,7 +1,7 @@
 package se.dabox.cocobox.cpweb.module.project.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.ServiceRequestCycle;
 import org.slf4j.Logger;
@@ -10,15 +10,11 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
-import se.dabox.service.common.json.JsonException;
-import se.dabox.service.common.json.JsonUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,59 +115,17 @@ public class ParticipationEventHelper {
         }
     }
 
-    private static Optional<ParticipationEvent> fromJsonOld(String stateName, String jsonString) {
-        // TODO: Should use json annotation somehow to create ParticipationEvent objects.
-        final String cid = stateName.substring(EVENT_PREFIX.length()); // event.{cid}
-        try {
-            final Map<String, ?> json = JsonUtils.decode(jsonString);
-
-            ParticipationEventState state = null;
-            if(json.containsKey("state")) {
-                try {
-                    state = ParticipationEventState.valueOf((String) json.get("state"));
-                } catch(IllegalArgumentException|NullPointerException e) {
-                    LOGGER.warn("Ignoring event with malformed state data: {}", json.get("state"));
-                    return Optional.empty();
-                }
-            }
-
-            ParticipationEventChannel channel = null;
-            if(json.containsKey("channel")) {
-                try {
-                    channel = ParticipationEventChannel.valueOf((String) json.get("channel"));
-                } catch(IllegalArgumentException|NullPointerException e) {
-                    LOGGER.warn("Ignoring event with malformed channel data: {}", json.get("channel"));
-                    return Optional.empty();
-                }
-            }
-
-            Date updated = null;
-            if(json.containsKey("updated")) {
-                try {
-                    updated =  new Date((Long)json.get("updated")); // TODO: Will probably change when we decide on da
-                } catch(NumberFormatException e) {
-                    LOGGER.warn("Ignoring malformed date: {}", json.get("updated"));
-                }
-            }
-
-            return Optional.of(new ParticipationEvent(cid, state, updated, channel));
-        } catch(JsonException e) {
-            return Optional.empty();
-        }
-    }
-
-    public static void setParticipationEvent(RequestCycle cycle, ParticipationEvent event, long participationId) {
+    public static void setParticipationEvent(RequestCycle cycle, String id, ParticipationEvent event, long participationId) {
         final CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
 
-        String field = EVENT_PREFIX + event.getCid();
+        String field = EVENT_PREFIX + id;
 
-        final ImmutableMap<String, ? extends Serializable> vals = ImmutableMap.of(
-                "cid", event.getCid(),
-                "state", event.getState(),
-                "channel", event.getChannel(),
-                "updated", event.getUpdated());
-
-        ccbc.setParticipationState(participationId, field, JsonUtils.encode(vals));
+        try {
+            String st = MAPPER.writeValueAsString(event);
+            ccbc.setParticipationState(participationId, field, st);
+        } catch(JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not serialize object");
+        }
     }
 
 

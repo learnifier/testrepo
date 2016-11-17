@@ -146,7 +146,7 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        ParticipationEventHelper.setParticipationEvent(cycle, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
+        ParticipationEventHelper.setParticipationEvent(cycle, cid, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
 
         return ImmutableMap.of(
                 "status", "ok",
