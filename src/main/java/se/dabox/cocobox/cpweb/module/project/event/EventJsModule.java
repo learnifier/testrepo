@@ -47,9 +47,6 @@ public class EventJsModule extends AbstractProjectJsModule {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-
     @WebAction
     public Map<String, Object> onListEvents(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
