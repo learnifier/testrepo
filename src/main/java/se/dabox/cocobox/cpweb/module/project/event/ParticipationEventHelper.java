@@ -10,8 +10,9 @@ import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.json.JsonException;
 import se.dabox.service.common.json.JsonUtils;
-import se.dabox.util.idgen.ObjectId;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
@@ -20,9 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.reflections.util.ConfigurationBuilder.build;
-import static se.dabox.service.common.coursedesign.v1.ExternalResourceReferenceType.crl;
 
 /**
  * Helper class to read/write event participation data.
@@ -40,7 +38,13 @@ public class ParticipationEventHelper {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
 
-    public static List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
+    /**
+     * Get a list of events for this participation.
+     * @param cycle
+     * @param participationId
+     * @return List of ParticipationsEvent .
+     */
+    public static @Nonnull List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final ProjectParticipationState state = ccbc.getParticipationState(participationId);
         final Map<String, String> stateMap = state.getMap();
@@ -82,7 +86,7 @@ public class ParticipationEventHelper {
         return Collections.emptyMap();
     }
 
-    public static ParticipationEvent getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
+    public static @Nullable ParticipationEvent getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         ProjectParticipationState state = ccbc.getParticipationState(participationId);
 

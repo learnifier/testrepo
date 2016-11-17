@@ -90,7 +90,7 @@ public class EventJsModule extends AbstractProjectJsModule {
                                 UserAccount ua = uaMap.get(participation.getUserId());
                                 final ImmutableMap.Builder<String, Object> partB = ImmutableMap.<String, Object>builder()
                                         .put("userId", ua.getUserId())
-                                        .put("displayName", ua.getDisplayName() != null ? ua.getDisplayName() : "(unnamed participant)") // TODO: What do i do when these vals are empty?)
+                                        .put("displayName", ua.getDisplayName() != null ? ua.getDisplayName() : "(name not set)")
                                         .put("email", ua.getPrimaryEmail() != null ? ua.getPrimaryEmail() : "(email not set)")
                                         .put("participationId", participation.getParticipationId());
                                 final List<ParticipationEvent> pes = participationEvents.getOrDefault(participation.getParticipationId(), Collections.emptyList());
