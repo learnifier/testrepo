@@ -3,6 +3,8 @@
  */
 package se.dabox.cocobox.cpweb.module.project.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
@@ -45,6 +47,9 @@ public class EventJsModule extends AbstractProjectJsModule {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+
     @WebAction
     public RequestTarget onListEvents(RequestCycle cycle, String strProjectId) {
         long prjId = Long.valueOf(strProjectId);
@@ -75,26 +80,6 @@ public class EventJsModule extends AbstractProjectJsModule {
         }
 
         CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
-
-//        final List<Map<String, Object>> events = cdd.getAllComponents().stream()
-//                .filter(component -> component.getType().startsWith("ev_"))
-//                .map(component -> {
-//                    // Extract participations with this cid from participationEvents.
-//                    String cidStr = component.getCid().toString();
-//                    List<ParticipationEvent> pes = new ArrayList<>();
-//                    participationEvents.entrySet().forEach(e -> {
-//                        e.getValue().forEach(es -> {
-//                            if (cidStr.equals(es.getCid())) {
-//                                pes.add(es);
-//                            }
-//                        });
-//                    });
-//                    return ImmutableMap.of(
-//                            "cid", component.getCid(),
-//                            "title", component.getProperties().getOrDefault("title", "(Unnamed event)"),
-//                            "participants", pes
-//                    );
-//                }).collect(Collectors.toList());
 
         final List<Map<String, Object>> events = cdd.getAllComponents().stream()
                 .filter(component -> component.getType().startsWith("ev_"))
@@ -128,9 +113,21 @@ public class EventJsModule extends AbstractProjectJsModule {
                             }).collect(Collectors.toList()));
                 }).collect(Collectors.toList());
 
-        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of(
-                "status", "ok",
-                "result", events)));
+        try {
+            final String s = MAPPER.writeValueAsString(
+                    ImmutableMap.of(
+                            "status", "ok",
+                            "result", events
+                    ));
+            return new JsonRequestTarget(s);
+        } catch (JsonProcessingException e) {
+//            return new JsonRequestTarget(MAPPER.writeValueAsString(ImmutableMap.of(
+//                    "status", "ok",
+//                    "result", events
+//            )));
+            return null;
+        }
+
     }
 
 
