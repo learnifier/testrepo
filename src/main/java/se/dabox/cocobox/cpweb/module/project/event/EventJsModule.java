@@ -3,36 +3,27 @@
  */
 package se.dabox.cocobox.cpweb.module.project.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
-import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
-import net.unixdeveloper.druwa.request.JsonRequestTarget;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
-import se.dabox.cocobox.cpweb.module.project.roster.ParticipationIdProjectProductDeleteCheck;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
-import se.dabox.service.common.json.JsonUtils;
-import se.dabox.service.common.mailsender.pmt.Part;
 import se.dabox.service.login.client.UserAccount;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.apache.http.client.methods.RequestBuilder.put;
@@ -46,7 +37,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
-    private static final String PREFIX = ".event";
+    private static final String PREFIX = "event.";
 
     @WebAction
     public Map<String, Object> onListEvents(RequestCycle cycle, String strProjectId) {
@@ -67,7 +58,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         // Hashed on participationId
         final Map<Long, List<ParticipationEvent>> participationEvents =
-                new ParticipationEventHelper(cycle, PREFIX).getParticipationEvents(cycle, participations.stream()
+                new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX).getParticipationEvents(cycle, participations.stream()
                         .map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
@@ -147,7 +138,7 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        new ParticipationEventHelper(cycle, PREFIX).setParticipationEvent(cycle, cid, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
+        new ParticipationStateJsonHelper<ParticipationEvent>(ParticipationEvent.class, cycle, PREFIX).setParticipationEvent(cycle, cid, new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB), partId);
 
         return ImmutableMap.of(
                 "status", "ok",

@@ -10,7 +10,6 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.json.DwsJacksonObjectMapperFactory;
-import se.dabox.service.common.mailsender.pmt.Part;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,48 +22,45 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Helper class to read/write event participation data.
- *
- * TODO: I intend to make this more generic, so it can be used for all participation state data that is saved in json format.
- *
- * TODO: Should perhaps add functions to return data mapped on cid.
+ * Helper to read/write participation state data in json format.
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
-public class ParticipationEventHelper {
+public class ParticipationStateJsonHelper<T> {
     private static final ObjectMapper MAPPER = new DwsJacksonObjectMapperFactory().newInstance();
 
+    Class<T> typeParameterClass;
     private final RequestCycle cycle;
     private final String prefix;
-
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(EventJsModule.class);
+            LoggerFactory.getLogger(ParticipationStateJsonHelper.class);
 
     /**
      *
      * @param cycle
      * @param prefix Prefix of state data. Should include the trailing dot (e.g. "event.").
      */
-    ParticipationEventHelper(RequestCycle cycle, String prefix) {
+    ParticipationStateJsonHelper(Class<T> typeParameterClass, RequestCycle cycle, String prefix) {
+        this.typeParameterClass = typeParameterClass;
         this.cycle = cycle;
         this.prefix = prefix;
     }
 
     /**
-     * Get a list of events for this participation.
+     *
      * @param cycle
      * @param participationId
      * @return List of ParticipationsEvent .
      */
-    public @Nonnull List<ParticipationEvent> getParticipationEvents(RequestCycle cycle, long participationId) {
+    public @Nonnull List<T> getParticipationEvents(RequestCycle cycle, long participationId) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final ProjectParticipationState state = ccbc.getParticipationState(participationId);
         final Map<String, String> stateMap = state.getMap();
 
         if (stateMap != null) {
-            final List<ParticipationEvent> events = stateMap.entrySet().stream()
+            final List<T> events = stateMap.entrySet().stream()
                     .filter(e -> e.getKey() != null && e.getKey().startsWith(prefix))
-                    .map(e -> fromJson(e.getKey(), e.getValue()))
+                    .map(e -> fromJson(e.getValue()))
                     .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                     .collect(Collectors.toList());
             return events;
@@ -72,21 +68,27 @@ public class ParticipationEventHelper {
         return Collections.emptyList();
     }
 
-    public Map<Long, List<ParticipationEvent>> getParticipationEvents(RequestCycle cycle, List<Long> participationIds) {
+    /**
+     *
+     * @param cycle
+     * @param participationIds
+     * @return
+     */
+    public Map<Long, List<T>> getParticipationEvents(RequestCycle cycle, List<Long> participationIds) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final List<ProjectParticipationState> states = ccbc.getParticipationState(participationIds);
 
         if(states != null) {
-            final Map<Long, List<ParticipationEvent>> partStateMap = states.stream()
+            final Map<Long, List<T>> partStateMap = states.stream()
                     .collect(Collectors.toMap(
                             ProjectParticipationState::getParticipationId,
                             state -> {
                                 final Map<String, String> stateMap = state.getMap();
 
                                 if (stateMap != null) {
-                                    final List<ParticipationEvent> events = stateMap.entrySet().stream()
+                                    final List<T> events = stateMap.entrySet().stream()
                                             .filter(e -> e.getKey() != null && e.getKey().startsWith(prefix))
-                                            .map(e -> fromJson(e.getKey(), e.getValue()))
+                                            .map(e -> fromJson(e.getValue()))
                                             .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                                             .collect(Collectors.toList());
                                     return events;
@@ -98,7 +100,7 @@ public class ParticipationEventHelper {
         return Collections.emptyMap();
     }
 
-    public @Nullable ParticipationEvent getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
+    public @Nullable T getParticipationEvent(RequestCycle cycle, long participationId, String cid) {
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         ProjectParticipationState state = ccbc.getParticipationState(participationId);
 
@@ -108,7 +110,7 @@ public class ParticipationEventHelper {
             if (stateMap != null) {
                 return stateMap.entrySet().stream()
                         .filter(e -> e.getKey() != null && e.getKey().equals(prefix + cid))
-                        .map(e -> fromJson(e.getKey(), e.getValue()))
+                        .map(e -> fromJson(e.getValue()))
                         .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())  // In Java 9: .flatMap(Optional::stream)
                         .findFirst()
                         .orElse(null);
@@ -118,9 +120,9 @@ public class ParticipationEventHelper {
     }
 
 
-    private Optional<ParticipationEvent> fromJson(String stateName, String jsonString) {
+    private Optional<T> fromJson(String jsonString) {
         try {
-            final ParticipationEvent obj = MAPPER.readValue(jsonString, ParticipationEvent.class);
+            final T obj = MAPPER.readValue(jsonString, typeParameterClass);
             return Optional.of(obj);
         } catch(IOException e) {
             return Optional.empty();
