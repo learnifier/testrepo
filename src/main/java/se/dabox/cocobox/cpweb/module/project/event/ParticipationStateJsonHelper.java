@@ -119,7 +119,6 @@ public class ParticipationStateJsonHelper<T> {
         return null;
     }
 
-
     private Optional<T> fromJson(String jsonString) {
         try {
             final T obj = MAPPER.readValue(jsonString, typeParameterClass);
@@ -141,8 +140,6 @@ public class ParticipationStateJsonHelper<T> {
             throw new IllegalArgumentException("Could not serialize object");
         }
     }
-
-
 
     private CocoboxCoordinatorClient getCocoboxCordinatorClient(
             ServiceRequestCycle cycle) {
