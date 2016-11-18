@@ -11,11 +11,11 @@ import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
+import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEvent;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventChannel;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventState;
 import se.dabox.service.common.ccbc.participation.state.ParticipationStateJsonHelper;
-import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.coursedesign.CourseDesign;
@@ -38,7 +38,6 @@ public class EventJsModule extends AbstractProjectJsModule {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EventJsModule.class);
-    private static final String PREFIX = "event.";
 
     @WebAction
     public Map<String, Object> onListEvents(RequestCycle cycle, String strProjectId) {
@@ -59,7 +58,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         // Hashed on participationId
         final Map<Long, List<ParticipationEvent>> participationEvents =
-                new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, PREFIX).getParticipationEvents(participations.stream()
+                new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, ParticipationEvent.PREFIX).getParticipationStates(participations.stream()
                         .map(ProjectParticipation::getParticipationId).collect(Collectors.toList()));
 
         final CourseDesign design = getCourseDesignClient(cycle).getDesign(project.getDesignId());
@@ -139,8 +138,8 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(participation.getProjectId());
         checkPermission(cycle, project);
 
-        new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, PREFIX)
-                .setParticipationEvent(
+        new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, ParticipationEvent.PREFIX)
+                .setParticipationState(
                         partId,
                         cid,
                         new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB));
