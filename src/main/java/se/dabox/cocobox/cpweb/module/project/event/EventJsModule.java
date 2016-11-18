@@ -138,9 +138,9 @@ public class EventJsModule extends AbstractProjectJsModule {
 
         new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, PREFIX)
                 .setParticipationEvent(
+                        partId,
                         cid,
-                        new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB),
-                        partId);
+                        new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB));
 
         return ImmutableMap.of(
                 "status", "ok",
