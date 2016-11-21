@@ -233,6 +233,12 @@ public class CreateProjectSessionProcessor implements NewProjectSessionProcessor
             return new WebModuleRedirectRequestTarget(VerifyProjectDesignModule.class,
                     VerifyProjectDesignModule.ACTION_VERIFY_NEW_DESIGN,
                     Long.toString(project.getProjectId()));
+        } else if (ptype == ProjectType.SINGLE_PRODUCT_PROJECT) {
+            UpdateProjectRequest updateReq
+                    = new UpdateProjectRequestBuilder(project.getCreatedBy(), project.getProjectId()).
+                            setUnstaged(
+                                    false).createUpdateProjectRequest();
+            ccbc.updateOrgProject(updateReq);
         }
 
         return toProjectPage(project.getProjectId());
