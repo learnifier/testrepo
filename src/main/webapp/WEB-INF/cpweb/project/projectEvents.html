@@ -25,12 +25,10 @@ ${cpweb_foot}
             this.events = ko.observableArray();
             this.changeState = function(eventData, partData, state){
                 var cid = eventData.cid, partId = partData.participationId;
-                console.log("Change State: ", eventData.cid, partData.participationId, state);
-                $.post(settings.changeEventState, {
-                    "cid": eventData.cid,
-                    "participationId": partData.participationId,
+                $.post(settings.changeEventState + "/" + partId, JSON.stringify({
+                    "cid": cid,
                     "state": state
-                }).done(function(data){
+                })).done(function(data){
                     console.log("Succeeded", data);
                 }).fail(function(){
                     console.log("Failed");

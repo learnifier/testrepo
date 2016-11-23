@@ -5,9 +5,12 @@ package se.dabox.cocobox.cpweb.module.project.event;
 
 import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
+import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
+import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
@@ -21,8 +24,10 @@ import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.coursedesign.CourseDesign;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
+import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.UserAccount;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -106,47 +111,47 @@ public class EventJsModule extends AbstractProjectJsModule {
 
 
     @WebAction
-    public Map<String, Object> onChangeEventState(RequestCycle cycle) {
+    public Map<String, Object> onChangeEventState(RequestCycle cycle, String strParticipationId) {
 
         final WebRequest req = cycle.getRequest();
-        final String strParticipationId = req.getParameter("participationId");
-        final String cid = req.getParameter("cid");
-        final String strState = req.getParameter("state");
-
-        if(strParticipationId == null || "".equals(strParticipationId)) {
-            throw new IllegalArgumentException("participationId missing");
-        }
-        if(cid == null || "".equals(cid)) {
-            throw new IllegalArgumentException("cid missing");
-        }
-
-        if(strState == null || "".equals(strState)) {
-            throw new IllegalArgumentException("state missing");
-        }
-
-        final ParticipationEventState state;
         try {
-            state = ParticipationEventState.valueOf(strState);
-        } catch(IllegalArgumentException e) {
-            throw new IllegalArgumentException("invalid state");
+            final Map<String, ?> json = JsonUtils.decode(IOUtils.toString(req.getReader()));
+            final String cid = (String) json.get("cid");
+            final String strState = (String) json.get("state");
+            if(empty(strParticipationId) || empty(cid) || empty(strState)) {
+                throw new RetargetException(new ErrorCodeRequestTarget(400));
+            }
+            final ParticipationEventState state;
+            try {
+                state = ParticipationEventState.valueOf(strState);
+            } catch(IllegalArgumentException e) {
+                throw new RetargetException(new ErrorCodeRequestTarget(400));
+            }
+
+            CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+            long partId = Long.valueOf(strParticipationId);
+            final ProjectParticipation participation = ccbc.getProjectParticipation(partId);
+
+            OrgProject project = ccbc.getProject(participation.getProjectId());
+            checkPermission(cycle, project);
+
+            new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, ParticipationEvent.PREFIX)
+                    .setParticipationState(
+                            partId,
+                            cid,
+                            new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB));
+
+            return ImmutableMap.of(
+                    "status", "ok",
+                    "state", state.toString()
+            );
+        } catch (IOException e) {
+            throw new RetargetException(new ErrorCodeRequestTarget(400));
         }
-
-        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
-        long partId = Long.valueOf(strParticipationId);
-        final ProjectParticipation participation = ccbc.getProjectParticipation(partId);
-
-        OrgProject project = ccbc.getProject(participation.getProjectId());
-        checkPermission(cycle, project);
-
-        new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, ParticipationEvent.PREFIX)
-                .setParticipationState(
-                        partId,
-                        cid,
-                        new ParticipationEvent(cid, state, new Date(), ParticipationEventChannel.CPWEB));
-
-        return ImmutableMap.of(
-                "status", "ok",
-                "state", state.toString()
-        );
     }
+
+    private boolean empty(String st) {
+        return st == null || "".equals(st);
+    }
+
 }
