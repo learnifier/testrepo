@@ -6,6 +6,19 @@
         [#else]
         <img src="${cocoboxCdn}/cocobox/img/cp/userImage_64x64.png" class="page-thumbnail img-circle img-thumbnail" alt="${user.displayName?xhtml} Profile Image" />
         [/#if]
+        [#if anonQuarantine]
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            User is quarantined and will be anonymized soon.
+        </div>
+        [/#if]
+        [#if user.anonymized]
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            This user has been anonymized
+        </div>
+        [/#if]
+
         <p class="page-title-label">User</p>
         <h1 class="page-title">${user.displayName?xhtml}</h1>
         <div class="ccb-page-header__actions">
@@ -22,4 +35,5 @@
             <li><div class="row-label">Last login</div><div class="row-setting clearfix">${(user.lastLogin?datetime?string.full)!''}</div></li>
         </ul>
     </div>
+
 </section>

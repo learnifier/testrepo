@@ -37,6 +37,7 @@ import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.context.DwsRealmHelper;
 import se.dabox.service.common.webfeature.WebFeatures;
 import se.dabox.service.login.client.CocoboxUserAccount;
+import se.dabox.service.login.client.LockReasonConstants;
 import se.dabox.service.login.client.LoginService;
 import se.dabox.service.login.client.NotFoundException;
 import se.dabox.service.login.client.UserAccount;
@@ -90,7 +91,7 @@ public class UserModule extends AbstractWebAuthModule {
         addCommonValue(cycle, map, org, user);
 
         map.put("roles", roles);
-        
+
         return new FreemarkerRequestTarget("/user/userRoles.html", map);
     }
 
@@ -122,7 +123,7 @@ public class UserModule extends AbstractWebAuthModule {
         UserAccount user = getUserAccountService(cycle).getUserAccount(userId);
 
         Set<String> roles = UserAccountRoleCheck.getCpRoles(user, orgId, true);
-        final Map<String, String> cpRoles = new CocoboxRoleUtil().getCpRoles(cycle);        
+        final Map<String, String> cpRoles = new CocoboxRoleUtil().getCpRoles(cycle);
 
         if (!cpRoles.containsKey(role)) {
             throw new IllegalStateException("Non existing client role: "+role);
@@ -162,7 +163,7 @@ public class UserModule extends AbstractWebAuthModule {
                         append(o1.getName(), o2.getName()).
                         append(o1.getUuid(), o2.getUuid()).
                         build());
-        
+
         return infoList;
     }
 
@@ -230,6 +231,11 @@ public class UserModule extends AbstractWebAuthModule {
         }
 
         map.put("profileSettingsAllowed", new CocoboxUserAccount(user).isUserSettingsAllowed(cycle));
+
+        //Boolean to indicate that a user is in lock quarantine
+        map.put("anonQuarantine", !user.isAnonymized() && LockReasonConstants.ANON_QUARANTINE.
+                equals(user.getProfileValue(CocoboxUserAccount.PROFILE_COCOBOX,
+                        LockReasonConstants.FIELD_NAME)));
     }
 
     private String getAutoLoginLink(RequestCycle cycle, long orgId, UserAccount user) {
@@ -237,7 +243,7 @@ public class UserModule extends AbstractWebAuthModule {
         if (!WebFeatures.getFeatures(cycle).hasFeature(CocositeWebFeatureConstants.AUTOLOGINLINK)) {
             return null;
         }
-        
+
         if (!hasOrgPermission(cycle, orgId, CocoboxPermissions.BO_CREATE_USER_AUTOLOGINLINK)) {
             return null;
         }
@@ -274,7 +280,7 @@ public class UserModule extends AbstractWebAuthModule {
         public String getName() {
             return name;
         }
-        
+
     }
 
 }
