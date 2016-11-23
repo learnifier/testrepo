@@ -211,6 +211,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         MiniOrgInfo org = secureGetMiniOrg(cycle, strOrgId);
 
         List<UserAccount> uas = getCompleteOrgUserAccountList(org, cycle);
+        uas = CollectionsUtil.sublist(uas, (u) -> !u.isAnonymized());
 
         return jsonTarget(toJsonUserAccounts(cycle, uas, org.getId()));
     }
