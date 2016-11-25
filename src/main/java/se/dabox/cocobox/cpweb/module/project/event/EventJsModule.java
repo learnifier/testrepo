@@ -135,6 +135,7 @@ public class EventJsModule extends AbstractProjectJsModule {
             OrgProject project = ccbc.getProject(participation.getProjectId());
             checkPermission(cycle, project);
 
+            // TODO: Should verify that cid is in design.
             new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, ParticipationEvent.PREFIX)
                     .setParticipationState(
                             partId,
