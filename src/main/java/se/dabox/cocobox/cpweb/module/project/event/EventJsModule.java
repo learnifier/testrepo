@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
+import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEvent;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventChannel;
@@ -22,6 +23,7 @@ import se.dabox.service.common.ccbc.participation.state.ParticipationStateJsonHe
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.coursedesign.CourseDesign;
+import se.dabox.service.common.coursedesign.CourseDesignClient;
 import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonUtils;
@@ -32,6 +34,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -135,7 +138,9 @@ public class EventJsModule extends AbstractProjectJsModule {
             OrgProject project = ccbc.getProject(participation.getProjectId());
             checkPermission(cycle, project);
 
-            // TODO: Should verify that cid is in design.
+            if(!isCidInDesign(cycle, project, UUID.fromString(cid))) {
+                throw new RetargetException(new ErrorCodeRequestTarget(404));
+            }
             new ParticipationStateJsonHelper<>(ParticipationEvent.class, cycle, ParticipationEvent.PREFIX)
                     .setParticipationState(
                             partId,
@@ -149,6 +154,19 @@ public class EventJsModule extends AbstractProjectJsModule {
         } catch (IOException e) {
             throw new RetargetException(new ErrorCodeRequestTarget(400));
         }
+    }
+
+    private boolean isCidInDesign(RequestCycle cycle, OrgProject project, UUID cid) {
+        CourseDesignClient cdc = CacheClients.getClient(cycle, CourseDesignClient.class);
+        final CourseDesign design = cdc.getDesign(project.getDesignId());
+        if(design == null) {
+            return false;
+        }
+
+        CourseDesignDefinition cdd = CddCodec.decode(cycle, design.getDesign());
+        return cdd.getAllComponents().stream()
+                .filter(component -> component.getType().startsWith("ev_"))
+                .anyMatch(c -> cid.equals(c.getCid()));
     }
 
     private boolean empty(String st) {
