@@ -102,11 +102,11 @@ ${cpweb_foot}
                     - <span data-bind="text: participationEvent.state"></span>
                     - <span data-bind="text: participationEvent.channel"></span>
                     - Set:
-                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'CONFIRMED');}" href="#">CONFIRMED</a>
+                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'ACCEPTED');}" href="#">ACCEPTED</a>
                     /
-                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'CANCELLED');}" href="#">CANCELLED</a>
+                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'DECLINED');}" href="#">ACCEPTED</a>
                     /
-                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'TENTATIVE');}" href="#">TENTATIVE</a>
+                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'TENTATIVE');}" href="#">ACCEPTED</a>
                 </div>
             </div>
         </div>
