@@ -34,6 +34,30 @@ ${cpweb_foot}
                     console.log("Failed");
                 });
             };
+            this.resendInvite = function(eventData, partData){
+                var cid = eventData.cid, partId = partData.participationId;
+                console.log("Resend single participation for an event: ", eventData, partData);
+//                $.post(settings.changeEventState + "/" + partId, JSON.stringify({
+//                    "cid": cid,
+//                    "state": state
+//                })).done(function(data){
+//                    console.log("Succeeded", data);
+//                }).fail(function(){
+//                    console.log("Failed");
+//                });
+            };
+            this.resendInvites = function(eventData){
+                var cid = eventData.cid;
+                console.log("Resend all participations for an event: ", eventData);
+//                $.post(settings.changeEventState + "/" + partId, JSON.stringify({
+//                    "cid": cid,
+//                    "state": state
+//                })).done(function(data){
+//                    console.log("Succeeded", data);
+//                }).fail(function(){
+//                    console.log("Failed");
+//                });
+            };
             this.formatDate = function(millis){
                 if(millis) {
                     var date = new Date(millis);
@@ -94,6 +118,7 @@ ${cpweb_foot}
         <!-- ko if: events().length != 0 -->
         <div data-bind="foreach: events">
             <h1 data-bind="text: title"></h1>
+            <a data-bind="click: function(){$root.resendInvites($data);}" href="#">Resend Invitations</a>
             <div data-bind="foreach: participations">
                 <div>
                     <span data-bind="text: displayName"></span>
@@ -107,6 +132,8 @@ ${cpweb_foot}
                     <a data-bind="click: function(){$root.changeState($parents[0], $data, 'DECLINED');}" href="#">ACCEPTED</a>
                     /
                     <a data-bind="click: function(){$root.changeState($parents[0], $data, 'TENTATIVE');}" href="#">ACCEPTED</a>
+                    -
+                    <a data-bind="click: function(){$root.resendInvite($parents[0], $data);}" href="#">Resend Invitation</a>
                 </div>
             </div>
         </div>
