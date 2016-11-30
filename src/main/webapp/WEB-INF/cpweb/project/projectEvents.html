@@ -14,8 +14,10 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 
     var settings = {
-        listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents',[prj.projectId])}",
+        listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents', [prj.projectId])}",
         changeEventState: "${helper.urlFor('project.event.EventJsModule', 'changeEventState')}",
+        resendInvite: "${helper.urlFor('project.event.EventJsModule', 'resendInvite')}",
+        resendInvites: "${helper.urlFor('project.event.EventJsModule', 'resendInvites', [prj.projectId])}",
 
     };
 
@@ -37,26 +39,24 @@ ${cpweb_foot}
             this.resendInvite = function(eventData, partData){
                 var cid = eventData.cid, partId = partData.participationId;
                 console.log("Resend single participation for an event: ", eventData, partData);
-//                $.post(settings.changeEventState + "/" + partId, JSON.stringify({
-//                    "cid": cid,
-//                    "state": state
-//                })).done(function(data){
-//                    console.log("Succeeded", data);
-//                }).fail(function(){
-//                    console.log("Failed");
-//                });
+                $.post(settings.resendInvite + "/" + partId, JSON.stringify({
+                    "cid": cid
+                })).done(function(data){
+                    console.log("Succeeded", data);
+                }).fail(function(){
+                    console.log("Failed");
+                });
             };
             this.resendInvites = function(eventData){
                 var cid = eventData.cid;
                 console.log("Resend all participations for an event: ", eventData);
-//                $.post(settings.changeEventState + "/" + partId, JSON.stringify({
-//                    "cid": cid,
-//                    "state": state
-//                })).done(function(data){
-//                    console.log("Succeeded", data);
-//                }).fail(function(){
-//                    console.log("Failed");
-//                });
+                $.post(settings.resendInvites, JSON.stringify({
+                    "cid": cid
+                })).done(function(data){
+                    console.log("Succeeded", data);
+                }).fail(function(){
+                    console.log("Failed");
+                });
             };
             this.formatDate = function(millis){
                 if(millis) {

@@ -156,6 +156,61 @@ public class EventJsModule extends AbstractProjectJsModule {
         }
     }
 
+    @WebAction
+    public Map<String, Object> onResendInvite(RequestCycle cycle, String strParticipationId) {
+
+        final WebRequest req = cycle.getRequest();
+        try {
+            final Map<String, ?> json = JsonUtils.decode(IOUtils.toString(req.getReader()));
+            final String cid = (String) json.get("cid");
+            if(empty(strParticipationId) || empty(cid)) {
+                throw new RetargetException(new ErrorCodeRequestTarget(400));
+            }
+
+            CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+            long partId = Long.valueOf(strParticipationId);
+            final ProjectParticipation participation = ccbc.getProjectParticipation(partId);
+
+            OrgProject project = ccbc.getProject(participation.getProjectId());
+            checkPermission(cycle, project);
+
+            // TODO: Resend the invite here.
+
+            return ImmutableMap.of(
+                    "status", "ok"
+            );
+        } catch (IOException e) {
+            throw new RetargetException(new ErrorCodeRequestTarget(400));
+        }
+    }
+
+    @WebAction
+    public Map<String, Object> onResendInvites(RequestCycle cycle, String strProjectId) {
+
+        final WebRequest req = cycle.getRequest();
+        try {
+            final Map<String, ?> json = JsonUtils.decode(IOUtils.toString(req.getReader()));
+            final String cid = (String) json.get("cid");
+            if(empty(strProjectId) || empty(cid)) {
+                throw new RetargetException(new ErrorCodeRequestTarget(400));
+            }
+
+            CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+            long projId = Long.valueOf(strProjectId);
+
+            OrgProject project = ccbc.getProject(projId);
+            checkPermission(cycle, project);
+
+            // TODO: Resend the invites here.
+
+            return ImmutableMap.of(
+                    "status", "ok"
+            );
+        } catch (IOException e) {
+            throw new RetargetException(new ErrorCodeRequestTarget(400));
+        }
+    }
+
     private boolean isCidInDesign(RequestCycle cycle, OrgProject project, UUID cid) {
         CourseDesignClient cdc = CacheClients.getClient(cycle, CourseDesignClient.class);
         final CourseDesign design = cdc.getDesign(project.getDesignId());
