@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
+import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEvent;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventChannel;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventState;
@@ -28,6 +29,7 @@ import se.dabox.service.common.coursedesign.v1.CddCodec;
 import se.dabox.service.common.coursedesign.v1.CourseDesignDefinition;
 import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.login.client.UserAccount;
+import se.dabox.service.webutils.login.LoginUserAccountHelper;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -158,6 +160,7 @@ public class EventJsModule extends AbstractProjectJsModule {
 
     @WebAction
     public Map<String, Object> onResendInvite(RequestCycle cycle, String strParticipationId) {
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
         final WebRequest req = cycle.getRequest();
         try {
@@ -174,8 +177,8 @@ public class EventJsModule extends AbstractProjectJsModule {
             OrgProject project = ccbc.getProject(participation.getProjectId());
             checkPermission(cycle, project);
 
-            // TODO: Resend the invite here.
-
+            final ParticipationCalendarCancellationRequest calendarReq = new ParticipationCalendarCancellationRequest(caller, Collections.singletonList(participation.getParticipationId()), false, false);
+            ccbc.sendCalendarInvitations(calendarReq);
             return ImmutableMap.of(
                     "status", "ok"
             );
