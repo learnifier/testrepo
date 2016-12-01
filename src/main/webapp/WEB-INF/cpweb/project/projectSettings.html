@@ -182,43 +182,6 @@ ${cpweb_foot}
             });
     });
 
-    $('#expirationtoggle-false').click(function() {
-        $.ajax({
-            type: "POST",
-            url: settingsUrl,
-            data: {
-                pk: 'participationexpiration',
-                value: 0
-            }
-        });
-    });
-
-    $('#expirationtoggle-true').click(function() {
-        require(['jsrender'], function() {
-            $('body').append($('#setExpirationDialogTemplate').render());
-
-            $('#setExpirationDialog').dialog({
-                title: "Set expiration",
-                buttons: {
-                    "Set": function() {
-                        $.ajax({
-                            type: "POST",
-                            url: settingsUrl,
-                            data: {
-                                pk: 'participationexpiration',
-                                value: $('#expirationToggleSetter').val()
-                            },
-                            success: function() {
-                                $('#setExpirationDialog').dialog('close');
-                                window.location.reload();
-                            }
-                        });
-                    }
-                }
-            });
-        });
-
-    });
 </script>
 
 [/#assign]
@@ -287,23 +250,6 @@ ${cpweb_foot}
             </a>
         </li>
         [/@dwsrt.feature]
-
-        [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
-        <li id="expirationtoggle">
-            <span class="setting">
-                <span class="row-label">[@dws.txt key="cpweb.project.settings.expirationtoggle.title" /]</span>
-                [#if prj.defaultParticipationExpiration??]
-                    [#if prj.defaultParticipationExpiration?c?number?c?number > 0]
-                        [#assign expirationtoggleActive = "true" /]
-                    [#else]
-                        [#assign expirationtoggleActive = "false" /]
-                    [/#if]
-                [/#if]
-
-                [@bsform.inputBoolean 'expirationtoggle' 'Expiration' 'ON' 'OFF' expirationtoggleActive session=formsess /]
-            </span>
-        </li>
-        [/@]
 
         [@portalSecurity.permissionBlock permission="PRJ_CHANGE_EXPIRATION"]
         <li id="expiration">
