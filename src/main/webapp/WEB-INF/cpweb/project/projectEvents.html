@@ -39,6 +39,9 @@ ${cpweb_foot}
             this.resendInvite = function(eventData, partData){
                 var cid = eventData.cid, partId = partData.participationId;
                 console.log("Resend single participation for an event: ", eventData, partData);
+                console.log("Json: ", JSON.stringify({
+                    "cid": cid
+                }));
                 $.post(settings.resendInvite + "/" + partId, JSON.stringify({
                     "cid": cid
                 })).done(function(data){

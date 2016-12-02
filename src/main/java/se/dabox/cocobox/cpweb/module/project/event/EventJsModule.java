@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
-import se.dabox.service.common.ccbc.autoical.ParticipationCalendarCancellationRequest;
+import se.dabox.service.common.ccbc.autoical.CalendarInvitationRequest;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEvent;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventChannel;
 import se.dabox.service.common.ccbc.participation.state.ParticipationEventState;
@@ -165,11 +165,11 @@ public class EventJsModule extends AbstractProjectJsModule {
         final WebRequest req = cycle.getRequest();
         try {
             final Map<String, ?> json = JsonUtils.decode(IOUtils.toString(req.getReader()));
-            final String cid = (String) json.get("cid");
-            if(empty(strParticipationId) || empty(cid)) {
+            final String cidStr = (String) json.get("cid");
+            if(empty(strParticipationId) || empty(cidStr)) {
                 throw new RetargetException(new ErrorCodeRequestTarget(400));
             }
-
+            UUID cid = UUID.fromString(cidStr);
             CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
             long partId = Long.valueOf(strParticipationId);
             final ProjectParticipation participation = ccbc.getProjectParticipation(partId);
@@ -177,7 +177,7 @@ public class EventJsModule extends AbstractProjectJsModule {
             OrgProject project = ccbc.getProject(participation.getProjectId());
             checkPermission(cycle, project);
 
-            final ParticipationCalendarCancellationRequest calendarReq = new ParticipationCalendarCancellationRequest(caller, Collections.singletonList(participation.getParticipationId()), false, false);
+            final CalendarInvitationRequest calendarReq = new CalendarInvitationRequest(caller, Collections.singletonList(participation.getParticipationId()), cid);
             ccbc.sendCalendarInvitations(calendarReq);
             return ImmutableMap.of(
                     "status", "ok"
