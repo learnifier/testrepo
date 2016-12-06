@@ -14,6 +14,7 @@ ${cpweb_foot}
     "use strict";
     $('#menu-projects').addClass('active');
 
+    window.appContextPath = '${contextPath}/';
     require(["${contextPath}/static/js/projectEvents.js?${cycle.application.formattedStartTime.base36String}"], function(m) {
         console.log("Module: ", m, m.init);
         m.init({
