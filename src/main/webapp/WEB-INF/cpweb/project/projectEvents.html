@@ -13,82 +13,16 @@ ${cpweb_foot}
     "use strict";
     $('#menu-projects').addClass('active');
 
-    var settings = {
-        listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents', [prj.projectId])}",
-        changeEventState: "${helper.urlFor('project.event.EventJsModule', 'changeEventState')}",
-        resendInvite: "${helper.urlFor('project.event.EventJsModule', 'resendInvite')}",
-        resendInvites: "${helper.urlFor('project.event.EventJsModule', 'resendInvites', [prj.projectId])}",
-
-    };
-
-    require(['knockout', 'messenger', 'es6-shim', 'dabox-common'], function(ko) {
-        function EventsModel() {
-            this.initializing = ko.observable(true);
-            this.events = ko.observableArray();
-            this.changeState = function(eventData, partData, state){
-                var cid = eventData.cid, partId = partData.participationId;
-                $.post(settings.changeEventState + "/" + partId, JSON.stringify({
-                    "cid": cid,
-                    "state": state
-                })).done(function(data){
-                    console.log("Succeeded", data);
-                }).fail(function(){
-                    console.log("Failed");
-                });
-            };
-            this.resendInvite = function(eventData, partData){
-                var cid = eventData.cid, partId = partData.participationId;
-                console.log("Resend single participation for an event: ", eventData, partData);
-                console.log("Json: ", JSON.stringify({
-                    "cid": cid
-                }));
-                $.post(settings.resendInvite + "/" + partId, JSON.stringify({
-                    "cid": cid
-                })).done(function(data){
-                    console.log("Succeeded", data);
-                }).fail(function(){
-                    console.log("Failed");
-                });
-            };
-            this.resendInvites = function(eventData){
-                var cid = eventData.cid;
-                console.log("Resend all participations for an event: ", eventData);
-                $.post(settings.resendInvites, JSON.stringify({
-                    "cid": cid
-                })).done(function(data){
-                    console.log("Succeeded", data);
-                }).fail(function(){
-                    console.log("Failed");
-                });
-            };
-            this.formatDate = function(millis){
-                if(millis) {
-                    var date = new Date(millis);
-                    console.log("date: ", date.toString());
-                    return date.toString();
-                } else {
-                    return "(no date)";
-                }
-            };
-        }
-        var model = new EventsModel();
-        ko.applyBindings(model, $("#events-container")[0])
-
-        $.getJSON(settings.listEventsUrl).done(function(data) {
-            if(data.status == "ok") {
-                console.log("WE got data: ", data.result);
-                model.events(data.result);
-                model.initializing(false);
-            } else {
-                console.log("Could not fetch events: " + data.message);
-                CCBMessengerError("Could not fetch list of events.");
-            }
-        }).fail(function(jqXHR, textStatus, errorThrown){
-            console.log("Could not fetch events: ", errorThrown);
-            CCBMessengerError("Could not fetch list of events.");
+    require(["${contextPath}/static/js/projectEvents.js?${cycle.application.formattedStartTime.base36String}"], function(m) {
+        console.log("Module: ", m);
+        m({
+            listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents', [prj.projectId])}",
+            changeEventState: "${helper.urlFor('project.event.EventJsModule', 'changeEventState')}",
+            resendInvite: "${helper.urlFor('project.event.EventJsModule', 'resendInvite')}",
+            resendInvites: "${helper.urlFor('project.event.EventJsModule', 'resendInvites', [prj.projectId])}",
+            elementId: "events-container"
         });
     });
-
 </script>
 
 
@@ -97,51 +31,14 @@ ${cpweb_foot}
 [#assign title = (prj.name!'') + " events ("+orgName+")" /]
 [@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
 
-[@pInfo.projectInfo selected="events"][/@pInfo.projectInfo] <!-- remove if we decide to skip tabs here -->
+[@pInfo.projectInfo selected="events"][/@pInfo.projectInfo]
 
 
 <h1>[@dws.txt key="cpweb.project.events.title" /]</h1>
 
 <div class="row">
     <div class="col-sm-12">
-        <div data-bind="template: 'eventsTemplate'"></div>
+        <div id="events-container"></div>
     </div>
 </div>
-
-<script id="eventsTemplate" type="text/html">
-    <div id="events-container">
-        <!-- ko if: initializing -->
-        <span>Loading...</span>
-        <!-- /ko -->
-
-        <!-- ko ifnot: initializing -->
-        <!-- ko if: events().length == 0 -->
-        <em>There are no events in this project</em>
-        <!-- /ko -->
-        <!-- ko if: events().length != 0 -->
-        <div data-bind="foreach: events">
-            <h1 data-bind="text: title"></h1>
-            <a data-bind="click: function(){$root.resendInvites($data);}" href="#">Resend Invitations</a>
-            <div data-bind="foreach: participations">
-                <div>
-                    <span data-bind="text: displayName"></span>
-                    - <span data-bind="text: email"></span>
-                    - Date: <span data-bind="text: function(){return $root.formatDate(participationEvent.updated)}()"></span>
-                    - <span data-bind="text: participationEvent.state"></span>
-                    - <span data-bind="text: participationEvent.channel"></span>
-                    - Set:
-                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'ACCEPTED');}" href="#">ACCEPTED</a>
-                    /
-                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'DECLINED');}" href="#">DECLINED</a>
-                    /
-                    <a data-bind="click: function(){$root.changeState($parents[0], $data, 'TENTATIVE');}" href="#">TENTATIVE</a>
-                    -
-                    <a data-bind="click: function(){$root.resendInvite($parents[0], $data);}" href="#">Resend Invitation</a>
-                </div>
-            </div>
-        </div>
-        <!-- /ko -->
-        <!-- /ko -->
-    </div>
-</script>
 [/@dws.skin]
