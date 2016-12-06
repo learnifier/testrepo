@@ -14,8 +14,8 @@ ${cpweb_foot}
     $('#menu-projects').addClass('active');
 
     require(["${contextPath}/static/js/projectEvents.js?${cycle.application.formattedStartTime.base36String}"], function(m) {
-        console.log("Module: ", m);
-        m({
+        console.log("Module: ", this, arguments);
+        m.init({
             listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents', [prj.projectId])}",
             changeEventState: "${helper.urlFor('project.event.EventJsModule', 'changeEventState')}",
             resendInvite: "${helper.urlFor('project.event.EventJsModule', 'resendInvite')}",
