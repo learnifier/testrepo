@@ -22,6 +22,8 @@ import se.dabox.cocobox.cpweb.command.RecentTimezoneUpdateCommand;
 import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocosite.druwa.DruwaParamHelper;
 import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.timezone.FormTimeZone;
+import se.dabox.cocosite.timezone.PlatformFormTimeZoneFactory;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.ProjectStatus;
 import se.dabox.service.common.ccbc.project.OrgProject;
@@ -204,16 +206,19 @@ public class ProjectSettingsJsonModule extends AbstractJsonAuthModule {
     private ObjectStringContainer<TimeZone> getProjectTimeZone(RequestCycle cycle, String fieldValue) {
         TimeZone tz = TimeZone.getTimeZone(fieldValue);
 
-        List<TimeZone> projTzs =
-                NewProjectModule.getTimezones(cycle);
+        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+        PlatformFormTimeZoneFactory pftZoneFactory
+                = new PlatformFormTimeZoneFactory(cycle, userLocale);
 
-        if (!projTzs.contains(tz)) {
+        FormTimeZone ftz = pftZoneFactory.toFormTimeZone(tz);
+
+        List<FormTimeZone> projTzs = NewProjectModule.getTimezones(cycle);
+
+        if (!projTzs.contains(ftz)) {
             throw new ValidationException("Invalid choice");
         }
 
-        Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
-
-        return new ObjectStringContainer<>(tz, tz.getDisplayName(userLocale));
+        return new ObjectStringContainer<>(tz, ftz.getName());
     }
 
     private ObjectStringContainer<Locale> getProjectLocale(RequestCycle cycle, String fieldValue) {

@@ -4,22 +4,18 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.common.collect.ImmutableMap;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RequestTarget;
-import net.unixdeveloper.druwa.RetargetException;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
 import net.unixdeveloper.druwa.formbean.DruwaFormValidationSession;
 import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
-import net.unixdeveloper.druwa.request.JsonRequestTarget;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegCreditLimitForm;
 import se.dabox.cocobox.cpweb.formdata.project.SetRegPasswordForm;
 import se.dabox.cocobox.cpweb.module.OrgMaterialJsonModule;
-import se.dabox.cocobox.cpweb.module.core.AbstractJsonAuthModule;
 import se.dabox.cocobox.cpweb.module.project.publish.IsProjectPublishingCommand;
 import se.dabox.cocobox.security.CocoboxSecurityConstants;
 import se.dabox.cocobox.security.permission.CocoboxPermissions;
@@ -46,7 +42,6 @@ import se.dabox.service.common.ccbc.project.MailBounce;
 import se.dabox.service.common.ccbc.project.MailBounceUtil;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
-import se.dabox.service.common.ccbc.project.ProjectParticipationState;
 import se.dabox.service.common.ccbc.project.ProjectProduct;
 import se.dabox.service.common.ccbc.project.ProjectProductTransformers;
 import se.dabox.service.common.ccbc.project.ProjectTask;
@@ -54,8 +49,6 @@ import se.dabox.service.common.ccbc.project.catalog.CatalogMode;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.material.ProjectMaterialCoordinatorClient;
 import se.dabox.service.common.ccbc.project.update.UpdateProjectRequestBuilder;
-import se.dabox.service.common.json.JsonException;
-import se.dabox.service.common.json.JsonUtils;
 import se.dabox.service.common.mailsender.BounceConstants;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplate;
 import se.dabox.service.common.mailsender.mailtemplate.MailTemplateServiceClient;
@@ -80,7 +73,6 @@ import se.dabox.util.RecentList;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -92,9 +84,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
-import static se.dabox.service.common.ccbc.participation.filter.FilterParticipationField.activated;
+import se.dabox.cocosite.timezone.FormTimeZone;
 
 /**
  *
@@ -690,7 +681,7 @@ public class ProjectJsonModule extends AbstractProjectJsModule {
         OrgProject prj = ccbc.getProject(prjId);
         checkPermission(cycle, prj, strProjectId, LOGGER);
 
-        RecentList<TimeZone> timeZones =
+        RecentList<FormTimeZone> timeZones =
                 OrgProjectTimezoneFactory.newRecentList(cycle, prj.getOrgId());
 
         List<Object> response = new ArrayList<>();
@@ -921,17 +912,17 @@ public class ProjectJsonModule extends AbstractProjectJsModule {
 
     }
 
-    private Object timezoneSection(String title, List<TimeZone> zones) {
+    private Object timezoneSection(String title, List<FormTimeZone> zones) {
         Map<String,Object> section = new HashMap<>();
         section.put("text", title);
 
         List<Map<String,String>> otherList = new ArrayList<>(zones.size());
 
-        for (TimeZone timeZone : zones) {
+        for (FormTimeZone timeZone : zones) {
             @SuppressWarnings("unchecked")
             Map<String,String> map = new Flat3Map();
-            map.put("value", timeZone.getID());
-            map.put("text", timeZone.getID());
+            map.put("value", timeZone.getId());
+            map.put("text", timeZone.getName());
             otherList.add(map);
         }
 

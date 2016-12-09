@@ -4,6 +4,7 @@
 package se.dabox.cocobox.cpweb.module.project;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import net.unixdeveloper.druwa.RequestCycle;
 import net.unixdeveloper.druwa.RetargetException;
@@ -21,6 +22,7 @@ import se.dabox.cocosite.login.CocositeUserHelper;
 import se.dabox.service.common.ccbc.project.material.MaterialListFactory;
 import se.dabox.service.common.ccbc.project.GetIdProjectProductIdCommand;
 import se.dabox.cocosite.project.UpdateRecentProjectList;
+import se.dabox.cocosite.timezone.PlatformFormTimeZoneFactory;
 import se.dabox.cocosite.webfeature.CocositeWebFeatureConstants;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
@@ -58,6 +60,8 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         OrgProject masterProject = null;
         ProjectParticipation participationOwner = null;
 
+        final Locale userLocale = CocositeUserHelper.getUserLocale(cycle);
+
         if (project.getMasterProject() != null) {
             masterProject = getCocoboxCordinatorClient(cycle).getProject(project.getMasterProject());
 
@@ -82,9 +86,7 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         if (product != null) {
 
             map.put("product", product);
-
-            MaterialListFactory mlf = new MaterialListFactory(cycle, CocositeUserHelper.
-                    getUserLocale(cycle));
+            MaterialListFactory mlf = new MaterialListFactory(cycle, userLocale);
             mlf.addProducts(Collections.singletonList(product));
 
             Material material = mlf.getList().get(0);
@@ -115,6 +117,7 @@ public abstract class AbstractProjectWebModule extends AbstractWebAuthModule {
         map.put("isPublishing", isPublishing(project));
 
         map.put("isPublishing", isPublishing(project));
+        map.put("projectTimeZoneName", new PlatformFormTimeZoneFactory(cycle, userLocale).getDisplayName(project.getTimezone()));
 
     }
 

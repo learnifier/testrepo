@@ -133,13 +133,14 @@ ${cpweb_head}
                 <div id="projecttimezone">
                     <h2>3 Set the time zone - can be edited later</h2>
                         [#assign defaultValue = formsess.getDefaultValue('timezone')!(defaultTimezone.ID)!'' /]
+
                         [@bsform.select name="timezone" tabindex="7" required="required"]
                         <option></option>
                         [#assign tzValueFound = false /]
                         <optgroup label="Recently used">
                             [#list timezones.recentList as tz]
-                                [@bsform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@bsform.option]
-                                [#if tz.ID == defaultValue]
+                                [@bsform.option value=tz.id defaultValue=defaultValue]${tz.name?xhtml}[/@bsform.option]
+                                [#if tz.id == defaultValue]
                                   [#assign tzValueFound = true /]
                                 [/#if]
                             [/#list]
@@ -147,9 +148,9 @@ ${cpweb_head}
                         <optgroup label="All timezones">
                             [#list timezones.otherList?sort as tz]
                                 [#if tzValueFound]
-                                    [@bsform.option value=tz.ID defaultValue="xyz"]${tz.ID?xhtml}[/@bsform.option]
+                                    [@bsform.option value=tz.id defaultValue="xyz"]${tz.name?xhtml}[/@bsform.option]
                                 [#else]
-                                    [@bsform.option value=tz.ID defaultValue=defaultValue]${tz.ID?xhtml}[/@bsform.option]
+                                    [@bsform.option value=tz.id defaultValue=defaultValue]${tz.name?xhtml}[/@bsform.option]
                                 [/#if]
                             [/#list]
                         </optgroup>

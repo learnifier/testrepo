@@ -62,6 +62,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+import se.dabox.cocosite.timezone.FormTimeZone;
+import se.dabox.cocosite.timezone.PlatformFormTimeZoneFactory;
 
 /**
  *
@@ -598,10 +600,6 @@ public class NewProjectModule extends AbstractWebAuthModule {
     }
 
     private TimeZone getDefaultTimezone(RequestCycle cycle) {
-        if (1 > 0) {
-            return null;
-        }
-
 //        String defaultTz = DwsRealmHelper.
 //                getRealmConfiguration(cycle).get("cocobox.project.timezone.default", null);
 //        if (defaultTz == null) {
@@ -626,10 +624,9 @@ public class NewProjectModule extends AbstractWebAuthModule {
                 cycle);
     }
 
-    public static List<TimeZone> getTimezones(RequestCycle cycle) {
-        List<String> ids = Arrays.asList(TimeZone.getAvailableIDs());
-
-        return CollectionsUtil.transformList(ids, TimeZone::getTimeZone);
+    public static List<FormTimeZone> getTimezones(RequestCycle cycle) {
+        return new PlatformFormTimeZoneFactory(cycle, CocositeUserHelper.getUserLocale(cycle)).
+                getTimeZoneList();
     }
 
     /**

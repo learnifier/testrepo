@@ -9,8 +9,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 import se.dabox.cocobox.cpweb.command.RecentTimezoneStringForOrgCommand;
+import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.timezone.FormTimeZone;
+import se.dabox.cocosite.timezone.PlatformFormTimeZoneFactory;
 import se.dabox.util.ParamUtil;
 import se.dabox.util.RecentList;
 
@@ -20,39 +22,36 @@ import se.dabox.util.RecentList;
  * @author Jerker Klang (jerker.klang@dabox.se)
  */
 public final class OrgProjectTimezoneFactory {
-    
-    public static RecentList<TimeZone> newRecentList(RequestCycle cycle, long orgId) {
+
+    public static RecentList<FormTimeZone> newRecentList(RequestCycle cycle, long orgId) {
         ParamUtil.required(cycle, "cycle");
 
         String recentString = new RecentTimezoneStringForOrgCommand(cycle).forOrgId(orgId);
 
-        RecentList<TimeZone> recentList
-                = new RecentList<TimeZone>(10) {
+        final PlatformFormTimeZoneFactory ftzFactory = new PlatformFormTimeZoneFactory(cycle,
+                CocositeUserHelper.getUserLocale(cycle));
 
-                    @Override
-                    protected TimeZone stringToObject(
-                            Collection<? extends TimeZone> allItems, String recentString) {
-                                return TimeZone.getTimeZone(recentString);
-                            }
+        RecentList<FormTimeZone> recentList
+                = new RecentList<FormTimeZone>(10) {
 
-                            @Override
-                            protected Comparator<TimeZone> getSortComparator() {
-                                return new Comparator<TimeZone>() {
-                                    @Override
-                                    public int compare(TimeZone o1, TimeZone o2) {
-                                        return new CompareToBuilder().append(o1.getID(), o2.getID()).
-                                                append(o1, o2).build();
-                                    }
-                                };
-                            }
+            @Override
+            protected FormTimeZone stringToObject(
+                    Collection<? extends FormTimeZone> allItems, String recentString) {
+                return ftzFactory.toFormTimeZone(TimeZone.getTimeZone(recentString));
+            }
 
-                            @Override
-                            protected String objectToString(TimeZone item) {
-                                return item.getID();
-                            }
-                };
+            @Override
+            protected Comparator<FormTimeZone> getSortComparator() {
+                return ftzFactory.getComparator();
+            }
 
-        List<TimeZone> timeZones = NewProjectModule.getTimezones(cycle);
+            @Override
+            protected String objectToString(FormTimeZone item) {
+                return item.getId();
+            }
+        };
+
+        List<FormTimeZone> timeZones = NewProjectModule.getTimezones(cycle);
 
         recentList.process(recentString, timeZones);
 

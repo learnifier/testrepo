@@ -8,6 +8,9 @@ import java.util.TimeZone;
 import net.unixdeveloper.druwa.RequestCycle;
 import se.dabox.cocobox.cpweb.module.project.OrgProjectTimezoneFactory;
 import se.dabox.cocosite.druwa.CocoSiteConstants;
+import se.dabox.cocosite.login.CocositeUserHelper;
+import se.dabox.cocosite.timezone.FormTimeZone;
+import se.dabox.cocosite.timezone.PlatformFormTimeZoneFactory;
 import se.dabox.service.client.CacheClients;
 import se.dabox.service.orgdir.client.OrganizationDirectoryClient;
 import se.dabox.util.ParamUtil;
@@ -28,6 +31,15 @@ public class RecentTimezoneUpdateCommand {
         this.cycle = cycle;
     }
 
+    public boolean updateRecentTimezone(long orgUnitId, TimeZone tz) {
+        PlatformFormTimeZoneFactory factory
+                = new PlatformFormTimeZoneFactory(cycle, CocositeUserHelper.getUserLocale(cycle));
+
+        FormTimeZone ftz = factory.toFormTimeZone(tz);
+
+        return updateRecentTimezone(orgUnitId, ftz);
+    }
+
     /**
      * Updates the recent timezone string a organization unit. The string is only
      * updated if the timezone is non-null and the recent string differ from the existing.
@@ -36,14 +48,14 @@ public class RecentTimezoneUpdateCommand {
      * @param tz The latest used timezone or {@code null}.
      * @return {@code true} if the timezone string was updated or false otherwise.
      */
-    public boolean updateRecentTimezone(long orgUnitId, TimeZone tz) {
+    public boolean updateRecentTimezone(long orgUnitId, FormTimeZone tz) {
         if (tz == null) {
             return false;
         }
 
         String orgRecentString = new RecentTimezoneStringForOrgCommand(cycle).forOrgId(orgUnitId);
 
-        RecentList<TimeZone> recent = OrgProjectTimezoneFactory.newRecentList(cycle, orgUnitId);
+        RecentList<FormTimeZone> recent = OrgProjectTimezoneFactory.newRecentList(cycle, orgUnitId);
         recent.addRecent(tz);
 
         String newRecentString = recent.getRecentString();
