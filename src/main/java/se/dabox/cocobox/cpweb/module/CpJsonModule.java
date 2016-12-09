@@ -12,7 +12,6 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -61,7 +60,6 @@ import se.dabox.service.webutils.json.JsonEncoding;
 import se.dabox.service.webutils.login.LoginUserAccountHelper;
 import se.dabox.util.collections.CollectionsUtil;
 import se.dabox.util.collections.MapUtil;
-import se.dabox.util.collections.Transformer;
 import se.dabox.util.collections.ValueUtils;
 
 /**
@@ -192,13 +190,7 @@ public class CpJsonModule extends AbstractJsonAuthModule {
         long userId = LoginUserAccountHelper.getUserId(cycle);
         List<Long> favoriteIds = ccbc.getFavorites(userId, orgId);
 
-        List<OrgProject> projects = CollectionsUtil.transformList(favoriteIds,
-                new Transformer<Long, OrgProject>() {
-                    @Override
-                    public OrgProject transform(Long projectId) {
-                        return ccbc.getProject(projectId);
-                    }
-                });
+        List<OrgProject> projects = CollectionsUtil.transformList(favoriteIds, ccbc::getProject);
 
         ByteArrayOutputStream os = toJsonObjectProjects(cycle, projects, favoriteIds);
 
