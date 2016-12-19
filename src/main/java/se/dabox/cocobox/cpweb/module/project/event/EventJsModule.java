@@ -57,6 +57,7 @@ public class EventJsModule extends AbstractProjectJsModule {
         OrgProject project = ccbc.getProject(prjId);
         checkPermission(cycle, project, strProjectId, LOGGER);
 
+        final boolean autoIcal = project.isAutoIcal();
         final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
         if(participations == null) {
             return ImmutableMap.of(
@@ -87,6 +88,7 @@ public class EventJsModule extends AbstractProjectJsModule {
                     final String cidStr = component.getCid().toString();
                     return ImmutableMap.of(
                             "cid", cidStr,
+                            "resendEnabled", autoIcal,
                             "title", component.getProperties().getOrDefault("title", "(Unnamed event)"),
                             "participations", participations.stream().map(participation -> {
                                 UserAccount ua = uaMap.get(participation.getUserId());
