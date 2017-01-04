@@ -16,7 +16,7 @@ ${cpweb_foot}
     require(["${contextPath}/js/papi/listApiKeys.js?${cycle.application.formattedStartTime.base36String}"], function(s) {
            //No initialization needed
     });
-   
+
 </script>
 
 <script id="settings-template" type="text/x-handlebars-template">
@@ -27,11 +27,11 @@ ${cpweb_foot}
     <p class="keyPos">{{publicKey}}</p>
     <p class="namePos">{{name}}</p>
 
-    [#if security.hasPermission("CP_VIEW_APIKEY_SECRET")]
+    [#if portalSecurity.hasPermission("CP_VIEW_APIKEY_SECRET")]
     <button type="button" class="showBtnPos btn btn-primary btn-sm" data-id="{{publicKey}}">Show</button>
     [/#if]
 
-    [#if security.hasPermission("CP_DELETE_APIKEY")]
+    [#if portalSecurity.hasPermission("CP_DELETE_APIKEY")]
     <button type="button" class="delBtnPos btn btn-primary btn-sm" data-id="{{id}}">Delete</button>
     [/#if]
     </div>
@@ -53,7 +53,7 @@ ${cpweb_foot}
     <div>
     The API orgunit endpoint is: <code>${orgUnitEndpoint?xml}</code>
     </div>
-    
+
 </div>
 
 <div id="settingsList">
@@ -73,7 +73,7 @@ ${cpweb_foot}
     <br>
 
     <div class="clearALl">
-        [#if security.hasPermission("CP_CREATE_APIKEY")]
+        [#if portalSecurity.hasPermission("CP_CREATE_APIKEY")]
         <button type="button" class="fl addBtn btn btn-primary btn-sm">Add Key</button>
         [/#if]
     </div>

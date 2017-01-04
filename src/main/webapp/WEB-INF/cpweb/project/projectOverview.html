@@ -56,7 +56,7 @@ ${cpweb_foot}
                                     dName = row.email;
                                 }
                             data = '<p class="team-members__name" title="' + dName + '">' + cocobox.trunc(dName, 20) + '</p>';
-                                    [#if security.hasPermission("CP_EDIT_USER")]
+                                    [#if portalSecurity.hasPermission("CP_EDIT_USER")]
                                     for (var i = 0; i < row.roles.length; i++) {
                             data += '<span class="team-members__role">' + row.roles[i].roleName + ' <a onclick="deleteMember(\'' + row.roles[i].role + '\',\'' + row.roles[i].deleteRoleLink + '\',\'' + row.userId + '\')"><span class="glyphicon glyphicon-remove-sign"></span></a></span>';
                             }
