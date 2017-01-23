@@ -11,12 +11,12 @@ ${cpweb_foot}
 $('#menu-users').addClass('active');
 
 $(document).ready(function() {
-    
+
     require(['dataTables-bootstrap', 'dabox-common'], function() {
-       
+
         var oTable = $('#userroleslist').dataTable({
             "dom": '<"row"<"col-sm-12"rt>><"row"<"col-sm-6"i><"col-sm-6"p>>',
-            "paging": false,            
+            "paging": false,
             "order": [[0,'asc']],
             "columnDefs": [
                 {
@@ -44,7 +44,7 @@ $(document).ready(function() {
                     "orderable": false,
                     "data" : function(row, type, set) {
                         if (!row.actionDisplay) {
-                            [#if security.hasPermission("CP_EDIT_USER")]
+                            [#if portalSecurity.hasPermission("CP_EDIT_USER")]
                               row.actionDisplay = '<button onclick="deleteMember(\'' +  row.uuid +'\')" class="btn btn-primary-outlined btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>';
                             [#else]
                               row.actionDisplay = '';
@@ -66,22 +66,22 @@ $(document).ready(function() {
 
 
             ],
-                        
+
             "ajax": "${helper.urlFor('user.UserJsonModule','listRoles',[org.id, user.userId?c])}",
-             
+
             "language": {
                 "emptyTable": "<span class='emptytable'>${user.displayName?xhtml} has no roles assigned </span>",
                 "loadingRecords": "<p>Loading roles...</p><img src='[@common.spinnerUrl /]' />"
             }
         });
-       
 
-        
+
+
     });
- 
+
 });
 
- 
+
 function reloadMemberList(data) {
     var oTable = $('#userroleslist').DataTable();
     oTable.clear();
@@ -90,7 +90,7 @@ function reloadMemberList(data) {
 };
 
 function deleteMember(role) {
-    cocobox.confirmationDialog("Delete role", "Do you want to delete this role for ${user.displayName?xhtml}?", function() { 
+    cocobox.confirmationDialog("Delete role", "Do you want to delete this role for ${user.displayName?xhtml}?", function() {
         var ajaxData = {userId: ${user.userId?c}, 'role': role};
         cocobox.ajaxPost("${helper.urlFor('user.UserJsonModule','removeCpRole', [org.id?c])}", {
             data: ajaxData,
@@ -98,8 +98,8 @@ function deleteMember(role) {
         });
     });
     return false;
-};   
-   
+};
+
 </script>
 <div class="modal fade" id="addRole" tabindex="-1" role="dialog" aria-labelledby="addRoleLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -146,8 +146,8 @@ ${cpweb_head}
     [#include "userInfo.html" /]
 
     [@userMenu.userOverviewMenu selected="roles"][/@userMenu.userOverviewMenu]
-    
-    
+
+
 
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRole">
     <span class="glyphicon glyphicon-plus-sign"></span> Add Role
