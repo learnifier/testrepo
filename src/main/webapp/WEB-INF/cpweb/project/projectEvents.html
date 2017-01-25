@@ -1,0 +1,43 @@
+[#ftl strip_text="true" /]
+
+[#import "projectInfo.html" as pInfo /]
+
+[#assign cpweb_head]
+<link href="${contextPath}/static/css/projectEvents.css" rel="stylesheet">
+${cpweb_head}
+
+[/#assign]
+
+[#assign cpweb_foot ]
+${cpweb_foot}
+<script>
+    "use strict";
+    $('#menu-projects').addClass('active');
+
+    window.appContextPath = '${contextPath}/';
+    require(["${contextPath}/static/js/projectEvents.js?${cycle.application.formattedStartTime.base36String}"], function(m) {
+        console.log("Module: ", m, m.init);
+        m.init({
+            listEventsUrl: "${helper.urlFor('project.event.EventJsModule', 'listEvents', [prj.projectId])}",
+            changeEventState: "${helper.urlFor('project.event.EventJsModule', 'changeEventState')}",
+            resendInvite: "${helper.urlFor('project.event.EventJsModule', 'resendInvite')}",
+            resendInvites: "${helper.urlFor('project.event.EventJsModule', 'resendInvites', [prj.projectId])}",
+            elementId: "events-container"
+        });
+    });
+</script>
+
+
+[/#assign]
+
+[#assign title = (prj.name!'') + " events ("+orgName+")" /]
+[@dws.skin skin="CPAuth3" head=cpweb_head ctxMenu=cpweb_ctxMenu foot=cpweb_foot orgName=title]
+
+[@pInfo.projectInfo selected="events"][/@pInfo.projectInfo]
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="events-container"></div>
+    </div>
+</div>
+[/@dws.skin]

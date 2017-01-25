@@ -74,12 +74,16 @@ public class UploadJsModule extends AbstractProjectJsModule {
         Map<String, Map<String, Object>> uploads = new HashMap<>();
 
         if(participations != null) {
+
+            final List<Long> userIds = participations.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+            final Map<Long, UserAccount> uaMap = getUserAccountMap(cycle, userIds);
+
             participations.forEach(participant -> {
-                UserAccount userAccount = getUserAccountServiceClient(cycle).getUserAccount(participant.getUserId());
-                if(userAccount == null) {
+                if(!uaMap.containsKey(participant.getUserId())) {
                     return;
                 }
-                String participantName = userAccount.getDisplayName()!=null?userAccount.getDisplayName():"(Unnamed user)";
+                final UserAccount ua = uaMap.get(participant.getUserId());
+                String participantName = ua.getDisplayName()!=null?ua.getDisplayName():"(Unnamed user)";
                 final ProjectParticipationState state = ccbc.getParticipationState(participant.getParticipationId());
                 if(state != null) {
                     final Map<String, String> stateMap = state.getMap();
