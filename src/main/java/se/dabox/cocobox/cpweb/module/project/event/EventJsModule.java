@@ -191,14 +191,16 @@ public class EventJsModule extends AbstractProjectJsModule {
 
     @WebAction
     public Map<String, Object> onResendInvites(RequestCycle cycle, String strProjectId) {
+        long caller = LoginUserAccountHelper.getCurrentCaller(cycle);
 
         final WebRequest req = cycle.getRequest();
         try {
             final Map<String, ?> json = JsonUtils.decode(IOUtils.toString(req.getReader()));
-            final String cid = (String) json.get("cid");
-            if(empty(strProjectId) || empty(cid)) {
+            final String cidStr = (String) json.get("cid");
+            if(empty(strProjectId) || empty(cidStr)) {
                 throw new RetargetException(new ErrorCodeRequestTarget(400));
             }
+            UUID cid = UUID.fromString(cidStr);
 
             CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
             long projId = Long.valueOf(strProjectId);
@@ -206,7 +208,15 @@ public class EventJsModule extends AbstractProjectJsModule {
             OrgProject project = ccbc.getProject(projId);
             checkPermission(cycle, project);
 
-            // TODO: Resend the invites here.
+            final List<ProjectParticipation> participations = ccbc.listProjectParticipations(project.getProjectId());
+
+            if(participations != null) {
+                final CalendarInvitationRequest calendarReq = new CalendarInvitationRequest(
+                        caller,
+                        participations.stream().map(ProjectParticipation::getParticipationId).collect(Collectors.toList()),
+                        cid);
+                ccbc.sendCalendarInvitations(calendarReq);
+            }
 
             return ImmutableMap.of(
                     "status", "ok"
