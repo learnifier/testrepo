@@ -3,7 +3,7 @@
 [#assign cpweb_foot ]
 ${cpweb_foot}
 <script>
-    require(['select2-4.min'], function() {
+    require(['select2-4.min','dabox-common'], function() {
 
        $("#userSelect").select2({
            tags: true,
@@ -31,7 +31,7 @@ ${cpweb_foot}
 
                 if (data.id !== data.text) {
                     //Existing user
-                    return '<div><div class="pull-left" style="margin-right: 5px;"><img src="'+data.thumbnail+'" style="width: 32px" class="float-left" /></div><div><span>' + data.text + '</span><br/><span>' + data.email + ' </span></div></div>' ;
+                    return '<div><div class="pull-left" style="margin-right: 5px;"><img src="'+data.thumbnail+'" style="width: 32px" class="float-left" /></div><div><span>' + cocobox.internal.escapeHTML(data.text) + '</span><br/><span>' + cocobox.internal.escapeHTML(data.email) + ' </span></div></div>' ;
                 } else {
                     return '<div><div class="pull-left" style="width: 32px; margin-right: 5px;"></div><div><span>' + data.text + '</span><br/><span>Add new user</span></div></div>';
                 }

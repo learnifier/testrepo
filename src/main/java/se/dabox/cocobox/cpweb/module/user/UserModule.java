@@ -195,7 +195,13 @@ public class UserModule extends AbstractWebAuthModule {
     private void addCommonValue(RequestCycle cycle, Map<String, Object> map, MiniOrgInfo org,
             UserAccount user) {
 
-        Locale userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
+        Locale userLocale = null;
+        try {
+            userLocale = CocositeUserHelper.getUserAccountUserLocale(user);
+        } catch (IllegalArgumentException iae){
+            //If users get bad locale data revert to english
+            userLocale = Locale.ENGLISH;
+        }
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
         String userRole = user.getProfileValue(CocoSiteConstants.UA_PROFILE, orgRoleName.toString());
