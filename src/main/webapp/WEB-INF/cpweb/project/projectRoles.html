@@ -71,9 +71,9 @@ ${cpweb_foot}
                         if (!row.displayNameDisplay) {
                             var dName = row.displayName;
                             if (dName.length < 2) {
-                                row.displayNameDisplay = row.email;
+                                row.displayNameDisplay = cocobox.internal.escapeHTML(row.email);
                             } else {
-                                row.displayNameDisplay = '<span title="' + dName + '">' + cocobox.trunc(dName, 20) + '</span>';
+                                row.displayNameDisplay = '<span title="' + cocobox.internal.escapeHTML(dName) + '">' + cocobox.internal.escapeHTML(cocobox.trunc(dName, 20)) + '</span>';
                             }
                         }
                         if (type === 'display') {
@@ -96,7 +96,7 @@ ${cpweb_foot}
                         if (!row.roleDisplay) {
                             var roleList='';
                             for(var i = 0; i < row.roles.length; i++) {
-                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + row.roles[i].roleName + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  row.roles[i].role + '\',\'' + row.roles[i].deleteRoleLink + '\',\'' + row.userId + '\')">Remove role</a></p>';
+                                roleList+= '<p style="margin: 3px 0; line-height: 14px;">' + cocobox.internal.escapeHTML(row.roles[i].roleName) + ' - <a style="cursor: pointer;" onclick="deleteMember(\'' +  cocobox.internal.escapeHTML(row.roles[i].role) + '\',\'' + row.roles[i].deleteRoleLink + '\',\'' + row.userId + '\')">Remove role</a></p>';
                             }
                             row.roleDisplay = roleList;
                         }
