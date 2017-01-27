@@ -147,6 +147,12 @@
                 [/@]
             [/#if]
 
+            <li class="[#if selected == 'events']active[/#if]"><a href="${helper.urlFor('ProjectModule','events',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.events' /]</span></a></li>
+
+            [#if dwsrt.hasFeature("uploadassignment")]
+            <li class="[#if selected == 'uploads']active[/#if]"><a href="${helper.urlFor('ProjectModule','uploads',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.uploads' /]</span></a></li>
+            [/#if]
+
             [#--
             [#if project.type.ptype == 2 && !isIdproject(prj)]
                 <li class="[#if selected == 'info']active[/#if]"><a href="${helper.urlFor('ProjectModule','details',[project.projectId])}"><span>Info</span></a></li>
@@ -177,12 +183,6 @@
             [@projectSecurity.permissionBlock permission="CP_EDIT_PROJECT"]
             <li class="[#if selected == 'settings']active[/#if]"><a href="${helper.urlFor('ProjectModule','settings',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.settings' /]</span></a></li>
             [/@]
-
-            [#if dwsrt.hasFeature("uploadassignment")]
-            <li class="[#if selected == 'uploads']active[/#if]"><a href="${helper.urlFor('ProjectModule','uploads',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.uploads' /]</span></a></li>
-            [/#if]
-
-            <li class="[#if selected == 'events']active[/#if]"><a href="${helper.urlFor('ProjectModule','events',[project.projectId])}"><span>[@dws.txt key='cpweb.projectmenu.events' /]</span></a></li>
 
         </ul>
     </nav>
