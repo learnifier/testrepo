@@ -15,7 +15,8 @@ ${cpweb_foot}
 
     var settings = {
         listUploadsUrl: "${helper.urlFor('project.upload.UploadJsModule', 'listUploads',[prj.projectId])}",
-        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}"
+        removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}",
+        downloadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'download')}"
     };
 
     require(['knockout', 'moment', 'messenger', 'es6-shim', 'dabox-common'], function(ko, moment) {
@@ -42,9 +43,11 @@ ${cpweb_foot}
                     });
                 });
             };
-            this.downloadUrl = function(){
-                var uploadId = this.uploadId, participationId = this.participationId;
+            this.downloadUrlNg = function(data){
+                console.log("In downloadUrlNg", settings.downloadUrl);
+                var uploadId = data.uploadId, participationId = data.participationId;
                 var url = settings.downloadUrl + "/" + participationId + "/" + uploadId;
+                console.log("Url = ", url);
                 return url;
             };
             this.createdString = function(data){
@@ -142,6 +145,7 @@ ${cpweb_foot}
                         </span>
                         <!-- ko if: downloadUrl -->
                         <a data-bind="attr: { href: downloadUrl }, text: fileName" style="display: block;"></a>
+                        <a data-bind="attr: { href: function(){return $root.downloadUrlNg($data);}()}, text: fileName" style="display: block;"></a>
                         <!-- /ko -->
                         <!-- ko ifnot: downloadUrl -->
                         <span data-bind="text: fileName" style="display: block;"></span>

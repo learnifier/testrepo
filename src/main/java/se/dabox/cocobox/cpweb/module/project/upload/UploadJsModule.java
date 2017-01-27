@@ -9,14 +9,14 @@ import net.unixdeveloper.druwa.RequestTarget;
 import net.unixdeveloper.druwa.WebRequest;
 import net.unixdeveloper.druwa.annotation.WebAction;
 import net.unixdeveloper.druwa.annotation.mount.WebModuleMountpoint;
-import net.unixdeveloper.druwa.request.ErrorCodeRequestTarget;
 import net.unixdeveloper.druwa.request.JsonRequestTarget;
-import net.unixdeveloper.druwa.request.RedirectUrlRequestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.dabox.cocobox.cpweb.module.project.AbstractProjectJsModule;
 import se.dabox.service.common.ccbc.CocoboxCoordinatorClient;
 import se.dabox.service.common.ccbc.NotFoundException;
+import se.dabox.service.common.ccbc.participation.state.ParticipationStateJsonHelper;
+import se.dabox.service.common.ccbc.participation.state.ParticipationUpload;
 import se.dabox.service.common.ccbc.project.OrgProject;
 import se.dabox.service.common.ccbc.project.ProjectParticipation;
 import se.dabox.service.common.ccbc.project.ProjectParticipationState;
@@ -30,9 +30,11 @@ import se.dabox.service.login.client.UserAccount;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -188,4 +190,28 @@ public class UploadJsModule extends AbstractProjectJsModule {
 
         return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of("status", "ok")));
     }
+
+
+    @WebAction
+    public RequestTarget onDownload(RequestCycle cycle, String strParticipationId, String uploadId) {
+
+        CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
+        final ProjectParticipation participation = ccbc.getProjectParticipation(Long.valueOf(strParticipationId));
+
+        OrgProject project = ccbc.getProject(participation.getProjectId());
+        checkPermission(cycle, project);
+
+        final String rawId = uploadId.substring(ParticipationUpload.PREFIX.length());
+
+        final ParticipationUpload upload =
+                new ParticipationStateJsonHelper<>(ParticipationUpload.class, cycle, ParticipationUpload.PREFIX).getParticipationState(participation.getParticipationId(), rawId);
+
+        String crl = upload.getCrl();
+        String filename = upload.getFilename();
+
+        // TODO: Fix a downloadable file from this somehow.
+
+        return new JsonRequestTarget(JsonUtils.encode(ImmutableMap.of("status", "ok")));
+    }
+
 }
