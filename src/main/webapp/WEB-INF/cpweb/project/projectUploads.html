@@ -18,7 +18,7 @@ ${cpweb_foot}
         removeUploadUrl: "${helper.urlFor('project.upload.UploadJsModule', 'removeUpload')}"
     };
 
-    require(['knockout', 'messenger', 'es6-shim', 'dabox-common'], function(ko) {
+    require(['knockout', 'moment', 'messenger', 'es6-shim', 'dabox-common'], function(ko, moment) {
         function UploadModel() {
             this.initializing = ko.observable(true);
             this.uploadComponents = ko.observableArray();
@@ -46,6 +46,9 @@ ${cpweb_foot}
                 var uploadId = this.uploadId, participationId = this.participationId;
                 var url = settings.downloadUrl + "/" + participationId + "/" + uploadId;
                 return url;
+            };
+            this.createdString = function(data){
+                return moment(data.created).format();
             };
         }
         var model = new UploadModel();
@@ -143,6 +146,7 @@ ${cpweb_foot}
                         <!-- ko ifnot: downloadUrl -->
                         <span data-bind="text: fileName" style="display: block;"></span>
                         <!-- /ko -->
+                        &ndash; <span data-bind="text: function(){return $root.createdString($data);}()" style="font-style: italic"></span>
                         &ndash; <span data-bind="text: comment" style="font-style: italic"></span>
                     </span>
                 </div>

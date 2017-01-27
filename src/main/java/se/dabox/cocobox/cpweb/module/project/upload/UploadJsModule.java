@@ -112,6 +112,11 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                             } else {
                                                 uploadBuilder.put("comment", "");
                                             }
+                                            if(json.containsKey("created")) {
+                                                uploadBuilder.put("created", json.get("created"));
+                                            } else {
+                                                uploadBuilder.put("created", "");
+                                            }
                                             final ImmutableMap<String, Object> upload = uploadBuilder.build();
 
                                             if(!uploads.containsKey(cid)) {
