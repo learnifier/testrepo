@@ -48,7 +48,7 @@ ${cpweb_foot}
                 return url;
             };
             this.createdString = function(data){
-                return moment(data.created).format();
+                return moment(data.created).format('LLL');
             };
         }
         var model = new UploadModel();
