@@ -100,11 +100,6 @@ public class UploadJsModule extends AbstractProjectJsModule {
                                             uploadBuilder.put("crl", json.get("crl"));
                                             uploadBuilder.put("uploadId", e.getKey());
                                             uploadBuilder.put("participationId", participant.getParticipationId());
-                                            try {
-                                                uploadBuilder.put("downloadUrl", getContentRepoClient().getDownloadUrl((String) json.get("crl")));
-                                            } catch (NotFoundException | InvalidUriException ex) {
-                                                uploadBuilder.put("downloadUrl", "");
-                                            }
                                             if(json.containsKey("comment")) {
                                                 uploadBuilder.put("comment", json.get("comment"));
                                             } else {

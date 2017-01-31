@@ -141,12 +141,7 @@ ${cpweb_foot}
                           class="glyphicon glyphicon-trash"
                         >
                         </span>
-                        <!-- ko if: downloadUrl -->
                         <a data-bind="attr: { href: function(){return $root.downloadUrl($data);}()}, text: fileName" style="display: block;"></a>
-                        <!-- /ko -->
-                        <!-- ko ifnot: downloadUrl -->
-                        <span data-bind="text: fileName" style="display: block;"></span>
-                        <!-- /ko -->
                         &ndash; <span data-bind="text: function(){return $root.createdString($data);}()" style="font-style: italic"></span>
                         &ndash; <span data-bind="text: comment" style="font-style: italic"></span>
                     </span>
