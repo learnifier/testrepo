@@ -27,7 +27,7 @@ import se.dabox.service.webutils.login.LoginUserAccountHelper;
  *
  * @author Magnus Andersson (magnus.andersson@learnifier.com)
  */
-@WebModuleMountpoint("/projectupload.json")
+@WebModuleMountpoint("/projectupload")
 public class UploadModule extends AbstractProjectWebModule {
 
     private static final Logger LOGGER =
@@ -35,7 +35,7 @@ public class UploadModule extends AbstractProjectWebModule {
 
 
     @WebAction
-    public RequestTarget onDownload(RequestCycle cycle, String strParticipationId, String uploadId) {
+    public RequestTarget onDownloadUpload(RequestCycle cycle, String strParticipationId, String uploadId) {
 
         CocoboxCoordinatorClient ccbc = getCocoboxCordinatorClient(cycle);
         final ProjectParticipation participation = ccbc.getProjectParticipation(Long.valueOf(strParticipationId));
