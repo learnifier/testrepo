@@ -31,7 +31,7 @@ ${cpweb_foot}
 
         fetchTemplate(this.value);
     });
-    
+
     //[#if stickyTemplateId??]
     $(function() {
         fetchTemplate(${stickyTemplateId?c});
@@ -80,7 +80,7 @@ ${cpweb_foot}
             }); //end require
 
             return false;
-        }); //end click        
+        }); //end click
     });
     //[/#if]
 
@@ -112,7 +112,7 @@ ${cpweb_foot}
             ]
             );
         });
-    
+
         $("#emailform").submit(function(event) {
     var body = $('#body');
             if (CKEDITOR.env.isCompatible) {
@@ -155,12 +155,12 @@ ${cpweb_foot}
                 <option value="">No Template</option>
                 <optgroup label="Generic templates">
                     [#list templateLists.stickyList as template]
-                    <option value="${template.id?c}" [@selected template/]>${template.name}</option>
+                    <option value="${template.id?c}" [@selected template/]>${template.name?xhtml}</option>
                     [/#list]
                 </optgroup>
                 <optgroup label="Custom templates">
                     [#list templateLists.unstickyList as template]
-                    <option value="${template.id?c}" [@selected template/]>${template.name}</option>
+                    <option value="${template.id?c}" [@selected template/]>${template.name?xhtml}</option>
                     [/#list]
                 </optgroup>
             </select>
