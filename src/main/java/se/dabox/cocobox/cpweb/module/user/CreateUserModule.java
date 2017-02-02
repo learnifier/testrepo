@@ -108,7 +108,13 @@ public class CreateUserModule extends AbstractWebAuthModule {
         form.setEmail(userAccount.getPrimaryEmail());
         form.setFirstname(userAccount.getGivenName());
         form.setLastname(userAccount.getSurname());
-        form.setLang(CocositeUserHelper.getUserAccountUserLocale(userAccount));
+        Locale userLocale = Locale.ENGLISH;
+        try {
+            userLocale = CocositeUserHelper.getUserAccountUserLocale(userAccount);
+        } catch (IllegalArgumentException illegalArgumentException){
+            //Ignore
+        }
+        form.setLang(userLocale);
         form.setOrganization(userAccount.getOrganizationId());
 
         CharSequence orgRoleName = OrgRoleName.forOrg(org.getId());
